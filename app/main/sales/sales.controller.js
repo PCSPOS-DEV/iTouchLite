@@ -1,12 +1,13 @@
 /**
  * Created by shalitha on 17/5/16.
  */
-
-
 angular.module('itouch.controllers')
-  .controller("SalesCtrl", ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal', 'AuthService', 'CartItemService', 'ControlService', 'ionicDatePicker', 'FunctionsService', '$filter', 'SalesKitService', 'DiscountService', 'BillService', 'ShiftService', '$timeout', 'ControlService', 'PWPService',
-    '$ionicScrollDelegate', 'Alert', function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal, AuthService, CartItemService,
-                                      ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService, $timeout, ControlService, PWPService,  $ionicScrollDelegate, Alert) {
+  .controller("SalesCtrl", ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal',
+      'AuthService', 'CartItemService', 'ControlService', 'ionicDatePicker', 'FunctionsService', '$filter', 'SalesKitService', 'DiscountService', 'BillService', 'ShiftService',
+      'PWPService', '$ionicScrollDelegate', 'Alert',
+      function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal,
+      AuthService, CartItemService, ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService,
+                                               PWPService,  $ionicScrollDelegate, Alert) {
       $scope.currentPage = {};
       $scope.pages = [];
       $scope.keys = [];
@@ -33,23 +34,31 @@ angular.module('itouch.controllers')
       };
       $scope.TakeAway = true;
 
+      console.log('ctrl');
       $scope.$on("$ionicView.beforeEnter", function(event, data){
         // handle event
         loadLayout();
         loadFunctions();
         refresh();
       });
+          // $scope.$on("$ionicParentView.enter", function(event, data){
+          //     console.log('parent.enter');
+          // });
+          //
+          // $scope.$on("$ionicView.enter", function(event, data){
+          //     console.log('enter');
+          // });
 
       var refresh = function(){
         var rec_id = BillService.getCurrentReceiptId();
-        BillService.getHeader(rec_id).then(function(header){
+        return BillService.getHeader(rec_id).then(function(header){
           var promise;
           if(!header){
             promise = BillService.initHeader();
           } else {
             promise = BillService.getHeader();
           }
-          promise.then(function(header){
+          return promise.then(function(header){
             // console.log(header);
             refreshCart();
             $scope.header = header;
@@ -94,7 +103,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating tender modal dialog
        */
-      $ionicModal.fromTemplateUrl('tender/tender.html', {
+      $ionicModal.fromTemplateUrl('main/tender/tender.html', {
         scope: $scope,
         animation: 'slide-in-up',
         backdropClickToClose: false,
@@ -137,7 +146,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating discount modal dialog
        */
-      $ionicModal.fromTemplateUrl('discount/discount.html', {
+      $ionicModal.fromTemplateUrl('main/discount/discount.html', {
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
@@ -155,7 +164,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating reason modal dialog
        */
-      $ionicModal.fromTemplateUrl('refunds/refundModal.html', {
+      $ionicModal.fromTemplateUrl('main/refunds/refundModal.html', {
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
@@ -178,7 +187,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating shift modal dialog
        */
-      $ionicModal.fromTemplateUrl('salesKits/salesKit.html', {
+      $ionicModal.fromTemplateUrl('main/salesKits/salesKit.html', {
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
@@ -225,7 +234,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating shift modal dialog
        */
-      $ionicModal.fromTemplateUrl('login/loginModal.html', {
+      $ionicModal.fromTemplateUrl('main/login/loginModal.html', {
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
@@ -417,7 +426,7 @@ angular.module('itouch.controllers')
                       $scope.pwp.selectedItems = {};
                       $scope.pwp.item = item;
                       $scope.shownModal = 'pwp';
-                      $ionicModal.fromTemplateUrl('pwp/pwp.html', {
+                      $ionicModal.fromTemplateUrl('main/pwp/pwp.html', {
                         scope: $scope,
                         backdropClickToClose: false,
                         animation: 'slide-in-up'
@@ -532,12 +541,14 @@ angular.module('itouch.controllers')
       }
 
       var selectLastItem = function () {
-        var last = $scope.cart.items[Object.keys($scope.cart.items)[Object.keys($scope.cart.items).length-1]];
-        if(last){
-          $scope.selectItem(last);
-        } else {
-          $scope.selectItem(null);
-        }
+          if($scope.cart.items){
+              var last = $scope.cart.items[Object.keys($scope.cart.items)[Object.keys($scope.cart.items).length-1]];
+              if(last){
+                  $scope.selectItem(last);
+              } else {
+                  $scope.selectItem(null);
+              }
+          }
       }
 
       /**
@@ -729,7 +740,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating shift modal dialog
        */
-      $ionicModal.fromTemplateUrl('shift/shiftOptions.html', {
+      $ionicModal.fromTemplateUrl('main/shift/shiftOptions.html', {
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
@@ -753,13 +764,21 @@ angular.module('itouch.controllers')
         }
       });
 
-      $ionicModal.fromTemplateUrl('modifiers/modifierModal.html', {
+      $ionicModal.fromTemplateUrl('main/modifiers/modifierModal.html', {
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
       }).then(function (modal) {
         $scope.modals.modifiers = modal;
       });
+
+
+          loadLayout();
+          loadFunctions();
+          refresh().then(function(){
+              selectLastItem();
+          });
+
 
 
     }]);

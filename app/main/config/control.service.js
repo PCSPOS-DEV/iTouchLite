@@ -95,7 +95,7 @@ angular.module('itouch.services')
       if(self.getBusinessDate() && moment([1950, 1, 1]).diff(self.getBusinessDate())){
         return self.getBusinessDate().add(1, 'days');
       } else {
-        return (self.getDayEndDate().add(1, 'days') || moment());
+        return (self.getDayEndDate() ? self.getDayEndDate().add(1, 'days') : moment());
       }
     }
 

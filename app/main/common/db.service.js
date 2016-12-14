@@ -19,7 +19,7 @@ angular.module('itouch.services')
      */
     self.init = function () {
       if (window.sqlitePlugin) {
-        self.db = window.sqlitePlugin.openDatabase({name: DB_CONFIG.name});    //enables the sqllite plugin for development
+        self.db = window.sqlitePlugin.openDatabase({name: DB_CONFIG.name, location: 'default'});    //enables the sqllite plugin for development
       } else {
         self.db = window.openDatabase(DB_CONFIG.name, '1.0', 'database', -1);     //enables the websql for testing purposes
       }

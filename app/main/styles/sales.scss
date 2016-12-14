@@ -1,5 +1,6 @@
 *, p, a, li, div {
-  font-size: 12px; !important;
+  //font-size: 12px; !important;
+  font-size: 12px;
 }
 
 .btn p {
@@ -86,7 +87,7 @@
   zoom:1; /* For IE 6/7 (trigger hasLayout) */
 }
 
-.sales .content-area .buttons .btn { min-width: 84px;  min-height:84px;}
+.sales .content-area .buttons .btn { min-width: 11.5%;  min-height:84px;}
 
 .sales .button-wrapper { margin-top: -1px; }
 
@@ -171,12 +172,14 @@
 .sales .row.table-body.selected ,
 .sales .row.table-body.sales-kit-item.selected,
 .sales .row.table-body.modifier-item.selected,
-.sales .row.table-body.sales-kit.selected { background-color: rgba(250, 255, 229, 0.83); !important; }
+//.sales .row.table-body.sales-kit.selected { background-color: rgba(250, 255, 229, 0.83); !important; }
+.sales .row.table-body.sales-kit.selected { background-color: rgba(250, 255, 229, 0.83); }
 
 .sales .row.table-body.take-away ,
 .sales .row.table-body.sales-kit-item.take-away,
 .sales .row.table-body.modifier-item.take-away,
-.sales .row.table-body.sales-kit.take-away { color: rgba(153,31,12,1); !important; }
+//.sales .row.table-body.sales-kit.take-away { color: rgba(153,31,12,1); !important; }
+.sales .row.table-body.sales-kit.take-away { color: rgba(153,31,12,1); }
 
 
 .sales .row.table-body.sales-kit{ background-color: rgba(119, 121, 123, 0.83); }
@@ -193,7 +196,7 @@
 
 .sales .functions { padding-left: 10px; margin-top: 74px; }
 .sales .functions .button {
-  width: 120px;
+  width: 48%;
   font-size: 12px;
   height: 46px;
   margin-bottom: 3px;

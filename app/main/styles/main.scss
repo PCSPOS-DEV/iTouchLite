@@ -21,4 +21,35 @@ $ionicons-font-path: "../assets/fonts" !default;
 // Include all of Ionic
 @import "../../bower_components/ionic/scss/ionic";
 
+.spinner svg {
+  width: 28px;
+  height: 28px;
+  stroke: white;
+  fill: #444;
+}
+
+.warning-alert .popup .button{
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+
+.error-alert .popup .button{
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+.wrapper{
+  maring: 0;
+  padding: 0;
+}
+.wrapper>.col{
+  margin: 0;
+}
+
+.text-center{
+  text-align: center;
+}
+
 

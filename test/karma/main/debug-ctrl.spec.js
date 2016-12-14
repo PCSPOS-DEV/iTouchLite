@@ -1,4 +1,4 @@
-'use strict';
+
 
 describe('module: main, controller: DebugCtrl', function () {
 

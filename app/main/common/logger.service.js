@@ -9,7 +9,7 @@ angular.module("itouch.logger", [])
     return {
       init: function () {
         if (window.sqlitePlugin) {
-          db = window.sqlitePlugin.openDatabase({name: 'ITouchLite_debug'});    //enables the sqllite plugin for development
+          db = window.sqlitePlugin.openDatabase({name: 'ITouchLite_debug', location: 'default'});    //enables the sqllite plugin for development
         } else {
           db = window.openDatabase('ITouchLite_debug', '1.0', 'database', -1);     //enables the websql for testing purposes
         }

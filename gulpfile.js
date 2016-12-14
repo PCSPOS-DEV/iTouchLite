@@ -1,4 +1,4 @@
-'use strict';
+
 var gulp = require('gulp');
 var minimist = require('minimist');
 var requireDir = require('require-dir');
@@ -11,9 +11,9 @@ var paths = gulp.paths = {
   dist: 'www',
   jsFiles: ['app/**/*.js', '!app/bower_components/**/*.js'],
   jsonFiles: ['app/**/*.json', '!app/bower_components/**/*.json'],
-  scssFiles: ['app/*/styles/**/*.scss'],
-  cssFiles: ['.tmp/*/styles/*.css'],
-  templates: ['app/*/templates/**/*'],
+  scssFiles: ['app/*/**/*.scss'],
+  cssFiles: ['.tmp/*/**/*.css'],
+  templates: ['app/*/**/*.html'],
   contrib: ['gulpfile.js', 'gulp/**/*.js', 'hooks/**/*.js'],
   karma: ['test/karma/**/*.js'],
   protractor: ['test/protractor/**/*.js']

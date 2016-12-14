@@ -51,7 +51,7 @@ angular.module('itouch.controllers')
     /**
      * Initiating shift modal dialog
      */
-    $ionicModal.fromTemplateUrl('shift/shiftOptions.html', {
+    $ionicModal.fromTemplateUrl('main/shift/shiftOptions.html', {
       scope: $scope,
       backdropClickToClose: false,
       animation: 'slide-in-up'

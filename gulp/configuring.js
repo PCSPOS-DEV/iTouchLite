@@ -1,5 +1,5 @@
 
-'use strict';
+
 // gulp
 var gulp = require('gulp');
 var options = gulp.options;

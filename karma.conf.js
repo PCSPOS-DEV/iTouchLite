@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Wed Jul 01 2015 13:51:22 GMT+0200 (CEST)
 
-'use strict';
+
 
 module.exports = function (config) {
   // retrieve main files from bower

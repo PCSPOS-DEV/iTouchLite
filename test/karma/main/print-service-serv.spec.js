@@ -1,4 +1,4 @@
-'use strict';
+
 
 describe('module: main, service: PrintService', function () {
 

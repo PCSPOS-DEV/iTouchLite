@@ -16,6 +16,14 @@ angular.module('itouch.controllers')
       };
     });
 
+      $scope.$on("$ionicParentView.enter", function(event, data){
+          console.log('parent.enter');
+      });
+
+      $scope.$on("$ionicView.enter", function(event, data){
+          console.log('enter');
+      });
+
     $scope.doLogin = function () {
       if($scope.credentials.username && $scope.credentials.password){
         AuthService.attempt($scope.credentials.username, $scope.credentials.password).then(function () {

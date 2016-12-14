@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-'use strict';
+
 
 // taken from https://github.com/diegonetto/generator-ionic/blob/master/templates/hooks/after_prepare/update_platform_config.js
 

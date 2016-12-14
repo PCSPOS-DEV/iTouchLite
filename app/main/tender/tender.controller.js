@@ -263,7 +263,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating discount modal dialog
        */
-      $ionicModal.fromTemplateUrl('tender.discount/discount.html', {
+      $ionicModal.fromTemplateUrl('main/tender.discount/discount.html', {
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'

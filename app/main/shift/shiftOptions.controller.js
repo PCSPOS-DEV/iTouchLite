@@ -21,7 +21,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating shift modal dialog
        */
-      $ionicModal.fromTemplateUrl('shift/selectShift.html', {
+      $ionicModal.fromTemplateUrl('main/shift/selectShift.html', {
         id: 3,
         scope: $scope,
         backdropClickToClose: false,

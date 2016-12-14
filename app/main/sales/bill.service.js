@@ -334,8 +334,17 @@ angular.module('itouch.services')
         return def.promise;
       }
 
-      self.saveBill = function (billHeader, billDetails, stockTransaction = [], payTransactions = [], payTransactionsOverTender = []) {
+      self.saveBill = function (billHeader, billDetails, stockTransaction, payTransactions, payTransactionsOverTender) {
         var deferred = $q.defer();
+        if(!stockTransaction){
+          stockTransaction = [];
+        }
+        if(!payTransactions){
+          payTransactions = [];
+        }
+        if(!payTransactionsOverTender){
+          payTransactionsOverTender = [];
+        }
 
         stockTransaction = _.map(stockTransaction, function (item) {
           return _.pick(item, stockTransactionColumnList);

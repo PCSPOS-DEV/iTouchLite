@@ -35,7 +35,7 @@
                     <p>{{ print(key, 'KeyDesc', 2) || print(key, 'PageDesc', 2) }}</p>
                     <p>{{ print(key, 'KeyDesc', 3) || print(key, 'PageDesc', 3) }}</p>
                   </div>
-                  <img ng-show="key.ImageName" width="75" src="{{key.ImageName}}" alt=" ">
+                  <img ng-show="key.ImageName" width="75" src="{{'main/assets/'+key.ImageName}}" alt=" ">
                 </div>
               </div>
             </div>

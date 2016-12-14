@@ -34,13 +34,13 @@ angular.module('itouch.services')
       return deferred.promise;
     }
 
-    self.get = function(type = 'F') {
+    self.get = function(type) {
       var deferred = $q.defer();
       var q = "SELECT DISTINCT i.Description1, i.Description1, Modifier, d.ModifierType, i.Plu, m.KeyNo, m.PageNo FROM ModifiersKeyInfo AS m "
         +"INNER JOIN Item AS i ON m.PLU = i.Plu "
         +"INNER JOIN Departments AS d ON d.Id = i.DepartmentId "
         +"WHERE ModifierType = ? AND Modifier = 'true'"
-      DB.query(q, [type]).then(function (result) {
+      DB.query(q, [type||'F']).then(function (result) {
         deferred.resolve(DB.fetchAll(result));
       }, function (err) {
         deferred.reject(err.message);

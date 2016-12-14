@@ -17,7 +17,7 @@ angular.module('itouch.controllers')
 
       var checkQuantities = function(pwp){
         var times = Math.floor(pwp.QtyEntered / pwp.Quantity);
-        console.log(times);
+        // console.log(times);
         pwp.MaxQuantity = pwp.MaxQuantity * times;
         return pwp;
       }
@@ -54,9 +54,9 @@ angular.module('itouch.controllers')
             item.MaxQuantity--;
             $scope.pwp.Qty++;
             // $scope.pwp.MaxQuantity--;
-            $scope.pwp.selectedItems = {
-              [item.SubItemId]: item
-            };
+            $scope.pwp.selectedItems = {};
+            $scope.pwp.selectedItems[item.SubItemId] = item;
+
           });
 
         }
@@ -131,7 +131,7 @@ angular.module('itouch.controllers')
             items[i.SubItemId] = ItemService.getById(i.SubItemId);
           });
           $q.all(items).then(function(data){
-            console.log(data);
+            // console.log(data);
             var promises  = [];
             $scope.pwp.item.ItemId = $scope.pwp.item.Id;
             $scope.pwp.item.ItemType = 'PWP';
@@ -139,7 +139,7 @@ angular.module('itouch.controllers')
             promises.concat(_.map(data, function(item, key){
               var exItem = $scope.pwp.selectedItems[key];
               if(exItem.DiscountId) {
-                console.log(exItem);
+                // console.log(exItem);
                 DiscountService.getDiscountById(exItem.DiscountId).then(function(dis){
                   console.log(dis);
                   // DiscountService.saveTempDiscountItem(item, dis).then(function (item) {
@@ -164,7 +164,7 @@ angular.module('itouch.controllers')
             }));
             console.log(promises);
             $q.all(promises).then(function(data){
-              console.log(data);
+              // console.log(data);
               $scope.$emit('refresh-cart');
               $scope.$emit('pwpModal-close');
             }, function(errors){
