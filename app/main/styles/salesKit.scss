@@ -1,0 +1,90 @@
+.sk, .sk .bar{
+  background-color: rgba(7, 50, 82, 1);
+  color: white;
+  opacity: 1;
+}
+
+.sk .bar .title {
+  color: white;
+}
+
+.sk .sk-item {
+  min-width: 30%;
+  max-width: 30%;
+  margin: 5px;
+  height: auto;
+  font-size: 12px;
+  background-color: rgba(32, 114, 112, 0.83);
+  line-height: 1;
+}
+.sk.modal {
+  top: 10%;
+  right: 10%;
+  bottom: 10%;
+  left: 10%;
+  width: 80%;
+}
+
+.sk .components{ padding-left: 6px; }
+.sk .components .button { background-color: #9B9146; }
+
+.sk .summary .col {
+  padding: 0;
+}
+
+.sk .summary .totals .col {
+  font-size: 18px;
+}
+
+.sk .button-row {
+  margin-top: 3px;
+}
+
+.sk .buttontext {
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
+  text-overflow: ellipsis;
+}
+
+.tender .functions .button {
+  width: 80px;
+  font-size: 12px;
+  height: 46px;
+}
+
+.tender input.total {
+  margin-right: 3px;
+  width: 131px;
+  margin-bottom: 2px;
+  padding-bottom: 0px;
+  text-align: right;
+}
+
+.sk .selected-items{
+  height: 340px;
+}
+
+.sk .operations .button, .footer-buttons .button{
+  border-radius: 4px;
+}
+
+.footer-buttons .button.save { background-color: rgba(19, 57, 192, 1); border: 1px solid white; }
+.footer-buttons .button.cancel { background-color: rgba(153, 27, 19, 1); border: 1px solid white; }
+
+.sk .selected-items .col, .sk .operations .col, .sk .footer-buttons .col{
+  padding: 0 3px;
+}
+
+.sk .row.selected .col { background-color: rgba(250, 255, 229, 1); !important; color: black; }
+
+
+/*.sk .selected-items .selected{*/
+  /*background-color: #faffe5;*/
+  /*color: white;*/
+/*}*/
+
+/*.row .sales-kit-item{*/
+  /*padding-left: 5px;*/
+  /*background-color: rgba(191, 196, 175, 0.83);*/
+/*}*/

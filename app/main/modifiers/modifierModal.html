@@ -1,0 +1,43 @@
+<ion-modal-view class="modifier" ng-controller="ModifierCtrl as ctrl">
+  <ion-header-bar>
+  <button class="button button-icon ion-arrow-left-c" ng-if="ctrl.view == 2" ng-click="ctrl.goBack()"></button>
+  <h1 class="title">{{ctrl.title}}</h1>
+    <button class="button button-clear" ng-click="ctrl.close()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content>
+    <div class="row">
+      <div class="col-80">
+        <div class="row">
+          <div class="col modifier-buttons" ng-if="ctrl.view == 1">
+            <button class="button button-stable " ng-repeat="mod in ctrl.selectedPage" ng-click="ctrl.selectItem(mod)">{{print(mod, 'Description')}}</button>
+          </div>
+          <div class="col modifier-buttons" ng-if="ctrl.view == 2">
+            <button class="button button-stable " ng-repeat="item in ctrl.subPlus" ng-click="ctrl.selectSubPlu(item)">{{print(item, 'Description')}}</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-20 cart">
+        <h3>Details</h3>
+        <div class="row" ng-repeat="item in ctrl.cart">
+          <div class="col">
+            {{ item.SubPluDesc1 && item.SubPluDesc1 != 'N/A' ? print(item, 'SubPluDesc') : ""}} {{print(item, 'Description')}}</div>
+        </div>
+      </div>
+
+    </div>
+  </ion-content>
+  <div class="bar bar-footer">
+    <div class="col-80">
+      <div class="row">
+        <div class="col pages" ng-if="ctrl.view == 1">
+          <button class="button" ng-class="{ selected: page.selected }" ng-repeat="(key, page) in ctrl.pages" ng-click="ctrl.selectPage(page)">{{key}}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col col-20">
+      <button class="save-button button" ng-click="ctrl.save()" ng-disabled="ctrl.cart.length == 0">Save</button>
+    </div>
+  </div>
+</ion-modal-view>

@@ -1,0 +1,18 @@
+.subplu, .subplu .bar{
+  background-color: rgba(7, 50, 82, 0.83);
+  color: white;
+  opacity: 1;
+}
+
+.subplu .bar .title {
+  color: white;
+}
+
+.subplu .plu-item {
+  min-width: 30%;
+  max-width: 30%;
+  margin: 5px;
+  height: auto;
+  font-size: 12px;
+  background-color: rgba(32, 114, 112, 0.83);
+}

@@ -1,0 +1,187 @@
+/**
+ * Created by shalitha on 18/5/16.
+ */
+angular.module('itouch.services')
+  .factory("KeyBoardService", ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
+    var self = this;
+    var pages;
+    var keys;
+
+    self.fetchLayout = function () {
+      var deferred = $q.defer();
+      try {
+        Restangular.one("GetKeyboardLayoutsByMachines").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+          var kBLayouts = JSON.parse(res);
+          if (kBLayouts) {
+            self.saveLayout(kBLayouts);
+            deferred.resolve();
+          } else {
+            deferred.reject('Unknown machine');
+          }
+
+        }, function (err) {
+          console.error(err);
+          deferred.reject('Unable to fetch data from the server');
+        });
+      } catch (ex) {
+        deferred.reject(ex);
+      }
+
+      return deferred.promise;
+    }
+
+    self.fetchPages = function () {
+      var deferred = $q.defer();
+      try {
+        Restangular.one("GetKeyboardPages").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+          var pageSet = JSON.parse(res);
+          if (pageSet && pageSet.length > 0) {
+            self.savePages(pageSet);
+            deferred.resolve(pageSet);
+          } else {
+            deferred.reject('Unknown machine');
+          }
+
+        }, function (err) {
+          console.error(err);
+          deferred.reject('Unable to fetch data from the server');
+        });
+
+        Restangular.one("GetKeyboardPageInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+          var pageInfo = JSON.parse(res);
+          if (pageInfo && pageInfo.length > 0) {
+            pageInfo = _.map(pageInfo, function (pageKey) {
+              if (pageKey && pageKey.ImageName) {
+                if (pageKey.ImageName == 'No file was uploaded.') {
+                  pageKey.ImageName = null;
+                } else {
+                  pageKey.ImageName = "img" + pageKey.ImageName.replace("~", "");
+                }
+              }
+
+              if(pageKey && pageKey.Colour){
+                pageKey.Colour = argbToRGB(pageKey.Colour);
+              }
+              return pageKey;
+            });
+            self.savePageInfo(pageInfo);
+            deferred.resolve();
+          } else {
+            deferred.reject('Unknown machine');
+          }
+
+        }, function (err) {
+          console.error(err);
+          deferred.reject('Unable to fetch data from the server');
+        });
+      } catch (ex) {
+        deferred.reject(ex);
+      }
+
+
+      return deferred.promise;
+    }
+
+    self.fetchKeys = function () {
+      var deferred = $q.defer();
+      try {
+        Restangular.one("GetKayboardKeyInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+          keys = JSON.parse(res);
+          if (keys && keys.length > 0) {
+            keys = _.map(keys, function (key) {
+              if (key && key.ImageName) {
+                if (key.ImageName == 'No file was uploaded.') {
+                  key.ImageName = null;
+                } else {
+                  key.ImageName = "img" + key.ImageName.replace("~", "");
+                }
+              }
+
+              if(key && key.Color){
+                key.Color = argbToRGB(key.Color);
+              }
+              return key;
+            });
+            self.saveKeys(keys);
+            deferred.resolve(keys);
+          } else {
+            deferred.reject('Unable to fetch keys for this machine');
+          }
+
+        }, function (err) {
+          console.error(err);
+          deferred.reject('Unable to fetch data from the server');
+        });
+      } catch (ex) {
+        deferred.reject(ex);
+      }
+
+      return deferred.promise;
+    }
+
+    self.getLayout = function () {
+      var deferred = $q.defer();
+      DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.layouts + " WHERE MachineId = ?", [SettingsService.getMachineId()]).then(function (result) {
+        deferred.resolve(DB.fetch(result));
+      }, function (err) {
+        deferred.reject(err.message);
+      });
+      return deferred.promise;
+    }
+
+    self.getKeys = function (layoutId) {
+      var deferred = $q.defer();
+      DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.keys + " WHERE KeyboardLayoutId = ?", [layoutId]).then(function (result) {
+        keys = DB.fetchAll(result);
+        // deferred.resolve(keys);
+      }, function (err) {
+        deferred.reject(err.message);
+      });
+      DB.query("SELECT * FROM view_keyboard WHERE KeyboardLayoutMasterId = ?", [layoutId]).then(function (data) {
+        keys = keys.concat(DB.fetchAll(data));
+        deferred.resolve(keys);
+      }, function (err) {
+        deferred.reject(err.message);
+        console.log(err);
+      });
+      return deferred.promise;
+    }
+
+    self.getKeysForPage = function (pageId) {
+      return _.where(keys, {KeyboardPageId: pageId});
+    };
+
+    self.getPages = function (layoutId) {
+      var deferred = $q.defer();
+      DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.pages + " WHERE KeyboardLayoutMasterId = ?", [layoutId]).then(function (result) {
+        pages = DB.fetchAll(result);
+        deferred.resolve(pages);
+      }, function (err) {
+        deferred.reject(err.message);
+      });
+      return deferred.promise;
+    }
+
+    self.saveLayout = function (layouts) {
+      DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.layouts, layouts);
+    }
+
+    self.savePages = function (pages) {
+      DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.pages, pages);
+    }
+
+    self.savePageInfo = function (pageInfo) {
+      DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.pageInfo, pageInfo);
+    }
+
+    self.saveKeys = function (keys) {
+      DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.keys, keys);
+    }
+
+    var argbToRGB = function (color) {
+      return color ? '#' + ('000000' + (color & 0xFFFFFF).toString(16)).slice(-6) : "";
+    }
+
+
+    return self;
+  }]);

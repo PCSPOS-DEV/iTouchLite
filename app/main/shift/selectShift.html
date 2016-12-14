@@ -1,0 +1,37 @@
+<ion-modal-view class="shift" ng-controller="ShiftCtrl">
+  <ion-header-bar>
+    <button class="button button-icon ion-arrow-left-c" ng-if="!shiftSelectionShown" ng-click="goBack()"></button>
+    <h1 class="title">{{title}}</h1>
+    <button class="button button-clear" ng-click="close()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content class="padding">
+    <div class="shift" ng-if="shiftSelectionShown">
+      <ul class="list">
+        <li class="item" ng-repeat="shift in shifts" ng-click="selectShift(shift)">
+          {{shift.Description1}} - {{shift.Description2}}
+        </li>
+      </ul>
+    </div>
+    <div class="float" ng-if="!shiftSelectionShown">
+      <div class="list list-inset">
+        <div class="item">
+          Float Value
+        </div>
+        <label class="item item-input">
+          <input type="text" placeholder="Float Value" ng-model="shift.RA" ng-disabled="shift.RANoAdj == 'true'">
+        </label>
+      </div>
+      <div class="row">
+        <div class="col col-33 col-offset-34">
+          <a href="" class="button button-block button-positive" ng-click="save()">Save</a>
+        </div>
+      </div>
+    </div>
+    <div class="no-data" ng-if="shifts.length == 0">
+      <!--<p>-->
+        <i class="icon ion-android-warning"></i>
+      <!--</p>-->
+      <p>No records found</p>
+    </div>
+  </ion-content>
+</ion-modal-view>

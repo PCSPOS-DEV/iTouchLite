@@ -1,0 +1,58 @@
+.discount, .discount ion-header-bar{
+  background-color: rgba(7, 50, 82, 1);
+  color: white;
+  opacity: 1;
+}
+
+.discount ion-header-bar .title {
+  color: white;
+}
+
+.discount .item {
+  background-color: rgba(7, 50, 82, 1);
+  color: white;
+}
+
+
+.discount .btn { min-width: 19%; padding-top: 15px; padding-bottom: 15px; height: auto; }
+
+.discount.modal {
+  top: 20%;
+  right: 20%;
+  bottom: 20%;
+  left: 20%;
+  width: 60%;
+}
+
+.discount .summary .col {
+  padding: 0;
+}
+
+.discount .summary .totals .col {
+  font-size: 18px;
+}
+
+.discount .button-row {
+  margin-top: 3px;
+}
+
+.discount .buttontext {
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
+  text-overflow: ellipsis;
+}
+
+.discount .functions .button {
+  width: 80px;
+  font-size: 12px;
+  height: 46px;
+}
+
+.discount input.total {
+  margin-right: 3px;
+  width: 131px;
+  margin-bottom: 2px;
+  padding-bottom: 0px;
+  text-align: right;
+}

@@ -1,0 +1,141 @@
+<ion-view view-title="iSeries NX Lite" class="sales">
+  <ion-content scroll="false">
+    <div class="row wrapper main-wrapper">
+      <div class="col content-area">
+        <div class="cart-area">
+          <div class="row cart">
+            <div class="table">
+              <div class="row table-header">
+                <div class="col col-50">Description</div>
+                <div class="col">Qty</div>
+                <div class="col">Price</div>
+                <div class="col">Discount</div>
+                <div class="col">Total</div>
+              </div>
+              <ion-scroll zooming="false" direction="y" style="height: 253px">
+                <div class="row table-body" ng-repeat="item in cart.items | orderObjectBy :'LineNumber' track by $index"
+                     ng-class="{ selected: item.selected, 'sales-kit': item.ItemType == 'SKT', 'sales-kit-item': item.ParentItemLineNumber != 0, 'modifier-item': item.ItemType == 'MOD', 'take-away': item.TakeAway == 'true' }"
+                     ng-click="selectItem(item)">
+                  <div class="col col-50">{{print(item, 'Desc')}}</div>
+                  <div class="col">{{item.Qty}}</div>
+                  <div class="col">{{item.OrgPrice.roundTo(2).toFixed(2)}}</div>
+                  <div class="col">{{item.Discount.roundTo(2).toFixed(2)}}</div>
+                  <div class="col">{{item.Total.roundTo(2).toFixed(2)}}</div>
+                </div>
+              </ion-scroll>
+            </div>
+          </div>
+          <div class="row wrapper button-wrapper">
+            <div class="col buttons clearfix">
+              <div class="clearfix">
+                <div class="btn" ng-repeat="k in range" ng-init="key = keys[k]"
+                     ng-style="{'background-color': key.Color }" ng-click="onKeyClick(key)">
+                  <div ng-hide="key.ImageName">
+                    <p class="desc1">{{ print(key, 'KeyDesc', 1) || print(key, 'PageDesc', 1) }}</p>
+                    <p>{{ print(key, 'KeyDesc', 2) || print(key, 'PageDesc', 2) }}</p>
+                    <p>{{ print(key, 'KeyDesc', 3) || print(key, 'PageDesc', 3) }}</p>
+                  </div>
+                  <img ng-show="key.ImageName" width="75" src="{{key.ImageName}}" alt=" ">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col button-area">
+        <div class="summery">
+          <!--<h3 class="title">Summary</h3>-->
+          <div class="row sblock top">
+            <div class="col label">Sub Total</div>
+            <div class="col value">{{cart.summery.SubTotal.roundTo(2).toFixed(2)}}</div>
+          </div>
+          <div class="row sblock">
+            <div class="col label">Tax</div>
+            <div class="col value">{{cart.summery.Tax.roundTo(2).toFixed(2)}}</div>
+          </div>
+          <div class="row sblock">
+            <div class="col label">Discount</div>
+            <div class="col value">{{cart.summery.Discount.roundTo(2).toFixed(2)}}</div>
+          </div>
+          <div class="row sblock">
+            <div class="col label">Count</div>
+            <div class="col value">{{cart.summery.Count}}</div>
+          </div>
+          <div class="row sblock">
+            <div class="col total label">Total</div>
+            <div class="col total value">{{cart.summery.Total.roundTo(2).toFixed(2)}}</div>
+          </div>
+        </div>
+        <div class="quantity">
+          <div class="list list-inset">
+            <label class="item item-input">
+              <span class="input-label">Quantity</span>
+              <input type="number" ng-model="qty.value">
+            </label>
+          </div>
+        </div>
+        <div class="functions">
+          <div class="row wrapper">
+            <div class="col">
+              <ion-scroll zooming="false" direction="y" id="functions-bottom">
+                  <a href="" class="button" ng-repeat="fn in functions" ng-click="invoke(fn)"
+                     ng-class="{ 'button-balanced': (fn.Name == 'FullTakeaway' && TakeAway) || (fn.Name == 'PartialTakeaway' && cart.selectedItem.TakeAway == 'true') }"
+                  >{{ print(fn, 'Description')}}</a>
+              </ion-scroll>
+            </div>
+          </div>
+        </div>
+        </div>
+
+    </div>
+
+    </div>
+
+
+  </ion-content>
+
+  <div class="bar bar-footer">
+    <div class="col page-bar row pages">
+      <div class="">
+        <ion-scroll direction="x">
+          <div class="button-bar">
+          <a class="button  button-positive" ng-click="changePage(page, $index)"
+             ng-class="{'button-balanced': page.selected, 'button-positive': !page.selected}" ng-repeat="page in pages">
+            <p class="desc1">{{ print(page, "Description") }}</p>
+          </a>
+            </div>
+
+        </ion-scroll>
+      </div>
+    </div>
+    <div class="col">
+      <a class="button button-full button-calm tender-button" ng-click="openTenderForm()">
+        <p class="desc1">Tender</p>
+      </a>
+    </div>
+  </div>
+</ion-view>
+
+<script id="subPLU.html" type="text/ng-template">
+  <ion-modal-view class="subplu">
+    <ion-header-bar>
+      <h1 class="title">{{modalData.title}}</h1>
+      <button class="button button-clear" ng-click="closeSubPLUModal()"> <i class="ion-close-round"></i></button>
+    </ion-header-bar>
+    <ion-content>
+      <div class="row">
+        <div class="col list">
+          <a ng-repeat="subPLU in SubPLUList" href="" class="button button-calm plu-item"
+             ng-click="onSubPLUClick(subPLU)">{{ print(subPLU, "Description") }}</a>
+        </div>
+      </div>
+    </ion-content>
+    <!--<ion-footer-bar class="bar-stable">-->
+      <!--<div class="h1 title"></div>-->
+      <!--<div class="buttons" ng-click="modalClose()">-->
+        <!--<button class="button button-energized button-outline">Cancel</button>-->
+      <!--</div>-->
+    <!--</ion-footer-bar>-->
+  </ion-modal-view>
+</script>

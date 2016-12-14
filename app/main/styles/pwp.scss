@@ -1,0 +1,93 @@
+.pwp, .pwp .bar{
+  background-color: rgba(7, 50, 82, 1);
+  color: white;
+  opacity: 1;
+}
+
+.pwp .bar .title {
+  color: white;
+}
+.pwp ion-content {
+  margin-top: 20px;
+}
+
+.pwp .pwp-item {
+  min-width: 30%;
+  max-width: 30%;
+  margin: 5px;
+  height: auto;
+  font-size: 12px;
+  background-color: rgba(32, 114, 112, 0.83);
+  line-height: 1;
+}
+.pwp.modal {
+  top: 10%;
+  right: 10%;
+  bottom: 10%;
+  left: 10%;
+  width: 80%;
+}
+
+.pwp .components{ padding-left: 6px; }
+.pwp .components .button { background-color: #9B9146; }
+
+.pwp .summary .col {
+  padding: 0;
+}
+
+.pwp .summary .totals .col {
+  font-size: 18px;
+}
+
+.pwp .button-row {
+  margin-top: 3px;
+}
+
+.pwp .buttontext {
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
+  text-overflow: ellipsis;
+}
+
+.tender .functions .button {
+  width: 80px;
+  font-size: 12px;
+  height: 46px;
+}
+
+.tender input.total {
+  margin-right: 3px;
+  width: 131px;
+  margin-bottom: 2px;
+  padding-bottom: 0px;
+  text-align: right;
+}
+
+.pwp .selected-items{
+  height: 190px;
+}
+
+.pwp .operations .button, .footer-buttons .button{
+  border-radius: 4px;
+}
+
+.footer-buttons .button.save { background-color: rgba(19, 57, 192, 1); border: 1px solid white; }
+.footer-buttons .button.cancel { background-color: rgba(153, 27, 19, 1); border: 1px solid white; }
+
+.pwp .selected-items .col, .pwp .operations .col, .pwp .footer-buttons .col{
+  padding: 0 3px;
+}
+
+.pwp .row.selected .col { background-color: rgba(250, 255, 229, 1); !important; color: black; }
+
+
+/*.pwp .selected-items .selected{*/
+  /*background-color: #faffe5;*/
+  /*color: white;*/
+/*}*/
+
+/*.row .sales-kit-item{*/
+  /*padding-left: 5px;*/
+  /*background-color: rgba(191, 196, 175, 0.83);*/
+/*}*/

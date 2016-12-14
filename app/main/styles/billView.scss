@@ -1,0 +1,31 @@
+.billView .form { margin-top: 20px; }
+.billView, .billView .bar{
+  border-color: #111;
+  background-color: #444444;
+}
+.billView, .billView .bar h1{
+  color: #fff;
+
+}
+
+.billView ion-content{
+  background-color: white;
+  color: black;
+}
+
+.billView {
+  top: 10%;
+  right: 30%;
+  bottom: 10%;
+  left: 29%;
+  min-height: 240px;
+  width: 40%;
+  height: 80%;
+}
+
+.billView p{ margin: 0;}
+
+.billView .logo {
+  margin: 0 auto;
+  display: block;
+}

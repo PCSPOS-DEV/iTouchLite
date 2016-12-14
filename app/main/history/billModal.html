@@ -1,0 +1,51 @@
+<ion-modal-view class="billView" ng-controller="BillViewCtrl">
+  <ion-header-bar>
+  <!--<button class="button button-icon ion-arrow-left-c" ng-if="!shiftSelectionShown" ng-click="goBack()"></button>-->
+  <h1 class="title">{{bill.header.DocNo}}</h1>
+    <button class="button button-icon ion-close-round button-small" ng-click="close()"></button>
+  </ion-header-bar>
+  <ion-content>
+    <div class="row header">
+      <div class="col">
+        <img src="img/dummy.png" alt="" class="logo" width="100">
+      </div>
+      </div>
+    <div class="row header">
+      <div class="col ">
+        <p class="text-center" ng-repeat="item in settings.Header">{{item.Text}}</p>
+      </div>
+    </div>
+    <div class="row body">
+      <div class="col">
+        <div class="row" ng-repeat="item in bill.items">
+          <civ class="col-10">{{item.Qty}}</civ>
+          <civ class="col-80">{{print(item,'Desc')}}</civ>
+          <civ class="col-10 text-right">$ {{item.Total.toFixed(2)}}</civ>
+        </div>
+      </div>
+    </div>
+    <div class="row body">
+      <div class="col">
+        <div class="row">
+          <div class="col-80">SUBTOTAL</div>
+          <div class="col-20 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
+        </div>
+        <div class="row">
+          <div class="col-80">TOTAL</div>
+          <div class="col-20 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
+        </div>
+        <div class="row" ng-repeat="item in bill.transactions">
+          <!--{{item.PayTypeId}}-->
+          <div class="col-80">{{print(item, 'Description').toUpperCase() || 'ROUNDED'}}</div>
+          <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
+          <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="row footer">
+      <div class="col">
+        <p class="text-center" ng-repeat="item in settings.Footer">{{item.Text}}</p>
+      </div>
+    </div>
+  </ion-content>
+</ion-modal-view>

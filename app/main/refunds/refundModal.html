@@ -1,0 +1,25 @@
+<ion-modal-view class="refund" ng-controller="RefundCtrl">
+  <ion-header-bar>
+  <!--<button class="button button-icon ion-arrow-left-c" ng-if="!shiftSelectionShown" ng-click="goBack()"></button>-->
+  <h1 class="title">Refund</h1>
+    <button class="button button-clear" ng-click="close()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content>
+    <div class="form list col col-80 col-offset-10">
+      <label class="item item-input item-select">
+        <span class="input-label">Reason</span>
+        <select placeholder="Reason" ng-options="r as r.Description1 for r in reasons" ng-model="refund.reason"></select>
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Reference</span>
+        <textarea placeholder="" ng-model="refund.reference"></textarea>
+      </label>
+    </div>
+    <div class="row">
+      <div class="col col-25 col-offset-66">
+        <button class="button save-button" ng-click="save()">Save</button>
+        <button class="button cancel-button" ng-click="clear()">Clear</button>
+      </div>
+    </div>
+  </ion-content>
+</ion-modal-view>

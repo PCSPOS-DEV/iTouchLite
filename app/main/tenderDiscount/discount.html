@@ -1,0 +1,37 @@
+<ion-modal-view class="discount" ng-controller="TenderDiscountCtrl">
+  <ion-header-bar>
+    <h1 class="title">Discounts</h1>
+    <button class="button button-clear" ng-click="close()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content>
+    <ion-item class="menu-tabs tabs tabs-secondary tabs-icon-top">
+      <a class="tab-item" ng-click="setType(1)" ng-class="{'active': discounts === 'bookmarks'}">
+        <i class="icon" ng-class="type === 2 ? 'ion-calculator' : 'ion-calculator'">
+        </i> Amounts
+      </a>
+      <a class="tab-item" ng-click="setType(2)" ng-class="{'active': discounts === 'friends'}">
+        <i class="icon" ng-class="type === 1 ? 'ion-steam' : 'ion-steam'">
+        </i> Percentages
+      </a>
+    </ion-item>
+    <div class="list">
+
+      <div class="item item-divider">
+        {{title}}
+      </div>
+
+      <a class="item" ng-click="selectDiscount(discount)" ng-repeat="discount in discounts">
+        {{print(discount, 'Description')}}
+      </a>
+
+    </div>
+
+  </ion-content>
+  <!--<ion-footer-bar class="bar-stable">-->
+    <!--<div class="h1 title"></div>-->
+    <!--<div class="buttons">-->
+      <!--<button class="button button-primary button-outline" ng-click="save()">Save</button>-->
+      <!--<button class="button button-energized button-outline" ng-click="modalClose()">Cancel</button>-->
+    <!--</div>-->
+  <!--</ion-footer-bar>-->
+</ion-modal-view>

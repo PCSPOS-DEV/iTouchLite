@@ -1,0 +1,72 @@
+.modifier .form { margin-top: 20px; }
+.modifier, .modifier .bar{
+  background-color: rgba(7, 50, 82, 1);
+  color: white;
+  opacity: 1;
+}
+
+.modifier .bar .title {
+  color: white;
+}
+
+.modifier .modifier-buttons .button {
+  height: auto;
+  font-size: 12px;
+  width: 24%;
+  margin: 5px 5px 0 0;
+}
+
+
+
+.modifier .button.save-button{
+  background-color: rgba(32, 114, 112, 0.83);
+}
+
+.modifier.button.cancel-button{
+  background-color: rgba(115, 27, 19, 0.83);
+}
+
+.modifier {
+  top: 15%;
+  right: 10%;
+  bottom: 15%;
+  left: 10%;
+  min-height: 300px;
+  width: 80%;
+}
+
+.modifier div.bar-footer { height: 60px; }
+
+.modifier div.bar-footer div {
+  padding: 0;
+  height: 100%;
+}
+
+.modifier .pages button {
+  width: 80px;
+  margin-left: 0;
+  border-radius: 0;
+  border-left: 1px solid #0d3349;
+  background-color: #387ef5;
+  color: #fff;
+  min-height: 100%;
+}
+
+.modifier .pages button.selected {
+  background-color: #33cd5f;
+}
+
+.modifier .cart h3 {
+  text-align: center;
+  color: white;
+  font-size: 1.2em;
+  border-bottom: 1px solid white;
+}
+
+.modifier .save-button {
+  min-width: 100%;
+  border-radius: 0;
+  min-height: 100%;
+  background-color: #11c1f3;
+  color: white;
+}
