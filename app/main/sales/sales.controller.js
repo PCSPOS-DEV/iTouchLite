@@ -34,7 +34,6 @@ angular.module('itouch.controllers')
       };
       $scope.TakeAway = false;
 
-      console.log('ctrl');
       $scope.$on("$ionicView.beforeEnter", function(event, data){
         // handle event
         loadLayout();
@@ -71,10 +70,6 @@ angular.module('itouch.controllers')
        */
       var loadFunctions = function () {
         FunctionsService.getSalesFunctions().then(function (fns) {
-          // $scope.functions = {
-          //   top: _.where(fns, {DisplayOnTop: "true"}),
-          //   bottom: _.where(fns, {DisplayOnTop: "false"})
-          // }
           $scope.functions = fns;
         });
       }
@@ -293,16 +288,6 @@ angular.module('itouch.controllers')
         };
         // loadLayout();
 
-      /**
-       * This is called once ionic finishes loading. Cordova plugin related operations should be done inside this.
-       */
-      // ionic.Platform.ready(function () {
-      //   loadLayout().then(function () {
-      //   }, function (err) {
-      //     console.error(err);
-      //   });
-      // });
-
       var errHandler = function (err) {
         console.log(err.message);
       }
@@ -339,18 +324,6 @@ angular.module('itouch.controllers')
         $scope.range = _.range((32 * $index) + 1, (32 * $index) + 33);
 
       }
-
-      // $scope.$on("$ionicView.afterEnter", function(event, data){
-      //   // handle event
-      //
-      //   if(!ShiftService.getCurrent()){
-      //     $scope.shiftModal.show();
-      //   }
-      //   if(!businessDate){
-      //     $scope.openDatePicker();
-      //   }
-      // });
-
 
       /**
        * Manages the sales item click event
@@ -545,9 +518,9 @@ angular.module('itouch.controllers')
           if($scope.cart.items){
               var last = $scope.cart.items[Object.keys($scope.cart.items)[Object.keys($scope.cart.items).length-1]];
               if(last){
-                  $scope.selectItem(last);
+                $scope.selectItem(last);
               } else {
-                  $scope.selectItem(null);
+                $scope.selectItem(null);
               }
           }
       }
