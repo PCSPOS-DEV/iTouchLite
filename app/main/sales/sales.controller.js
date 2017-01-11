@@ -32,7 +32,7 @@ angular.module('itouch.controllers')
       $scope.modals = {
         modifiers: null
       };
-      $scope.TakeAway = true;
+      $scope.TakeAway = false;
 
       console.log('ctrl');
       $scope.$on("$ionicView.beforeEnter", function(event, data){
