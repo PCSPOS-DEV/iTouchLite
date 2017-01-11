@@ -438,6 +438,7 @@ angular.module('itouch.controllers')
                     } else {
                       CartItemService.addItemToCart(item).then(function (it) {
                        refreshCart().then(function () {
+                          $scope.qty.value = 1;
                           selectLastItem();
                         })
                       });
