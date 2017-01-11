@@ -52,4 +52,17 @@ $ionicons-font-path: "../assets/fonts" !default;
   text-align: center;
 }
 
+.modal {
+  background-color: rgba(7, 50, 82, 1);
+  color: white;
+}
 
+.modal .bar{
+  background-color: rgba(7, 50, 82, 1);
+}
+
+.modal .bar {
+  .title, .button{
+    color: white;
+  }
+}
