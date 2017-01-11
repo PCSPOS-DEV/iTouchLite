@@ -34,7 +34,16 @@ angular.module('itouch.services')
     });
   }
 
-  this.showConfirm = function(message, title){
+    this.error = function (message, title) {
+        return $ionicPopup.alert({
+            // cssClass: cssClass || null,
+            title: title || 'Error',
+            template: message
+        });
+    }
+
+
+    this.showConfirm = function(message, title){
     return $ionicPopup.confirm({
       title: title,
       template: message
