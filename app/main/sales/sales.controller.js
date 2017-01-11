@@ -598,10 +598,36 @@ angular.module('itouch.controllers')
         },
         Discount: function (fn) {
           var item = $scope.cart.selectedItem;
-          if (item && item.ItemType == 'NOR' && item.ItemType == 'SKT' && DiscountService.checkItemEligibility(item)) {
-            if(authorityCheck(fn)) {
-              $scope.discountModal.show();
+          var condition = true;
+          var errors = [];
+          if(!item){
+            errors.push("No item selected");
+            condition = false;
+          } else {
+            if(!item){
+              errors.push("No item selected");
+              condition = false;
             }
+            if(item.ItemType != 'NOR' && item.ItemType != 'SKT'){
+              errors.push("Not an eligible item type");
+              condition = false;
+            }
+            if(!DiscountService.checkItemEligibility(item)){
+              errors.push("Not an eligible item");
+              condition = false;
+            }
+
+            if(!authorityCheck(fn)){
+              errors.push("Not authorized");
+              condition = false;
+            }
+          }
+
+
+          if (condition) {
+            $scope.discountModal.show();
+          } else {
+            Alert.error(errors.join(" | "));
           }
 
         },
