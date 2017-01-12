@@ -127,7 +127,7 @@ angular.module('itouch.services')
 
         return BillService.findItems(item.ItemId, item.ItemType, item.parentItemLineNumber).then(function (items) {
           var ndItem = getItem(items);
-          if (ndItem && !salesKit) {
+          if (ndItem && !salesKit && ndItem.TakeAway == 'false') {
             if(item.customQuantity){
               ndItem.Qty += item.customQuantity;
             } else {
@@ -216,12 +216,18 @@ angular.module('itouch.services')
       var counter = 1;
       self.setItem = function (id, type, item, lineNumber, refunded, parentItemLineNumber) {
         if (id && type && item) {
+          var label = "";
           if(refunded){
-            refunded = "REFUND-";
-          } else {
-            refunded = "";
+            label += "REFUND-";
           }
-          var label = refunded + id + type;
+
+          if(item.TakeAway == 'true'){
+            label += 'TA-';
+            label += counter++;
+          }
+
+          label += id + type;
+
           if (lineNumber) {
             label += lineNumber;
           }

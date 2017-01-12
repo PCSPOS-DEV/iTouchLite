@@ -390,6 +390,9 @@ angular.module('itouch.controllers')
                   if(customeQty > 1){
                     item.customQuantity = customeQty;
                   }
+                  if($scope.TakeAway){
+                    item.TakeAway = true;
+                  }
                   PWPService.getPWP(item.Id).then(function(pwp){
                     if(pwp && ( (item.Qty >= pwp.Quantity) || item.customQuantity >= pwp.Quantity)){
                       $scope.pwp = {};
