@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q',
-    function ($scope, PrinterSettings, HistoryService, $q) {
+  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept',
+    function ($scope, PrinterSettings, HistoryService, $q, Reciept) {
       $scope.settings = {};
       $scope.bill = {
         header: null,
@@ -34,6 +34,13 @@ angular.module('itouch.controllers')
           console.log(ex);
         });
       };
+
+      $scope.printReciept = function(DocNo){
+        if(DocNo){
+          console.log(DocNo);
+          Reciept.print(DocNo);
+        }
+      }
 
 
     }]);

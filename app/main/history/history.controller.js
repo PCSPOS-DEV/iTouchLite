@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('HistoryCtrl', ['$scope', 'HistoryService', 'BillService', 'CartItemService', 'PrinterSettings', '$ionicModal',
-    function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal) {
+  .controller('HistoryCtrl', ['$scope', 'HistoryService', 'BillService', 'CartItemService', 'PrinterSettings', '$ionicModal', 'Reciept',
+    function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept) {
       $scope.items = [];
       $scope.selectedItem = null;
       $scope.search = "";
@@ -40,6 +40,5 @@ angular.module('itouch.controllers')
         $scope.selectedItem = item;
         $scope.modal.show();
       }
-
 
     }]);

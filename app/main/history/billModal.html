@@ -1,6 +1,6 @@
 <ion-modal-view class="billView" ng-controller="BillViewCtrl">
   <ion-header-bar>
-  <!--<button class="button button-icon ion-arrow-left-c" ng-if="!shiftSelectionShown" ng-click="goBack()"></button>-->
+  <button class="button button-icon ion-printer" ng-if="!shiftSelectionShown" ng-click="printReciept(bill.header.DocNo)"></button>
   <h1 class="title">{{bill.header.DocNo}}</h1>
     <button class="button button-icon ion-close-round button-small" ng-click="close()"></button>
   </ion-header-bar>
