@@ -43,7 +43,7 @@ angular.module('itouch.services')
     PrintService.addHLine();
 
     angular.forEach(data.items, function(row){
-      PrintService.addLine(row.Desc1, "$"+(row.Total.toFixed(2)), ""+row.Qty);
+      PrintService.addLine(row.Desc1, "$"+(row.SubTotal.toFixed(2)), ""+row.Qty);
       if(row.discounts){
         angular.forEach(row.discounts, function(discount){
           PrintService.addTabbedLine(discount.Description1, "-$"+(discount.DiscountAmount ? discount.DiscountAmount.toFixed(2) : 0))
@@ -53,11 +53,11 @@ angular.module('itouch.services')
 
     PrintService.addHLine();
 
-    PrintService.addLine('SUBTOTAL', "$"+(data.header.SubTotal.toFixed(2)));
+    PrintService.addLine('SUBTOTAL', "$"+(data.header.Total.toFixed(2)));
     PrintService.addLine('TOTAL', "$"+(data.header.Total.toFixed(2)));
     angular.forEach(data.transactions, function(row){
       console.log(row);
-      PrintService.addLine(row.Description1, "$"+(row.Amount.toFixed(2)));
+      PrintService.addLine(row.Description1 || 'ROUNDED', "$"+(row.Amount.toFixed(2)));
     });
     printer.addText('\n');
   }
@@ -101,6 +101,7 @@ angular.module('itouch.services')
     return DB.query("SELECT *  FROM " + DB_CONFIG.tableNames.bill.header + " WHERE DocNo = ?", [DocNo]).then(function (res) {
       var item = DB.fetch(res);
       item = ItemService.calculateTotal(item);
+      // item.SubTotal = item.SubTotal + item.Tax;
       return item;
     });
   }
@@ -117,6 +118,7 @@ angular.module('itouch.services')
           var exItem = items[""+item.LineNumber+item.ItemId];
           if(!exItem){
             item = ItemService.calculateTotal(item);
+            item.SubTotal = item.SubTotal + item.Tax;
             item.discounts = [];
             if(item.DiscountAmount){
               item.discounts.push(_.pick(item, [ 'DiscountAmount', 'Description1', 'Description2' ]));
