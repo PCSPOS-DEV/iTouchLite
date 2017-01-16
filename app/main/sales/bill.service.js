@@ -25,6 +25,13 @@ angular.module('itouch.services')
         'Tax2Option', 'Tax3Option', 'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'NoDiscount',
         'ByAmount', 'CurCode', 'BuyRate', 'ReasonId', 'RefCode', 'Remark', 'MultiDiscount', 'PriceChanged', 'Taxable', 'BelowCost', 'Comm', 'Desc1', 'Desc2', 'Selectable', 'parentItemLineNumber'];
 
+      var headerColumnList = ['BusinessDate','LocationId', 'MachineId', 'DocNo', 'DocType', 'SysDateTime', 'VoidDocNo', 'TableId',
+        'SuspendDepDocNo', 'OrderedBy', 'SpecialOrderRemark', 'ServingTime', 'TakeAway', 'ItemType', 'ParentItemLineNumber', 'PromoPwpId',
+        'Pax', 'ShiftId', 'VipId', 'CashierId', 'StaffId', 'AuthBy', 'SubTotal', 'DepAmount', 'DiscAmount', 'Tax1DiscAmount',
+        'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount', 'Tax1Amount','Tax2Amount','Tax3Amount','Tax4Amount','Tax5Amount','Tax1Option',
+        'Tax2Option', 'Tax3Option', 'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'ReprintCount',
+        'Remarks', 'OrderTag', 'IsExported', 'IsClosed'];
+
 
       self.generateReceiptId = function () {
         return ControlService.getNextDocId();
@@ -367,7 +374,9 @@ angular.module('itouch.services')
             return item;
           });
           DB.clearQueue();
-          DB.addInsertToQueue(DB_CONFIG.tableNames.bill.header, bill.header);
+          billHeader.IsExported = true;
+          billHeader.IsClosed = true;
+          DB.addInsertToQueue(DB_CONFIG.tableNames.bill.header, _.pick(billHeader, headerColumnList));
           DB.addInsertToQueue(DB_CONFIG.tableNames.bill.detail, bill.items);
           DB.addInsertToQueue(DB_CONFIG.tableNames.bill.stockTransactions, stockTransaction);
           DB.addInsertToQueue(DB_CONFIG.tableNames.bill.payTransactions, payTransactions);
