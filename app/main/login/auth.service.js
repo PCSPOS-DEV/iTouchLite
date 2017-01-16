@@ -2,17 +2,18 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module("itouch.services")
-  .factory("AuthService", ['Restangular', 'DB', '$q', '$ionicPlatform', 'SettingsService', '$localStorage', '$state', 'DB_CONFIG', '$log', function (Restangular, DB, $q, $ionicPlatform, SettingsService, $localStorage, $state, DB_CONFIG, $log) {
+  .factory("AuthService", ['Restangular', 'DB', '$q', '$ionicPlatform', 'SettingsService', '$localStorage', '$state', 'DB_CONFIG', '$log',
+    function (Restangular, DB, $q, $ionicPlatform, SettingsService, $localStorage, $state, DB_CONFIG, $log) {
     var self = this;
     var users = [];
     var tempUser = null;
 
     self.fetchUsers = function () {
-      var deferred = $q.defer();
-      var locationId = SettingsService.getLocationId();
-      if(locationId){
-        Restangular.one("GetStaffByLocations").get({LocationId: locationId}).then(function (res) {
-          $log.log('users fetch done');
+        var deferred = $q.defer();
+        var locationId = SettingsService.getLocationId();
+        if(locationId){
+          Restangular.one("GetStaffByLocations").get({LocationId: locationId}).then(function (res) {
+            $log.log('users fetch done');
             users = JSON.parse(res);
             users = _.map(users, function (user, key) {
               user.Password = user.EncPass;
@@ -20,15 +21,15 @@ angular.module("itouch.services")
             });
             DB.addInsertToQueue(DB_CONFIG.tableNames.auth.staff, users);
             deferred.resolve();
-        }, function (err) {
-          deferred.reject('Could fetch data from the server');
-          console.error(err);
-        });
-      } else {
-        deferred.reject('Location ID is not available');
+          }, function (err) {
+            deferred.reject('Could fetch data from the server');
+            console.error(err);
+          });
+        } else {
+          deferred.reject('Location ID is not available');
+        }
+        return deferred.promise;
       }
-      return deferred.promise;
-    }
 
     self.attempt = function (username, password, temp) {
       var deferred = $q.defer();
