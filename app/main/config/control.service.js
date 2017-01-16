@@ -71,8 +71,6 @@ angular.module('itouch.services')
      * @param date
        */
     self.setBusinessDate = function (moment) {
-      console.log("bd set");
-      console.log(moment);
       $localStorage.app_config.businessDate = moment.valueOf();
     }
 

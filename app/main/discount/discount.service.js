@@ -62,15 +62,19 @@ angular.module('itouch.services')
           Restangular.one("GetDiscountsByLocations").get({LocationId: SettingsService.getLocationId()}).then(function (res) {
             try {
               var items = JSON.parse(res);
+              if (items) {
+                self.saveDiscounts(items);
+
+                console.log('discounts');
+                console.log(items);
+                deferred.resolve();
+              } else {
+                deferred.reject('Unknown machine');
+              }
             } catch (ex) {
               deferred.reject("No results");
             }
-            if (items) {
-              self.saveDiscounts(items);
-              deferred.resolve();
-            } else {
-              deferred.reject('Unknown machine');
-            }
+
           }, function (err) {
             console.error(err);
             deferred.reject('Unable to fetch data from the server');
@@ -92,7 +96,6 @@ angular.module('itouch.services')
           Restangular.one("GetDiscountFor").get({LocationId: SettingsService.getLocationId()}).then(function (res) {
             try {
               var items = JSON.parse(res);
-              console.log(items);
             } catch (ex) {
               deferred.reject("No results");
             }
@@ -122,10 +125,11 @@ angular.module('itouch.services')
       }
 
       self.get = function () {
-        var q = "SELECT * FROM " + DB_CONFIG.tableNames.discounts.discounts + " AS d INNER JOIN "+DB_CONFIG.tableNames.discounts.discountsFor
+        var q = "SELECT d.id as DiscountId, * FROM " + DB_CONFIG.tableNames.discounts.discounts + " AS d INNER JOIN "+DB_CONFIG.tableNames.discounts.discountsFor
         + " AS df ON d.DiscountFor = df.Id";
        return DB.query(q, []).then(function (result) {
-          return DB.fetchAll(result);
+         console.log(DB.fetchAll(result));
+         return DB.fetchAll(result);
         });
       }
 
@@ -274,7 +278,7 @@ angular.module('itouch.services')
 
       var processDiscountItem = function (item, discount) {
         return getNextSeqNumber(item.ItemId).then(function (sn) {
-          renameProperty(discount, 'Id', 'DiscountId');
+          // renameProperty(discount, 'Id', 'DiscountId');
           renameProperty(discount, 'Percentage', 'DiscountPercentage');
           renameProperty(discount, 'Code', 'DiscountCode');
           console.log(discount);

@@ -14,7 +14,6 @@ angular.module('itouch.services')
       var items = [];
       var payTransactions = [];
       var businessDate = ControlService.getBusinessDate(true);
-      console.log(businessDate);
       var payTransactionColumnList = ['BusinessDate','LocationId', 'MachineId', 'DocNo', 'Cash', 'SeqNo', 'PayTypeId', 'Amount', 'ChangeAmount',
         'ConvRate', 'CurrencyId', 'Remarks', 'IsExported'];
       var stockTransactionColumnList = ['LocationId', 'BusinessDate', 'DocNo', 'ItemId', 'LineNumber', 'SeqNo', 'DocType', 'Qty',
