@@ -27,7 +27,7 @@ angular.module('itouch.services')
           seqNumbers = _.pluck(selectedDiscounts, 'SeqNo');
           seqNumber = _.max(seqNumbers);
         }
-        console.log(seqNumber);
+        // console.log(seqNumber);
         if(seqNumber){
           return $q.when(++seqNumber);
         } else {
@@ -65,8 +65,8 @@ angular.module('itouch.services')
               if (items) {
                 self.saveDiscounts(items);
 
-                console.log('discounts');
-                console.log(items);
+                // console.log('discounts');
+                // console.log(items);
                 deferred.resolve();
               } else {
                 deferred.reject('Unknown machine');
@@ -128,7 +128,7 @@ angular.module('itouch.services')
         var q = "SELECT d.id as DiscountId, * FROM " + DB_CONFIG.tableNames.discounts.discounts + " AS d INNER JOIN "+DB_CONFIG.tableNames.discounts.discountsFor
         + " AS df ON d.DiscountFor = df.Id";
        return DB.query(q, []).then(function (result) {
-         console.log(DB.fetchAll(result));
+         // console.log(DB.fetchAll(result));
          return DB.fetchAll(result);
         });
       }

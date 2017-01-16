@@ -106,7 +106,7 @@ angular.module('itouch.services')
           if(startBlock.length > lengths.startBlockMaxLength){
             startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
             startBlock += "...";
-            console.log(startBlock);
+            // console.log(startBlock);
           }
 
           lengths.spaces = ((lengths.total - ((lengths.qty ? 4 : 0) + 8)) - lengths.start );
