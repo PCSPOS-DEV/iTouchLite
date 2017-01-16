@@ -6,10 +6,10 @@ angular.module('itouch.services')
   .service("SyncService", ['$q', 'AuthService', 'KeyBoardService', 'Alert', 'DB', 'ItemService', 'SubPLU1Service',
     'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', 'LocationService', 'FileService', 'TenderService',
     'FunctionsService', 'SalesKitService', 'DaysService', 'ShiftService', 'DiscountService', 'ReasonService', 'PrinterSettings',
-    'PWPService', 'ModifierService', 'DepartmentService',
+    'PWPService', 'ModifierService', 'DepartmentService', 'SettingsService',
     function ($q, AuthService, KeyBoardService, Alert, DB, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service,
               PriceGroupService, LocationService, FileService, TenderService, FunctionsService, SalesKitService, DaysService,
-              ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService) {
+              ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService, SettingsService) {
     this.do = function () {
       Alert.showLoading();
       DB.clearQueue();
@@ -38,6 +38,7 @@ angular.module('itouch.services')
           'PWP': PWPService.fetchPWP(),
           'Departments': DepartmentService.fetch(),
           'Modifiers': ModifierService.fetch(),
+          'Machines': SettingsService.fetchMachines(),
           // 'Images': FileService.fetch()
         })
         // FunctionsService.fetch()

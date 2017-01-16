@@ -59,7 +59,8 @@ var tableNames = {
     reasons: 'Reason'
   },
   config: {
-    printerSettings: 'PrinterSettings'
+    printerSettings: 'PrinterSettings',
+    machines: 'MachinesDetails',
   },
   pwp:{
     pwp: "Pwp",
@@ -834,6 +835,16 @@ angular.module('itouch.config')
             { name: "Sequence", type: "INT NOT NULL" },
             { name: "Text", type: "TEXT NULL" },
             { name: "IsBold", type: "BOOL" }
+          ]
+        },
+        {
+          name: tableNames.config.machines,
+          columns: [
+            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
+            { name: "Code", type: "TEXT NOT NULL" },
+            { name: "Description1", type: "TEXT NOT NULL" },
+            { name: "Description2", type: "TEXT NULL" },
+            { name: "LocationId", type: "INT" }
           ]
         },
         {
