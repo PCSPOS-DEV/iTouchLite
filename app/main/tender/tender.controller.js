@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService', 'DiscountService', '$ionicModal', 'RoundingService',
-    function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService) {
+  .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService', 'DiscountService', '$ionicModal', 'RoundingService', 'Reciept',
+    function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService, Reciept) {
       $scope.tenderTypes = [];
       $scope.title = "Tender";
       $scope.tenderHeader = {
@@ -240,6 +240,7 @@ angular.module('itouch.controllers')
                 overTender = [];
                 $scope.$emit("tenderModel-close");
                 $scope.$emit("refresh-cart");
+                Reciept.print(header.DocNo);
                 $ionicPopup.alert({
                   title: 'Balance',
                   template: '<p>Balance: $'+ changeAmount.toFixed(2) + '</p><p>Rounded Balance: $'+ changeAmount.roundTo(2, .25).toFixed(2) +'</p>'
