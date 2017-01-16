@@ -14,7 +14,14 @@ angular.module('itouch', [
     'itouch.services'
     // TODO: load other modules selected during generation
 ])
-    .run(['$ionicPlatform', 'DB', function ($ionicPlatform, DB) {
+    .run(['$ionicPlatform', 'DB', 'PrintService', 'Alert', function ($ionicPlatform, DB, PrintService, Alert) {
+      PrintService.setIPAddress('192.168.1.205');
+      PrintService.setPort('8008');
+      PrintService.connect('192.168.1.205', '8008').then(function(){
+        // Alert.success('Success');
+      }, function(err){
+        Alert.success(err, 'Error');
+      });
         $ionicPlatform.ready(function () {
             DB.init();
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -28,6 +35,8 @@ angular.module('itouch', [
                 // org.apache.cordova.statusbar required
                 StatusBar.styleDefault();
             }
+
+
         });
     }])
 
