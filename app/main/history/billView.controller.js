@@ -17,7 +17,6 @@ angular.module('itouch.controllers')
       });
 
       var refresh = function () {
-        console.log($scope.selectedItem);
         PrinterSettings.get().then(function (data) {
           $scope.settings = data;
         });
@@ -28,7 +27,6 @@ angular.module('itouch.controllers')
           transactions: HistoryService.getTransactions($scope.selectedItem.DocNo),
           discounts: HistoryService.getDiscounts($scope.selectedItem.DocNo)
         }).then(function (data) {
-          console.log(data);
           $scope.bill = data;
         }, function (ex) {
           console.log(ex);
@@ -37,9 +35,12 @@ angular.module('itouch.controllers')
 
       $scope.printReciept = function(DocNo){
         if(DocNo){
-          console.log(DocNo);
           Reciept.print(DocNo);
         }
+      }
+
+      $scope.close = function(){
+        $scope.$emit('bill.modal.close');
       }
 
 

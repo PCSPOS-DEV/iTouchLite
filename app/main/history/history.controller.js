@@ -46,4 +46,8 @@ angular.module('itouch.controllers')
         $scope.search.text = "";
       }
 
+      $scope.$on('bill.modal.close', function(){
+        $scope.modal.hide();
+      });
+
     }]);
