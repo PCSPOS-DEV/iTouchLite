@@ -303,8 +303,8 @@ angular.module('itouch.services')
         discount = discountAmounts.discount;
 
         return processDiscountItem(item, discount).then(function (discount) {
-          console.log(item);
-          console.log(discount);
+          // console.log(item);
+          // console.log(discount);
           saveItemDiscount(discount);
           updateTempBillDetail(item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [item.DocNo, item.ItemId, item.LineNumber]});
           return DB.executeQueue().then(function () {

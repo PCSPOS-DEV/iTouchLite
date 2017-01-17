@@ -64,7 +64,7 @@ angular.module('itouch.services')
           cart.summery.Tax3DiscAmount = cart.summery.Tax3DiscAmount.roundTo(2);
           cart.summery.Tax4DiscAmount = cart.summery.Tax4DiscAmount.roundTo(2);
           cart.summery.Tax5DiscAmount = cart.summery.Tax5DiscAmount.roundTo(2);
-          cart.summery.Tax = cart.summery.Tax.roundTo(2);
+          cart.summery.Tax = (cart.summery.Tax - cart.summery.Tax5DiscAmount).roundTo(2);
           cart.summery.Total = cart.summery.Total.roundTo(2);
           cart.summery.Discount = cart.summery.Discount.roundTo(2);
 
