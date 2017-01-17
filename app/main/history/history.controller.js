@@ -6,7 +6,7 @@ angular.module('itouch.controllers')
     function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept) {
       $scope.items = [];
       $scope.selectedItem = null;
-      $scope.search = "";
+      $scope.search = { text: "" };
 
       $scope.$on("$ionicView.beforeEnter", function(event, data){
         refresh();
@@ -39,6 +39,11 @@ angular.module('itouch.controllers')
       $scope.selectItem = function (item) {
         $scope.selectedItem = item;
         $scope.modal.show();
+      }
+
+      $scope.clearSearch = function(){
+        console.log('clear');
+        $scope.search.text = "";
       }
 
     }]);

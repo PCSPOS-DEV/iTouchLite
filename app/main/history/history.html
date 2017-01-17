@@ -1,4 +1,4 @@
-<ion-view class="history" ng-controller="RefundCtrl" title="History">
+<ion-view class="history" title="History">
   <ion-header-bar>
   <!--<button class="button button-icon ion-arrow-left-c" ng-if="!shiftSelectionShown" ng-click="goBack()"></button>-->
   <h1 class="title">Refund</h1>
@@ -6,19 +6,19 @@
   </ion-header-bar>
   <ion-content>
     <div class="row">
-      <div class="col">
+      <div class="col col-50 col-offset-25">
         <div class="list list-inset">
-          <label class="item item-input">
+          <div class="item item-input" id="search">
             <i class="icon ion-search placeholder-icon"></i>
-            <input type="text" placeholder="Search" ng-model="search">
-          </label>
+            <input type="text" placeholder="Search" ng-model="search.text" ionic-input-clearable>
+          </div>
         </div>
       </div>
     </div>
     <div class="row">
         <ion-scroll zooming="false" direction="y" style="width: 100%; height: 630px">
       <div class="col">
-          <div class="row" ng-repeat="bill in items | filter: {DocNo: search}" ng-if="$index % 3 === 0">
+          <div class="row" ng-repeat="bill in items | filter: {DocNo: search.text}" ng-if="$index % 3 === 0">
             <div class="col col-33" ng-if="$index + 0 < items.length">
               <div class="card " ng-click="selectItem(items[$index+0])">
                 {{_.size(items)  }}
