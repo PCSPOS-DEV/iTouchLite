@@ -8,7 +8,7 @@ angular.module('itouch.controllers')
       $scope.refund = {
       };
 
-      $scope.$on('$ionicView.beforeEnter', function(event, data){
+      $scope.$on('modal.shown', function(event, data){
         // handle event
         refresh();
       });
@@ -20,6 +20,7 @@ angular.module('itouch.controllers')
       }
 
       $scope.close = function () {
+        $scope.clear();
         $scope.$emit('refundModal-close');
       }
 
