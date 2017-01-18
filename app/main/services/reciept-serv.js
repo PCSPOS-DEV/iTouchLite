@@ -1,7 +1,7 @@
 'use strict';
 angular.module('itouch.services')
-.service('Reciept', ['$log', 'PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService',
-  function ($log, PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService) {
+.service('Reciept', ['$log', 'PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert',
+  function ($log, PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert) {
   var self = this;
   var data = null;
   var printer = PrintService.getPrinter();
@@ -89,11 +89,18 @@ angular.module('itouch.services')
   }
 
   self.print = function(DocNo){
-    printer = PrintService.getPrinter();
+    if(PrintService.isConnected()){
+      try {
+        printer = PrintService.getPrinter();
+        creatBodyData(DocNo);
+      } catch(e){
+        console.log(e);
+      }
+    } else {
+      Alert.success('printer not connected', 'Error');
+    }
 
 
-
-    creatBodyData(DocNo);
 
   }
 
@@ -170,16 +177,8 @@ angular.module('itouch.services')
       self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
 
       printer.addCut(printer.CUT_FEED);
-      //
-      if(PrintService.isConnected()){
-        try {
-          printer.send();
-        } catch(e){
-          console.log(e);
-        }
-      } else {
-        Alert.success('Not connected', 'Error');
-      }
+
+      printer.send();
     });
   }
 

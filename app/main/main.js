@@ -19,6 +19,13 @@ angular.module('itouch', [
       PrintService.setPort('8008');
       PrintService.connect('192.168.1.205', '8008').then(function(){
         // Alert.success('Success');
+        PrintService.onOffline(function(){
+          Alert.success('Printer connected', 'Connected');
+        });
+
+        PrintService.onRecieve(function(){
+          Alert.success('Printer offline', 'offline');
+        });
       }, function(err){
         Alert.success(err, 'Error');
       });

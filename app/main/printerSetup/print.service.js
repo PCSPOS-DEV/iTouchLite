@@ -36,15 +36,12 @@ angular.module('itouch.services')
                 }
                 console.log('device created');
                 printer = deviceObj;
+                //Displays the successful print message
+                deferred.resolve();
                 //Registers the print complete event
                 printer.onreceive = function (response) {
                   if (response.success) {
                     console.log('device recived');
-                    //Displays the successful print message
-                    deferred.resolve();
-                  } else {
-                    //Displays error messages
-                    deferred.reject("connect error. code:" + errorCode);
                   }
                 };
               });
@@ -58,6 +55,42 @@ angular.module('itouch.services')
           deferred.reject("Lib error");
         }
         return deferred.promise;
+      }
+
+      self.onRecieve = function(func){
+        if(_.isFunction(func)){
+          printer.onreceive = func;
+        }
+      }
+
+      self.onReconnect = function(func){
+        if(_.isFunction(func)){
+          printer.onreconnect = func;
+        }
+      }
+
+      self.onReconnecting = function(func){
+        if(_.isFunction(func)){
+          printer.onreconnecting = func;
+        }
+      }
+
+      self.onRecieve = function(func){
+        if(_.isFunction(func)){
+          printer.onreceive = func;
+        }
+      }
+
+      self.onOnline = function(func){
+        if(_.isFunction(func)){
+          printer.ononline = func;
+        }
+      }
+
+      self.onOffline = function(func){
+        if(_.isFunction(func)){
+          printer.onpoweroff = func;
+        }
       }
 
       self.disconnect = function () {
@@ -86,7 +119,7 @@ angular.module('itouch.services')
       }
 
       self.isConnected = function(){
-        return ePosDev.isConnected;
+        return ePosDev.isConnected();
       }
 
       self.addLine = function(startBlock, endBlock, qtyBlock){
