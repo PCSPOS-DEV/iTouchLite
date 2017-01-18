@@ -241,13 +241,14 @@ angular.module('itouch.controllers')
                 $scope.$emit("tenderModel-close");
                 $scope.$emit("refresh-cart");
                 Reciept.print(header.DocNo);
+
+                numpadValue = "";
+                setValueManually = false;
+
                 $ionicPopup.alert({
                   title: 'Balance',
                   template: '<p>Balance: $'+ changeAmount.toFixed(2) + '</p><p>Rounded Balance: $'+ changeAmount.roundTo(2, .25).toFixed(2) +'</p>'
-                }).then(function () {
                 });
-                numpadValue = "";
-                setValueManually = false;
               }, function (err) {
                 console.log(err);
               });
