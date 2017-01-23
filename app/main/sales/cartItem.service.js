@@ -139,7 +139,8 @@ angular.module('itouch.services')
           } else {
             if(item.customQuantity){
               item.Qty = item.customQuantity;
-            } else {
+            }
+            if(!item.Qty){
               item.Qty = 1;
             }
 
