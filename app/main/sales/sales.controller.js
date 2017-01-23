@@ -123,19 +123,19 @@ angular.module('itouch.controllers')
         $scope.tenderModal.hide();
         $scope.shownModal = null;
 
-        BillService.getHeader().then(function(header){
-          var promise;
-          if(!header){
-            promise = BillService.initHeader();
-          } else {
-            promise = BillService.getHeader();
-          }
-          promise.then(function(header){
-            // console.log(header);
-            refreshCart();
-            $scope.header = header;
-          });
-        });
+        // BillService.getHeader().then(function(header){
+        //   var promise;
+        //   if(!header){
+        //     promise = BillService.initHeader();
+        //   } else {
+        //     promise = BillService.getHeader();
+        //   }
+        //   promise.then(function(header){
+        //     // console.log(header);
+        //     refreshCart();
+        //     $scope.header = header;
+        //   });
+        // });
       });
 
       /**
@@ -393,14 +393,9 @@ angular.module('itouch.controllers')
                   if($scope.TakeAway){
                     item.TakeAway = true;
                   }
-                  PWPService.getPWP(item.Id).then(function(pwp){
+                  PWPService.getPWP(item, item.customQuantity || item.Qty).then(function(pwp){
                     if(pwp && ( (item.Qty >= pwp.Quantity) || item.customQuantity >= pwp.Quantity)){
-                      $scope.pwp = {};
                       $scope.pwp = pwp;
-                      $scope.pwp.QtyEntered = item.customQuantity || item.Qty;
-                      $scope.pwp.Qty = 0;
-                      $scope.pwp.selectedItems = {};
-                      $scope.pwp.item = item;
                       $scope.shownModal = 'pwp';
                       $ionicModal.fromTemplateUrl('main/pwp/pwp.html', {
                         scope: $scope,
