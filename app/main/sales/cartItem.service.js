@@ -194,6 +194,22 @@ angular.module('itouch.services')
         return nDI;
       }
 
+      self.addPWP = function(parentItem, items){
+        return BillService.loadLineNewNumber().then(function(lineNumber){
+
+          var promises = [];
+          parentItem.LineNumber = lineNumber;
+          promises.push(self.addItemToCart(parentItem));
+          items = _.map(items, function(item){
+            item.ParentItemLineNumber = parentItem.LineNumber;
+            item.LineNumber = ++lineNumber;
+            promises.push(self.addItemToCart(item));
+            return item;
+          });
+          return $q.all(promises);
+        });
+      }
+
       self.clearCart = function () {
         cart = {
           summery: {},

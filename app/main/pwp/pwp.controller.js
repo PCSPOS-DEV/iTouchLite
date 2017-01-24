@@ -161,8 +161,8 @@ angular.module('itouch.controllers')
             var promises  = [];
             $scope.pwp.item.ItemId = $scope.pwp.item.Id;
             $scope.pwp.item.ItemType = 'PWP';
-            promises.push(CartItemService.addItemToCart($scope.pwp.item));
-            promises.concat(_.map(data, function(item, key){
+            // promises.push(CartItemService.addItemToCart($scope.pwp.item));
+            items = _.map(data, function(item, key){
               var exItem = $scope.pwp.selectedItems[key];
               if(exItem){
                 if(exItem.DiscountId) {
@@ -186,19 +186,29 @@ angular.module('itouch.controllers')
                 // renameProperty(item, 'SubItemId', 'ItemId');
                 item.ItemId = item.Id;
                 item.ItemType = 'PWI';
-                item.ParentItemLineNumber = $scope.pwp.item.ItemId;
-                return CartItemService.addItemToCart(item);
+                item.ParentItemLineNumber = $scope.pwp.item.LineNumber;
+                // return CartItemService.addItemToCart(item);
+                return item;
               }
               // return item;
-            }));
-            // console.log(promises);
-            $q.all(promises).then(function(data){
+            });
+
+
+            CartItemService.addPWP($scope.pwp.item, items).then(function(data){
               // console.log(data);
               $scope.$emit('refresh-cart');
               $scope.$emit('pwpModal-close');
             }, function(errors){
               console.log(errors);
             });
+            // console.log(promises);
+            // $q.all(promises).then(function(data){
+            //   // console.log(data);
+            //   $scope.$emit('refresh-cart');
+            //   $scope.$emit('pwpModal-close');
+            // }, function(errors){
+            //   console.log(errors);
+            // });
 
             // console.log(data);
           });
