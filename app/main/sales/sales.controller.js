@@ -530,41 +530,44 @@ angular.module('itouch.controllers')
       $scope.salesFunctions = {
         VoidTop: function (fn) {
           var item = $scope.cart.selectedItem;
-          if(item && authorityCheck(fn)) {
-          if (item.ItemType == 'SKT') {
-                BillService.voidSalesKit(item).then(function () {
-                  refreshCart();
-                }, function (err) {
-                  console.log(err);
-                  refreshCart();
-                });
-              } else {
-                if (item.ItemType == 'SKI') {
-                  if (item.Selectable == 'true') {
-                    CartItemService.findSalesKitParent(item.ParentItemLineNumber).then(function (parentItem) {
-                      SalesKitService.getSalesKit(parentItem.ItemId, businessDate).then(function (salesKit) {
-                        if (salesKit) {
-                          $scope.salesKits = salesKit;
-                          $scope.salesKitUpdate = true;
-                          $scope.skModalModal.show();
-                        }
-                      });
-                    });
-                  }
-                } else {
-                  BillService.voidItem(item).then(function () {
-                    refreshCart().then(function () {
-                      selectLastItem();
-                    });
+          if (item && authorityCheck(fn)) {
+            if (item.ItemType == 'SKT') {
+              BillService.voidSalesKit(item).then(function () {
+                refreshCart();
+              }, function (err) {
+                console.log(err);
+                refreshCart();
+              });
+            // } else if(){
 
-                  }, function (err) {
-                    console.log(err);
-                    refreshCart().then(function () {
-                      // console.log('void');
-                      selectLastItem();
+            } else {
+              console.log(item);
+              if (item.ItemType == 'SKI') {
+                if (item.Selectable == 'true') {
+                  CartItemService.findSalesKitParent(item.ParentItemLineNumber).then(function (parentItem) {
+                    SalesKitService.getSalesKit(parentItem.ItemId, businessDate).then(function (salesKit) {
+                      if (salesKit) {
+                        $scope.salesKits = salesKit;
+                        $scope.salesKitUpdate = true;
+                        $scope.skModalModal.show();
+                      }
                     });
                   });
                 }
+              } else {
+                BillService.voidItem(item).then(function () {
+                  refreshCart().then(function () {
+                    selectLastItem();
+                  });
+
+                }, function (err) {
+                  console.log(err);
+                  refreshCart().then(function () {
+                    // console.log('void');
+                    selectLastItem();
+                  });
+                });
+              }
             }
           }
         },
