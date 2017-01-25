@@ -4,10 +4,10 @@
 angular.module('itouch.controllers')
   .controller("SalesCtrl", ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal',
       'AuthService', 'CartItemService', 'ControlService', 'ionicDatePicker', 'FunctionsService', '$filter', 'SalesKitService', 'DiscountService', 'BillService', 'ShiftService',
-      'PWPService', '$ionicScrollDelegate', 'Alert',
+      'PWPService', '$ionicScrollDelegate', 'Alert', '$q',
       function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal,
       AuthService, CartItemService, ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService,
-                                               PWPService,  $ionicScrollDelegate, Alert) {
+                                               PWPService,  $ionicScrollDelegate, Alert, $q) {
       $scope.currentPage = {};
       $scope.pages = [];
       $scope.keys = [];
@@ -117,9 +117,9 @@ angular.module('itouch.controllers')
       /**
        * Biding an event to catch modal close call
        */
-      $scope.$on('tenderModel-close', function () {
-        CartItemService.clearCart();
-        refreshCart();
+      $scope.$on('close-tenderModel', function () {
+        // CartItemService.clearCart();
+        // refreshCart();
         $scope.tenderModal.hide();
         $scope.shownModal = null;
 
@@ -370,6 +370,11 @@ angular.module('itouch.controllers')
             SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
               if(salesKit){
                 $scope.salesKits = salesKit;
+                // console.log(salesKit);
+                angular.forEach($scope.salesKits.selectedList, function(item, key) {
+                  $scope.salesKits.selectedList[key].AddedAt = new Date();
+                  // $scope.salesKits.selectedList[key].Price = 0;
+                });
                 $timeout(function () {
                   $scope.shownModal = 'sk';
                   $scope.skModalModal.show();
@@ -538,10 +543,24 @@ angular.module('itouch.controllers')
                 console.log(err);
                 refreshCart();
               });
-            // } else if(){
-
-            } else {
+            } else if(item.ParentItemLineNumber == 0){
               console.log(item);
+              var promises = [BillService.voidItem(item)];
+              CartItemService.getChildItems(item.LineNumber).then(function(data){
+                angular.forEach(data, function(item){
+                  promises.push(BillService.voidItem(item));
+                });
+                $q.all(promises).then(function(){
+                  refreshCart().then(function () {
+                    // console.log('void');
+                    selectLastItem();
+                  });
+                }, function(err){
+                  console.log(err);
+                });
+              });
+            } else {
+
               if (item.ItemType == 'SKI') {
                 if (item.Selectable == 'true') {
                   CartItemService.findSalesKitParent(item.ParentItemLineNumber).then(function (parentItem) {
@@ -583,7 +602,7 @@ angular.module('itouch.controllers')
               errors.push("No item selected");
               condition = false;
             }
-            if(item.ItemType != 'NOR' && item.ItemType != 'SKT'){
+            if(item.ItemType != 'NOR' && item.ItemType != 'SKT' && item.ItemType != 'PWP'){
               errors.push("Not an eligible item type");
               condition = false;
             }
