@@ -293,6 +293,12 @@ angular.module('itouch.services')
         });
       }
 
+      self.getChildItems = function(parentItemLineNumber){
+        return DB.query("SELECT * FROM "+DB_CONFIG.tableNames.bill.tempDetail +" WHERE ParentItemLineNumber = ?", [parentItemLineNumber]).then(function(res){
+          return DB.fetchAll(res);
+        });
+      }
+
 
       return self;
     }]);

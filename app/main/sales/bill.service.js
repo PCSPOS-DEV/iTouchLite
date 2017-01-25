@@ -838,6 +838,10 @@ angular.module('itouch.services')
         return DB.query("DELETE FROM "+DB_CONFIG.tableNames.discounts.tempBillDiscounts);
       }
 
+      var clearVoidItems = function () {
+        return DB.query("DELETE FROM "+DB_CONFIG.tableNames.bill.voidItems);
+      }
+
       self.voidItem = function (item) {
         if(item.ItemId && item.ItemType && item.LineNumber){
           DB.clearQueue();

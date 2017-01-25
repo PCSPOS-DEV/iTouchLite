@@ -24,7 +24,7 @@
       </div>
       <div class="col col-25">
         <div class="selected-items">
-          <div ng-repeat="item in salesKits.selectedList | orderObjectBy :'AddedAt'" class="row" ng-class="{selected: item.selected == true}" ng-click="selectRow(item)">
+          <div ng-repeat="item in salesKits.selectedList | orderObjectBy :'AddedAt' : false" class="row" ng-class="{selected: item.selected == true}" ng-click="selectRow(item)">
             <div class="col col-75">{{print(item, 'Description')}}</div>
             <div class="col col-25">{{item.Qty}}</div>
           </div>

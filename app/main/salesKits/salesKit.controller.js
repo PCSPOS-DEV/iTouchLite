@@ -9,6 +9,17 @@ angular.module('itouch.controllers')
       $scope.selectedRow = null;
       var selectedItem = null;
 
+      $scope.$on('modal.shown', function(event, modal) {
+        // $scope.salesKits.selectedList = _.map($scope.salesKits.selectedList, function(item){
+        //   if(item){
+        //     item.AddedAt = new Date();
+        //     item.Price = 0;
+        //   }
+        //
+        //   return item;
+        // });
+      });
+
      $scope.selectComponent = function (sk) {
         $scope.salesKits.selected = sk;
      }
@@ -22,12 +33,10 @@ angular.module('itouch.controllers')
             item.Qty = 0;
           }
           item.Qty++;
+          item.AddedAt = new Date();
           $scope.salesKits.selectedList[item.ItemId] = _.omit(item, 'Selections');
           selectedItem = $scope.salesKits.selectedList[item.ItemId];
-          kit.Selections = _.map($scope.salesKits.selectedList, function (item) {
-            item.Price = 0;
-            return item;
-          });
+          kit.Selections = angular.copy($scope.salesKits.selectedList);
           $scope.selectedSalesKit = kit;
         }
       }
@@ -87,17 +96,21 @@ angular.module('itouch.controllers')
         if(selectedItem){
           var item = angular.copy($scope.salesKits);
           var omitList = ['$$hashKey', 'Default', 'Quantity', 'Priority', 'PLU_Description1', 'PLU_Description2', 'KitchenId', 'SubPlu1Id', 'SubPlu2Id', 'SubPlu3Id', 'DepartmentId', 'UOM_Id', 'HouseBarCode', 'Selected', 'AddedAt', 'key'];
-          item.selectedList = _.map(item.selectedList, function (item) {
-            if(!item.OrgPrice) item.OrgPrice = item.Price;
-            if(!item.AlteredPrice) item.AlteredPrice = item.Price;
-            if(!item.StdCost) item.StdCost = item.Price;
+          var selectedList = [];
+          _.map(item.selectedList, function (i) {
+            if(i){
+              if(!i.OrgPrice) i.OrgPrice = i.Price;
+              if(!i.AlteredPrice) i.AlteredPrice = i.Price;
+              if(!i.StdCost) i.StdCost = i.Price;
 
-            return _.omit(item, omitList);
+              selectedList.push(_.omit(i, omitList));
+            }
           });
+          item.selectedList = selectedList;
           var operation;
           if($scope.salesKitUpdate){
             var oldItem = $scope.cart.selectedItem;
-            console.log(oldItem);
+            // console.log(oldItem);
             BillService.voidItem(oldItem);
             var item = angular.copy(selectedItem);
             item.LineNumber = oldItem.LineNumber;
