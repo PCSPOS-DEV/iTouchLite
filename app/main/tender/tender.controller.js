@@ -113,13 +113,13 @@ angular.module('itouch.controllers')
         });
         var item = _.first(bill);
         var total = $scope.tenderHeader.Total;
-        var amount = (tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.TenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
+        var amount = (tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
         var changeAmount = 0;
         if (amount > total) {
           changeAmount = (amount - total).roundTo(2);
         }
         var diff = (($scope.tenderHeader.Total - parseFloat($scope.tenderHeader.TotalRounded))* -1).roundTo(2);
-        // console.log(diff);
+        console.log(diff);
         if(diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
           payTransactions.push({
             BusinessDate: businessDate,
@@ -238,9 +238,6 @@ angular.module('itouch.controllers')
                 });
                 payTransactions = [];
                 overTender = [];
-                $scope.$emit("tenderModel-close");
-                $scope.$emit("refresh-cart");
-                Reciept.print(header.DocNo);
 
                 numpadValue = "";
                 setValueManually = false;
@@ -248,6 +245,10 @@ angular.module('itouch.controllers')
                 $ionicPopup.alert({
                   title: 'Balance',
                   template: '<p>Balance: $'+ changeAmount.toFixed(2) + '</p><p>Rounded Balance: $'+ changeAmount.roundTo(2, .25).toFixed(2) +'</p>'
+                }).then(function(){
+                  $scope.$emit("refresh-cart");
+                  $scope.$emit("close-tenderModel");
+                  Reciept.print(header.DocNo);
                 });
               }, function (err) {
                 console.log(err);
