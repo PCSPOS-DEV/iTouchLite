@@ -55,10 +55,17 @@ angular.module('itouch.services')
 
     PrintService.addLine('SUBTOTAL', "$"+(data.header.Total.toFixed(2)));
     PrintService.addLine('TOTAL', "$"+(data.header.Total.toFixed(2)));
+    var change = null;
     angular.forEach(data.transactions, function(row){
-      console.log(row);
+      // console.log(row);
       PrintService.addLine(row.Description1 || 'ROUNDED', "$"+(row.Amount.toFixed(2)));
+      if(row.Cash == 'true' && row.ChangeAmount > 0){
+        change = row.ChangeAmount.toFixed(2);
+      }
     });
+    if(change){
+      printer.addText('\nChange Due: $'+change+"\n");
+    }
     printer.addText('\n');
   }
 
@@ -148,7 +155,7 @@ angular.module('itouch.services')
   }
 
   self.getBillTransactions = function (DocNo) {
-    return DB.query("SELECT pt.Amount, tt.Description1  FROM " + DB_CONFIG.tableNames.bill.payTransactions + " AS pt LEFT OUTER JOIN "+ DB_CONFIG.tableNames.bill.tenderTypes +" AS tt ON pt.PayTypeId = tt.Id WHERE DocNo = ?", [DocNo]).then(function (res) {
+    return DB.query("SELECT pt.Amount, pt.ChangeAmount, pt.Cash, tt.Description1  FROM " + DB_CONFIG.tableNames.bill.payTransactions + " AS pt LEFT OUTER JOIN "+ DB_CONFIG.tableNames.bill.tenderTypes +" AS tt ON pt.PayTypeId = tt.Id WHERE DocNo = ?", [DocNo]).then(function (res) {
       // return _.map(DB.fetchAll(res), function (item) {
       //   return ItemService.calculateTotal(item);
       // });
