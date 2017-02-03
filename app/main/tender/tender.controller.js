@@ -93,7 +93,7 @@ angular.module('itouch.controllers')
        * Tells the sales controller to close the tender modal
        */
       $scope.modalClose = function () {
-        $scope.$emit("tenderModel-close");
+        $scope.$emit("close-tenderModel");
       }
 
       /**
@@ -286,7 +286,7 @@ angular.module('itouch.controllers')
       /**
        * Initiating discount modal dialog
        */
-      $ionicModal.fromTemplateUrl('main/tender.discount/discount.html', {
+      $ionicModal.fromTemplateUrl('main/tenderDiscount/discount.html', {
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
@@ -430,9 +430,9 @@ angular.module('itouch.controllers')
 
       $scope.$on('discountModel-close', function () {
         console.log($scope.tenderHeader);
-        // $scope.updatedRoundedTotal = $scope.tenderHeader.updatedRoundedTotal;
-        // tenderDiscount.header = angular.copy($scope.tenderHeader);
-        // originalHeader.Total = tenderDiscount.header.Total
+        $scope.updatedRoundedTotal = $scope.tenderHeader.updatedRoundedTotal;
+        tenderDiscount.header = angular.copy($scope.tenderHeader);
+        originalHeader.Total = tenderDiscount.header.Total
         //TODO comeup with a plan to capture selected discount
         // tenderDiscount.discount = angular.copy($scope.tenderHeader);
       });
