@@ -17,10 +17,16 @@
     </div>
     <div class="row body">
       <div class="col">
-        <div class="row" ng-repeat="item in bill.items">
-          <civ class="col-10">{{item.Qty}}</civ>
-          <civ class="col-80">{{print(item,'Desc')}}</civ>
-          <civ class="col-10 text-right">$ {{item.Total.toFixed(2)}}</civ>
+        <div ng-repeat="item in bill.items">
+          <div class="row">
+            <div class="col-10">{{item.Qty}}</div>
+          <div class="col-80">{{print(item,'Desc')}}</div>
+          <div class="col-10 text-right">$ {{item.Total.toFixed(2)}}</div>
+          </div>
+          <div class="row" ng-repeat="discount in item.discounts">
+            <div class="col-60 col-offset-20">{{print(discount,'Description')}}</div>
+            <div class="col-20 text-right">-$ {{discount.DiscountAmount.toFixed(2)}}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -40,7 +46,13 @@
           <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
           <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
         </div>
+        <div class="row" ng-if="location.Tax5Option == 3">
+          <div class="col">
+            {{'Inc of '+location.Tax5Desc1+' $'+ bill.header.Tax.toFixed(2)}}
+          </div>
+        </div>
       </div>
+
     </div>
     <div class="row footer">
       <div class="col">

@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept',
-    function ($scope, PrinterSettings, HistoryService, $q, Reciept) {
+  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept', 'LocationService',
+    function ($scope, PrinterSettings, HistoryService, $q, Reciept, LocationService) {
       $scope.settings = {};
       $scope.bill = {
         header: null,
@@ -11,6 +11,7 @@ angular.module('itouch.controllers')
         transactions: null,
         discounts: null
       };
+      $scope.location = LocationService.currentLocation;
 
       $scope.$on("modal.shown", function(event){
         refresh();
@@ -22,10 +23,9 @@ angular.module('itouch.controllers')
         });
 
         $q.all({
-          header: HistoryService.getHeader($scope.selectedItem.DocNo),
-          items: HistoryService.getItems($scope.selectedItem.DocNo),
-          transactions: HistoryService.getTransactions($scope.selectedItem.DocNo),
-          discounts: HistoryService.getDiscounts($scope.selectedItem.DocNo)
+          header: Reciept.getBillHeader($scope.selectedItem.DocNo),
+          items: Reciept.getBillItems($scope.selectedItem.DocNo),
+          transactions: Reciept.getBillTransactions($scope.selectedItem.DocNo)
         }).then(function (data) {
           $scope.bill = data;
         }, function (ex) {
