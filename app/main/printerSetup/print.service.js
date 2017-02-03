@@ -12,8 +12,8 @@ angular.module('itouch.services')
       $localStorage.printeSettings = {
         ipAddress: '192.168.1.205',
         port: '8008',
-        maxCharsPerLine: 32,
-        maxCharsPerTabbedLine: 26,
+        maxCharsPerLine: 48,
+        maxCharsPerTabbedLine: 40,
       };
 
       self.connect = function (ipAddress, port) {
