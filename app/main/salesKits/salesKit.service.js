@@ -146,7 +146,7 @@ angular.module('itouch.services')
                 salesKit.selectedList = {};
                 ski.SalesKitId = itemId;
                 // console.log(salesKit);
-                  DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]}).then(function (res) {
+                  return DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]}).then(function (res) {
                     var selections = _.map(DB.fetchAll(res), function (row) {
                       row.SalesKitId = itemId;
                       row.Qty = 0;
@@ -170,9 +170,11 @@ angular.module('itouch.services')
                       ski.Selectable = false;
                       salesKit.selectedList[ski.ItemId] = ski;
                     }
-                    deferred.resolve(salesKit);
                 });
               });
+
+
+              deferred.resolve(salesKit);
             } else {
               deferred.resolve(false);
             }

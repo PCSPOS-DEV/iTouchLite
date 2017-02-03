@@ -370,7 +370,9 @@ angular.module('itouch.controllers')
             SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
               if(salesKit){
                 $scope.salesKits = salesKit;
-                // console.log(salesKit);
+                if($scope.qty.value){
+                  $scope.salesKits.customQuantity = $scope.qty.value;
+                }
                 angular.forEach($scope.salesKits.selectedList, function(item, key) {
                   $scope.salesKits.selectedList[key].AddedAt = new Date();
                   // $scope.salesKits.selectedList[key].Price = 0;
