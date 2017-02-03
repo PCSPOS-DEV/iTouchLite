@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('DiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup',
-    function ($scope, DiscountService, $ionicPopup) {
+  .controller('DiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert',
+    function ($scope, DiscountService, $ionicPopup, Alert) {
       var discountsSet = {
         type1: [],
         type2: []
@@ -81,7 +81,8 @@ angular.module('itouch.controllers')
           // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
           $scope.$emit("refresh-cart");
           $scope.$emit("discountModel-close");
-        }, function () {
+        }, function (err) {
+          Alert.error(err);
           $scope.$emit("discountModel-close");
         });
       }

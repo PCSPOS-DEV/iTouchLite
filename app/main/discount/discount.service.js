@@ -220,7 +220,7 @@ angular.module('itouch.services')
 
 
       var total = null;
-      var calculateDiscountAmounts = function (item, discount) {
+      var calculateDiscountAmounts = function (item, discount, amount) {
         if(total == null){
           total = 0;
         }
@@ -234,7 +234,10 @@ angular.module('itouch.services')
             subDiscount = addDiscountAmount((item.SubTotal - item.DiscAmount), discount.Percentage || discount.DiscountPercentage).roundTo(2);
             delete item.DiscPrec;
           } else {
-            totalDiscount  = (item.Total < discount.Amount ? item.Total : discount.Amount).roundTo(2);
+            // totalDiscount  = (item.Total < discount.Amount ? item.Total : discount.Amount).roundTo(2);
+            // subDiscount = ((totalDiscount * (100-item.Tax5Perc)) / 100).roundTo(2);
+
+            totalDiscount = amount ? parseFloat(amount) : discount.Amount;
             subDiscount = ((totalDiscount * (100-item.Tax5Perc)) / 100).roundTo(2);
           }
 
@@ -301,16 +304,19 @@ angular.module('itouch.services')
         var discountAmounts = calculateDiscountAmounts(item, discount, amount);
         item = discountAmounts.item;
         discount = discountAmounts.discount;
-
-        return processDiscountItem(item, discount).then(function (discount) {
-          // console.log(item);
-          // console.log(discount);
-          saveItemDiscount(discount);
-          updateTempBillDetail(item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [item.DocNo, item.ItemId, item.LineNumber]});
-          return DB.executeQueue().then(function () {
-            return item;
+        if(checkAmountEligibility(item)){
+          return processDiscountItem(item, discount).then(function (discount) {
+            // console.log(item);
+            // console.log(discount);
+            saveItemDiscount(discount);
+            updateTempBillDetail(item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [item.DocNo, item.ItemId, item.LineNumber]});
+            return DB.executeQueue().then(function () {
+              return item;
+            });
           });
-        });
+        } else {
+          return $q.reject("Not eligible for this discount amount");
+        }
 
       }
 
@@ -324,6 +330,14 @@ angular.module('itouch.services')
           }
         }
         return true;
+      }
+
+      var checkAmountEligibility = function(item){
+        // console.log(item);
+        if(item.BelowCost == 'false'){
+          return (item.Total-item.Discount) >= item.StdCost;
+        }
+        return false;
       }
 
       self.prepareTenderDiscount = function (header, items, discount, amount) {

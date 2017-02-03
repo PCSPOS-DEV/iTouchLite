@@ -464,7 +464,7 @@ angular.module('itouch.services')
         }
         if(!item.OrgPrice) item.OrgPrice = item.Price;
         if(!item.AlteredPrice) item.AlteredPrice = item.Price;
-        if(!item.StdCost) item.StdCost = item.Price;
+        if(_.isUndefined(item.StdCost)) item.StdCost = 0;
         if(!item.WaCost) item.WaCost = 0;
         if(!item.DiscAmount) item.DiscAmount = 0;
         if(!item.Tax1DiscAmount || _.isNaN(item.Tax1DiscAmount)) item.Tax1DiscAmount = 0;
@@ -642,7 +642,7 @@ angular.module('itouch.services')
         }
         if(!item.OrgPrice) item.OrgPrice = item.Price;
         if(!item.AlteredPrice) item.AlteredPrice = item.Price;
-        if(!item.StdCost) item.StdCost = item.Price;
+        if(_.isUndefined(item.StdCost)) item.StdCost = 0;
         if(!item.WaCost) item.WaCost = 0;
         if(!item.DiscAmount) item.DiscAmount = 0;
         if(!item.Tax1DiscAmount) item.Tax1DiscAmount = 0;
