@@ -15,7 +15,7 @@ angular.module('itouch', [
     // TODO: load other modules selected during generation
 ])
     .run(['$ionicPlatform', 'DB', 'PrintService', 'Alert', function ($ionicPlatform, DB, PrintService, Alert) {
-      PrintService.setIPAddress('192.168.1.205');
+      PrintService.setIPAddress('192.168.1.204');
       PrintService.setPort('8008');
       PrintService.connect('192.168.1.205', '8008').then(function(){
         // Alert.success('Success');
