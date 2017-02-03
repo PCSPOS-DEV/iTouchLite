@@ -322,6 +322,9 @@ angular.module('itouch.services')
        * @returns {Promise}
        */
     self.select = function (tableName, columns, where, order, limit) {
+      if(!columns){
+        columns = "*";
+      }
       var q = "SELECT "+columns+" FROM "+tableName;
       if(where){
         q += " WHERE " + where.columns;
