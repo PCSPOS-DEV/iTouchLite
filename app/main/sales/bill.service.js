@@ -1000,6 +1000,23 @@ angular.module('itouch.services')
         return $q.all(promises);
       }
 
+      self.getAllHeaders = function(){
+        return DB.select(DB_CONFIG.tableNames.bill.header).then(function(res){ return DB.fetchAll(res); });
+      }
+
+      self.getAllDetails = function(){
+        return DB.select(DB_CONFIG.tableNames.bill.detail).then(function(res){ return DB.fetchAll(res); });
+      }
+
+      self.getAllTransactions = function(){
+        return DB.select(DB_CONFIG.tableNames.bill.payTransactions).then(function(res){ return DB.fetchAll(res); });
+      }
+
+      self.getAllTransactionsOT = function(){
+        return DB.select(DB_CONFIG.tableNames.bill.payTransactionsOverTender).then(function(res){ return DB.fetchAll(res); });
+      }
+
+
       return self;
     }
   ]);
