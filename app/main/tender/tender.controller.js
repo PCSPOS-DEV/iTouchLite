@@ -27,7 +27,7 @@ angular.module('itouch.controllers')
         Disocunt: 0
       };
       var payTransactions = [];
-      var businessDate = $filter('date')(ControlService.getBusinessDate(), "yyyy-MM-dd");
+      var businessDate = ControlService.getBusinessDate(true);
       var tenderDiscount = {
         header: null,
         discount: null
@@ -54,6 +54,7 @@ angular.module('itouch.controllers')
 
           BillService.getHeader().then(function(header){
             $scope.tenderHeader = header;
+            $scope.tenderHeader.DocNo = ControlService.getDocId();
             refreshData();
           });
         }
@@ -245,6 +246,9 @@ angular.module('itouch.controllers')
 
                 numpadValue = "";
                 setValueManually = false;
+                Reciept.openDrawer();
+                Reciept.print(header.DocNo);
+
 
                 $ionicPopup.alert({
                   title: 'Balance',
@@ -252,7 +256,6 @@ angular.module('itouch.controllers')
                 }).then(function(){
                   $scope.$emit("refresh-cart");
                   $scope.$emit("close-tenderModel");
-                  Reciept.print(header.DocNo);
                 });
               }, function (err) {
                 console.log(err);
