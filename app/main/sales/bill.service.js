@@ -944,6 +944,7 @@ angular.module('itouch.services')
           var i = DB.fetch(res);
           if(i){
             i.SubTotal *= -1;
+            i.Qty *= -1;
             i.Tax1DiscAmount = _.isNumber(i.Tax1DiscAmount) ? (i.Tax1DiscAmount *= -1).roundTo(2) : 0;
             i.Tax2DiscAmount = _.isNumber(i.Tax2DiscAmount) ? (i.Tax2DiscAmount *= -1).roundTo(2) : 0;
             i.Tax3DiscAmount = _.isNumber(i.Tax3DiscAmount) ? (i.Tax3DiscAmount *= -1).roundTo(2): 0;
