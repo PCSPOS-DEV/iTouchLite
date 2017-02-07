@@ -2,8 +2,8 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory("ShiftService", ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', '$localStorage', 'AuthService', 'ControlService', '$filter',
-    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, $localStorage, AuthService, ControlService, $filter) {
+  .factory("ShiftService", ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', '$localStorage', 'AuthService', 'ControlService', '$filter', 'ItemService',
+    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, $localStorage, AuthService, ControlService, $filter, ItemService) {
       var self = this;
 
       self.fetch = function () {
@@ -55,6 +55,17 @@ angular.module('itouch.services')
         return deferred.promise;
       }
 
+      self.getById = function (id) {
+        var deferred = $q.defer();
+        DB.query("SELECT * FROM shifts WHERE Id = ?", [id]).then(function (data) {
+          deferred.resolve(DB.fetch(data));
+        }, function (ex) {
+          throw new Error(ex.message);
+          deferred.reject(ex.message);
+        });
+        return deferred.promise;
+      }
+
       self.getDeclareCashShifts = function () {
         var deferred = $q.defer();
         DB.query("SELECT * FROM shifts WHERE Id IN(SELECT Id FROM shiftstatus WHERE CloseDateTime IS NOT NULL AND DeclareCashLater)", []).then(function (data) {
@@ -68,6 +79,7 @@ angular.module('itouch.services')
 
       self.saveCurrent = function (shift) {
         $localStorage.shift = shift;
+
         return DB.insert(DB_CONFIG.tableNames.auth.shiftStatus, {
           Id: shift.Id,
           ShiftName: shift.Description1,
@@ -76,6 +88,27 @@ angular.module('itouch.services')
           RA: shift.RA,
           RANoAdj: shift.RANoAdj,
           DeclareCashLater: false
+        });
+
+      }
+
+      self.addFloat = function(shift, amount){
+        var header = initBillHeader();
+        header.DocType = 'RA';
+        header.Remarks = "Add Float";
+        header.SubTotal = amount;
+        header.ShiftId = shift.Id;
+        header.CashierId = shift.Id;
+
+        var payTrans = initPayTrans(header.DocNo);
+        payTrans.Amount = amount
+
+        return $q.all({
+          header: DB.insert(DB_CONFIG.tableNames.bill.header, header),
+          payTrans: DB.insert(DB_CONFIG.tableNames.bill.payTransactions, payTrans)
+        }).then(function(){
+          ControlService.counterDocId(header.DocNo);
+          return true;
         });
       }
 
@@ -171,10 +204,10 @@ angular.module('itouch.services')
         return deferred.promise;
       }
 
-      var declareCash = function(Amount, ShiftId){
+      var initBillHeader = function(){
         header = {};
         header.DocNo = ControlService.getNextDocId();
-        header.DocType = 'CD';
+        header.DocType = null;
         header.LocationId = SettingsService.getLocationId();
         header.MachineId = SettingsService.getMachineId();
         header.BusinessDate = ControlService.getBusinessDate(true);
@@ -182,18 +215,18 @@ angular.module('itouch.services')
 
         header.AuthBy = 0;
         header.VipId = 0;
-        header.CashierId = ShiftId;
+        header.CashierId = null;
         header.TableId = 0;
         header.DepAmount = 0;
         header.VoidDocNo = 0;
         header.ReprintCount = 0;
         header.OrderTag = "";
-        header.Remarks = "Declare Cash";
+        header.Remarks = null;
         header.IsClosed = true;
         header.Pax = 0;
 
-        header.SubTotal = Amount;
-        header.ShiftId = ShiftId;
+        header.SubTotal = 0;
+        header.ShiftId = null;
 
         header.DepAmount = 0;
         header.DiscAmount = 0;
@@ -220,9 +253,42 @@ angular.module('itouch.services')
         header.Tax5Perc = 0;
         header.IsExported = true;
         header.IsClosed = true;
+        return header;
+      }
 
-        return DB.insert(DB_CONFIG.tableNames.bill.header, header).then(function(){
-          ControlService.saveDocId(header.DocNo);
+      var initPayTrans = function(DocNo){
+        return {
+          BusinessDate: ControlService.getBusinessDate(true),
+          LocationId: SettingsService.getLocationId(),
+          MachineId: SettingsService.getMachineId(),
+          DocNo: DocNo,
+          Cash: 'true',
+          SeqNo: 1,
+          PayTypeId: SettingsService.getCashId(),
+          Amount: 0,
+          ChangeAmount: 0,
+          ConvRate: 0,
+          CurrencyId: 0,
+          IsExported: true
+        };
+      }
+
+      var declareCash = function(Amount, ShiftId){
+        var header = initBillHeader();
+        header.DocType = 'CD';
+        header.Remarks = "Declare Cash";
+        header.SubTotal = Amount;
+        header.ShiftId = ShiftId;
+        header.CashierId = ShiftId;
+
+        var payTrans = initPayTrans(header.DocNo);
+        payTrans.Amount = Amount
+
+        return $q.all({
+          header: DB.insert(DB_CONFIG.tableNames.bill.header, header),
+          payTrans: DB.insert(DB_CONFIG.tableNames.bill.payTransactions, payTrans)
+        }).then(function(){
+          BillService.saveReceiptId(header.DocNo);
           return true;
         });
       }
@@ -240,6 +306,132 @@ angular.module('itouch.services')
         });
 
         return deferred.promise;
+      }
+
+      var getHeaderDetailsForMode = function(shiftId, mode){
+        var q = "SELECT ShiftId, "
+          +"COUNT(*) AS ItemCount, "
+          +"SUM(SubTotal) AS SubTotal, "
+          +"SUM(DiscAmount) AS DiscAmount, "
+          +"SUM(Tax1Amount) AS Tax1Amount, "
+          +"SUM(Tax2Amount) AS Tax2Amount, "
+          +"SUM(Tax3Amount) AS Tax3Amount, "
+          +"SUM(Tax4Amount) AS Tax4Amount, "
+          +"SUM(Tax5Amount) AS Tax5Amount, "
+          +"SUM(Tax1DiscAmount) AS Tax1DiscAmount, "
+          +"SUM(Tax2DiscAmount) AS Tax2DiscAmount, "
+          +"SUM(Tax3DiscAmount) AS Tax3DiscAmount, "
+          +"SUM(Tax4DiscAmount) AS Tax4DiscAmount, "
+          +"SUM(Tax5DiscAmount) AS Tax5DiscAmount "
+        +"FROM BillHeader WHERE 1=1 ";
+        var data = [];
+
+        if(!_.isUndefined(mode)){
+          q += "AND DocType = ? ";
+          data.push(mode);
+        }
+
+        if(!_.isUndefined(shiftId)){
+          q += "AND ShiftId = ? ";
+          data.push(shiftId);
+        }
+        q += "GROUP BY ShiftId";
+        return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
+      }
+
+      var getItemDetails = function(type, shiftId){
+        var q = "SELECT "
+          +"COUNT(*) AS ItemCount, "
+          +"SUM(d.SubTotal) AS SubTotal, "
+          +"SUM(d.DiscAmount) AS DiscAmount, "
+          +"SUM(d.Tax1Amount) AS Tax1Amount, "
+          +"SUM(d.Tax2Amount) AS Tax2Amount, "
+          +"SUM(d.Tax3Amount) AS Tax3Amount, "
+          +"SUM(d.Tax4Amount) AS Tax4Amount, "
+          +"SUM(d.Tax5Amount) AS Tax5Amount, "
+          +"SUM(d.Tax1DiscAmount) AS Tax1DiscAmount, "
+          +"SUM(d.Tax2DiscAmount) AS Tax2DiscAmount, "
+          +"SUM(d.Tax3DiscAmount) AS Tax3DiscAmount, "
+          +"SUM(d.Tax4DiscAmount) AS Tax4DiscAmount, "
+          +"SUM(d.Tax5DiscAmount) AS Tax5DiscAmount "
+          +"FROM BillDetail AS d INNER JOIN BillHeader AS h ON d.DocNo = h.DocNo WHERE 1=1 ";
+        switch(type){
+          case 'reverse':
+            q += "AND Qty < 0 ";
+            break;
+        }
+        var data = [];
+
+        if(!_.isUndefined(shiftId)){
+          q += "AND ShiftId = ? ";
+          data.push(shiftId);
+        }
+        q += "GROUP BY ShiftId";
+        return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
+      }
+
+      var getVoidItemDetails = function(shiftId){
+        var q = "SELECT "
+          +"COUNT(*) AS ItemCount, "
+          +"SUM(d.SubTotal) AS SubTotal, "
+          +"SUM(d.DiscAmount) AS DiscAmount "
+          +"FROM VoidItems AS d WHERE 1=1 ";
+        var data = [];
+
+        if(!_.isUndefined(shiftId)){
+          q += "AND ShiftId = ? ";
+          data.push(shiftId);
+        }
+        q += "GROUP BY ShiftId";
+        return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
+      }
+
+      self.getHeaderDetails = function(shiftId){
+        return $q.all({
+          sales: getHeaderDetailsForMode(shiftId, 'SA'),
+          void: getHeaderDetailsForMode(shiftId, 'VD'),
+          float: getHeaderDetailsForMode(shiftId, 'RA'),
+          payout: getHeaderDetailsForMode(shiftId, 'PO'),
+          receiveIn: getHeaderDetailsForMode(shiftId, 'RI'),
+          cashDeclared: getHeaderDetailsForMode(shiftId, 'CD'),
+          reverse: getItemDetails('reverse', shiftId),
+          itemVoid: getVoidItemDetails(shiftId)
+        }).then(function(data){
+          data.sales = ItemService.calculateTotal(_.first(data.sales));
+          data.refund = ItemService.calculateTotal(_.first(data.refund));
+          data.float = ItemService.calculateTotal(_.first(data.float));
+          data.payout = ItemService.calculateTotal(_.first(data.payout));
+          data.receiveIn = ItemService.calculateTotal(_.first(data.receiveIn));
+          data.cashDeclared = ItemService.calculateTotal(_.first(data.cashDeclared));
+          data.reverse = ItemService.calculateTotal(_.first(data.reverse));
+          data.itemVoid = _.first(data.itemVoid);
+
+          return data;
+        });
+      }
+
+      var getTransDetailsForMode = function(shiftId, cash){
+        var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount) AS Amount FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE Cash = ?";
+        var data = [cash];
+        // +"WHERE DocType = 'SA' "
+        if(!_.isUndefined(shiftId)){
+          q += "AND ShiftId = ?";
+          data.push(shiftId);
+        }
+        q += "GROUP BY ShiftId";
+        return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
+      }
+
+      self.getTransDetails = function(shiftId){
+        return $q.all({
+          cash: getTransDetailsForMode(shiftId, 'true'),
+          nonCash: getTransDetailsForMode(shiftId, 'false')
+        }).then(function(data){
+          data.cash = _.first(data.cash);
+          data.nonCash = _.first(data.nonCash);
+
+          return data;
+        });
       }
 
       return self;

@@ -2,14 +2,13 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state',
-    function ($scope, ShiftService, $ionicPopup, $state) {
+  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q',
+    function ($scope, ShiftService, $ionicPopup, $state, Report, $q) {
       $scope.shifts = [];
       $scope.shiftSelectionShown = true;
       $scope.shift = {};
       $scope.title = '';
 
-      console.log('shift');
       $scope.$on('modal.shown', function(event, modal) {
         $scope.shiftSelectionShown = true;
         if(modal.id == 3){
@@ -69,9 +68,13 @@ angular.module('itouch.controllers')
       }
 
       $scope.save = function () {
-        ShiftService.saveCurrent($scope.shift).then(function(){
+        $q.all({
+          save: ShiftService.saveCurrent($scope.shift),
+          addFloat: ShiftService.addFloat($scope.shift, 200)
+        }).then(function(){
           $scope.$emit("shift-modal-close");
           $scope.$emit('shift-changed');
+          Report.printAddFloat(200);
         }, function(err){
           console.log(err);
         });

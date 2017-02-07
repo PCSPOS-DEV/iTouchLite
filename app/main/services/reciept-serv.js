@@ -189,4 +189,9 @@ angular.module('itouch.services')
     });
   }
 
+  self.openDrawer = function(){
+    printer = PrintService.getPrinter();
+    printer.addPulse();
+  }
+
 }]);
