@@ -7,7 +7,8 @@ angular.module('itouch.controllers')
       $scope.settings = {
         ent_id: SettingsService.getEntityId(),
         loc_id: SettingsService.getLocationId(),
-        mac_id: SettingsService.getMachineId()
+        mac_id: SettingsService.getMachineId(),
+        cash_id: SettingsService.getCashId()
       };
     } catch(ex){
       $scope.settings = {
@@ -22,6 +23,7 @@ angular.module('itouch.controllers')
       SettingsService.setEntityId($scope.settings.ent_id);
       SettingsService.setLocationId($scope.settings.loc_id);
       SettingsService.setMachineId($scope.settings.mac_id);
+      SettingsService.setCashId($scope.settings.cash_id);
       SettingsService.save();
 
       SyncService.do();

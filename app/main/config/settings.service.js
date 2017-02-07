@@ -129,5 +129,18 @@ angular.module('itouch.services')
       }
     }
 
+    self.setCashId = function (cash_id) {
+      settings.cash_id = cash_id;
+    }
+
+    self.getCashId = function () {
+      if(settings.cash_id){
+        return parseInt(settings.cash_id);
+      } else {
+        return null;
+      }
+
+    }
+
     return self;
   }]);
