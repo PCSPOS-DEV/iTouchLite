@@ -217,5 +217,76 @@ angular.module('itouch.services')
 
       }
 
+      self.addTitle = function(text){
+        printer.addTextAlign(printer.ALIGN_CENTER);
+        printer.addTextSize(2, 2);
+        printer.addTextStyle(false, false, true);
+        printer.addText(text+"\n");
+        printer.addTextStyle(false, false, false);
+        printer.addTextSize(1, 1);
+        printer.addTextAlign(printer.ALIGN_LEFT);
+      }
+
+      self.addReportLine = function(startBlock, endBlock, qtyBlock){
+
+        if(startBlock && endBlock){
+          var lengths  = {
+            start: startBlock.length,
+            end: endBlock.length,
+            qty: qtyBlock ? qtyBlock.length : 0,
+            spaces: 0,
+            total: $localStorage.printeSettings.maxCharsPerLine,
+            startBlockMaxLength: 22
+          }
+
+          if(startBlock.length > lengths.startBlockMaxLength){
+            startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
+            startBlock += "...";
+            // console.log(startBlock);
+          }
+
+          lengths.spaces = 22 - lengths.start;
+          lengths.spaces  = lengths.spaces < 1 ? 1 : lengths.spaces;
+
+          printer.addText("  " +startBlock);
+
+          addSpaces(lengths.spaces);
+
+          if(qtyBlock){
+            addSpaces(4 - lengths.qty);
+            printer.addText(qtyBlock);
+          } else {
+            addSpaces(4);
+          }
+          addSpaces(12);
+
+          if(lengths.end < 8){
+            addSpaces(8 - lengths.end);
+          }
+
+          printer.addText(endBlock + '\n');
+        }
+      }
+
+      self.addLine = function(text){
+        printer.addText(text + '\n');
+      }
+
+      self.addLineBreak = function(){
+        printer.addText('\n');
+      }
+
+      self.alignCenter = function(){
+        printer.addTextAlign(printer.ALIGN_CENTER);
+      }
+
+      self.alignLeft = function(){
+        printer.addTextAlign(printer.ALIGN_LEFT);
+      }
+
+      self.alignRight = function(){
+        printer.addTextAlign(printer.ALIGN_RIGHT);
+      }
+
       return self;
     }]);
