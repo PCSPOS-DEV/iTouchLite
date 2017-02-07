@@ -115,8 +115,12 @@ angular.module('itouch.services')
      * @returns {string}
        */
     self.getNextDocId = function() {
-      var newId = parseInt($localStorage.app_config.currentDocId.substring(1, 6));
-      return 'R'+('00000' + ++newId).slice(-5);
+      if($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)){
+        var newId = parseInt($localStorage.app_config.currentDocId.substring(1, 6));
+        return 'R'+('00000' + ++newId).slice(-5);
+      } else{
+        return 'R00001';
+      }
     }
 
     /**
@@ -137,6 +141,14 @@ angular.module('itouch.services')
 
     self.getTakeAwayTax = function () {
       return 0;
+    }
+
+    self.counterDocId = function(DocNo){
+      self.saveDocId(DocNo);
+      var nextId = self.getNextDocId();
+      console.log(self.getDocId());
+      self.saveDocId(nextId);
+      console.log(nextId);
     }
 
     return self;
