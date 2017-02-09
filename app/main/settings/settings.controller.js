@@ -26,9 +26,15 @@ angular.module('itouch.controllers')
       SettingsService.setCashId($scope.settings.cash_id);
       SettingsService.save();
 
-      SyncService.do();
+      SyncService.do().then(function () {
+        SettingsService.setEntityId($scope.settings.ent_id);
+        SettingsService.setLocationId($scope.settings.loc_id);
+        SettingsService.setMachineId($scope.settings.mac_id);
+        SettingsService.save();
+        $state.go('login');
+      });
 
-      $state.go('login');
+
     }
 
   }]);
