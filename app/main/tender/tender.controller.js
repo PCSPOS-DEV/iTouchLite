@@ -52,9 +52,9 @@ angular.module('itouch.controllers')
       $scope.$on("modal.shown", function () {
         if($scope.shownModal == 'tender'){
 
-          BillService.getHeader().then(function(header){
+          var rec_id = BillService.getCurrentReceiptId();
+          return BillService.getHeader(rec_id).then(function(header){
             $scope.tenderHeader = header;
-            $scope.tenderHeader.DocNo = ControlService.getDocId();
             refreshData();
           });
         }
@@ -246,17 +246,25 @@ angular.module('itouch.controllers')
 
                 numpadValue = "";
                 setValueManually = false;
-                Reciept.openDrawer();
+                if(tenderType.OpenDrawer == 'true'){
+                  Reciept.openDrawer();
+                }
                 Reciept.print(header.DocNo);
 
 
-                $ionicPopup.alert({
-                  title: 'Balance',
-                  template: '<p>Balance: $'+ changeAmount.toFixed(2) + '</p><p>Rounded Balance: $'+ changeAmount.roundTo(2, .25).toFixed(2) +'</p>'
-                }).then(function(){
+                if(changeAmount > 0){
+                  $ionicPopup.alert({
+                    title: 'Balance',
+                    template: '<p>Balance: $'+ changeAmount.toFixed(2)+'</p>'
+                  }).then(function(){
+                    $scope.$emit("refresh-cart");
+                    $scope.$emit("close-tenderModel");
+                  });
+                } else {
                   $scope.$emit("refresh-cart");
                   $scope.$emit("close-tenderModel");
-                });
+                }
+
               }, function (err) {
                 console.log(err);
               });
