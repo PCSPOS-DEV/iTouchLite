@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService',
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService) {
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService',
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService) {
       var self = this;
       var dayEnd = false;
 
@@ -95,18 +95,27 @@ angular.module('itouch.controllers')
           console.log(shift);
           var promise = null;
           if(cash == 'later'){
-            promise = ShiftService.declareCashLater(shift.Id);
+            ShiftService.declareCashLater(shift.Id).then(function(){
+              self.shiftModal.hide();
+              $scope.closeShiftOptionsModal();
+              $scope.$emit('shift-changed');
+            }, function(err){
+              console.log(err);
+            });
           } else {
-            promise = ShiftService.declareCash(cash, shift.Id);
+            ShiftService.declareCash(cash, shift.Id).then(function(DocNo){
+              self.shiftModal.hide();
+              Report.printDeclareCash(shift, cash);
+
+              Report.printShiftClosingReport(shift.Id);
+              $scope.closeShiftOptionsModal();
+              $scope.$emit('shift-changed');
+            }, function(err){
+              console.log(err);
+            });;
           }
 
-          promise.then(function(){
-            self.shiftModal.hide();
-            $scope.closeShiftOptionsModal();
-            $scope.$emit('shift-changed');
-          }, function(err){
-            console.log(err);
-          });
+          promise
           // console.log('Tapped!', res);
         });
       }
@@ -178,11 +187,11 @@ angular.module('itouch.controllers')
           }
 
           ShiftService.dayEnd().then(function () {
-            $scope.closeShiftOptionsModal();
             $scope.$emit('shift-changed');
+            Report.printShiftClosingReport();
             Alert.showAlert('Success!', 'Day end completed').then(function(){
-
-            })
+              $scope.closeShiftOptionsModal();
+            });
           }, function (err) {
             console.log(err);
             dayEnd = false;

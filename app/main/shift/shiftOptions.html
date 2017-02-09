@@ -2,7 +2,7 @@
   <ion-header-bar>
     <!--<button class="button button-icon ion-arrow-left-c" ng-if="!shiftSelectionShown" ng-click="goBack()"></button>-->
     <h1 class="title">Shift Options</h1>
-    <button class="button button-clear" ng-click="closeShiftOptionsModal()"> <i class="ion-close-round"></i></button>
+    <button ng-if="!modalCloseDisabled" class="button button-clear" ng-click="closeShiftOptionsModal()"> <i class="ion-close-round"></i></button>
   </ion-header-bar>
   <ion-content class="padding">
     <div class="row">

@@ -49,7 +49,8 @@ angular.module('itouch.controllers')
             closeShift($scope.shift);
             break;
           case 'declareCash':
-            $scope.$emit("shift-modal-close");
+            $scope.close();
+            $scope.closeShiftOptionsModal();
             $scope.$emit("declare-cash", shift);
             break;
           default:
@@ -70,11 +71,12 @@ angular.module('itouch.controllers')
       $scope.save = function () {
         $q.all({
           save: ShiftService.saveCurrent($scope.shift),
-          addFloat: ShiftService.addFloat($scope.shift, 200)
+          addFloat: ShiftService.addFloat($scope.shift, $scope.shift.RA)
         }).then(function(){
-          $scope.$emit("shift-modal-close");
+          $scope.close();
           $scope.$emit('shift-changed');
-          Report.printAddFloat(200);
+          $scope.closeShiftOptionsModal();
+          Report.printAddFloat($scope.shift.RA);
         }, function(err){
           console.log(err);
         });

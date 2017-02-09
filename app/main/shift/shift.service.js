@@ -288,7 +288,7 @@ angular.module('itouch.services')
           header: DB.insert(DB_CONFIG.tableNames.bill.header, header),
           payTrans: DB.insert(DB_CONFIG.tableNames.bill.payTransactions, payTrans)
         }).then(function(){
-          BillService.saveReceiptId(header.DocNo);
+          ControlService.counterDocId(header.DocNo);
           return true;
         });
       }
@@ -299,6 +299,7 @@ angular.module('itouch.services')
         DB.addDeleteToQueue("ShiftStatus");
 
         DB.executeQueue().then(function(){
+          $localStorage.shift = null;
           ControlService.setDayEndDate(ControlService.getBusinessDate());
           deferred.resolve();
         }, function(err){
@@ -308,7 +309,7 @@ angular.module('itouch.services')
         return deferred.promise;
       }
 
-      var getHeaderDetailsForMode = function(shiftId, mode){
+      var getHeaderDetailsForMode = function(shiftId, mode, discounted){
         var q = "SELECT ShiftId, "
           +"COUNT(*) AS ItemCount, "
           +"SUM(SubTotal) AS SubTotal, "
@@ -326,14 +327,22 @@ angular.module('itouch.services')
         +"FROM BillHeader WHERE 1=1 ";
         var data = [];
 
-        if(!_.isUndefined(mode)){
+        if(_.isUndefined(mode) || _.isNull(mode)){
+
+        } else {
           q += "AND DocType = ? ";
           data.push(mode);
         }
 
-        if(!_.isUndefined(shiftId)){
+        if(_.isUndefined(shiftId) || _.isNull(shiftId)){
+
+        } else {
           q += "AND ShiftId = ? ";
           data.push(shiftId);
+        }
+
+        if(discounted){
+          q += "AND DiscAmount > 0 ";
         }
         q += "GROUP BY ShiftId";
         return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
@@ -370,6 +379,11 @@ angular.module('itouch.services')
         return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
       }
 
+      var getReceiptCount = function(shiftId){
+        var q = "SELECT  COUNT(*) AS ItemCount FROM BillHeader WHERE DocType = 'SA' OR DocType = 'VD' GROUP BY ShiftId";
+        return DB.query(q).then(function(res){ return DB.fetch(res); });
+      }
+
       var getVoidItemDetails = function(shiftId){
         var q = "SELECT "
           +"COUNT(*) AS ItemCount, "
@@ -395,12 +409,16 @@ angular.module('itouch.services')
           receiveIn: getHeaderDetailsForMode(shiftId, 'RI'),
           cashDeclared: getHeaderDetailsForMode(shiftId, 'CD'),
           reverse: getItemDetails('reverse', shiftId),
-          itemVoid: getVoidItemDetails(shiftId)
+          itemVoid: getVoidItemDetails(shiftId),
+          discounted: getHeaderDetailsForMode(shiftId, null, true),
+          recCount: getReceiptCount()
         }).then(function(data){
           data.sales = ItemService.calculateTotal(_.first(data.sales));
+          data.discounted = ItemService.calculateTotal(_.first(data.discounted));
           data.refund = ItemService.calculateTotal(_.first(data.refund));
           data.float = ItemService.calculateTotal(_.first(data.float));
           data.payout = ItemService.calculateTotal(_.first(data.payout));
+          data.void = ItemService.calculateTotal(_.first(data.void));
           data.receiveIn = ItemService.calculateTotal(_.first(data.receiveIn));
           data.cashDeclared = ItemService.calculateTotal(_.first(data.cashDeclared));
           data.reverse = ItemService.calculateTotal(_.first(data.reverse));
@@ -410,13 +428,18 @@ angular.module('itouch.services')
         });
       }
 
-      var getTransDetailsForMode = function(shiftId, cash){
-        var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount) AS Amount FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE Cash = ?";
+      var getTransDetailsForMode = function(shiftId, cash, rounded){
+        var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount) AS Amount, SUM(ChangeAmount) AS ChangeAmount FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE Cash = ? AND DocType != 'CD' ";
         var data = [cash];
         // +"WHERE DocType = 'SA' "
         if(!_.isUndefined(shiftId)){
-          q += "AND ShiftId = ?";
+          q += "AND ShiftId = ? ";
           data.push(shiftId);
+        }
+        if(!_.isUndefined(rounded)){
+          q += "AND PayTypeId = -1 ";
+        } else {
+          q += "AND PayTypeId > 0 ";
         }
         q += "GROUP BY ShiftId";
         return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
@@ -425,10 +448,12 @@ angular.module('itouch.services')
       self.getTransDetails = function(shiftId){
         return $q.all({
           cash: getTransDetailsForMode(shiftId, 'true'),
-          nonCash: getTransDetailsForMode(shiftId, 'false')
+          nonCash: getTransDetailsForMode(shiftId, 'false'),
+          rounded: getTransDetailsForMode(shiftId, 'false', true)
         }).then(function(data){
           data.cash = _.first(data.cash);
           data.nonCash = _.first(data.nonCash);
+          data.rounded = _.first(data.rounded);
 
           return data;
         });

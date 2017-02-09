@@ -253,8 +253,8 @@ angular.module('itouch.services')
           addSpaces(lengths.spaces);
 
           if(qtyBlock){
-            addSpaces(4 - lengths.qty);
             printer.addText(qtyBlock);
+            addSpaces(4 - lengths.qty);
           } else {
             addSpaces(4);
           }
@@ -268,7 +268,7 @@ angular.module('itouch.services')
         }
       }
 
-      self.addLine = function(text){
+      self.addTextLine = function(text){
         printer.addText(text + '\n');
       }
 

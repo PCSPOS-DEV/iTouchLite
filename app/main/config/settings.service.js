@@ -30,6 +30,17 @@ angular.module('itouch.services')
 
     self.setLocationId = function (loc_id) {
       settings.loc_id = loc_id;
+      if(loc_id){
+        self.getLocation(loc_id).then(function(location){
+          if(location){
+            console.log(location);
+            settings.location = location;
+            self.save();
+          }
+        }, function(err){
+          console.log(err);
+        });
+      }
     }
 
     self.getLocationId = function () {
@@ -117,6 +128,12 @@ angular.module('itouch.services')
 
     self.getMachine = function(id){
       return DB.select(DB_CONFIG.tableNames.config.machines, '*', { columns: 'Id=?', data: [id] }).then(function(res){
+        return DB.fetch(res);
+      });
+    }
+
+    self.getLocation = function(id){
+      return DB.select(DB_CONFIG.tableNames.locations.locations, '*', { columns: 'Id=?', data: [id] }).then(function(res){
         return DB.fetch(res);
       });
     }

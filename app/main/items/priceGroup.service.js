@@ -43,6 +43,7 @@ angular.module('itouch.services')
     }
 
     self.get = function (plu, priceGroupId, priceLevel, taxable) {
+      location = LocationService.currentLocation;
       return DB.query("SELECT * FROM " + DB_CONFIG.tableNames.item.priceGroups + " WHERE  PLU = ? AND PriceGroupId = ? AND PriceLevelId = ?", [plu, priceGroupId, priceLevel]).then(function (result) {
         var data = DB.fetch(result);
         if(data){
@@ -51,7 +52,7 @@ angular.module('itouch.services')
           data.AlteredPrice = data.AlteredPrice;
           data.StdCost = data.StdCost;
           if(taxable){
-            if(location.Tax5Option == 3){
+            if(location && location.Tax5Option == 3){
               data.Price =((data.Price / (100 + location.Tax5Perc)) * 100).roundTo(2);
             }
           }

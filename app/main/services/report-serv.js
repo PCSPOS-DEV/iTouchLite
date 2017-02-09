@@ -245,66 +245,80 @@ angular.module('itouch.services')
         data.header.sales.Total -= data.header.void.Total;
         data.header.sales.Discount -= data.header.void.Discount;
       }
-      var salesTotal = data.header.sales.Total - data.header.sales.Discount;
+      var localTotal = (data.trans.cash ? data.trans.cash.Amount:0 );
+      localTotal+= data.trans.nonCash ? data.trans.nonCash.Amount : 0;
+      localTotal -= data.trans.cash ? data.trans.cash.ChangeAmount : 0
+      var miscTotal = data.header.float ? data.header.float.Total : 0;
+      miscTotal += data.header.payOut ? data.header.payOut.Total : 0;
+      miscTotal += data.header.receiveIn ? data.header.receiveIn.Total : 0;
+      miscTotal += data.trans.rounded? data.trans.rounded.Amount:0;
+      var cash = (data.trans.cash?data.trans.cash.Amount-data.trans.cash.ChangeAmount:0);
+      var diff = (data.header.cashDeclared ? data.header.cashDeclared.Total:0) - cash;
 
       if(PrintService.isConnected()){
         try {
           printer = PrintService.getPrinter();
           self.creatRecieptHeader();
           PrintService.addHLine();
-          PrintService.addTitle('Shift Closing Report');
+          PrintService.addTitle(data.shift ? 'Shift Closing Report' : 'Z Report');
           PrintService.alignCenter();
-          PrintService.addLine('Shift : '+ data.shift.Description1);
+          if(data.shift){
+            PrintService.addTextLine('Shift : '+ data.shift.Description1);
+          }
+
           PrintService.addLineBreak();
-          PrintService.addLine('BUSINESS DATE : '+ bDate.format('DD/MM/YYYY'));
-          PrintService.addLine('TAKEN BY : '+ user.Id);
+          PrintService.addTextLine('BUSINESS DATE : '+ bDate.format('DD/MM/YYYY'));
+          PrintService.addTextLine('TAKEN BY : '+ user.Id);
 
           PrintService.addLineBreak();
 
 
           PrintService.alignLeft();
-          PrintService.addLine('CASH IN DRAWER (INCLUDING FLOAT)');
-          PrintService.addReportLine('DECLARED', (data.header.cashDeclared? data.header.cashDeclared.Total:0).toFixed(2));
-          PrintService.addReportLine('ACTUAL', '0.00');
-          PrintService.addTabbedLine('DIFFERENCE', '0.00');
+          PrintService.addTextLine('CASH IN DRAWER (INCLUDING FLOAT)');
+          PrintService.addReportLine('DECLARED', (data.header.cashDeclared ? data.header.cashDeclared.Total:0).toFixed(2));
+          PrintService.addReportLine('ACTUAL', cash.toFixed(2));
+          PrintService.addTabbedLine('DIFFERENCE', diff.toFixed(2));
           PrintService.addLineBreak();
           PrintService.addLineBreak();
 
-          PrintService.addLine('SALES TRANSACTIONS');
-          PrintService.addReportLine('GROSS SALES', (data.header.sales ? data.header.sales.Total: 0).toFixed(2));
-          PrintService.addReportLine('DISCOUNT', (data.header.sales? data.header.sales.Discount: 0).toFixed(2));
-          PrintService.addTabbedLine('SALES TOTAL', salesTotal.toFixed(2));
+          PrintService.addTextLine('SALES TRANSACTIONS');
+          PrintService.addReportLine('GROSS SALES', (data.header.sales ? data.header.sales.Total: 0).toFixed(2), ""+(data.trans.cash?data.header.sales.ItemCount: 0));
+          PrintService.addReportLine('DISCOUNT', (data.header.discounted? data.header.discounted.Discount: 0).toFixed(2), ""+(data.header.discounted?data.header.discounted.ItemCount: 0));
+          PrintService.addTabbedLine('SALES TOTAL',(data.header.sales? data.header.sales.Total: 0).toFixed(2));
           PrintService.addLineBreak();
           PrintService.addLineBreak();
 
-          PrintService.addLine('MISCELLANEOUS TRANSACTIONS');
-          PrintService.addReportLine('R.A(FLOAT)', (data.header.float? data.header.float.Total:0).toFixed(2));
-          PrintService.addReportLine('PAY OUT', (data.header.payOut ? data.header.payOut.Total:0).toFixed(2));
-          PrintService.addReportLine('RECEIVE IN', (data.header.receiveIn ? data.header.receiveIn.Total:0).toFixed(2));
-          PrintService.addTabbedLine('MICS TOTAL', (data.header.sales.Total||0).toFixed(2));
-          PrintService.addReportLine('TRANSACTION TOTAL', (data.header.sales ? data.header.sales.Total:0).toFixed(2));
+          PrintService.addTextLine('MISCELLANEOUS TRANSACTIONS');
+          PrintService.addReportLine('ROUNDED', (data.trans.rounded? data.trans.rounded.Amount:0).toFixed(2), ""+(data.trans.rounded?data.trans.rounded.ItemCount: 0));
+          PrintService.addReportLine('R.A(FLOAT)', (data.header.float? data.header.float.Total:0).toFixed(2), ""+(data.header.float?data.header.float.ItemCount: 0));
+          PrintService.addReportLine('PAY OUT', (data.header.payOut ? data.header.payOut.Total:0).toFixed(2), ""+(data.header.payOut?data.header.payOut.ItemCount: 0));
+          PrintService.addReportLine('RECEIVE IN', (data.header.receiveIn ? data.header.receiveIn.Total:0).toFixed(2), ""+(data.header.receiveIn?data.header.receiveIn.ItemCount: 0));
+          PrintService.addTabbedLine('MICS TOTAL', miscTotal.toFixed(2));
+          PrintService.addReportLine('TRANSACTION TOTAL', ((data.header.sales? data.header.sales.Total: 0)+miscTotal).toFixed(2));
           PrintService.addLineBreak();
           PrintService.addLineBreak();
 
-          PrintService.addLine('LOCAL COLLECTION');
-          PrintService.addLine('  CASH COLLECTION (INCLUDING FLOAT)');
-          PrintService.addReportLine('CASH', (data.trans.cash.Amount||0).toFixed(2), ""+data.trans.cash.ItemCount);
-          PrintService.addReportLine('NON-CASH COLLECTION', (data.trans.nonCash.Amount||0).toFixed(2), ""+data.trans.nonCash.ItemCount);
-          PrintService.addTabbedLine('LOCAL TOTAL', (data.trans.cash.Amount+ data.trans.nonCash.Amount).toFixed(2));
+          PrintService.addTextLine('LOCAL COLLECTION');
+          PrintService.addTextLine('  CASH COLLECTION (INCLUDING FLOAT)');
+          PrintService.addReportLine('CASH', cash.toFixed(2), ""+(data.trans.cash?data.trans.cash.ItemCount: 0));
+          PrintService.addReportLine('NON-CASH COLLECTION', (data.trans.nonCash?data.trans.nonCash.Amount:0).toFixed(2), ""+ (data.trans.nonCash ? data.trans.nonCash.ItemCount : 0));
+          PrintService.addTabbedLine('LOCAL TOTAL', localTotal.toFixed(2));
           PrintService.addLineBreak();
           PrintService.addLineBreak();
 
-          PrintService.addReportLine('ITEM REVERSE', (data.header.float? data.header.float.Total:0).toFixed(2));
-          PrintService.addReportLine('ABORT', (data.header.float? data.header.float.Total:0).toFixed(2));
-          PrintService.addReportLine('TRANS VD', (data.header.float? data.header.float.Total:0).toFixed(2));
-          PrintService.addReportLine('ITEM VD', (data.header.float? data.header.float.Total:0).toFixed(2));
+          PrintService.addReportLine('ITEM REVERSE', (data.header.refund? data.header.refund.Total:0).toFixed(2), ""+ (data.header.refund ? data.header.refund.ItemCount : 0));
+          PrintService.addReportLine('ABORT', (data.header.void? data.header.void.Total:0).toFixed(2), ""+ (data.header.void ? data.header.void.ItemCount : 0));
+          PrintService.addReportLine('TRANS VD', (data.header.void? data.header.void.Total:0).toFixed(2), ""+ (data.header.void ? data.header.void.ItemCount : 0));
+          PrintService.addReportLine('ITEM VD', (data.header.itemVoid? data.header.itemVoid.Total:0).toFixed(2), ""+ (data.header.itemVoid ? data.itemVoid.refund.ItemCount : 0));
           PrintService.addLineBreak();
           // PrintService.addReportLine('DRAWER OPEN', (data.header.float? data.header.float.Total:0).toFixed(2));
-          PrintService.addReportLine('RECEIPT COUNT', (data.header.float? data.header.float.Total:0).toFixed(2));
+          PrintService.addReportLine('RECEIPT COUNT', (data.header.recCount? data.header.recCount.ItemCount:0).toFixed(2));
+          PrintService.addLineBreak();
+          PrintService.addLineBreak();
 
           PrintService.alignCenter();
-          PrintService.addLine(now+" "+' Machine : '+ machine.Code);
-          PrintService.addLine("**");
+          PrintService.addTextLine(now+" "+' Machine : '+ machine.Code);
+          PrintService.addTextLine("**");
 
 
           printer.addCut(printer.CUT_FEED);
