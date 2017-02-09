@@ -65,6 +65,9 @@ angular.module('itouch.services')
 
 
       self.createTempHeader = function (totals) {
+        if(!location){
+          location = angular.copy(LocationService.currentLocation);
+        }
         if(location){
           bill.header = {};
           bill.header.DocNo = self.generateReceiptId();
@@ -73,7 +76,7 @@ angular.module('itouch.services')
           bill.header.MachineId = SettingsService.getMachineId();
           bill.header.BusinessDate = businessDate;
           bill.header.SysDateTime = $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss');
-          bill.header.ShiftId = AuthService.getShift().Id;
+          bill.header.ShiftId = ShiftService.getCurrentId();
           bill.header.AuthBy = 0;
           bill.header.VipId = 0;
           bill.header.CashierId = AuthService.currentUser().Id;
@@ -114,7 +117,9 @@ angular.module('itouch.services')
             bill.header.Tax5Amount = 0;
           }
 
-          return DB.insert(DB_CONFIG.tableNames.bill.tempHeader, bill.header);
+          return DB.insert(DB_CONFIG.tableNames.bill.tempHeader, bill.header).then(function () {
+            ControlService.saveDocId(bill.header.DocNo);
+          });
         } else {
           return $q.reject("Location not selected");
         }
@@ -208,7 +213,8 @@ angular.module('itouch.services')
           BusinessDate: businessDate,
           LocationId: SettingsService.getLocationId(),
           MachineId: SettingsService.getMachineId(),
-          DocNo: bill.header.DocNo,
+          DocNo: ControlService.getDocId(),
+          // DocNo: bill.header.DocNo,
           Cash: cash == 'true',
           SeqNo: 0,
           PayTypeId: tenderTypeId,
@@ -224,7 +230,7 @@ angular.module('itouch.services')
 
       var saveItemToDB = function (item) {
         return DB.insert(DB_CONFIG.tableNames.bill.tempDetail, self.calculateTax(item)).then(function (res) {
-          calculateTotal(bill.header.DocNo).then(updateTempHeader);
+          calculateTotal(ControlService.getDocId()).then(updateTempHeader);
         });
       }
 
@@ -280,7 +286,7 @@ angular.module('itouch.services')
         var def = $q.defer();
         return self.getNewLineNumber().then(function (ln) {
           var success = function () {
-            BillService.saveReceiptId(bill.header.DocNo);
+            // BillService.saveReceiptId(bill.header.DocNo);
           };
           item.LineNumber = ln;
           item.ParentItemLineNumber = 0;
@@ -305,7 +311,7 @@ angular.module('itouch.services')
           DB.addInsertToQueue(DB_CONFIG.tableNames.bill.tempDetail, _.omit(item, ['selected', 'selectedList', 'list']));
           return DB.executeQueue().then(function () {
             // console.log("items");
-            return calculateTotal(bill.header.DocNo).then(updateTempHeader);
+            return calculateTotal(ControlService.getDocId()).then(updateTempHeader);
           });
         });
 
@@ -317,7 +323,7 @@ angular.module('itouch.services')
         var def = $q.defer();
         return DB.max(DB_CONFIG.tableNames.bill.tempDetail, 'LineNumber').then(function (ln) {
           var success = function () {
-            BillService.saveReceiptId(bill.header.DocNo);
+            // BillService.saveReceiptId(bill.header.DocNo);
           };
 
           if (!item.Qty) {
@@ -333,7 +339,7 @@ angular.module('itouch.services')
           DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.tempDetail, _.omit(item, 'Selections'), { columns: 'LineNumber=? AND ItemId=? AND DocNo=?', data: [item.LineNumber, itemId, item.DocNo]});
 
           return DB.executeQueue().then(function () {
-            return calculateTotal(bill.header.DocNo).then(updateTempHeader);
+            return calculateTotal(ControlService.getDocId()).then(updateTempHeader);
           });
         });
 
@@ -390,7 +396,7 @@ angular.module('itouch.services')
             clearTempBillDetails();
             clearTempDicounts();
             DB.clearQueue();
-            ControlService.saveDocId(bill.header.DocNo);
+            ControlService.counterDocId(bill.header.DocNo);
             deferred.resolve();
           }, function (err) {
             deferred.reject(err);
@@ -416,20 +422,24 @@ angular.module('itouch.services')
        * TODO filter
        * @returns {Promise.<TResult>|*}
        */
-      self.getHeader = function(){
-        return DB.select(DB_CONFIG.tableNames.bill.tempHeader, '*').then(function(rs){
+      self.getHeader = function(DocNo){
+        var where;
+        if(DocNo){
+          where = { columns: ' DocNo=? ', data: [DocNo] };
+        }
+        return DB.select(DB_CONFIG.tableNames.bill.tempHeader, '*', where).then(function(rs){
           return bill.header = DB.fetch(rs);
         });
       }
 
       self.getItems = function(docNo){
-        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', { columns: 'DocNo=?', data: [docNo||bill.header.DocNo] }).then(function(rs){
+        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
           return DB.fetchAll(rs);
         });
       }
 
       self.getDiscounts = function(docNo){
-        return DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, '*', { columns: 'DocNo=?', data: [docNo||bill.header.DocNo] }).then(function(rs){
+        return DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
           return DB.fetchAll(rs);
         });
       }
@@ -633,7 +643,7 @@ angular.module('itouch.services')
 
         item.BusinessDate = item.BusinessDate || businessDate;
         item.MachineId = item.MachineId || SettingsService.getMachineId();
-        item.DocNo = bill.header.DocNo;
+        item.DocNo = ControlService.getDocId();
         if (!item.Qty) {
           item.Qty = 1;
         }
@@ -848,7 +858,7 @@ angular.module('itouch.services')
           item.SysDateTime = $filter('date')(ControlService.getBusinessDate(), "yyyy-MM-dd HH:mm:ss");
           renameProperty(item, 'ParentItemLineNumber', 'ParentItemId')
           item.ShiftId = ShiftService.getCurrentId();
-          item.CashierId = 0;
+          item.CashierId = AuthService.currentUser().Id;
           item.StaffId = 0;
           item.IsExported = false;
 
@@ -870,7 +880,7 @@ angular.module('itouch.services')
             item.SysDateTime = date;
             renameProperty(item, 'ParentItemLineNumber', 'ParentItemId')
             item.ShiftId = ShiftService.getCurrentId();
-            item.CashierId = 0;
+            item.CashierId = AuthService.currentUser().Id;
             item.StaffId = 0;
             item.IsExported = false;
 
@@ -882,7 +892,7 @@ angular.module('itouch.services')
             angular.forEach(items, function (salesKitItem) {
               salesKitItem.SysDateTime = date;
               salesKitItem.ShiftId = ShiftService.getCurrentId();
-              salesKitItem.CashierId = 0;
+              salesKitItem.CashierId = AuthService.currentUser().Id;
               salesKitItem.StaffId = 0;
               salesKitItem.IsExported = false;
               renameProperty(salesKitItem, 'ParentItemLineNumber', 'ParentItemId')

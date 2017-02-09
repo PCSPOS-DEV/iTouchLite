@@ -27,41 +27,135 @@ angular.module('itouch.controllers')
         selected: {}
       };
       $scope.shownModal = null;
+      $scope.modalCloseDisabled = false;
       $scope.pwp = null;
       $scope.qty = { value: 1 };
       $scope.modals = {
         modifiers: null
       };
       $scope.TakeAway = false;
+      $scope.shift = null;
 
-      $scope.$on("$ionicView.beforeEnter", function(event, data){
-        // handle event
-        loadLayout();
-        loadFunctions();
-        refresh();
-      });
+        /**
+         * Initiating shift modal dialog
+         */
+        $ionicModal.fromTemplateUrl('main/shift/shiftOptions.html', {
+          scope: $scope,
+          backdropClickToClose: false,
+          animation: 'slide-in-up'
+        }).then(function (modal) {
+          $scope.shiftOptionsModal = modal;
+        });
+
+        /**
+         * Biding an event to catch modal close call
+         */
+        $scope.closeShiftOptionsModal = function () {
+          $scope.shiftOptionsModal.hide();
+        };
+
+        // $scope.$on("$ionicView.afterEnter", function (event, data) {
+        //   // handle event
+        //   console.log("afterEnter");
+        //   init();
+        // });
+        //
+        // $scope.$on("$ionicView.enter", function (event, data) {
+        //   // handle event
+        //   console.log("Enter");
+        //   init();
+        // });
+        //
+        //
+        $scope.$on("$ionicView.loaded", function (event, data) {
+          console.log('loaded');
+          init();
+        });
+
+        $scope.$on('sales-init', function() {
+          console.log('loading');
+          init();
+        });
+
+
+        /**
+         * Saves the Business Date set by the user
+         * @param date
+         */
+        var setBusinessDate = function (date) {
+          if (moment(date).isValid()) {
+            ControlService.setBusinessDate(moment(date));
+          } else {
+            $log.log('date is not valid');
+          }
+
+        }
+
+        var init = function () {
+          $scope.shift = ShiftService.getCurrent();
+          var ready = true;
+
+          // handle event
+          loadLayout();
+          loadFunctions();
+          refresh().then(function () {
+            selectLastItem();
+            if (ControlService.isNewBusinessDate()) {
+              ready = false;
+              $scope.openDatePicker();
+            }
+
+            if (!$scope.shift) {
+              ready = false;
+              $scope.modalCloseDisabled = true;
+              $scope.shiftOptionsModal.show();
+            }
+          });
+
+        }
+        /**
+         * Opens the Business Date picker
+         */
+        $scope.openDatePicker = function () {
+          var datePickerOptions = {
+            callback: function (val) {
+              setBusinessDate(new Date(val));
+            },
+            inputDate: ControlService.getNextBusinessDate().isValid() ? ControlService.getNextBusinessDate().toDate() : new Date(),
+            setLabel: 'Set Bu. Date',
+            showTodayButton: true
+          };
+
+          ionicDatePicker.openDatePicker(datePickerOptions);
+        };
           // $scope.$on("$ionicParentView.enter", function(event, data){
           //     console.log('parent.enter');
           // });
           //
-          // $scope.$on("$ionicView.enter", function(event, data){
-          //     console.log('enter');
-          // });
+      $scope.$on("shift-changed", function(event, data){
+          console.log('shift-changed from sales');
+          refresh();
+      });
 
       var refresh = function(){
         var rec_id = BillService.getCurrentReceiptId();
         return BillService.getHeader(rec_id).then(function(header){
           var promise;
           if(!header){
-            promise = BillService.initHeader();
-          } else {
-            promise = BillService.getHeader();
-          }
-          return promise.then(function(header){
-            // console.log(header);
-            refreshCart();
+            return BillService.initHeader().then(function(header){
+              // console.log(header);
+              refreshCart();
+              $scope.header = header;
+              return true;
+            }, function(ex){
+              console.log(ex);
+            });
+          } else{
             $scope.header = header;
-          });
+            return true;
+          }
+        }, function(ex){
+          console.log(ex);
         });
       }
 
@@ -419,6 +513,8 @@ angular.module('itouch.controllers')
                           $scope.qty.value = 1;
                           selectLastItem();
                         })
+                      }, function(ex){
+                        console.log(ex);
                       });
                     }
                   }, function(err){
@@ -671,6 +767,7 @@ angular.module('itouch.controllers')
         },
         Shiftoption: function (fn) {
           if(authorityCheck(fn)){
+            $scope.modalCloseDisabled = false;
             $scope.shiftOptionsModal.show();
           }
         },
@@ -678,12 +775,14 @@ angular.module('itouch.controllers')
           Alert.showConfirm('This will remove all the items', 'Abort?').then(function(res){
             if(res){
 
-              BillService.getHeader().then(function(header){
+              BillService.getHeader($scope.header.DocNo).then(function(header){
                 // $scope.tenderHeader = header;
                 console.log($scope.header);
                 $scope.header.DocType = 'AV';
                 BillService.saveBill($scope.header, $scope.cart.items).then(function(res){
+                  $scope.cart.selectedItem = null;
                   refresh();
+                  init();
                 }, function(res){
                   console.log(res);
                 });
@@ -692,12 +791,24 @@ angular.module('itouch.controllers')
           });
         },
         FoodModifier: function(fn){
-          $scope.type = 'F';
-          $scope.modals.modifiers.show();
+          if(authorityCheck(fn)){
+            var item = $scope.cart.selectedItem;
+            if(item) {
+              $scope.type = 'F';
+              $scope.modals.modifiers.show();
+            }
+          }
+
         },
         BeveragesModifiers: function(fn){
-          $scope.type = 'B';
-          $scope.modals.modifiers.show();
+          if(authorityCheck(fn)){
+            var item = $scope.cart.selectedItem;
+            if(item) {
+              $scope.type = 'B';
+              $scope.modals.modifiers.show();
+            }
+          }
+
         },
         PartialTakeaway: function(fn){
           if(authorityCheck(fn)){
@@ -757,26 +868,6 @@ angular.module('itouch.controllers')
         return authorized;
       }
 
-
-
-      /**
-       * Initiating shift modal dialog
-       */
-      $ionicModal.fromTemplateUrl('main/shift/shiftOptions.html', {
-        scope: $scope,
-        backdropClickToClose: false,
-        animation: 'slide-in-up'
-      }).then(function (modal) {
-        $scope.shiftOptionsModal = modal;
-      });
-
-      /**
-       * Biding an event to catch modal close call
-       */
-      $scope.closeShiftOptionsModal = function () {
-        $scope.shiftOptionsModal.hide();
-      };
-
       /**
        * Biding an event to catch modal close call
        */
@@ -793,13 +884,6 @@ angular.module('itouch.controllers')
       }).then(function (modal) {
         $scope.modals.modifiers = modal;
       });
-
-
-          loadLayout();
-          loadFunctions();
-          refresh().then(function(){
-              selectLastItem();
-          });
 
 
 
