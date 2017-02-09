@@ -80,7 +80,7 @@ angular.module('itouch.services')
      */
     self.setDayEndDate = function (m) {
       $localStorage.app_config.dayEndDate = m.valueOf();
-      self.setBusinessDate(moment([1950, 1, 1])); //setting business date to 1950-jan-01 (month is 0 based in js)
+      self.setBusinessDate(moment([1950, 0, 1])); //setting business date to 1950-jan-01 (month is 0 based in js)
       // $localStorage.app_config.businessDate = moment().valueOf();
     }
 
@@ -90,7 +90,7 @@ angular.module('itouch.services')
      * @returns {Date}
        */
     self.getNextBusinessDate = function () {
-      if(self.getBusinessDate() && moment([1950, 1, 1]).diff(self.getBusinessDate())){
+      if(self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())){
         return self.getBusinessDate().add(1, 'days');
       } else {
         return (self.getDayEndDate() ? self.getDayEndDate().add(1, 'days') : moment());
