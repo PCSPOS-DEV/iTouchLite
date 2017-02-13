@@ -44,7 +44,7 @@
           <div class="col col-50">
             <div class="row">
               <div class="col">GST 7%</div>
-              <div class="col">{{ tenderHeader.Tax5Amount.toFixed(2) }}</div>
+              <div class="col">{{ (tenderHeader.Tax5Amount - tenderHeader.Tax5DiscAmount||0).toFixed(2) }}</div>
             </div>
           </div>
         </div>
