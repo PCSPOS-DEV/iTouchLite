@@ -37,23 +37,44 @@ angular.module('itouch.services')
   }
 
   self.creatRecieptBody = function(data){
+    var subTotal = 0;
 
 
     printer.addTextAlign(printer.ALIGN_LEFT);
     PrintService.addHLine();
 
     angular.forEach(data.items, function(row){
-      PrintService.addLine(row.Desc1, "$"+(row.SubTotal.toFixed(2)), ""+row.Qty);
+      var sTotal = (row.SubTotal + row.Tax).roundTo(2);
+      PrintService.addLine(row.Desc1, " "+(sTotal.toFixed(2)), ""+row.Qty);
+      subTotal += sTotal;
       if(row.discounts){
         angular.forEach(row.discounts, function(discount){
-          PrintService.addTabbedLine(discount.Description1, "-$"+(discount.DiscountAmount ? discount.DiscountAmount.toFixed(2) : 0))
+          if(discount.Description1){
+            PrintService.addTabbedLine(discount.Description1, "-$"+(discount.DiscountAmount ? discount.DiscountAmount.toFixed(2) : 0));
+            subTotal -= discount.DiscountAmount ? discount.DiscountAmount : 0;
+          }
+
         });
       }
     });
 
     PrintService.addHLine();
 
-    PrintService.addLine('SUBTOTAL', "$"+(data.header.Total.toFixed(2)));
+
+
+    // console.log(data.tenderDiscounts);
+    PrintService.addLine('SUBTOTAL', "$"+subTotal.toFixed(2));
+    if(data.tenderDiscounts){
+      var tenderDisAmount = 0;
+      angular.forEach(data.tenderDiscounts, function(row){
+        PrintService.addLine(row.Description1, "$"+(row.Amount.toFixed(2)));
+        tenderDisAmount += row.Amount;
+      });
+
+      PrintService.addLine('SUBTOTAL After Discount', "$"+(subTotal-tenderDisAmount).toFixed(2));
+    } else {
+      PrintService.addLine('SUBTOTAL', "$"+(data.header.Total.toFixed(2)));
+    }
     PrintService.addLine('TOTAL', "$"+(data.header.Total.toFixed(2)));
     var change = null;
     angular.forEach(data.transactions, function(row){
@@ -124,7 +145,7 @@ angular.module('itouch.services')
     var q = "SELECT de.*, bd.DiscountAmount, d.Description1, d.Description2 "
     +"FROM BillDetail AS de "
     +"LEFT OUTER JOIN BillDiscounts AS bd ON bd.ItemId = de.ItemId AND bd.LineNumber = de.LineNumber AND de.DocNo = bd.DocNo "
-    +"LEFT OUTER  JOIN Discounts AS d ON d.Id = bd.DiscountId";
+    +"LEFT OUTER  JOIN Discounts AS d ON d.Id = bd.DiscountId AND bd.DiscountFrom = 'I'";
     return DB.query(q + " WHERE de.DocNo = ?", [DocNo]).then(function (res) {
       var items = {};
       angular.forEach(DB.fetchAll(res), function (item) {
@@ -132,7 +153,7 @@ angular.module('itouch.services')
           var exItem = items[""+item.LineNumber+item.ItemId];
           if(!exItem){
             item = ItemService.calculateTotal(item);
-            item.SubTotal = item.SubTotal + item.Tax;
+            // item.SubTotal = item.SubTotal + item.Tax;
             item.discounts = [];
             if(item.DiscountAmount){
               item.discounts.push(_.pick(item, [ 'DiscountAmount', 'Description1', 'Description2' ]));
@@ -148,9 +169,16 @@ angular.module('itouch.services')
 
       });
 
-      console.log(items);
+      // console.log(items);
 
       return items;
+    });
+  }
+
+  self.getTenderDiscounts = function(DocNo){
+    var q = "SELECT SUM(bd.DiscountAmount) AS Amount, d.Description1 AS Description1 FROM BillDiscounts AS bd INNER JOIN Discounts AS d ON d.Id = bd.DiscountId INNER JOIN BillHeader AS bh ON bd.DocNo = bh.DocNo WHERE DiscountFrom = 'T' AND bh.DocNo = ? GROUP BY DiscountCode";
+    return DB.query(q, [DocNo]).then(function(res){
+      return DB.fetchAll(res);
     });
   }
 
@@ -176,7 +204,8 @@ angular.module('itouch.services')
     $q.all({
       header: self.getBillHeader(DocNo),
       items: self.getBillItems(DocNo),
-      transactions: self.getBillTransactions(DocNo)
+      transactions: self.getBillTransactions(DocNo),
+      tenderDiscounts: self.getTenderDiscounts(DocNo)
     }).then(function(data){
       self.creatRecieptHeader();
       self.creatRecieptBody(data);
@@ -186,12 +215,16 @@ angular.module('itouch.services')
       printer.addCut(printer.CUT_FEED);
 
       printer.send();
+    }, function(ex){
+      console.log(ex);
     });
   }
 
   self.openDrawer = function(){
     printer = PrintService.getPrinter();
-    printer.addPulse();
+    if(printer){
+      printer.addPulse();
+    }
   }
 
 }]);
