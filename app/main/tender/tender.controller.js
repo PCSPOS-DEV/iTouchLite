@@ -440,10 +440,10 @@ angular.module('itouch.controllers')
       }
 
       $scope.$on('discountModel-close', function () {
-        console.log($scope.tenderHeader);
-        $scope.updatedRoundedTotal = $scope.tenderHeader.updatedRoundedTotal;
+        // console.log($scope.tenderHeader);
+        $scope.updatedRoundedTotal = $scope.tenderHeader.UpdatedRoundedTotal;
         tenderDiscount.header = angular.copy($scope.tenderHeader);
-        originalHeader.Total = tenderDiscount.header.Total
+        // originalHeader.Total = tenderDiscount.header.Total
         //TODO comeup with a plan to capture selected discount
         // tenderDiscount.discount = angular.copy($scope.tenderHeader);
       });

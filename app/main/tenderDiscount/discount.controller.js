@@ -39,7 +39,7 @@ angular.module('itouch.controllers')
 
       $scope.selectDiscount = function (discount) {
         // console.log($scope.cart);
-        console.log(discount);
+        // console.log(discount);
         if(discount){
           if(discount.DiscountType == 1 && discount.Amount == 0){
             $scope.data = {};
