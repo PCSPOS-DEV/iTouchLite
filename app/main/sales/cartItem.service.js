@@ -97,7 +97,7 @@ angular.module('itouch.services')
                 self.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
               } else {
                 // if(item.ReasonId){
-                  self.setItem(item.ItemId, item.ItemType, item, null, item.ReasonId != null, item.ParentItemLineNumber);
+                  self.setItem(item.ItemId, item.ItemType, item, item.LineNumber, item.ReasonId != null, item.ParentItemLineNumber);
                 // } else {
 
                 // }
@@ -127,7 +127,19 @@ angular.module('itouch.services')
 
         return BillService.findItems(item.ItemId, item.ItemType, item.parentItemLineNumber).then(function (items) {
           var ndItem = getItem(items);
-          if (ndItem && !salesKit && ndItem.TakeAway == 'false') {
+          console.log(item);
+          if(item.OpenKey){
+            if(item.customQuantity){
+              item.Qty = item.customQuantity;
+            }
+            if(!item.Qty){
+              item.Qty = 1;
+            }
+
+            return BillService.addItem(item).then(function(){
+              return ndItem || item;
+            });
+          } else if (ndItem && !salesKit && ndItem.TakeAway == 'false') {
             if(item.customQuantity){
               ndItem.Qty += item.customQuantity;
             } else {
@@ -253,6 +265,9 @@ angular.module('itouch.services')
           }
           if(type == 'PWP' || type == 'PWI'){
             label += counter++;
+          }
+          if(item.OpenKey){
+            label += 'OK'+(counter++);
           }
           cart.items[label] = item;
         }
