@@ -64,7 +64,7 @@ angular.module('itouch.services')
 
     // console.log(data.tenderDiscounts);
     PrintService.addLine('SUBTOTAL', "$"+subTotal.toFixed(2));
-    if(data.tenderDiscounts){
+    if(data.tenderDiscounts && data.tenderDiscounts.length > 0){
       var tenderDisAmount = 0;
       angular.forEach(data.tenderDiscounts, function(row){
         PrintService.addLine(row.Description1, "$"+(row.Amount.toFixed(2)));
@@ -72,8 +72,6 @@ angular.module('itouch.services')
       });
 
       PrintService.addLine('SUBTOTAL After Discount', "$"+(subTotal-tenderDisAmount).toFixed(2));
-    } else {
-      PrintService.addLine('SUBTOTAL', "$"+(data.header.Total.toFixed(2)));
     }
     PrintService.addLine('TOTAL', "$"+(data.header.Total.toFixed(2)));
     var change = null;
@@ -146,7 +144,7 @@ angular.module('itouch.services')
     +"FROM BillDetail AS de "
     +"LEFT OUTER JOIN BillDiscounts AS bd ON bd.ItemId = de.ItemId AND bd.LineNumber = de.LineNumber AND de.DocNo = bd.DocNo "
     +"LEFT OUTER  JOIN Discounts AS d ON d.Id = bd.DiscountId AND bd.DiscountFrom = 'I'";
-    return DB.query(q + " WHERE de.DocNo = ?", [DocNo]).then(function (res) {
+    return DB.query(q + " WHERE de.DocNo = ? ORDER BY de.LineNumber", [DocNo]).then(function (res) {
       var items = {};
       angular.forEach(DB.fetchAll(res), function (item) {
         if(item){
