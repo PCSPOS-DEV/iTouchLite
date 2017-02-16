@@ -2,13 +2,20 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs',
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs) {
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService',
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService) {
       var self = this;
       var dayEnd = false;
 
       $scope.shiftListType = null;
       this.shiftData = shiftData;
+
+      $scope.$on("$ionicView.enter", function(event, data){
+        if(ControlService.isNewBusinessDate()){
+            ready = false;
+            self.openDatePicker();
+          }
+      });
 
 
       /**
@@ -90,7 +97,7 @@ angular.module('itouch.controllers')
           if(cash == 'later'){
             ShiftService.declareCashLater(shift.Id).then(function(){
               self.shiftModal.hide();
-              $scope.closeShiftOptionsModal();
+              // $scope.closeShiftOptionsModal();
               $scope.$emit('shift-changed');
             }, function(err){
               console.log(err);
@@ -101,7 +108,7 @@ angular.module('itouch.controllers')
               Report.printDeclareCash(shift, cash);
 
               Report.printShiftClosingReport(shift.Id);
-              $scope.closeShiftOptionsModal();
+              // $scope.closeShiftOptionsModal();
               $scope.$emit('shift-changed');
             }, function(err){
               console.log(err);
@@ -183,7 +190,7 @@ angular.module('itouch.controllers')
             $scope.$emit('shift-changed');
             Report.printShiftClosingReport();
             Alert.showAlert('Success!', 'Day end completed').then(function(){
-              $scope.closeShiftOptionsModal();
+              // $scope.closeShiftOptionsModal();
             });
           }, function (err) {
             console.log(err);
@@ -191,4 +198,39 @@ angular.module('itouch.controllers')
           });
         });
       }
+
+
+
+      /**
+       * Opens the Business Date picker
+       */
+      self.openDatePicker = function () {
+        var datePickerOptions = {
+          callback: function (val) {
+            setBusinessDate(new Date(val));
+          },
+          inputDate: ControlService.getNextBusinessDate().isValid() ? ControlService.getNextBusinessDate().toDate() : new Date(),
+          setLabel: 'Set Bu. Date',
+          showTodayButton: true
+        };
+
+        ionicDatePicker.openDatePicker(datePickerOptions);
+      };
+
+
+
+
+      /**
+       * Saves the Business Date set by the user
+       * @param date
+       */
+      var setBusinessDate = function (date) {
+        if(moment(date).isValid()){
+          ControlService.setBusinessDate(moment(date));
+        } else {
+          $log.log('date is not valid');
+        }
+
+      }
+
     }]);
