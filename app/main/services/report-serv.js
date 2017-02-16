@@ -282,7 +282,7 @@ angular.module('itouch.services')
           PrintService.addLineBreak();
 
           PrintService.addTextLine('SALES TRANSACTIONS');
-          PrintService.addReportLine('GROSS SALES', (data.header.sales ? data.header.sales.Total: 0).toFixed(2), ""+(data.trans.cash?data.header.sales.ItemCount: 0));
+          PrintService.addReportLine('GROSS SALES', (data.header.sales ? data.header.sales.Total: 0).toFixed(2), ""+(data.header.sales?data.header.sales.ItemCount: 0));
           PrintService.addReportLine('DISCOUNT', (data.header.discounted? data.header.discounted.Discount: 0).toFixed(2), ""+(data.header.discounted?data.header.discounted.ItemCount: 0));
           PrintService.addTabbedLine('SALES TOTAL',(data.header.sales? data.header.sales.Total: 0).toFixed(2));
           PrintService.addLineBreak();
