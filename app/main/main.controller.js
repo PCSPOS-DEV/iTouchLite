@@ -69,6 +69,22 @@ angular.module('itouch.controllers')
       }
     }
 
+    /**
+     *
+     * @param url
+     * @param root
+     * @param params
+     */
+    $scope.go = function(url, root, params){
+      if(root){
+        $ionicHistory.nextViewOptions({
+          disableAnimate: false,
+          disableBack: true
+        });
+      }
+      $state.go(url, params, {reload: true});
+    }
+
     $scope.logout = function () {
       $state.go('login');
     }

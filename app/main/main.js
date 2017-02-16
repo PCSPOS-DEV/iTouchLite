@@ -86,7 +86,8 @@ angular.module('itouch', [
                     views: {
                         'menuContent': {
                             templateUrl: 'main/sales/sales.html',
-                            controller: 'SalesCtrl'
+                            controller: 'SalesCtrl',
+                            controllerAs: 'SalesCtrl'
                         }
                     },
                     resolve: {
@@ -176,6 +177,45 @@ angular.module('itouch', [
                       def.reject("error");
                     });
                     return def.promise;
+                  }]
+                }
+              })
+              .state('app.tender', {
+                url: '/tender/{DocNo}',
+                views: {
+                  'menuContent': {
+                    templateUrl: 'main/tender/tender.html',
+                    controller: 'TenderCtrl as ctrl'
+                  }
+                },
+                resolve: {
+                  billData: ['$q', 'BillService', 'CartItemService', '$stateParams', 'ItemService', 'RoundingService', '$state', function($q, BillService, CartItemService, $stateParams, ItemService, RoundingService, $state){
+                    var docNo = $stateParams.DocNo;
+                    console.log(docNo);
+                    var def = $q.defer();
+                    // def.resolve({});
+                    $q.all({
+                      header: BillService.getHeader(docNo),
+                      items: CartItemService.fetchItemsFromDb(docNo)
+                    }).then(function(data){
+                      if(data && data.header){
+                        data.header = ItemService.calculateTotal(data.header);
+                        data.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
+                        data.header.UpdatedTenderTotal = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
+                        data.header.UpdatedRoundedTotal = RoundingService.round(data.header.Total).toFixed(2);
+                        def.resolve(data);
+                      } else {
+                        def.reject("Bill not initialized");
+                      }
+
+                    }, function(ex){
+                      console.log(ex);
+                      def.reject("error");
+                    });
+                    return def.promise.catch(function(ex){
+                      console.log(ex);
+                      $state.go('app.sales');
+                    });
                   }]
                 }
               })
