@@ -62,6 +62,8 @@ $ionicons-font-path: "../assets/fonts" !default;
 }
 
 .modal .bar {
+  //background-color: rgba(7, 50, 82, 1);
+
   .title, .button{
     color: white;
   }
@@ -109,4 +111,8 @@ Clear button
 
 .item-input-inset .input-clear-btn.button{
   bottom: 4px;
+}
+
+ion-modal-view ion-header-bar.bar.bar-header {
+  background-color: #073252;
 }
