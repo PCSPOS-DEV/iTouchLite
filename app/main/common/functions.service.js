@@ -97,7 +97,8 @@ angular.module('itouch.services')
         // [86, 'Tender Remark', null, 'TenderRemarks', true, false, 'T', 1, false],
         [87, 'Payment Made', null, 'PaymentMade', false, true, 'T', 1, false],
         // [88, 'VIPs', null, 'vipdiscount', false, true, 'T', 1, false],
-        [89, 'Staff Usage', null, 'TenderStaff', false, true, 'T', 1, false],
+        // [89, 'Staff Usage', null, 'TenderStaff', false, true, 'T', 1, false],
+        [89, '', null, 'TenderStaff', false, true, 'T', 1, false],
         [90, 'Discount', null, 'Discount', false, true, 'T', 1, false],
         // [91, 'Deposit', null, 'TenderDeposit', true, true, 'T', 1, false],
         // [92, 'Force Conclude (R)', null, 'ForceConclusionRed', true, false, 'V', 1, false],
@@ -136,7 +137,9 @@ angular.module('itouch.services')
         // [1009, 'Reports', null, 'winreportc40', false, true, 'V', 1, false],
         [1010, 'Shift Option', null, 'Shiftoption', false, false, 'V', 1, false],
         // [2000, 'KeyBoard', null, 'KeyBoardTop', false, true, 'V', 1, false],
-        [2001, 'Item Detail', null, 'ItemDetailTop', false, true, 'V', 1, false],
+        [2001, '', null, 'ItemDetailTop', false, true, 'V', 1, false],
+        // [2001, '', null, 'ItemDetailTop', false, true, 'V', 1, false],
+        // [2001, 'Item Detail', null, 'ItemDetailTop', false, true, 'V', 1, false],
         // [2002, 'Search', null, 'SearchTop', false, true, 'V', 1, false],
         // [10000, 'Lock Machine', null, 'LockMachineTop', true, false, 'V', 1, true]
     ];
