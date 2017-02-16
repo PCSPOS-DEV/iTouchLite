@@ -12,6 +12,7 @@ angular.module('itouch.controllers')
       $scope.tenderHeader = billData.header;
       $scope.billItems = billData.items;
       var payTransactions = [];
+      $scope.payTransactions = [];
       var businessDate = ControlService.getBusinessDate(true);
       var tenderDiscount = {
         header: null,
@@ -279,6 +280,11 @@ angular.module('itouch.controllers')
             CurrencyId: 0,
             IsExported: true
           });
+          $scope.payTransactions.push({
+            Desc1: tenderType.Description1,
+            Desc2: tenderType.Description2,
+            Amount: transAmount
+          });
         }
         seq++;
       }
@@ -292,6 +298,17 @@ angular.module('itouch.controllers')
         animation: 'slide-in-up'
       }).then(function (modal) {
         $scope.discountModal = modal;
+      });
+
+      /**
+       * Initiating discount modal dialog
+       */
+      $ionicModal.fromTemplateUrl('main/tender/paymentsMade.html', {
+        scope: $scope,
+        backdropClickToClose: false,
+        animation: 'slide-in-up'
+      }).then(function (modal) {
+        $scope.paymentsMadeModal = modal;
       });
 
       /**
@@ -323,6 +340,12 @@ angular.module('itouch.controllers')
         },
         Discount: function (fn) {
           $scope.discountModal.show();
+
+        },
+        PaymentMade: function(fn){
+          $scope.paymentsMadeModal.show();
+        },
+        TenderStaff: function(){
 
         }
       };
@@ -425,6 +448,10 @@ angular.module('itouch.controllers')
 
       $scope.close = function () {
         $scope.$emit("tenderModel-close");
+      }
+
+      $scope.closePaymentsModal = function () {
+        $scope.paymentsMadeModal.hide();
       }
 
       $scope.$on('discountModel-close', function () {
