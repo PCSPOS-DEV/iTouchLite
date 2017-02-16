@@ -1,4 +1,4 @@
-<ion-view view-title="iSeries NX Lite" class="sales">
+<ion-view view-title="iSeries NX Lite" class="sales" cache-view="false" hide-back-button="true">
   <ion-content scroll="false">
     <div class="row wrapper main-wrapper">
       <div class="col content-area">
@@ -19,7 +19,7 @@
                   <div class="col col-50">{{print(item, 'Desc')}}</div>
                   <div class="col">{{item.Qty}}</div>
                   <div class="col">{{item.OrgPrice.roundTo(2).toFixed(2)}}</div>
-                  <div class="col">{{item.Discount.roundTo(2).toFixed(2)}}</div>
+                  <div class="col">{{(item.DiscAmount + item.Tax5DiscAmount).roundTo(2).toFixed(2)}}</div>
                   <div class="col">{{item.Total.roundTo(2).toFixed(2)}}</div>
                 </div>
               </ion-scroll>
