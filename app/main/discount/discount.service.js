@@ -214,6 +214,27 @@ angular.module('itouch.services')
         DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.tempDetail, _.pick(item, 'SubTotal', 'DiscAmount', 'Tax5DiscAmount'), {columns:'ItemId=? AND LineNumber=?', data: [item.ItemId, item.LineNumber]});
       }
 
+      var updateTempBillHeader = function (DocNo, item) {
+        var def = $q.defer();
+        BillService.getHeader(DocNo).then(function(header){
+          if(header){
+            header.DiscAmount += item.DiscAmount;
+            header.Tax1DiscAmount += item.Tax1DiscAmount;
+            header.Tax2DiscAmount += item.Tax2DiscAmount;
+            header.Tax3DiscAmount += item.Tax3DiscAmount;
+            header.Tax4DiscAmount += item.Tax4DiscAmount;
+            header.Tax5DiscAmount += item.Tax5DiscAmount;
+            updateTempHeader(header);
+            def.resolve();
+          } else {
+            def.reject("header not found");
+          }
+        }, function(ex){
+          def.reject(ex);
+        });
+        return def.promise;
+      }
+
       var updateTempHeader = function (header) {
         DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.tempHeader, _.pick(header, 'SubTotal', 'DiscAmount', 'Tax5DiscAmount'), {columns:'DocNo=?', data: [header.DocNo]});
       }
@@ -334,9 +355,15 @@ angular.module('itouch.services')
             // console.log(discount);
             saveItemDiscount(discount);
             updateTempBillDetail(item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [item.DocNo, item.ItemId, item.LineNumber]});
-            return DB.executeQueue().then(function () {
-              return item;
+            return updateTempBillHeader(item.DocNo, _.pick(item, ['DiscAmount', 'Tax1DiscAmount', 'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount'])).then(function(){
+              return DB.executeQueue().then(function () {
+                return item;
+              }, function(ex){
+                console.log(ex);
+              });
             });
+
+
           });
         } else {
           return $q.reject("Not eligible for this discount amount");
