@@ -4,10 +4,11 @@
 angular.module('itouch.controllers')
   .controller("SalesCtrl", ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal',
       'AuthService', 'CartItemService', 'ControlService', 'ionicDatePicker', 'FunctionsService', '$filter', 'SalesKitService', 'DiscountService', 'BillService', 'ShiftService',
-      'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup',
+      'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup', 'header', 'user', 'shift', '$state',
       function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal,
       AuthService, CartItemService, ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService,
-                                               PWPService,  $ionicScrollDelegate, Alert, $q, $ionicPopup) {
+                                               PWPService,  $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state) {
+      $scope.header = header;
       $scope.currentPage = {};
       $scope.pages = [];
       $scope.keys = [];
@@ -16,7 +17,7 @@ angular.module('itouch.controllers')
       $scope.SubPLUList = [];
       $scope.modalData = {};
       $scope.cart = {};
-      $scope.user = AuthService.currentUser();
+      $scope.user = user;
       $scope.tempUser = null;
       $scope.salesKitUpdate = false;
       // var businessDate = $filter('date')(ControlService.getBusinessDate(), "yyyy-MM-dd");
@@ -34,8 +35,13 @@ angular.module('itouch.controllers')
         modifiers: null
       };
       $scope.TakeAway = false;
-      $scope.shift = null;
+      $scope.shift = shift;
       $scope.data = {};
+
+        document.querySelector("input").addEventListener("keyup", function () {
+          this.value = this.value.replace(/\D/, "")
+        });
+
 
         /**
          * Initiating shift modal dialog
@@ -101,16 +107,6 @@ angular.module('itouch.controllers')
           loadFunctions();
           refresh().then(function () {
             selectLastItem();
-            if (ControlService.isNewBusinessDate()) {
-              ready = false;
-              $scope.openDatePicker();
-            }
-
-            if (!$scope.shift) {
-              ready = false;
-              $scope.modalCloseDisabled = true;
-              $scope.shiftOptionsModal.show();
-            }
           });
 
         }
@@ -129,10 +125,7 @@ angular.module('itouch.controllers')
 
           ionicDatePicker.openDatePicker(datePickerOptions);
         };
-          // $scope.$on("$ionicParentView.enter", function(event, data){
-          //     console.log('parent.enter');
-          // });
-          //
+
       $scope.$on("shift-changed", function(event, data){
           console.log('shift-changed from sales');
           refresh();
@@ -649,7 +642,7 @@ angular.module('itouch.controllers')
               }
             });
 
-          $ionicScrollDelegate.scrollBottom(true);
+          $ionicScrollDelegate.$getByHandle('cart').scrollBottom(true);
         });
 
       }
@@ -824,8 +817,7 @@ angular.module('itouch.controllers')
         },
         Shiftoption: function (fn) {
           if(authorityCheck(fn)){
-            $scope.modalCloseDisabled = false;
-            $scope.shiftOptionsModal.show();
+            $state.go('app.shift');
           }
         },
         AbortFunction: function(fn){
@@ -889,6 +881,11 @@ angular.module('itouch.controllers')
               console.log(ex);
             });
 
+          }
+        },
+        ReceiptHistory: function(fn){
+          if(authorityCheck(fn)){
+            $state.go('app.history');
           }
         }
       };
