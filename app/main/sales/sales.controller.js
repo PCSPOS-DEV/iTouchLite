@@ -4,10 +4,10 @@
 angular.module('itouch.controllers')
   .controller("SalesCtrl", ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal',
       'AuthService', 'CartItemService', 'ControlService', 'ionicDatePicker', 'FunctionsService', '$filter', 'SalesKitService', 'DiscountService', 'BillService', 'ShiftService',
-      'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup', 'header', 'user', 'shift', '$state',
+      'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup', 'header', 'user', 'shift', '$state', '$rootScope',
       function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal,
       AuthService, CartItemService, ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService,
-                                               PWPService,  $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state) {
+                                               PWPService,  $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state, $rootScope) {
       $scope.header = header;
       $scope.currentPage = {};
       $scope.pages = [];
@@ -61,29 +61,36 @@ angular.module('itouch.controllers')
           $scope.shiftOptionsModal.hide();
         };
 
-        // $scope.$on("$ionicView.afterEnter", function (event, data) {
-        //   // handle event
-        //   console.log("afterEnter");
-        //   init();
-        // });
-        //
-        // $scope.$on("$ionicView.enter", function (event, data) {
-        //   // handle event
-        //   console.log("Enter");
-        //   init();
-        // });
-        //
-        //
-        $scope.$on("$ionicView.loaded", function (event, data) {
-          console.log('loaded');
+        $scope.$on("$ionicView.beforeEnter", function(event, data){
+          initBill();
+        });
+
+        $scope.$on("$ionicView.loaded", function(event, data){
           init();
         });
 
-        $scope.$on('sales-init', function() {
-          console.log('loading');
-          init();
+
+        $rootScope.$on("initBill", function (event, data) {
+          // if($scope.header){
+            initBill();
+          // }
         });
 
+        var initBill = function(){
+          BillService.getHeader(BillService.getCurrentReceiptId()).then(function(header){
+            if(!header){
+              return BillService.initHeader().then(function(header){
+                $scope.header = header;
+              });
+            } else{
+              $scope.header = header;
+            }
+          }).then(function(){
+            refresh().then(function () {
+              selectLastItem();
+            });
+          });
+        }
 
         /**
          * Saves the Business Date set by the user
@@ -492,7 +499,7 @@ angular.module('itouch.controllers')
                 $timeout(function () {
                   $scope.shownModal = 'sk';
                   $scope.skModalModal.show();
-                }, 300);
+                }, 100);
 
 
               } else {
@@ -620,8 +627,7 @@ angular.module('itouch.controllers')
        */
       $scope.openTenderForm = function () {
         if(!_.isEmpty($scope.cart.items)){
-          $scope.tenderModal.show();
-          $scope.shownModal = 'tender';
+          $state.go('app.tender', { DocNo: $scope.header.DocNo });
         }
       }
 
@@ -648,9 +654,13 @@ angular.module('itouch.controllers')
       }
       refreshCart();
 
-      $scope.$on("refresh-cart", function () {
+      $rootScope.$on("refresh-cart", function () {
         refreshCart();
       });
+
+        $scope.$on("refresh-cart", function () {
+          refreshCart();
+        });
 
 
       /**
@@ -887,6 +897,9 @@ angular.module('itouch.controllers')
           if(authorityCheck(fn)){
             $state.go('app.history');
           }
+        },
+        ItemDetailTop: function(){
+
         }
       };
 

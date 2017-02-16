@@ -115,27 +115,29 @@
       </a>
     </div>
   </div>
-</ion-view>
 
-<script id="subPLU.html" type="text/ng-template">
-  <ion-modal-view class="subplu">
-    <ion-header-bar>
-      <h1 class="title">{{modalData.title}}</h1>
-      <button class="button button-clear" ng-click="closeSubPLUModal()"> <i class="ion-close-round"></i></button>
-    </ion-header-bar>
-    <ion-content>
-      <div class="row">
-        <div class="col list">
-          <a ng-repeat="subPLU in SubPLUList" href="" class="button button-calm plu-item"
-             ng-click="onSubPLUClick(subPLU)">{{ print(subPLU, "Description") }}</a>
+  <script id="subPLU.html" type="text/ng-template">
+    <ion-modal-view class="subplu">
+      <ion-header-bar>
+        <h1 class="title">{{modalData.title}}</h1>
+        <button class="button button-clear" ng-click="closeSubPLUModal()"> <i class="ion-close-round"></i></button>
+      </ion-header-bar>
+      <ion-content>
+        <div class="row">
+          <div class="col list">
+            <a ng-repeat="subPLU in SubPLUList" href="" class="button button-calm plu-item"
+               ng-click="onSubPLUClick(subPLU)">{{ print(subPLU, "Description") }}</a>
+          </div>
         </div>
-      </div>
-    </ion-content>
-    <!--<ion-footer-bar class="bar-stable">-->
+      </ion-content>
+      <!--<ion-footer-bar class="bar-stable">-->
       <!--<div class="h1 title"></div>-->
       <!--<div class="buttons" ng-click="modalClose()">-->
-        <!--<button class="button button-energized button-outline">Cancel</button>-->
+      <!--<button class="button button-energized button-outline">Cancel</button>-->
       <!--</div>-->
-    <!--</ion-footer-bar>-->
-  </ion-modal-view>
-</script>
+      <!--</ion-footer-bar>-->
+    </ion-modal-view>
+  </script>
+
+</ion-view>
+

@@ -11,6 +11,12 @@
 
 .tender .btn { min-width: 19%; padding-top: 15px; padding-bottom: 15px; height: auto; }
 
+.tender .wrapper {
+  width: 96%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .tender.modal {
     top: 10%;
     right: 10%;
@@ -56,11 +62,12 @@
 }
 
 .tender input.total {
-  margin-right: 3px;
+  margin-right: 5px;
   width: 131px;
   margin-bottom: 2px;
   padding-bottom: 0px;
   text-align: right;
+  float: right;
 }
 
 .tender #tender-types {
@@ -70,4 +77,9 @@
 .tender .scroll-view.scroll-y {
   overflow-x: hidden;
   overflow-y: hidden;
+}
+
+.tender .num-pad {
+  float: right;
+  margin-right: -4px;
 }

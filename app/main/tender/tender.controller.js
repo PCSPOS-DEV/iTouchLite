@@ -2,30 +2,15 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService', 'DiscountService', '$ionicModal', 'RoundingService', 'Reciept',
-    function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService, Reciept) {
-      $scope.tenderTypes = [];
+  .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService',
+    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory',
+    function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService,
+              Reciept, billData, $state, $rootScope, $ionicHistory) {
+    console.log(billData);
+    $scope.tenderTypes = [];
       $scope.title = "Tender";
-      $scope.tenderHeader = {
-        DiscAmount: 0,
-        DocNo: "",
-        Pax: 0,
-        SubTotal: 0,
-        Tax1Amount: 0,
-        Tax1DiscAmount: 0,
-        Tax2Amount: 0,
-        Tax2DiscAmount: 0,
-        Tax3Amount: 0,
-        Tax3DiscAmount: 0,
-        Tax4Amount: 0,
-        Tax4DiscAmount: 0,
-        Tax5Amount: 0,
-        Tax5DiscAmount: 0,
-        TaxAmount: 0,
-        Total: 0,
-        TotalRounded: 0,
-        Disocunt: 0
-      };
+      $scope.tenderHeader = billData.header;
+      $scope.billItems = billData.items;
       var payTransactions = [];
       var businessDate = ControlService.getBusinessDate(true);
       var tenderDiscount = {
@@ -257,12 +242,16 @@ angular.module('itouch.controllers')
                     title: 'Balance',
                     template: '<p>Balance: $'+ changeAmount.toFixed(2)+'</p>'
                   }).then(function(){
-                    $scope.$emit("refresh-cart");
-                    $scope.$emit("close-tenderModel");
+                    // $scope.$emit("refresh-cart");
+                    $rootScope.$emit("initBill");
                   });
                 } else {
-                  $scope.$emit("refresh-cart");
-                  $scope.$emit("close-tenderModel");
+                  $ionicHistory.nextViewOptions({
+                    disableAnimate: false,
+                    disableBack: true
+                  });
+                  $rootScope.$emit("refresh-cart");
+                  $state.go('app.sales', {}, {reload: true});
                 }
 
               }, function (err) {
@@ -317,7 +306,6 @@ angular.module('itouch.controllers')
        * @param name
        */
       $scope.invoke = function (name) {
-        console.log(name);
         if (!_.isUndefined($scope.tenderFunctions[name])) {
           $scope.tenderFunctions[name]();
         } else {
