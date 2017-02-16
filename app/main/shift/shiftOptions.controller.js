@@ -9,19 +9,6 @@ angular.module('itouch.controllers')
 
       $scope.shiftListType = null;
       this.shiftData = shiftData;
-      console.log(shiftData);
-
-      var fixFreeze = function(){
-        //ADD THIS BEFORE
-        $ionicModal.fromTemplateUrl('<div></div>', {
-          scope: $scope
-        }).then(function(modal) {
-          $scope.workaroundModal = modal;
-          $scope.workaroundModal.show();
-          $scope.workaroundModal.hide();
-        });
-
-      }
 
 
       /**
