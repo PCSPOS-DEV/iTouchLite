@@ -2,20 +2,26 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService',
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService) {
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs',
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs) {
       var self = this;
       var dayEnd = false;
 
       $scope.shiftListType = null;
+      this.shiftData = shiftData;
+      console.log(shiftData);
 
-      $scope.$on('modal.shown', function(event, modal) {
-        $ionicHistory.nextViewOptions({
-          disableAnimate: false,
-          disableBack: true
+      var fixFreeze = function(){
+        //ADD THIS BEFORE
+        $ionicModal.fromTemplateUrl('<div></div>', {
+          scope: $scope
+        }).then(function(modal) {
+          $scope.workaroundModal = modal;
+          $scope.workaroundModal.show();
+          $scope.workaroundModal.hide();
         });
 
-      });
+      }
 
 
       /**

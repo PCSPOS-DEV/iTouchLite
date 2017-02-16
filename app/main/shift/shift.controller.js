@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q',
-    function ($scope, ShiftService, $ionicPopup, $state, Report, $q) {
+  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q', '$ionicHistory',
+    function ($scope, ShiftService, $ionicPopup, $state, Report, $q, $ionicHistory) {
       $scope.shifts = [];
       $scope.shiftSelectionShown = true;
       $scope.shift = {};
@@ -47,15 +47,15 @@ angular.module('itouch.controllers')
             break;
           case 'close':
             closeShift($scope.shift);
+            $scope.$emit("shift-modal-close");
             break;
           case 'declareCash':
             $scope.close();
-            $scope.closeShiftOptionsModal();
             $scope.$emit("declare-cash", shift);
             break;
           default:
-            // $scope.$emit("shift-modal-close");
             $scope.$emit("shift-exit", shift);
+            $scope.$emit("shift-modal-close");
             break;
         }
       }
@@ -73,10 +73,17 @@ angular.module('itouch.controllers')
           save: ShiftService.saveCurrent($scope.shift),
           addFloat: ShiftService.addFloat($scope.shift, $scope.shift.RA)
         }).then(function(){
-          $scope.close();
+
           $scope.$emit('shift-changed');
-          $scope.closeShiftOptionsModal();
           Report.printAddFloat($scope.shift.RA);
+          $scope.$emit("shift-modal-close");
+
+          $ionicHistory.nextViewOptions({
+            disableAnimate: false,
+            disableBack: true
+          });
+          $state.go('app.sales');
+
         }, function(err){
           console.log(err);
         });

@@ -77,6 +77,13 @@ angular.module('itouch.services')
         return deferred.promise;
       }
 
+      self.dayEndPossible = function () {
+        return DB.query("SELECT COUNT(*) AS count FROM shiftstatus", []).then(function (data) {
+          var count = DB.fetch(data).count;
+          return count > 0;
+        });
+      }
+
       self.saveCurrent = function (shift) {
         $localStorage.shift = shift;
 

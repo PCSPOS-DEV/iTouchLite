@@ -1,4 +1,4 @@
-<ion-modal-view class="shift" ng-controller="ShiftOptionsCtrl as ctrl">
+<ion-view view-title="iSeries NX Lite" class="shift" cache-view="false">
   <ion-header-bar>
     <!--<button class="button button-icon ion-arrow-left-c" ng-if="!shiftSelectionShown" ng-click="goBack()"></button>-->
     <h1 class="title">Shift Options</h1>
@@ -7,38 +7,38 @@
   <ion-content class="padding">
     <div class="row">
       <div class="col-50 padding">
-        <button class="button button-large button-positive button-block" ng-click="ctrl.openShiftOpenModal()">
+        <button class="button button-large button-positive button-block" ng-click="ctrl.openShiftOpenModal()" ng-disabled="ctrl.shiftData.unOpened.length == 0">
           Open / Change Shift
         </button>
       </div>
       <div class="col-50 padding">
-        <button class="button button-large button-positive button-block" ng-click="ctrl.openShiftCloseModal()">
-                <!--ng-disabled="!shift"-->
+        <button class="button button-large button-positive button-block" ng-click="ctrl.openShiftCloseModal()"
+                ng-disabled="ctrl.shiftData.opened.length == 0">
           Close Shift
         </button>
       </div>
     </div>
     <div class="row">
       <div class="col-50 padding">
-        <button class="button button-large button-positive button-block" ng-click="ctrl.openDayEnd()">
-                <!--ng-disabled="!shift"-->
+        <button class="button button-large button-positive button-block" ng-click="ctrl.openDayEnd()"
+                ng-disabled="!ctrl.shiftData.dayEndPossible">
 
           Day End Closing
         </button>
       </div>
       <div class="col-50 padding">
-        <button class="button button-large button-positive button-block" ng-click="ctrl.openShiftExitModal()">
-                <!--ng-disabled="!shift"-->
+        <button class="button button-large button-positive button-block" ng-click="ctrl.openShiftExitModal()"
+                ng-disabled="ctrl.shiftData.opened.length == 0">
           Shift Exit
         </button>
       </div>
     </div>
     <div class="row">
       <div class="col-50 padding">
-        <button class="button button-large button-positive button-block" ng-click="ctrl.openDeclareCash()">
+        <button class="button button-large button-positive button-block" ng-click="ctrl.openDeclareCash()" ng-disabled="ctrl.shiftData.toBeDeclared.length == 0">
           Declare Cash
         </button>
       </div>
     </div>
   </ion-content>
-</ion-modal-view>
+</ion-view>
