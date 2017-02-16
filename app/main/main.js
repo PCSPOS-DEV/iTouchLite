@@ -88,6 +88,50 @@ angular.module('itouch', [
                             templateUrl: 'main/sales/sales.html',
                             controller: 'SalesCtrl'
                         }
+                    },
+                    resolve: {
+                      header: ['BillService', function(BillService){
+                        var rec_id = BillService.getCurrentReceiptId();
+                        return BillService.getHeader(rec_id).then(function(header){
+                          if(!header){
+                            return BillService.initHeader().then(function(header){
+                              return header;
+                            });
+                          } else{
+                            return header;
+                          }
+                        });
+                      }],
+                      user: ['AuthService', '$q', function(AuthService, $q){
+                        return AuthService.currentUser();
+                      }],
+                      shift: ['ShiftService', '$q', '$state', '$timeout', function(ShiftService, $q, $state, $timeout){
+
+                        var def = $q.defer();
+                        // $timeout(function() {
+                          var shift = ShiftService.getCurrent();
+                          if (shift) {
+                            def.resolve(shift);
+                          } else {
+                            console.log('shift not set');
+                            // def.reject({redirectTo: 'app.shift'});
+                            def.reject();
+                          }
+                        // });
+                        return def.promise.catch(function () { $state.go('app.shift'); });;
+                      }],
+                      businessDate: ['ControlService', '$q', function(ControlService, $q){
+                        var def = $q.defer();
+                        var bd = ControlService.getBusinessDate(true);
+                        if(bd){
+                          def.resolve(bd);
+                        } else {
+                          console.log('business date not set');
+                          return false;
+                        }
+                        return def.promise;
+                      }],
+
                     }
                 })
 
@@ -109,6 +153,32 @@ angular.module('itouch', [
                         }
                     }
                 })
+              .state('app.shift', {
+                url: '/shift',
+                views: {
+                  'menuContent': {
+                    templateUrl: 'main/shift/shiftOptions.html',
+                    controller: 'ShiftOptionsCtrl as ctrl'
+                  }
+                },
+                resolve: {
+                  shiftData: ['$q', 'ShiftService', function($q, ShiftService){
+                    var def = $q.defer();
+                    $q.all({
+                      opened: ShiftService.getOpened(),
+                      unOpened: ShiftService.getUnOpened(),
+                      toBeDeclared: ShiftService.getDeclareCashShifts(),
+                      dayEndPossible: ShiftService.dayEndPossible()
+                    }).then(function(data){
+                      def.resolve(data);
+                    }, function(ex){
+                      console.log(ex);
+                      def.reject("error");
+                    });
+                    return def.promise;
+                  }]
+                }
+              })
 
 
             // .state('app.single', {
