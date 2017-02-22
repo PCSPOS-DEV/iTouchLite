@@ -236,24 +236,8 @@ angular.module('itouch.controllers')
        * Biding an event to catch modal close call
        */
       $scope.$on('close-tenderModel', function () {
-        // CartItemService.clearCart();
-        // $scope.refreshCart();
         $scope.tenderModal.hide();
         $scope.shownModal = null;
-
-        // BillService.getHeader().then(function(header){
-        //   var promise;
-        //   if(!header){
-        //     promise = BillService.initHeader();
-        //   } else {
-        //     promise = BillService.getHeader();
-        //   }
-        //   promise.then(function(header){
-        //     // console.log(header);
-        //     $scope.refreshCart();
-        //     $scope.header = header;
-        //   });
-        // });
       });
 
       /**
@@ -532,14 +516,19 @@ angular.module('itouch.controllers')
                     var q = null;
                     if(data.Price == 0 && item.ZeroPrice == 'false'){
                       q = showPriceForm().then(function (amount) {
-                        amount = parseFloat(amount);
-                        item.Price = amount || 0;
-                        item.OrgPrice = amount || 0;
-                        item.AlteredPrice = amount || 0;
-                        item.StdCost = amount || 0;
-                        item.PriceLevelId  = 0;
-                        item.OpenKey = true;
-                        return item;
+                        if(amount){
+                          amount = parseFloat(amount);
+                          item.Price = amount || 0;
+                          item.OrgPrice = amount || 0;
+                          item.AlteredPrice = amount || 0;
+                          item.StdCost = amount || 0;
+                          item.PriceLevelId  = 0;
+                          item.OpenKey = true;
+                          return item;
+                        } else {
+                          return $q.reject();
+                        }
+
                       });
                     } else {
                       q = $q.when(data, function(){

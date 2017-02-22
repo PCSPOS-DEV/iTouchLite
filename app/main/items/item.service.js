@@ -130,9 +130,6 @@ angular.module('itouch.services')
     self.getPrice = function (itemPlu, priceGroupId, taxable) {
       return LocationService.get().then(function (location) {
         return PriceGroupService.get(itemPlu, priceGroupId, location.PriceLevel, taxable).then(function (data) {
-          // var item = {};
-          // item.Price = data ? data.Price : 0;
-          // item.PriceLevelId  = data ? data.PriceLevelId : 0;
           delete data.Id;
           return data;
         }
