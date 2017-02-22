@@ -10,20 +10,23 @@ angular.module('itouch.controllers')
       var selectedItem = null;
 
       $scope.$on('modal.shown', function(event, modal) {
-        var customeQty = $scope.salesKits.customQuantity;
+        if($scope.shownModal = 'sk') {
+          var customeQty = $scope.salesKits.customQuantity;
 
-        if(customeQty > 1){
-          angular.forEach($scope.salesKits.list, function(item, key){
-            item.Quantity *= customeQty;
-            $scope.salesKits.list[key] = item;
-          });
-          angular.forEach($scope.salesKits.selectedList, function(item, key){
-            item.Quantity *= customeQty;
-            item.Qty *= customeQty;
+          if (customeQty > 1) {
+            $scope.salesKits.Qty = customeQty;
+            angular.forEach($scope.salesKits.list, function (item, key) {
+              item.Quantity *= customeQty;
+              $scope.salesKits.list[key] = item;
+            });
+            angular.forEach($scope.salesKits.selectedList, function (item, key) {
+              item.Quantity *= customeQty;
+              item.Qty *= customeQty;
 
-            $scope.salesKits.selectedList[key] = item;
-          });
-          console.log($scope.salesKits);
+              $scope.salesKits.selectedList[key] = item;
+            });
+            console.log($scope.salesKits);
+          }
         }
 
 
@@ -147,11 +150,15 @@ angular.module('itouch.controllers')
             operation = CartItemService.addSalesKitItemToCart(item);
           }
 
-          operation.then(function () {
+          operation.then(function (item) {
             selectedItem = null;
-            $scope.$emit('refresh-cart');
+            $scope.refreshCart().then(function(){
+              $scope.scrollTo(item.LineNumber);
+              $scope.qty.value = 1;
+              $scope.selectItemWithLineNumber(item.LineNumber);
+            });
             $scope.$emit('skModalModal-save');
-            $scope.selectItem(item);
+
           }).catch(function (err) {
             console.log(err);
           });

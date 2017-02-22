@@ -42,6 +42,18 @@ angular.module('itouch.controllers')
           this.value = this.value.replace(/\D/, "")
         });
 
+        $scope.onQtyFocus = function () {
+          if($scope.qty.value == 1){
+            $scope.qty.value = "";
+          }
+        };
+
+        $scope.onQtyBlur = function ($event) {
+          if($scope.qty.value == ""){
+            $scope.qty.value = 1;
+          }
+        };
+
 
         /**
          * Initiating shift modal dialog
@@ -87,9 +99,20 @@ angular.module('itouch.controllers')
             }
           }).then(function(){
             refresh().then(function () {
-              selectLastItem();
+              // selectLastItem();
             });
           });
+        }
+
+         $scope.scrollTo = function(lineNumber){
+          // var currentPos = $ionicScrollDelegate.$getByHandle('cart').getScrollPosition();
+          // console.log(currentPos);
+          var ele = document.getElementById(lineNumber);
+          if(ele){
+            $ionicScrollDelegate.$getByHandle('cart').scrollTo(0, (ele.getBoundingClientRect().top-83), true);
+          }
+
+
         }
 
         /**
@@ -113,7 +136,7 @@ angular.module('itouch.controllers')
           loadLayout();
           loadFunctions();
           refresh().then(function () {
-            selectLastItem();
+            // selectLastItem();
           });
 
         }
@@ -145,7 +168,7 @@ angular.module('itouch.controllers')
           if(!header){
             return BillService.initHeader().then(function(header){
               // console.log(header);
-              refreshCart();
+              $scope.refreshCart();
               $scope.header = header;
               return true;
             }, function(ex){
@@ -214,7 +237,7 @@ angular.module('itouch.controllers')
        */
       $scope.$on('close-tenderModel', function () {
         // CartItemService.clearCart();
-        // refreshCart();
+        // $scope.refreshCart();
         $scope.tenderModal.hide();
         $scope.shownModal = null;
 
@@ -227,7 +250,7 @@ angular.module('itouch.controllers')
         //   }
         //   promise.then(function(header){
         //     // console.log(header);
-        //     refreshCart();
+        //     $scope.refreshCart();
         //     $scope.header = header;
         //   });
         // });
@@ -270,7 +293,7 @@ angular.module('itouch.controllers')
        */
       $scope.$on('refundModal-close', function () {
         $scope.refundModal.hide();
-        refreshCart();
+        $scope.refreshCart();
       });
 
 
@@ -297,6 +320,7 @@ angular.module('itouch.controllers')
        */
       $scope.$on('skModalModal-save', function () {
         $scope.salesKitUpdate = false;
+        $scope.qty.value = 1;
         $scope.skModalModal.hide();
       });
 
@@ -309,7 +333,7 @@ angular.module('itouch.controllers')
        * Biding an event to catch modal close call
        */
       $scope.$on('pwpModal-close', function () {
-        selectLastItem();
+        // selectLastItem();
         $scope.qty.value = 1;
         $scope.pwpModal.remove();
       });
@@ -565,9 +589,10 @@ angular.module('itouch.controllers')
                         ;
                       } else {
                         CartItemService.addItemToCart(item).then(function (it) {
-                          refreshCart().then(function () {
+                          $scope.refreshCart().then(function () {
+                            $scope.scrollTo(it.LineNumber);
                             $scope.qty.value = 1;
-                            selectLastItem();
+                            $scope.selectItemWithLineNumber(it.LineNumber);
                           })
                         }, function(ex){
                           console.log(ex);
@@ -589,7 +614,7 @@ angular.module('itouch.controllers')
 
           }, function (err) {
             console.log(err.message);
-            refreshCart();
+            $scope.refreshCart();
           });
         }
       }
@@ -634,7 +659,7 @@ angular.module('itouch.controllers')
       /**
        * Refreshes the cart data from it's service
        */
-      var refreshCart = function () {
+      $scope.refreshCart = function () {
         return CartItemService.fetchItemsFromDb().then(function (items) {
           $scope.cart.items = items;
           $scope.cart.summery = CartItemService.getSummery();
@@ -652,14 +677,14 @@ angular.module('itouch.controllers')
         });
 
       }
-      refreshCart();
+      $scope.refreshCart();
 
       $rootScope.$on("refresh-cart", function () {
-        refreshCart();
+        $scope.refreshCart();
       });
 
         $scope.$on("refresh-cart", function () {
-          refreshCart();
+          $scope.refreshCart();
         });
 
 
@@ -675,14 +700,25 @@ angular.module('itouch.controllers')
         }
       }
 
-      var selectLastItem = function () {
+      $scope.selectItemWithLineNumber = function (lineNumber) {
           if($scope.cart.items){
+            var key = null;
+            angular.forEach($scope.cart.items, function(item, k){
+              if(item.LineNumber == lineNumber){
+                key = k;
+                return;
+              }
+            });
+            if(key){
+              $scope.selectItem($scope.cart.items[key]);
+            } else {
               var last = $scope.cart.items[Object.keys($scope.cart.items)[Object.keys($scope.cart.items).length-1]];
               if(last){
                 $scope.selectItem(last);
               } else {
                 $scope.selectItem(null);
               }
+            }
           }
       }
 
@@ -696,10 +732,10 @@ angular.module('itouch.controllers')
           if (item && authorityCheck(fn)) {
             if (item.ItemType == 'SKT') {
               BillService.voidSalesKit(item).then(function () {
-                refreshCart();
+                $scope.refreshCart();
               }, function (err) {
                 console.log(err);
-                refreshCart();
+                $scope.refreshCart();
               });
             } else if(item.ParentItemLineNumber == 0){
               console.log(item);
@@ -709,9 +745,9 @@ angular.module('itouch.controllers')
                   promises.push(BillService.voidItem(item));
                 });
                 $q.all(promises).then(function(){
-                  refreshCart().then(function () {
+                  $scope.refreshCart().then(function () {
                     // console.log('void');
-                    selectLastItem();
+                    $scope.selectItemWithLineNumber();
                   });
                 }, function(err){
                   console.log(err);
@@ -733,15 +769,15 @@ angular.module('itouch.controllers')
                 }
               } else {
                 BillService.voidItem(item).then(function () {
-                  refreshCart().then(function () {
-                    selectLastItem();
+                  $scope.refreshCart().then(function () {
+                    $scope.selectItemWithLineNumber();
                   });
 
                 }, function (err) {
                   console.log(err);
-                  refreshCart().then(function () {
+                  $scope.refreshCart().then(function () {
                     // console.log('void');
-                    selectLastItem();
+                    $scope.selectItemWithLineNumber();
                   });
                 });
               }
@@ -789,7 +825,7 @@ angular.module('itouch.controllers')
             if(authorityCheck(fn)){
               var qty = angular.copy(item.Qty);
               BillService.changeItemQty(item.ItemId, item.LineNumber, ++qty).then(function () {
-                refreshCart();
+                $scope.refreshCart();
               }, function (err) {
                 console.log(err);
               });
@@ -803,7 +839,7 @@ angular.module('itouch.controllers')
               var qty = angular.copy(item.Qty);
               if(qty > 1){
                 BillService.changeItemQty(item.ItemId, item.LineNumber, --qty).then(function () {
-                  refreshCart();
+                  $scope.refreshCart();
                 }, function (err) {
                   console.log(err);
                 });
@@ -841,7 +877,7 @@ angular.module('itouch.controllers')
                 BillService.saveBill($scope.header, $scope.cart.items).then(function(res){
                   $scope.cart.selectedItem = null;
                   refresh();
-                  init();
+                  initBill();
                 }, function(res){
                   console.log(res);
                 });
@@ -854,6 +890,7 @@ angular.module('itouch.controllers')
             var item = $scope.cart.selectedItem;
             if(item) {
               $scope.type = 'F';
+              $scope.shownModal = 'mod';
               $scope.modals.modifiers.show();
             }
           }
@@ -864,6 +901,7 @@ angular.module('itouch.controllers')
             var item = $scope.cart.selectedItem;
             if(item) {
               $scope.type = 'B';
+              $scope.shownModal = 'mod';
               $scope.modals.modifiers.show();
             }
           }
@@ -875,7 +913,7 @@ angular.module('itouch.controllers')
             if(item){
               BillService.setTakeAway(item.TakeAway == 'false' ? true : false, item.ItemId, item.LineNumber).then(function(){
                 // console.log("done");
-                refresh();
+                $scope.refreshCart();
               }, function(ex){
                 console.log(ex);
               })
@@ -886,7 +924,7 @@ angular.module('itouch.controllers')
           if(authorityCheck(fn)){
             $scope.TakeAway = !$scope.TakeAway;
             BillService.fullTakeAway($scope.cart.items, $scope.TakeAway).then(function(){
-              refresh();
+              $scope.refreshCart();
             }, function(ex){
               console.log(ex);
             });
