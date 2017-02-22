@@ -7,12 +7,8 @@ angular.module('itouch.controllers')
     ionic.Platform.ready(function () {
       LocationService.get();
       Logger.init();
+      ionic.Platform.fullScreen();
     });
-
-    // $timeout(function() {
-    //   $state.go('login');
-    // }, 5000);
-
 
 
     $scope.$on('shift-changed', function(evt, shift){
