@@ -48,9 +48,10 @@ angular.module('itouch.services')
         var data = DB.fetch(result);
         if(data){
           // console.log(data);
-          data.OrgPrice = data.OrgPrice;
-          data.AlteredPrice = data.AlteredPrice;
+          data.OrgPrice = data.OrgPrice || data.Price;
+          data.AlteredPrice = data.AlteredPrice || data.Price;
           data.StdCost = data.StdCost;
+          data.Price = data.Price;
           if(taxable){
             if(location && location.Tax5Option == 3){
               data.Price =((data.Price / (100 + location.Tax5Perc)) * 100).roundTo(2);
