@@ -14,7 +14,9 @@ angular.module('itouch.controllers')
           var customeQty = $scope.salesKits.customQuantity;
 
           if (customeQty > 1) {
-            $scope.salesKits.Qty = customeQty;
+            // $scope.salesKits.Qty = customeQty;
+            $scope.salesKits.Qty = 0;
+            $scope.salesKits.Quantity = customeQty;
             angular.forEach($scope.salesKits.list, function (item, key) {
               item.Quantity *= customeQty;
               $scope.salesKits.list[key] = item;
@@ -90,9 +92,13 @@ angular.module('itouch.controllers')
 
       $scope.clearSelected = function () {
         if($scope.selectedRow && $scope.selectedRow.Default != true){
-          var kit = $scope.salesKits.list[$scope.selectedRow.SalesKitId];
-          kit.Qty -= $scope.selectedRow.Qty;
-          removeSelectedItem($scope.selectedRow.SalesKitId, $scope.selectedRow.ItemId);
+          if($scope.selectedRow.Qty > 0){
+            var kit = $scope.salesKits.list[$scope.selectedRow.SalesKitId];
+            if(kit.Qty > 0){
+              kit.Qty -= $scope.selectedRow.Qty;
+            }
+            removeSelectedItem($scope.selectedRow.SalesKitId, $scope.selectedRow.ItemId);
+          }
         }
       }
 
@@ -103,7 +109,9 @@ angular.module('itouch.controllers')
           }
         });
         var kit = $scope.salesKits.list[$scope.selectedRow.SalesKitId];
-        kit.Qty = 0;
+        if(kit){
+          kit.Qty = 0;
+        }
       }
 
       var removeSelectedItem =  function (salesKitId, ItemId) {
@@ -131,6 +139,7 @@ angular.module('itouch.controllers')
           });
           item.selectedList = selectedList;
           var operation;
+          item.Qty = $scope.salesKits.customQuantity;
           if($scope.salesKitUpdate){
             var oldItem = $scope.cart.selectedItem;
             // console.log(oldItem);
