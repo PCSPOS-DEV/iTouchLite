@@ -47,15 +47,14 @@ angular.module('itouch.controllers')
             break;
           case 'close':
             closeShift($scope.shift);
-            $scope.$emit("shift-modal-close");
             break;
           case 'declareCash':
             $scope.close();
             $scope.$emit("declare-cash", shift);
             break;
           default:
-            $scope.$emit("shift-exit", shift);
             $scope.$emit("shift-modal-close");
+            $scope.$emit("shift-exit", shift);
             break;
         }
       }
