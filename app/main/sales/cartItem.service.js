@@ -127,7 +127,6 @@ angular.module('itouch.services')
 
         return BillService.findItems(item.ItemId, item.ItemType, item.parentItemLineNumber).then(function (items) {
           var ndItem = getItem(items);
-          console.log(item);
           if(item.OpenKey){
             if(item.customQuantity){
               item.Qty = item.customQuantity;
@@ -139,7 +138,7 @@ angular.module('itouch.services')
             return BillService.addItem(item).then(function(){
               return ndItem || item;
             });
-          } else if (ndItem && !salesKit && ndItem.TakeAway == 'false') {
+          } else if (ndItem && !salesKit && ndItem.TakeAway == 'false' && ndItem.ChildCount == 0) {
             if(item.customQuantity){
               ndItem.Qty += item.customQuantity;
             } else {
@@ -232,6 +231,7 @@ angular.module('itouch.services')
 
       self.findItem = function (id, type, lineNumber, parentItemLineNumber) {
         if (id && type && type == 'NOR') {
+
           var label = id + type;
           if (lineNumber) {
             label += lineNumber;
@@ -239,7 +239,13 @@ angular.module('itouch.services')
           if(parentItemLineNumber){
             label += parentItemLineNumber;
           }
-          return cart.items[label];
+          var item = cart.items[label];
+          if(!item || item.ParentItemLineNumber != 0){
+            return null;
+          }
+          return item;
+        } else {
+          return null;
         }
       }
       var counter = 1;

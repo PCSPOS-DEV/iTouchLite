@@ -70,6 +70,12 @@ angular.module('itouch.services')
       DB.addInsertToQueue(DB_CONFIG.tableNames.item.modifiers, items);
     }
 
+    self.getItemModifiers = function(parentLineNumber){
+      return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', { columns: "ParentItemLineNumber = ? AND ItemType = 'MOD'", data: [parentLineNumber] }).then(function(res){
+        return DB.fetchAll(res);
+      });
+    }
+
 
     return self;
   }]);

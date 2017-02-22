@@ -44,13 +44,17 @@ angular.module('itouch.services')
     PrintService.addHLine();
 
     angular.forEach(data.items, function(row){
-      var sTotal = (row.SubTotal + row.Tax).roundTo(2);
-      PrintService.addLine(row.Desc1, " "+(sTotal.toFixed(2)), ""+row.Qty);
+      var sTotal = (row.SubTotal + row.Tax5Amount).roundTo(2);
+      var text = row.Desc1;
+      if(row.TakeAway == 'true'){
+        text += " *";
+      }
+      PrintService.addLine(text, " "+(sTotal.toFixed(2)), ""+row.Qty);
       subTotal += sTotal;
       if(row.discounts){
         angular.forEach(row.discounts, function(discount){
           if(discount.Description1){
-            PrintService.addTabbedLine(discount.Description1, "-$"+(discount.DiscountAmount ? discount.DiscountAmount.toFixed(2) : 0));
+            PrintService.addTabbedLine(discount.Description1, " -"+(discount.DiscountAmount ? discount.DiscountAmount.toFixed(2) : 0));
             subTotal -= discount.DiscountAmount ? discount.DiscountAmount : 0;
           }
 
@@ -67,7 +71,7 @@ angular.module('itouch.services')
     if(data.tenderDiscounts && data.tenderDiscounts.length > 0){
       var tenderDisAmount = 0;
       angular.forEach(data.tenderDiscounts, function(row){
-        PrintService.addLine(row.Description1, "$"+(row.Amount.toFixed(2)));
+        PrintService.addLine(row.Description1, "-"+(row.Amount.toFixed(2)));
         tenderDisAmount += row.Amount;
       });
 
@@ -167,8 +171,8 @@ angular.module('itouch.services')
 
       });
 
-      // console.log(items);
-
+      items = _.sortBy(_.values(items), 'LineNumber');
+      console.log(items);
       return items;
     });
   }

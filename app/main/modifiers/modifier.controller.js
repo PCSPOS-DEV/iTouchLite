@@ -10,12 +10,22 @@ angular.module('itouch.controllers')
       self.view = 1;
       self.subPlus = [];
       self.cart = [];
+      self.selectedCart = [];
 
       $scope.$on('modal.shown', function(event, data){
-        // handle event
-        self.view = 1;
-        self.cart = [];
-        refresh();
+        if($scope.shownModal = 'mod'){
+          // handle event
+          self.view = 1;
+          self.cart = [];
+          refresh();
+          var item = $scope.cart.selectedItem;
+          if(item){
+            ModifierService.getItemModifiers(item.LineNumber).then(function(data){
+              console.log(data);
+              self.selectedCart = data;
+            });
+          }
+        }
       });
 
       var refresh = function () {
@@ -39,6 +49,10 @@ angular.module('itouch.controllers')
             console.log(err);
           });
         }
+      }
+
+      var fetchExistingModifiers = function(){
+
       }
 
       self.close = function () {
@@ -74,14 +88,19 @@ angular.module('itouch.controllers')
       self.selectSubPlu = function(spItem){
         if(spItem){
           ItemService.getById(spItem.ItemId).then(function(item) {
-            if(item){
+            if(item && !_.find(self.selectedCart, { ItemId: item.Id })){
               item.SubPluDesc1 = spItem.Description1;
               item.SubPluDesc2 = spItem.Description2;
               renameProperty(item, 'Id', "ItemId");
               item.ItemType = 'MOD';
               item.ParentItemLineNumber = $scope.cart.selectedItem.LineNumber;
-              self.cart.push(item);
-              self.view = 1;
+              item.Qty = $scope.cart.selectedItem.Qty;
+              BillService.loadLineNewNumber($scope.cart.selectedItem.LineNumber).then(function(ln){
+                item.LineNumber = ln + 1;
+                self.cart.push(item);
+                self.view = 1;
+              });
+
             }
           }, function (err) {
             console.log(err);
@@ -94,6 +113,8 @@ angular.module('itouch.controllers')
         if(self.cart.length > 0){
           var promises = [];
           angular.forEach(self.cart, function(item){
+            item.Description1 = item.SubPluDesc1 + " " + item.Description1;
+            item.Description2 = item.SubPluDesc1 + " " + item.Description2;
             promises.push(CartItemService.addItemToCart(item));
           });
           $q.all(promises).then(function(res){
