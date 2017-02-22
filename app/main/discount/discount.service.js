@@ -273,7 +273,7 @@ angular.module('itouch.services')
         item.Discount += totalDiscount;
         item.DiscAmount += subDiscount;
         item.Tax5DiscAmount += (totalDiscount - subDiscount).roundTo(2);
-        discount.DiscountAmount = 0 + totalDiscount;
+        discount.DiscountAmount = totalDiscount;
         // total = (total + totalDiscount).roundTo(2);
         // console.log(totalDiscount);
         // console.log(item);
@@ -409,158 +409,78 @@ angular.module('itouch.services')
 
         var queue  = [];
 
-        var total = header.TenderTotal;
+        var total = header.TenderTotal || header.Total;
 
         var discountAmounts = null;
+        if(!amount){
+          amount = (total * discount.Percentage || discount.DiscountPercentage) / 100;
+        }
 
-        if(amount) {
-          amount = parseFloat(amount);
-          var headerDiscount = 0, headerSubDiscount = 0, totalEligibleDiscount = 0, headerTax5Disc = 0;
-          var prec = 0;
-          angular.forEach(items, function (item, key) {
-            // totalDiscount  = (item.Total < discountPerItem ? item.Total : discount.Amount).roundTo(2);
-            // subDiscount = ((totalDiscount * (100-item.Tax5Perc)) / 100).roundTo(2);
-            item = ItemService.calculateTotal(item);
-            if(!self.checkItemEligibility(item)){
-              item.TotalEligibleDiscount = 0;
-            } else if(item.BelowCost == 'true' || item.StdCost == 0){
-              item.TotalEligibleDiscount  = item.Total - item.Discount;
-            } else {
-              item.TotalEligibleDiscount = (item.StdCost * item.Qty) - item.Discount;
-            }
-
-            totalEligibleDiscount += item.TotalEligibleDiscount;
-          });
-          if(amount > totalEligibleDiscount){
-            return false;
+        amount = parseFloat(amount);
+        var headerDiscount = 0, headerSubDiscount = 0, totalEligibleDiscount = 0, headerTax5Disc = 0;
+        var prec = 0;
+        angular.forEach(items, function (item, key) {
+          // totalDiscount  = (item.Total < discountPerItem ? item.Total : discount.Amount).roundTo(2);
+          // subDiscount = ((totalDiscount * (100-item.Tax5Perc)) / 100).roundTo(2);
+          item = ItemService.calculateTotal(item);
+          if(!self.checkItemEligibility(item)){
+            item.TotalEligibleDiscount = 0;
+          } else if(item.BelowCost == 'true' || item.StdCost == 0){
+            item.TotalEligibleDiscount  = item.Total;
           } else {
-            angular.forEach(_.values(items), function (item, key) {
-              prec = item.TotalEligibleDiscount / totalEligibleDiscount;
-              var discountAmount = 0;
-              if(key != _.size(items) - 1){
-                discountAmount = (amount * prec).roundTo(2);
-              } else {
-                discountAmount = amount - headerDiscount;
-              }
-              var subDiscount = ((discountAmount * (100-item.Tax5Perc)) / 100).roundTo(2);
-              var tax5Disc = (discountAmount - subDiscount).roundTo(2);
-
-              item.Discount += discountAmount;
-              discount.DiscountAmount = angular.copy(discountAmount);
-              item.DiscAmount = subDiscount;
-              item.Tax5DiscAmount = tax5Disc;
-
-              headerDiscount += discountAmount;
-              headerSubDiscount += subDiscount;
-              headerTax5Disc += tax5Disc;
-
-
-
-              queue.push(processTendderDiscountItem(item, angular.copy(discount)));
-            });
-
-            return $q.all(queue).then(function(items){
-
-              header.Discount += headerDiscount;
-              header.DiscAmount += headerSubDiscount;
-              header.Tax5DiscAmount += headerTax5Disc;
-              header = ItemService.calculateTotal(header);
-
-              header.TenderTotal = header.Total.roundTo(2);
-
-              header.UpdatedTenderTotal = RoundingService.round(header.Total).toFixed(2);
-              header.TotalRounded = RoundingService.round(header.Total).toFixed(2);
-              tenderDiscounts.header = header;
-              tenderDiscounts.discounts = _.pluck(items, 'discount');
-              tenderDiscounts.items = _.pluck(items, 'item');
-              console.log(tenderDiscounts);
-            }, function(ex){
-              return ex;
-              console.log(ex);
-            });
+            item.TotalEligibleDiscount = (item.StdCost * item.Qty) - item.Discount;
           }
 
+          totalEligibleDiscount += item.TotalEligibleDiscount;
+        });
+        if(amount > totalEligibleDiscount){
+          return false;
         } else {
-          angular.forEach(items, function (item) {
-            if(self.checkItemEligibility(item)) {
-              discountSet = {};
-              // if(amount){
-              if(amount){
-                item.DiscPrec = ((amount / total) * item.Total).roundTo(2);
-              }
-
-              ItemService.calculateTotal(item);
-
-              // discountAmounts = calculateDiscountAmounts(item, discount, true);
-              // item = discountAmounts.item;
-              // discount = discountAmounts.discount;
-              // console.log('set');
-              // console.log(discountAmounts.discount);
-              queue.push(processTendderDiscountItem(item, discount));
-
-
-
-
+          angular.forEach(_.values(items), function (item, key) {
+            prec = item.TotalEligibleDiscount / totalEligibleDiscount;
+            var discountAmount = 0;
+            if(key != _.size(items) - 1){
+              discountAmount = (amount * prec).roundTo(2);
+            } else {
+              discountAmount = amount - headerDiscount;
             }
+            var subDiscount = ((discountAmount * (100-item.Tax5Perc)) / 100).roundTo(2);
+            var tax5Disc = (discountAmount - subDiscount).roundTo(2);
+
+            item.Discount += discountAmount;
+            discount.DiscountAmount = angular.copy(discountAmount);
+            item.DiscAmount = subDiscount;
+            item.Tax5DiscAmount = tax5Disc;
+
+            headerDiscount += discountAmount;
+            headerSubDiscount += subDiscount;
+            headerTax5Disc += tax5Disc;
+
+
+
+            queue.push(processTendderDiscountItem(item, angular.copy(discount)));
           });
 
           return $q.all(queue).then(function(items){
-            var discAmount = 0, tax5DiscAmount = 0;
-            angular.forEach(items, function(discountSet){
-              calculateDiscountAmounts(discountSet.item, discountSet.discount, true);
-              discAmount += discountSet.item.DiscAmount;
-              tax5DiscAmount += discountSet.item.Tax5DiscAmount;
 
-              discount.DiscountFrom = 'T';
-              tenderDiscounts.discounts.push(discountSet.discount);
-              tenderDiscounts.items.push(discountSet.item);
-            });
-            discAmount = discAmount.roundTo(2);
-            tax5DiscAmount = tax5DiscAmount.roundTo(2);
-            // console.log(discAmount, tax5DiscAmount);
-
-            discountSet = {};
-            // calculateDiscountAmounts(item, discount, true);
-            // discountSet.detail = item;
-            // discountSet.discount = discount;
-            // tenderDiscounts.push(discountSet);
-
-            // discountValues.DiscAmount += item.DiscAmount;
-            // discountValues.Tax5DiscAmount += item.Tax5DiscAmount;
-            // discountValues.Discount += item.Discount;
-
-            header.DiscAmount += discAmount.roundTo(2);
-            header.Tax5DiscAmount += tax5DiscAmount.roundTo(2);
+            header.Discount += headerDiscount;
+            header.DiscAmount += headerSubDiscount;
+            header.Tax5DiscAmount += headerTax5Disc;
             header = ItemService.calculateTotal(header);
-            // console.log(header);
+
             header.TenderTotal = header.Total.roundTo(2);
 
-            header.UpdatedRoundedTotal = RoundingService.round(header.Total).toFixed(2);
+            header.UpdatedTenderTotal = RoundingService.round(header.Total).toFixed(2);
             header.TotalRounded = RoundingService.round(header.Total).toFixed(2);
             tenderDiscounts.header = header;
-            // // console.log(header);
+            tenderDiscounts.discounts = _.pluck(items, 'discount');
+            tenderDiscounts.items = _.pluck(items, 'item');
+            console.log(tenderDiscounts);
+          }, function(ex){
+            return ex;
+            console.log(ex);
           });
         }
-
-        // } else {
-        //   angular.forEach(items, function (item) {
-        //     if(self.checkItemEligibility(item)) {
-        //       discountSet = {};
-        //       calculateDiscountAmounts(item, discount);
-        //       ItemService.calculateTotal(item);
-        //       discountSet.detail = item;
-        //       discountSet.discount = discount;
-        //       tenderDiscounts.push(discountSet);
-        //
-        //       discountValues.DiscAmount += item.DiscAmount;
-        //       discountValues.Tax5DiscAmount += item.Tax5DiscAmount;
-        //       discountValues.Discount += item.Discount;
-        //
-        //
-        //     }
-        //   });
-        // }
-
 
         return deferred.promise;
 
