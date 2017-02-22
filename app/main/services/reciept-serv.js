@@ -46,9 +46,16 @@ angular.module('itouch.services')
     angular.forEach(data.items, function(row){
       var sTotal = (row.SubTotal + row.Tax5Amount).roundTo(2);
       var text = row.Desc1;
-      if(row.TakeAway == 'true'){
+      if(row.ParentItemLineNumber > 0){
+        text = '  '+ text;
+      }
+      if (row.ItemType == 'MOD'){
+        text += " **";
+      } else if(row.TakeAway == 'true'){
         text += " *";
       }
+
+
       PrintService.addLine(text, " "+(sTotal.toFixed(2)), ""+row.Qty);
       subTotal += sTotal;
       if(row.discounts){
