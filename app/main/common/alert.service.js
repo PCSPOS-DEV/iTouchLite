@@ -2,7 +2,7 @@
  * Created by shalitha on 23/5/16.
  */
 angular.module('itouch.services')
-  .service('Alert', ['$ionicLoading', '$ionicPopup', function ($ionicLoading, $ionicPopup) {
+  .service('Alert', ['$ionicLoading', '$ionicPopup', '$cordovaDialogs', function ($ionicLoading, $ionicPopup, $cordovaDialogs) {
     this.showLoading = function () {
       $ionicLoading.show({
         template: '<ion-spinner icon="lines"></ion-spinner>',
@@ -35,11 +35,7 @@ angular.module('itouch.services')
     }
 
     this.error = function (message, title) {
-      return $ionicPopup.alert({
-        // cssClass: cssClass || null,
-        title: title || 'Error',
-        template: message
-      });
+      $cordovaDialogs.alert(message, title || 'Error');
     }
 
     this.warning = function (message, title) {
