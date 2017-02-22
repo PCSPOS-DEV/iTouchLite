@@ -3,10 +3,9 @@
  */
 angular.module('itouch.controllers')
   .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService',
-    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory',
+    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q',
     function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService,
-              Reciept, billData, $state, $rootScope, $ionicHistory) {
-    console.log(billData);
+              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q) {
     $scope.tenderTypes = [];
       $scope.title = "Tender";
       $scope.tenderHeader = billData.header;
@@ -18,19 +17,28 @@ angular.module('itouch.controllers')
         header: null,
         discount: null
       };
+      $scope.tenderTypes = billData.tenderTypes;
+      $scope.functions = billData.functions;
 
       $scope.updatedRoundedTotal = 0;
 
-      TenderService.getTenderTypes().then(function (types) {
-        $scope.tenderTypes = types;
+      $scope.$on("$ionicView.beforeEnter", function(event, data){
+        initBill();
       });
 
-      FunctionsService.getTenderFunctions().then(function (fns) {
-        $scope.functions = {
-          top: _.where(fns, {DisplayOnTop: "true"}),
-          bottom: _.where(fns, {DisplayOnTop: "false"})
-        }
-      });
+      var initBill = function(){
+        $q.all({
+          header: BillService.getHeader($stateParams.DocNo),
+          items: CartItemService.getItems($stateParams.DocNo)
+        }).then(function(data){
+          if(data.header){
+            $scope.header = data.header;
+            $scope.billItems = data.items;
+          }
+        }).then(function(){
+        });
+
+      }
 
       /**
        * Executes when modal is shown. Data initializations should be done inside this

@@ -189,19 +189,27 @@ angular.module('itouch', [
                   }
                 },
                 resolve: {
-                  billData: ['$q', 'BillService', 'CartItemService', '$stateParams', 'ItemService', 'RoundingService', '$state', function($q, BillService, CartItemService, $stateParams, ItemService, RoundingService, $state){
+                  billData: ['$q', 'BillService', 'CartItemService', '$stateParams', 'ItemService', 'RoundingService', '$state', 'FunctionsService', 'TenderService',
+                    function($q, BillService, CartItemService, $stateParams, ItemService, RoundingService, $state, FunctionsService, TenderService){
                     var docNo = $stateParams.DocNo;
                     console.log(docNo);
                     var def = $q.defer();
                     // def.resolve({});
                     $q.all({
                       header: BillService.getHeader(docNo),
-                      items: CartItemService.fetchItemsFromDb(docNo)
+                      items: CartItemService.fetchItemsFromDb(docNo),
+                      functions: FunctionsService.getTenderFunctions().then(function (fns) {
+                        return {
+                          top: _.where(fns, {DisplayOnTop: "true"}),
+                          bottom: _.where(fns, {DisplayOnTop: "false"})
+                        }
+                      }),
+                      tenderTypes: TenderService.getTenderTypes()
                     }).then(function(data){
                       if(data && data.header){
                         data.header = ItemService.calculateTotal(data.header);
                         data.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
-                        data.header.UpdatedTenderTotal = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
+                        data.header.UpdatedTenderTotal = data.header.Total.toFixed(2) || 0 ;
                         data.header.UpdatedRoundedTotal = RoundingService.round(data.header.Total).toFixed(2);
                         def.resolve(data);
                       } else {
