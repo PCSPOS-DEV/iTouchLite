@@ -131,9 +131,7 @@ angular.module('itouch.services')
 
       self.initHeader = function () {
         return self.createTempHeader().then(function(success){
-          if(success){
-            return self.getHeader();
-          }
+          return self.getHeader();
         });
       }
       // initHeader();
@@ -234,9 +232,26 @@ angular.module('itouch.services')
         });
       }
 
-      self.loadLineNewNumber = function () {
-        return DB.max(DB_CONFIG.tableNames.bill.tempDetail, 'LineNumber').then(function (ln) {
-          return ++ln;
+      self.loadLineNewNumber = function (parentNumber) {
+        var where = null;
+        if(parentNumber){
+          where = {
+            columns: 'ParentItemLineNumber=?',
+            data: [parentNumber]
+          }
+        }
+        return DB.max(DB_CONFIG.tableNames.bill.tempDetail, 'LineNumber', where).then(function (ln) {
+          if(parentNumber){
+            if(ln == 0){
+              return ++parentNumber;
+            } else {
+              return ln++;
+            }
+          } else {
+            return (ln - (ln%100)) + 100;
+          }
+        }, function(ex){
+          console.log(ex);
         });
       };
 
@@ -461,17 +476,16 @@ angular.module('itouch.services')
         var Tax1 = 0, Tax2 = 0, Tax3 = 0, Tax4 = 0, Tax5 = 0, SubTotal = 0, NewSubTotal = 0, Discount = 0, DiscountforTax1 = 0, DiscountforTax2 = 0, DiscountforTax3 = 0, DiscountforTax4 = 0, DiscountforTax5 = 0;
         var Takeaway = item.TakeAway;
 
-        if (_.isNaN(item.AlteredPrice) || _.isNaN(item.Qty)) {
+        if (_.isNaN(item.AlteredPrice)) {
           item.AlteredPrice = parseFloat(item.AlteredPrice).roundTo(2);
+        }
+        if (_.isNaN(item.Qty)) {
           item.Qty = parseFloat(item.Qty);
         }
         if(!item.Price){
           item.Price = 0;
         }
 
-        if(!item.Qty){
-          item.Qty = 0;
-        }
         if(!item.OrgPrice) item.OrgPrice = item.Price;
         if(!item.AlteredPrice) item.AlteredPrice = item.Price;
         if(_.isUndefined(item.StdCost)) item.StdCost = 0;
@@ -908,10 +922,25 @@ angular.module('itouch.services')
 
       self.findItems = function (itemId, itemType, parentLineNumber) {
         if(itemType == 'NOR'){
-          return DB.select(DB_CONFIG.tableNames.bill.tempDetail, "*", {
-            columns: 'ItemId=? AND ItemType=? AND parentItemLineNumber = ?',
-            data: [itemId, itemType, parentLineNumber||0]
-          }).then(function (res) {
+          var q = 'SELECT *, (SELECT COUNT(*) FROM TempBillDetail AS ct WHERE ct.ParentItemLineNumber == mt.LineNumber) AS ChildCount FROM TempBillDetail AS mt WHERE 1 = 1';
+          var data = [];
+          if(itemId){
+            q += ' AND ItemId = ?';
+            data.push(itemId);
+          }
+          if(itemType){
+            q += ' AND ItemType = ?';
+            data.push(itemType);
+          }
+          if(parentLineNumber){
+            q += ' AND ParentItemLineNumber = ?';
+            data.push(parentLineNumber);
+          }
+          return DB.query(q, data
+          // return DB.select(DB_CONFIG.tableNames.bill.tempDetail, "*", {
+          //   columns: 'ItemId=? AND ItemType=? AND parentItemLineNumber = ?',
+          //   data: [itemId, itemType, parentLineNumber||0]}
+          ).then(function (res) {
             return DB.fetchAll(res);
           });
         } else {
