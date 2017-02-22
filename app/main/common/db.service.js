@@ -339,8 +339,8 @@ angular.module('itouch.services')
     }
 
     self.max = function (table, column, where) {
-      return self.select(table, "MAX("+column+") ", where, '1').then(function (result) {
-        var ln = parseInt(self.fetch(result)["MAX("+column+")"] || 0);
+      return self.select(table, "MAX("+column+") AS max ", where, '1').then(function (result) {
+        var ln = parseInt(self.fetch(result)["max"] || 0);
         if(isNaN(ln)){
           ln = 0;
         }
