@@ -21,7 +21,6 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           if(item){
             ModifierService.getItemModifiers(item.LineNumber).then(function(data){
-              console.log(data);
               self.selectedCart = data;
             });
           }

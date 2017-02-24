@@ -887,7 +887,7 @@ angular.module('itouch.controllers')
         FoodModifier: function(fn){
           if(authorityCheck(fn)){
             var item = $scope.cart.selectedItem;
-            if(item) {
+            if(item && item.ItemType != 'MOD' && item.ItemType != 'SKT' && item.ItemType != 'PWP') {
               $scope.type = 'F';
               $scope.shownModal = 'mod';
               $scope.modals.modifiers.show();
@@ -898,7 +898,7 @@ angular.module('itouch.controllers')
         BeveragesModifiers: function(fn){
           if(authorityCheck(fn)){
             var item = $scope.cart.selectedItem;
-            if(item) {
+            if(item && item.ItemType != 'MOD' && item.ItemType != 'SKT' && item.ItemType != 'PWP') {
               $scope.type = 'B';
               $scope.shownModal = 'mod';
               $scope.modals.modifiers.show();
