@@ -83,7 +83,7 @@
                ng-click="selectTenderType(tenderType)">
           <span class="buttontext">
           {{ print(tenderType, 'Description')}}
-            {{tenderType.Round == 'true' ? ' ( $' + (tenderHeader.UpdatedTenderTotal || tenderHeader.TotalRounded) +' )' : ''}}</span>
+            {{tenderType.Round == 'true' ? ' ( $' + (tenderHeader.UpdatedRoundedTotal || tenderHeader.TotalRounded) +' )' : ''}}</span>
             </a>
           </ion-scroll>
         </div>

@@ -3,9 +3,9 @@
  */
 angular.module('itouch.controllers')
   .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService',
-    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q',
+    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q', 'ItemService',
     function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService,
-              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q) {
+              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q, ItemService) {
     $scope.tenderTypes = [];
       $scope.title = "Tender";
       $scope.tenderHeader = billData.header;
@@ -31,8 +31,13 @@ angular.module('itouch.controllers')
           header: BillService.getHeader($stateParams.DocNo),
           items: CartItemService.getItems($stateParams.DocNo)
         }).then(function(data){
+          console.log(data);
           if(data.header){
             $scope.header = data.header;
+            $scope.header = ItemService.calculateTotal(data.header);
+            $scope.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
+            $scope.header.UpdatedTenderTotal = data.header.Total.toFixed(2) || 0 ;
+            $scope.header.UpdatedRoundedTotal = RoundingService.round(data.header.Total).toFixed(2);
             $scope.billItems = data.items;
           }
         }).then(function(){
@@ -112,14 +117,14 @@ angular.module('itouch.controllers')
         if(!$scope.tenderHeader.UpdatedTenderTotal){
           $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total;
         }
-        if(tenderType.Cash == 'true'){
-          if(setValueManually){
+        if(tenderType.Cash == 'true' || setValueManually){
+          // if(){
             amount = parseFloat($scope.tenderHeader.UpdatedTenderTotal).roundTo(2);
-          } else {
-            amount = parseFloat(total || tenderType.TenderAmount).roundTo(2)
-          }
+          // } else {
+          //   amount = parseFloat(tenderType.TenderAmount).roundTo(2)
+          // }
         } else {
-          amount = parseFloat(tenderType.TenderAmount).roundTo(2);
+          amount = parseFloat(total || tenderType.TenderAmount).roundTo(2);
         }
         // var amount = ($scope.tenderHeader.UpdatedTenderTotal || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
         // var amount = ($scope.tenderHeader.UpdatedTenderTotal || tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);

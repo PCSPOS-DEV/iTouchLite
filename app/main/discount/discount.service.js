@@ -413,10 +413,12 @@ angular.module('itouch.services')
 
         var discountAmounts = null;
         if(!amount){
-          amount = (total * discount.Percentage || discount.DiscountPercentage) / 100;
+          amount = discount.Percentage ? (total * discount.Percentage || discount.DiscountPercentage) / 100 : parseFloat(discount.Amount);
+        } else {
+          amount = parseFloat(discount.Amount);
         }
 
-        amount = parseFloat(amount);
+        // amount = parseFloat(amount);
         var headerDiscount = 0, headerSubDiscount = 0, totalEligibleDiscount = 0, headerTax5Disc = 0;
         var prec = 0;
         angular.forEach(items, function (item, key) {
@@ -442,7 +444,7 @@ angular.module('itouch.services')
             if(key != _.size(items) - 1){
               discountAmount = (amount * prec).roundTo(2);
             } else {
-              discountAmount = amount - headerDiscount;
+              discountAmount = (amount - headerDiscount).roundTo(2);
             }
             var subDiscount = ((discountAmount * (100-item.Tax5Perc)) / 100).roundTo(2);
             var tax5Disc = (discountAmount - subDiscount).roundTo(2);
@@ -470,7 +472,8 @@ angular.module('itouch.services')
 
             header.TenderTotal = header.Total.roundTo(2);
 
-            header.UpdatedTenderTotal = RoundingService.round(header.Total).toFixed(2);
+            header.UpdatedTenderTotal = header.Total.toFixed(2);
+            header.UpdatedRoundedTotal = RoundingService.round(header.Total).toFixed(2);
             header.TotalRounded = RoundingService.round(header.Total).toFixed(2);
             tenderDiscounts.header = header;
             tenderDiscounts.discounts = _.pluck(items, 'discount');
@@ -482,11 +485,12 @@ angular.module('itouch.services')
           });
         }
 
+
         return deferred.promise;
 
       };
 
-      self.saveTenderDiscount = function () {
+      self.saveTenderDiscount = function (DocNo) {
         // var deferred = $q.defer();
         // console.log(tenderDiscounts);
         if(!_.isEmpty(tenderDiscounts) && !_.isEmpty(tenderDiscounts.header) && tenderDiscounts.discounts.length > 0 && tenderDiscounts.items.length > 0){
@@ -503,13 +507,13 @@ angular.module('itouch.services')
             saveItemDiscount(item);
           });
 
-          updateTempHeader(tenderDiscounts.header);
+          // updateTempHeader(tenderDiscounts.header);
 
           return DB.executeQueue().then(function () {
             tenderDiscounts.items = [];
             tenderDiscounts.discounts = [];
             DB.clearQueue();
-            return true;
+            return BillService.updateHeaderTotals(tenderDiscounts.header.DocNo)
           }, function(ex){
             return ex;
             console.log(ex);

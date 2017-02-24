@@ -151,6 +151,7 @@ angular.module('itouch.services')
     self.calculateTotal = function (item) {
       if(item){
         item.Tax = (item.Tax1Amount || 0 + item.Tax2Amount || 0 + item.Tax3Amount || 0 + item.Tax4Amount || 0 + item.Tax5Amount || 0) - (item.Tax1DiscAmount + item.Tax2DiscAmount + item.Tax3DiscAmount+ item.Tax4DiscAmount + item.Tax5DiscAmount);
+        item.Tax = item.Tax.roundTo(2);
         item.Discount = (item.DiscAmount).roundTo(2);
         item.Total = ((item.SubTotal + item.Tax) - item.Discount).roundTo(2);
         if (!item.Qty) {
