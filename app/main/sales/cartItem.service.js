@@ -135,18 +135,15 @@ angular.module('itouch.services')
               item.Qty = 1;
             }
 
-            return BillService.addItem(item).then(function(){
-              return ndItem || item;
-            });
+            return BillService.addItem(item);
+
           } else if (ndItem && !salesKit && ndItem.TakeAway == 'false' && ndItem.ChildCount == 0) {
             if(item.customQuantity){
               ndItem.Qty += item.customQuantity;
             } else {
               ndItem.Qty++;
             }
-            return BillService.updateItem(ndItem).then(function(){
-              return ndItem;
-            });
+            return BillService.updateItem(ndItem);
           } else {
             if(item.customQuantity){
               item.Qty = item.customQuantity;
@@ -155,9 +152,7 @@ angular.module('itouch.services')
               item.Qty = 1;
             }
 
-            return BillService.addItem(item).then(function(){
-              return ndItem || item;
-            });
+            return BillService.addItem(item);
           }
         });
 
