@@ -229,12 +229,10 @@ angular.module('itouch.controllers')
               };
             }
 
-            DiscountService.saveTenderDiscount().then(function(){
+            DiscountService.saveTenderDiscount($scope.tenderHeader.DocNo).then(function(){
               BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
                 BillService.saveReceiptId($scope.tenderHeader.DocNo);
-                BillService.initHeader().then(function(header){
-
-                });
+                BillService.initHeader();
                 payTransactions = [];
                 overTender = [];
 

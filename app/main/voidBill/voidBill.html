@@ -1,0 +1,13 @@
+<ion-modal-view class="voidBill" ng-controller="VoidBillCtrl as ctrl">
+  <ion-header-bar>
+  <h1 class="title">Void Bill</h1>
+    <button class="button button-clear" ng-click="ctrl.close()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content>
+        <div class="row" ng-repeat="bill in ctrl.bills" ng-click="ctrl.voidBill(bill)">
+          <div class="col"> {{ bill.DocNo }}  </div>
+          <div class="col"> {{ '$'+bill.Total.toFixed(2) }}  </div>
+        </div>
+      </div>
+  </ion-content>
+</ion-modal-view>

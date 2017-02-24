@@ -1,0 +1,16 @@
+.voidBill {
+  width: 30%;
+  left: 35%;
+  right: 35%;
+
+  .row {
+    margin-top: 0px;
+    padding-top: 5px;
+    border-bottom: 1px solid white;
+    cursor: pointer;
+  }
+
+  //.row:first {
+  //  border-bottom: 1px solid white;
+  //}
+}

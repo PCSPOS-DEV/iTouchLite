@@ -129,7 +129,23 @@ angular.module('itouch.services')
     if(PrintService.isConnected()){
       try {
         printer = PrintService.getPrinter();
-        creatBodyData(DocNo);
+
+        fetchData(DocNo).then(function (data) {
+          if(data && data.header){
+            self.creatRecieptHeader();
+
+            self.creatRecieptBody(data);
+
+            self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
+
+            printer.addCut(printer.CUT_FEED);
+
+            printer.send();
+          } else {
+            console.log("bill not available");
+          }
+        });
+
       } catch(e){
         console.log(e);
       }
@@ -141,8 +157,38 @@ angular.module('itouch.services')
 
   }
 
+  self.printVoid = function(DocNo){
+      if(PrintService.isConnected()){
+        try {
+          printer = PrintService.getPrinter();
+
+          fetchData(DocNo).then(function (data) {
+            if(data && data.header){
+              self.creatRecieptHeader();
+              PrintService.addTitle("Transaction Void");
+              PrintService.addTitle(data.header.SalesDocNo);
+              self.creatRecieptBody(data);
+
+              self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
+
+              printer.addCut(printer.CUT_FEED);
+
+              printer.send();
+            } else {
+              console.log("bill not available");
+            }
+          });
+
+        } catch(e){
+          console.log(e);
+        }
+      } else {
+        Alert.success('printer not connected', 'Error');
+      }
+    }
+
   self.getBillHeader = function (DocNo) {
-    return DB.query("SELECT *  FROM " + DB_CONFIG.tableNames.bill.header + " WHERE DocNo = ?", [DocNo]).then(function (res) {
+    return DB.query("SELECT v.*, s.DocNo  AS SalesDocNo  FROM " + DB_CONFIG.tableNames.bill.header + " AS v LEFT OUTER JOIN " + DB_CONFIG.tableNames.bill.header + " AS s ON v.DocNo = s.VoidDocNo WHERE v.DocNo = ?", [DocNo]).then(function (res) {
       var item = DB.fetch(res);
       item = ItemService.calculateTotal(item);
       // item.SubTotal = item.SubTotal + item.Tax;
@@ -209,21 +255,31 @@ angular.module('itouch.services')
     });
   }
 
-  var creatBodyData = function(DocNo){
-    $q.all({
+  // var creatBodyData = function(DocNo){
+  //   $q.all({
+  //     header: self.getBillHeader(DocNo),
+  //     items: self.getBillItems(DocNo),
+  //     transactions: self.getBillTransactions(DocNo),
+  //     tenderDiscounts: self.getTenderDiscounts(DocNo)
+  //   }).then(function(data){
+  //     self.creatRecieptBody(data);
+  //
+  //     self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
+  //
+  //     printer.addCut(printer.CUT_FEED);
+  //
+  //     printer.send();
+  //   }, function(ex){
+  //     console.log(ex);
+  //   });
+  // }
+
+  var fetchData = function(DocNo){
+    return $q.all({
       header: self.getBillHeader(DocNo),
       items: self.getBillItems(DocNo),
       transactions: self.getBillTransactions(DocNo),
       tenderDiscounts: self.getTenderDiscounts(DocNo)
-    }).then(function(data){
-      self.creatRecieptHeader();
-      self.creatRecieptBody(data);
-
-      self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
-
-      printer.addCut(printer.CUT_FEED);
-
-      printer.send();
     }, function(ex){
       console.log(ex);
     });

@@ -771,6 +771,16 @@ angular.module('itouch.controllers')
                 });
               }
             }
+          } else {
+            $scope.shownModal = 'voidBill';
+            $ionicModal.fromTemplateUrl('main/voidBill/voidBill.html', {
+              scope: $scope,
+              backdropClickToClose: false,
+              animation: 'slide-in-up'
+            }).then(function (modal) {
+              $scope.modals.voidBillModal = modal;
+              $scope.modals.voidBillModal.show();
+            });
           }
         },
         Discount: function (fn) {
@@ -813,7 +823,7 @@ angular.module('itouch.controllers')
           if(item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)){
             if(authorityCheck(fn)){
               var qty = angular.copy(item.Qty);
-              BillService.changeItemQty(item.ItemId, item.LineNumber, ++qty).then(function () {
+              BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, ++qty).then(function () {
                 $scope.refreshCart();
               }, function (err) {
                 console.log(err);
@@ -827,7 +837,7 @@ angular.module('itouch.controllers')
             if(authorityCheck(fn)){
               var qty = angular.copy(item.Qty);
               if(qty > 1){
-                BillService.changeItemQty(item.ItemId, item.LineNumber, --qty).then(function () {
+                BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, --qty).then(function () {
                   $scope.refreshCart();
                 }, function (err) {
                   console.log(err);
@@ -977,6 +987,12 @@ angular.module('itouch.controllers')
         animation: 'slide-in-up'
       }).then(function (modal) {
         $scope.modals.modifiers = modal;
+      });
+
+      $scope.$on('voidBill.modal.close', function () {
+        if($scope.modals.voidBillModal){
+          $scope.modals.voidBillModal.hide();
+        }
       });
 
 

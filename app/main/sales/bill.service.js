@@ -74,7 +74,7 @@ angular.module('itouch.services')
           bill.header.DocType = TenderService.getDocType();
           bill.header.LocationId = SettingsService.getLocationId();
           bill.header.MachineId = SettingsService.getMachineId();
-          bill.header.BusinessDate = businessDate;
+          bill.header.BusinessDate = ControlService.getBusinessDate(true);
           bill.header.SysDateTime = $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss');
           bill.header.ShiftId = ShiftService.getCurrentId();
           bill.header.AuthBy = 0;
@@ -82,7 +82,7 @@ angular.module('itouch.services')
           bill.header.CashierId = AuthService.currentUser().Id;
           bill.header.TableId = 0;
           bill.header.DepAmount = 0;
-          bill.header.VoidDocNo = 0;
+          bill.header.VoidDocNo = null;
           bill.header.ReprintCount = 0;
           bill.header.OrderTag = "";
           bill.header.Remarks = "";
@@ -126,7 +126,7 @@ angular.module('itouch.services')
       }
 
       var updateTempHeader = function (header) {
-        return DB.update(DB_CONFIG.tableNames.bill.tempHeader, header, { columns: ' DocNo = ?', data: [self.getCurrentReceiptId()]});
+        return DB.update(DB_CONFIG.tableNames.bill.tempHeader, header, { columns: ' DocNo = ?', data: [header.DocNo]});
       }
 
       self.initHeader = function () {
@@ -227,9 +227,7 @@ angular.module('itouch.services')
       }
 
       var saveItemToDB = function (item) {
-        return DB.insert(DB_CONFIG.tableNames.bill.tempDetail, self.calculateTax(item)).then(function (res) {
-          calculateTotal(ControlService.getDocId()).then(updateTempHeader);
-        });
+        return DB.insert(DB_CONFIG.tableNames.bill.tempDetail, self.calculateTax(item));
       }
 
       self.loadLineNewNumber = function (parentNumber) {
@@ -260,14 +258,20 @@ angular.module('itouch.services')
         item = prepareItem(item);
         var errors = validateBill(item);
         if (errors.length == 0) {
+          var itemPromise = null;
           if(!item.LineNumber){
-            return self.loadLineNewNumber().then(function (ln) {
+            itemPromise =  self.loadLineNewNumber().then(function (ln) {
               item.LineNumber = ln;
-              return saveItemToDB(item);
+              itemPromise = saveItemToDB(item);
             });
           }else {
-            return saveItemToDB(item);
+            itemPromise = saveItemToDB(item);
           }
+          return itemPromise.then(function(){
+            return self.updateHeaderTotals(item.DocNo).then(function(){
+              return item;
+            });
+          });
         } else {
           ErrorService.add(errors);
           def.reject("Invalid Item");
@@ -281,8 +285,12 @@ angular.module('itouch.services')
         item = self.calculateTax(item);
         var errors = validateBill(item);
         if (errors.length == 0) {
-          return DB.update(DB_CONFIG.tableNames.bill.tempDetail, item, {columns: 'ItemId=? AND DocNo=? AND LineNumber=?',
-            data:[item.ItemId, item.DocNo, item.LineNumber] });
+          DB.update(DB_CONFIG.tableNames.bill.tempDetail, item, {columns: 'ItemId=? AND DocNo=? AND LineNumber=?',
+            data:[item.ItemId, item.DocNo, item.LineNumber] }).then(function(){
+              self.updateHeaderTotals(item.DocNo).then(function(){
+                def.resolve(item);
+              });
+          });
         } else {
           ErrorService.add(errors);
           console.log(errors);
@@ -326,7 +334,7 @@ angular.module('itouch.services')
           DB.addInsertToQueue(DB_CONFIG.tableNames.bill.tempDetail, _.omit(item, ['selected', 'selectedList', 'list']));
           return DB.executeQueue().then(function () {
             // console.log("items");
-            return calculateTotal(ControlService.getDocId()).then(updateTempHeader);
+            return self.updateHeaderTotals(item.DocNo);
           });
         });
 
@@ -354,7 +362,7 @@ angular.module('itouch.services')
           DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.tempDetail, _.omit(item, 'Selections'), { columns: 'LineNumber=? AND ItemId=? AND DocNo=?', data: [item.LineNumber, itemId, item.DocNo]});
 
           return DB.executeQueue().then(function () {
-            return calculateTotal(ControlService.getDocId()).then(updateTempHeader);
+            return self.updateHeaderTotals(item.DocNo);
           });
         });
 
@@ -449,6 +457,12 @@ angular.module('itouch.services')
 
       self.getItems = function(docNo){
         return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
+          return DB.fetchAll(rs);
+        });
+      }
+
+      self.getTransactions = function(docNo){
+        return DB.select(DB_CONFIG.tableNames.bill.payTransactions, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
           return DB.fetchAll(rs);
         });
       }
@@ -876,11 +890,15 @@ angular.module('itouch.services')
           item.StaffId = 0;
           item.IsExported = false;
 
+
           return $q.all({
             'removeItem': DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: 'ItemId=? AND ItemType=? AND LineNumber=?', data:[item.ItemId, item.ItemType, item.LineNumber] }),
             'addVoidItem': DB.insert(DB_CONFIG.tableNames.bill.voidItems, _.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'IsExported', 'SysDateTime',
-              'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal' ]))
+              'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal' ])),
+            'header': self.updateHeaderTotals(item.DocNo)
           });
+
+
         }
       }
 
@@ -914,6 +932,7 @@ angular.module('itouch.services')
               queue.push(DB.insert(DB_CONFIG.tableNames.bill.voidItems, _.pick(salesKitItem, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'IsExported', 'SysDateTime',
                 'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal' ])));
             });
+            queue.push(self.updateHeaderTotals(item.DocNo));
 
             return $q.all(queue);
           });
@@ -963,18 +982,23 @@ angular.module('itouch.services')
         });
       }
 
-      self.changeItemQty = function (ItemId, LineNumber, qty) {
-        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]}).then(function (res) {
-          var i = DB.fetch(res);
-          if(i && i.Qty != qty){
-            i.Qty = qty;
-            i = prepareItem(i);
-            console.log(i);
-            i = self.calculateTax(i);
-            return DB.update(DB_CONFIG.tableNames.bill.tempDetail, i, {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]});
-          } else {
-            return $q.reject("Invalid item");
-          }
+      self.changeItemQty = function (DocNo, ItemId, LineNumber, qty) {
+        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', {columns: "ItemId=? AND LineNumber=? AND ParentItemLineNumber = 0 OR ParentItemLineNumber  = ? AND ItemType = 'MOD'", data: [ItemId, LineNumber, LineNumber]}).then(function (res) {
+          var items = DB.fetchAll(res);
+          var promises = [];
+          angular.forEach(items, function(item){
+            if(item && item.Qty != qty){
+              item.Qty = qty;
+              item = prepareItem(item);
+              item = self.calculateTax(item);
+              promises.push(DB.update(DB_CONFIG.tableNames.bill.tempDetail, item, {columns: 'ItemId=? AND LineNumber=?', data: [item.ItemId, item.LineNumber]}));
+            } else {
+              return $q.reject("Invalid item");
+            }
+          });
+          promises.push(self.updateHeaderTotals(DocNo));
+          return $q.all(promises);
+
         });
       }
 
@@ -997,7 +1021,10 @@ angular.module('itouch.services')
             i.DiscAmount = _.isNumber(i.DiscAmount) ? (i.DiscAmount *= -1).roundTo(2) : 0;
             i.ReasonId = reasonId;
             i.RefCode = reference;
-            return DB.update(DB_CONFIG.tableNames.bill.tempDetail, i, {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]});
+            return $q.all([
+              DB.update(DB_CONFIG.tableNames.bill.tempDetail, i, {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]}),
+              self.updateHeaderTotals(i.DocNo)
+            ]);
           } else {
             return $q.reject("Invalid item");
           }
@@ -1055,6 +1082,56 @@ angular.module('itouch.services')
       self.getAllTransactionsOT = function(){
         return DB.select(DB_CONFIG.tableNames.bill.payTransactionsOverTender).then(function(res){ return DB.fetchAll(res); });
       }
+
+      self.getBillHeader = function(DocNo){
+        return DB.select(DB_CONFIG.tableNames.bill.header, '*', { columns: 'DocNo=?', data: [DocNo] }).then(function(res){ return DB.fetch(res); });
+      }
+
+      self.getBillDetails = function(DocNo){
+        return DB.select(DB_CONFIG.tableNames.bill.detail, '*', { columns: 'DocNo=?', data: [DocNo] }).then(function(res){ return DB.fetchAll(res); });
+      }
+
+      self.updateHeaderTotals = function(DocNo, items){
+        var promises = {
+          header: self.getHeader(DocNo)
+        };
+        if(!items){
+          promises.items = self.getItems(DocNo);
+        }
+        return $q.all(promises).then(function(data){
+          if(data.header && data.items){
+            data.header.SubTotal = 0;
+            data.header.DiscAmount = 0;
+            data.header.Tax1Amount = 0;
+            data.header.Tax2Amount = 0;
+            data.header.Tax3Amount = 0;
+            data.header.Tax4Amount = 0;
+            data.header.Tax5Amount = 0;
+            data.header.Tax1DiscAmount = 0;
+            data.header.Tax2DiscAmount = 0;
+            data.header.Tax3DiscAmount = 0;
+            data.header.Tax4DiscAmount = 0;
+            data.header.Tax5DiscAmount = 0;
+            angular.forEach(data.items, function(item){
+              data.header.SubTotal += item.SubTotal;
+              data.header.DiscAmount += item.DiscAmount;
+              data.header.Tax1Amount += item.Tax1Amount;
+              data.header.Tax2Amount += item.Tax2Amount;
+              data.header.Tax3Amount += item.Tax3Amount;
+              data.header.Tax4Amount += item.Tax4Amount;
+              data.header.Tax5Amount += item.Tax5Amount;
+              data.header.Tax1DiscAmount += item.Tax1DiscAmount;
+              data.header.Tax2DiscAmount += item.Tax2DiscAmount;
+              data.header.Tax3DiscAmount += item.Tax3DiscAmount;
+              data.header.Tax4DiscAmount += item.Tax4DiscAmount;
+              data.header.Tax5DiscAmount += item.Tax5DiscAmount;
+            });
+            return updateTempHeader(data.header);
+          } else {
+            return $q.reject("No valid bill for this DocNo");
+          }
+      });
+    };
 
 
       return self;
