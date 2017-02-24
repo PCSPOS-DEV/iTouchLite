@@ -140,8 +140,8 @@ angular.module('itouch.controllers')
       var removeSelectedItem = function (itemId) {
         var item = $scope.pwp.selectedItems[itemId]
         if (item) {
-          item.Qty = 0;
           $scope.pwp.Qty -= item.Qty;
+          item.Qty = 0;
           delete $scope.pwp.selectedItems[itemId];
           var keys = _.keys($scope.pwp.selectedItems);
           if(keys.length > 0){
