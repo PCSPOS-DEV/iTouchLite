@@ -97,6 +97,8 @@ angular.module('itouch.controllers')
             } else{
               $scope.header = header;
             }
+            $scope.cart.selectedItem = null;
+            $scope.TakeAway = false;
           }).then(function(){
             refresh().then(function () {
               // selectLastItem();
@@ -464,6 +466,7 @@ angular.module('itouch.controllers')
       }
 
       var showPriceForm = function(){
+        $scope.data.amount = "";
         return $ionicPopup.show({
           template: '<input type="tel" ng-model="data.amount">',
           title: 'Enter Amount',
