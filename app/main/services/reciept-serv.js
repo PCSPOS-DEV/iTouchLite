@@ -36,7 +36,7 @@ angular.module('itouch.services')
     });
   }
 
-  self.creatRecieptBody = function(data){
+  self.creatRecieptBody = function(data, withSubTotalSection){
     var subTotal = 0;
 
 
@@ -67,43 +67,58 @@ angular.module('itouch.services')
 
         });
       }
+
+      if(row.ReasonId){
+        printer.addText("\tReason    : "+row.ReasonDesc1+"\n");
+        printer.addText("\tReference : "+(row.RefCode ? row.RefCode : "")+"\n");
+      }
     });
 
     PrintService.addHLine();
 
 
 
-    // console.log(data.tenderDiscounts);
-    PrintService.addLine('SUBTOTAL', "$"+subTotal.toFixed(2));
-    if(data.tenderDiscounts && data.tenderDiscounts.length > 0){
-      var tenderDisAmount = 0;
-      angular.forEach(data.tenderDiscounts, function(row){
-        PrintService.addLine(row.Description1, "-"+(row.Amount.toFixed(2)));
-        tenderDisAmount += row.Amount;
-      });
+    if(withSubTotalSection){
+      // console.log(data.tenderDiscounts);
+      PrintService.addLine('SUBTOTAL', "$"+subTotal.toFixed(2));
+      if(data.tenderDiscounts && data.tenderDiscounts.length > 0){
+        var tenderDisAmount = 0;
+        angular.forEach(data.tenderDiscounts, function(row){
+          PrintService.addLine(row.Description1, "-"+(row.Amount.toFixed(2)));
+          tenderDisAmount += row.Amount;
+        });
 
-      PrintService.addLine('SUBTOTAL After Discount', "$"+(subTotal-tenderDisAmount).toFixed(2));
-    }
-    PrintService.addLine('TOTAL', "$"+(data.header.Total.toFixed(2)));
-    var change = null;
-    angular.forEach(data.transactions, function(row){
-      // console.log(row);
-      PrintService.addLine(row.Description1 || 'ROUNDED', "$"+(row.Amount.toFixed(2)));
-      if(row.Cash == 'true' && row.ChangeAmount > 0){
-        change = row.ChangeAmount.toFixed(2);
+        PrintService.addLine('SUBTOTAL After Discount', "$"+(subTotal-tenderDisAmount).toFixed(2));
       }
-    });
-    if(change){
-      printer.addText('\nChange Due: $'+change+"\n");
+      PrintService.addLine('TOTAL', "$"+(data.header.Total.toFixed(2)));
+      var change = null, forfeited = null;
+      angular.forEach(data.transactions, function(row){
+        // console.log(row);
+        PrintService.addLine(row.Description1 || 'ROUNDED', "$"+(row.Amount.toFixed(2)));
+        if(row.ChangeAmount > 0){
+          if(row.Cash == 'true' ){
+            change = row.ChangeAmount.toFixed(2);
+          } else {
+            forfeited = row.ChangeAmount.toFixed(2);
+          }
+
+        }
+      });
+      if(change){
+        printer.addText('\nChange Due: $'+change+"\n");
+      } else if (forfeited){
+        printer.addText('\nForfeited : $'+forfeited+"\n");
+      }
     }
     printer.addText('\n');
-  }
 
-  self.creatRecieptFooter = function(DocNo, Tax){
-    if(location.Tax5Option == 3){ //Tax inclusive
-      printer.addText('Inc of '+location.Tax5Desc1+' $'+ Tax.toFixed(2) +'\n\n');
+    if(withSubTotalSection && location.Tax5Option == 3){ //Tax inclusive
+      printer.addText('Inc of '+location.Tax5Desc1+' $'+ data.header.Tax.toFixed(2) +'\n\n');
     }
 
+  }
+
+  self.creatRecieptFooter = function(DocNo){
     printer.addTextAlign(printer.ALIGN_CENTER);
     var bDate = ControlService.getBusinessDate();
     var shift = ShiftService.getCurrent();
@@ -134,7 +149,7 @@ angular.module('itouch.services')
           if(data && data.header){
             self.creatRecieptHeader();
 
-            self.creatRecieptBody(data);
+            self.creatRecieptBody(data, true);
 
             self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
 
@@ -167,7 +182,37 @@ angular.module('itouch.services')
               self.creatRecieptHeader();
               PrintService.addTitle("Transaction Void");
               PrintService.addTitle(data.header.SalesDocNo);
-              self.creatRecieptBody(data);
+              self.creatRecieptBody(data, data.header.Tax, true);
+
+              self.creatRecieptFooter(data.header.DocNo);
+
+              printer.addCut(printer.CUT_FEED);
+
+              printer.send();
+            } else {
+              console.log("bill not available");
+            }
+          });
+
+        } catch(e){
+          console.log(e);
+        }
+      } else {
+        Alert.success('printer not connected', 'Error');
+      }
+    }
+
+    self.printAbort = function(DocNo){
+      if(PrintService.isConnected()){
+        try {
+          printer = PrintService.getPrinter();
+
+          fetchData(DocNo).then(function (data) {
+            if(data && data.header){
+              self.creatRecieptHeader();
+              PrintService.addTitle("Abort");
+
+              self.creatRecieptBody(data, false);
 
               self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
 
@@ -197,11 +242,12 @@ angular.module('itouch.services')
   }
 
   self.getBillItems = function (DocNo) {
-    var q = "SELECT de.*, bd.DiscountAmount, d.Description1, d.Description2 "
+    var q = "SELECT de.*, bd.DiscountAmount, d.Description1, d.Description2, r.Description1 AS ReasonDesc1, r.Description2 AS ReasonDesc2 "
     +"FROM BillDetail AS de "
     +"LEFT OUTER JOIN BillDiscounts AS bd ON bd.ItemId = de.ItemId AND bd.LineNumber = de.LineNumber AND de.DocNo = bd.DocNo "
-    +"LEFT OUTER  JOIN Discounts AS d ON d.Id = bd.DiscountId AND bd.DiscountFrom = 'I'";
-    return DB.query(q + " WHERE de.DocNo = ? ORDER BY de.LineNumber", [DocNo]).then(function (res) {
+    +"LEFT OUTER  JOIN Discounts AS d ON d.Id = bd.DiscountId AND bd.DiscountFrom = 'I' "
+    +"LEFT OUTER  JOIN Reason AS r ON r.Code = de.ReasonId "
+    return DB.query(q + "WHERE de.DocNo = ? ORDER BY de.LineNumber", [DocNo]).then(function (res) {
       var items = {};
       angular.forEach(DB.fetchAll(res), function (item) {
         if(item){
@@ -231,7 +277,7 @@ angular.module('itouch.services')
   }
 
   self.getTenderDiscounts = function(DocNo){
-    var q = "SELECT SUM(bd.DiscountAmount) AS Amount, d.Description1 AS Description1 FROM BillDiscounts AS bd INNER JOIN Discounts AS d ON d.Id = bd.DiscountId INNER JOIN BillHeader AS bh ON bd.DocNo = bh.DocNo WHERE DiscountFrom = 'T' AND bh.DocNo = ? GROUP BY DiscountCode";
+    var q = "SELECT SUM(bd.DiscountAmount) AS Amount, d.Description1 AS Description1 FROM BillDiscounts AS bd INNER JOIN Discounts AS d ON d.Id = bd.DiscountId INNER JOIN BillHeader AS bh ON bd.DocNo = bh.DocNo WHERE DiscountFrom = 'T' AND bh.DocNo = ? GROUP BY SeqNo";
     return DB.query(q, [DocNo]).then(function(res){
       return DB.fetchAll(res);
     });

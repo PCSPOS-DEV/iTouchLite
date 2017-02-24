@@ -4,10 +4,10 @@
 angular.module('itouch.controllers')
   .controller("SalesCtrl", ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal',
       'AuthService', 'CartItemService', 'ControlService', 'ionicDatePicker', 'FunctionsService', '$filter', 'SalesKitService', 'DiscountService', 'BillService', 'ShiftService',
-      'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup', 'header', 'user', 'shift', '$state', '$rootScope',
+      'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup', 'header', 'user', 'shift', '$state', '$rootScope', 'Reciept',
       function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal,
       AuthService, CartItemService, ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService,
-                                               PWPService,  $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state, $rootScope) {
+                                               PWPService,  $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state, $rootScope, Reciept) {
       $scope.header = header;
       $scope.currentPage = {};
       $scope.pages = [];
@@ -877,7 +877,7 @@ angular.module('itouch.controllers')
                 console.log($scope.header);
                 $scope.header.DocType = 'AV';
                 BillService.saveBill($scope.header, $scope.cart.items).then(function(res){
-                  $scope.cart.selectedItem = null;
+                  Reciept.printAbort($scope.header.DocNo);
                   refresh();
                   initBill();
                 }, function(res){
