@@ -117,14 +117,14 @@ angular.module('itouch.controllers')
         if(!$scope.tenderHeader.UpdatedTenderTotal){
           $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total;
         }
-        if(tenderType.Cash == 'true' || setValueManually){
+        if(setValueManually){
           // if(){
             amount = parseFloat($scope.tenderHeader.UpdatedTenderTotal).roundTo(2);
           // } else {
           //   amount = parseFloat(tenderType.TenderAmount).roundTo(2)
           // }
         } else {
-          amount = parseFloat(total || tenderType.TenderAmount).roundTo(2);
+          amount = parseFloat(tenderType.TenderAmount != '0' ? tenderType.TenderAmount : total ).roundTo(2);
         }
         // var amount = ($scope.tenderHeader.UpdatedTenderTotal || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
         // var amount = ($scope.tenderHeader.UpdatedTenderTotal || tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
@@ -139,7 +139,7 @@ angular.module('itouch.controllers')
         if(item){
           var transAmount = 0;
           // console.log(tenderType);
-          if(tenderType.Cash == 'true' && setValueManually){
+          if(setValueManually){
             transAmount = parseFloat($scope.tenderHeader.UpdatedTenderTotal);
           } else if(tenderType.Round == 'true'){
             transAmount = total + diff;
@@ -162,7 +162,7 @@ angular.module('itouch.controllers')
                 ChangeAmount: 0,
                 ConvRate: 0,
                 CurrencyId: 0,
-                IsExported: true
+                IsExported: false
               });
             }
 
@@ -179,7 +179,7 @@ angular.module('itouch.controllers')
                 StdCost: item.StdCost,
                 Qty: item.Qty,
                 BaseUOMId: 1,
-                IsExported: true
+                IsExported: false
 
               });
             });
@@ -230,7 +230,7 @@ angular.module('itouch.controllers')
                 SeqNo: 0,
                 Amount: amount,
                 ChangeAmount: changeAmount,
-                IsExported: true
+                IsExported: false
               };
             }
 
@@ -249,7 +249,7 @@ angular.module('itouch.controllers')
                 Reciept.print(header.DocNo);
 
 
-                if(changeAmount > 0){
+                if(changeAmount > 0 && tenderType.Cash == 'true'){
                   $ionicPopup.alert({
                     title: 'Balance',
                     template: '<p>Balance: $'+ changeAmount.toFixed(2)+'</p>'
@@ -289,7 +289,7 @@ angular.module('itouch.controllers')
             ChangeAmount: changeAmount,
             ConvRate: 0,
             CurrencyId: 0,
-            IsExported: true
+            IsExported: false
           });
           $scope.payTransactions.push({
             Desc1: tenderType.Description1,
@@ -298,6 +298,7 @@ angular.module('itouch.controllers')
           });
         }
         seq++;
+        setValueManually = false;
       }
 
       /**
