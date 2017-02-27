@@ -116,3 +116,15 @@ Clear button
 ion-modal-view ion-header-bar.bar.bar-header {
   background-color: #073252;
 }
+
+.popup-container.popup-showing {
+  top: -30%;
+}
+
+.no-data {
+  text-align: center;
+
+  i: {
+    font-size: 90px;
+  }
+}
