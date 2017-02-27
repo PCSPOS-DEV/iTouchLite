@@ -298,7 +298,7 @@ angular.module('itouch.controllers')
           });
         }
         seq++;
-        setValueManually = false;
+        $scope.numpadClear();
       }
 
       /**
