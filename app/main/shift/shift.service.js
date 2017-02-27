@@ -35,7 +35,7 @@ angular.module('itouch.services')
 
       self.getUnOpened = function () {
         var deferred = $q.defer();
-        DB.query("SELECT * FROM shifts WHERE Id NOT IN(SELECT Id FROM shiftstatus)", []).then(function (data) {
+        DB.query("SELECT s.*, ss.OpenDateTime, ss.CloseDateTime, OpenUser, CloseUser, DeclareCashLater FROM shifts AS s LEFT OUTER JOIN shiftstatus AS ss ON s.Id = ss.Id WHERE CloseDateTime IS NULL", []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
           throw new Error(ex.message);
@@ -46,7 +46,7 @@ angular.module('itouch.services')
 
       self.getOpened = function () {
         var deferred = $q.defer();
-        DB.query("SELECT * FROM shifts WHERE Id IN(SELECT Id FROM shiftstatus WHERE CloseDateTime IS NULL)", []).then(function (data) {
+        DB.query("SELECT s.*, ss.OpenDateTime, ss.CloseDateTime, OpenUser, CloseUser, DeclareCashLater FROM shifts AS s LEFT OUTER JOIN shiftstatus AS ss ON s.Id = ss.Id WHERE CloseDateTime IS NULL AND OpenDateTime IS NOT NULL", []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
           throw new Error(ex.message);
@@ -164,7 +164,6 @@ angular.module('itouch.services')
        * @param shiftId
        */
       self.declareCash = function(cash, shiftId){
-        var deferred = $q.defer();
         var shift = self.getCurrent();
 
         if(shift || shiftId){
@@ -178,22 +177,19 @@ angular.module('itouch.services')
                 'createHeader': declareCash(cash, shift.Id)
               });
             } else {
-              deferred.reject("Shift is not valid");
+              return $q.reject("Shift is not valid");
             }
-          }, function(error){
-            deferred.reject(error);
           });
+        } else {
+          return $q.reject("Shift is not valid");
         }
-
-        return deferred.promise;
       }
 
       self.declareCashLater = function(shiftId){
-        var deferred = $q.defer();
         var shift = self.getCurrent();
 
         if(shift || shiftId){
-          DB.query("SELECT * FROM shiftstatus WHERE Id = ?", [shiftId || shift.Id]).then(function(res){
+          return DB.query("SELECT * FROM shiftstatus WHERE Id = ?", [shiftId || shift.Id]).then(function(res){
             shift = DB.fetch(res);
             if(shift){
               console.log(shift);
@@ -201,14 +197,12 @@ angular.module('itouch.services')
               return DB.update('ShiftStatus', _.omit(shift, 'Id'), { columns: 'Id= ?', data: [shift.Id]});
               // deferred.resolve();
             } else {
-              deferred.reject("Shift is not valid");
+              return $q.reject("Shift is not valid");
             }
-          }, function(error){
-            deferred.reject(error);
           });
+        } else {
+          return $q.reject("Shift is not valid");
         }
-
-        return deferred.promise;
       }
 
       var initBillHeader = function(){
@@ -387,8 +381,14 @@ angular.module('itouch.services')
       }
 
       var getReceiptCount = function(shiftId){
-        var q = "SELECT  COUNT(*) AS ItemCount FROM BillHeader WHERE DocType = 'SA' OR DocType = 'VD' GROUP BY ShiftId";
-        return DB.query(q).then(function(res){ return DB.fetch(res); });
+        var q = "SELECT  COUNT(*) AS ItemCount FROM BillHeader WHERE DocType = 'SA' OR DocType = 'VD' "
+        var data = [];
+        if(shiftId){
+          q += " AND ShiftId = ?"
+          data.push(shiftId);
+        }
+        q += " GROUP BY ShiftId";
+        return DB.query(q, data).then(function(res){ return DB.fetch(res); });
       }
 
       var getVoidItemDetails = function(shiftId){
@@ -429,7 +429,7 @@ angular.module('itouch.services')
           data.receiveIn = ItemService.calculateTotal(_.first(data.receiveIn));
           data.cashDeclared = ItemService.calculateTotal(_.first(data.cashDeclared));
           data.reverse = ItemService.calculateTotal(_.first(data.reverse));
-          data.itemVoid = _.first(data.itemVoid);
+          data.itemVoid = ItemService.calculateTotal(_.first(data.itemVoid));
 
           return data;
         });

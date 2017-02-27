@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q', '$ionicHistory',
-    function ($scope, ShiftService, $ionicPopup, $state, Report, $q, $ionicHistory) {
+  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q', '$ionicHistory', '$timeout', 'Alert',
+    function ($scope, ShiftService, $ionicPopup, $state, Report, $q, $ionicHistory, $timeout, Alert) {
       $scope.shifts = [];
       $scope.shiftSelectionShown = true;
       $scope.shift = {};
@@ -43,16 +43,38 @@ angular.module('itouch.controllers')
         $scope.shift = shift;
         switch($scope.shiftListType){
           case 'open':
-            $scope.shiftSelectionShown = false;
+            if(shift.OpenDateTime){
+              ShiftService.saveCurrent(shift);
+              $scope.$emit('shift-changed');
+              $scope.$emit("shift-modal-close");
+              $timeout(function(){
+                $ionicHistory.nextViewOptions({
+                  disableAnimate: false,
+                  disableBack: true
+                });
+                $state.go('app.sales');
+              }, 1000);
+            } else {
+              $scope.shiftSelectionShown = false;
+            }
+
             break;
           case 'close':
             closeShift($scope.shift);
             break;
           case 'declareCash':
             $scope.close();
-            $scope.$emit("declare-cash", shift);
+            $timeout(function(){
+              $scope.$emit("declare-cash", shift);
+            }, 500);
+
             break;
           default:
+            $ionicHistory.nextViewOptions({
+              disableAnimate: false,
+              disableBack: true
+            });
+            ShiftService.clearCurrent();
             $scope.$emit("shift-modal-close");
             $scope.$emit("shift-exit", shift);
             break;
@@ -77,11 +99,13 @@ angular.module('itouch.controllers')
           Report.printAddFloat($scope.shift.RA);
           $scope.$emit("shift-modal-close");
 
-          $ionicHistory.nextViewOptions({
-            disableAnimate: false,
-            disableBack: true
-          });
-          $state.go('app.sales');
+          $timeout(function(){
+            $ionicHistory.nextViewOptions({
+              disableAnimate: false,
+              disableBack: true
+            });
+            $state.go('app.sales');
+          }, 1000);
 
         }, function(err){
           console.log(err);
