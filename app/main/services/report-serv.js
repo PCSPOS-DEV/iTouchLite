@@ -233,8 +233,11 @@ angular.module('itouch.services')
     });
   }
 
-  self.printShiftClosingReport = function(shiftId){
+  self.printShiftClosingReport = function(shiftId, businessDate){
     setParameters();
+    if(businessDate){
+      bDate = businessDate;
+    }
     $q.all({
       shift: ShiftService.getById(shiftId),
       header: ShiftService.getHeaderDetails(shiftId),
@@ -309,7 +312,7 @@ angular.module('itouch.services')
           PrintService.addReportLine('ITEM REVERSE', (data.header.refund? data.header.refund.Total:0).toFixed(2), ""+ (data.header.refund ? data.header.refund.ItemCount : 0));
           PrintService.addReportLine('ABORT', (data.header.void? data.header.void.Total:0).toFixed(2), ""+ (data.header.void ? data.header.void.ItemCount : 0));
           PrintService.addReportLine('TRANS VD', (data.header.void? data.header.void.Total:0).toFixed(2), ""+ (data.header.void ? data.header.void.ItemCount : 0));
-          PrintService.addReportLine('ITEM VD', (data.header.itemVoid? data.header.itemVoid.Total:0).toFixed(2), ""+ (data.header.itemVoid ? data.itemVoid.refund.ItemCount : 0));
+          PrintService.addReportLine('ITEM VD', (data.header.itemVoid? data.header.itemVoid.Total:0).toFixed(2), ""+ (data.header.itemVoid ? data.header.itemVoid.ItemCount : 0));
           PrintService.addLineBreak();
           // PrintService.addReportLine('DRAWER OPEN', (data.header.float? data.header.float.Total:0).toFixed(2));
           PrintService.addReportLine('RECEIPT COUNT', (data.header.recCount? data.header.recCount.ItemCount:0).toFixed(2));
