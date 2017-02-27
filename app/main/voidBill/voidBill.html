@@ -8,6 +8,12 @@
           <div class="col"> {{ bill.DocNo }}  </div>
           <div class="col"> {{ '$'+bill.Total.toFixed(2) }}  </div>
         </div>
+        <div class="no-data" ng-if="ctrl.bills.length == 0">
+          <!--<p>-->
+          <i class="icon ion-android-warning"></i>
+          <!--</p>-->
+          <p>No records found</p>
+        </div>
       </div>
   </ion-content>
 </ion-modal-view>
