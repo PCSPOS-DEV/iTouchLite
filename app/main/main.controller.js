@@ -1,7 +1,7 @@
 
 angular.module('itouch.controllers')
-.controller("AppCtrl", ['SyncService', '$scope', '$ionicLoading', 'LocationService', 'Logger', 'APP_CONFIG', 'AuthService', '$state', '$ionicHistory', 'ShiftService', '$timeout',
-  function (SyncService, $scope, $ionicLoading, LocationService, Logger, APP_CONFIG, AuthService, $state, $ionicHistory, ShiftService, $timeout) {
+.controller("AppCtrl", ['SyncService', '$scope', '$ionicLoading', 'LocationService', 'Logger', 'APP_CONFIG', 'AuthService', '$state', '$ionicHistory', 'Alert', 'CartItemService',
+  function (SyncService, $scope, $ionicLoading, LocationService, Logger, APP_CONFIG, AuthService, $state, $ionicHistory, Alert, CartItemService) {
     var currentUser = AuthService.currentUser();
 
     ionic.Platform.ready(function () {
@@ -11,19 +11,19 @@ angular.module('itouch.controllers')
     });
 
 
-    $scope.$on('shift-changed', function(evt, shift){
-      console.log('shift-changed');
-      var shift = ShiftService.getCurrent();
-      $ionicHistory.nextViewOptions({
-        disableAnimate: false,
-        disableBack: true
-      });
-      if(shift){
-        $state.go('app.sales');
-      } else {
-        $state.go('app.home');
-      }
-    });
+    // $scope.$on('shift-changed', function(evt, shift){
+    //   console.log('shift-changed');
+    //   // var shift = ShiftService.getCurrent();
+    //   // $ionicHistory.nextViewOptions({
+    //   //   disableAnimate: false,
+    //   //   disableBack: true
+    //   // });
+    //   // if(shift){
+    //   //   $state.go('app.sales');
+    //   // } else {
+    //   //   $state.go('app.home');
+    //   // }
+    // });
 
     $scope.config = APP_CONFIG;
 
@@ -82,7 +82,19 @@ angular.module('itouch.controllers')
     }
 
     $scope.logout = function () {
-      $state.go('login');
+      Alert.showConfirm('Are you sure?', 'Logout', function(res){
+        if(res == 1){
+          CartItemService.isEmpty().then(function(empty){
+            if(!empty){
+              Alert.warning('Cart is not empty!');
+            } else {
+              $scope.go('login', true);
+            }
+          });
+        }
+      });
+
+
     }
 
   }]);
