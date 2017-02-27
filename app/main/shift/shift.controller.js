@@ -90,16 +90,10 @@ angular.module('itouch.controllers')
       }
 
       var closeShift = function(shift){
-        var confirmPopup = $ionicPopup.confirm({
-          title: 'Close Shift?',
-          template: 'Are you sure you want to close this shift ('+shift.Id+')?'
-        });
-
-        confirmPopup.then(function(res) {
-          if(res) {
+        Alert.showConfirm('Are you sure you want to close this shift ('+shift.Id+')?', 'Close Shift?', function(res){
+          if(res == 1){
             ShiftService.closeShift(shift.Id || null).then(function(success){
               $scope.$emit("shift-close", shift);
-              console.log(success);
             }, function(err){
               console.log(err);
             });

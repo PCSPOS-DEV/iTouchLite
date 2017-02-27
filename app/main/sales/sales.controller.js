@@ -869,8 +869,8 @@ angular.module('itouch.controllers')
           }
         },
         AbortFunction: function(fn){
-          Alert.showConfirm('This will remove all the items', 'Abort?').then(function(res){
-            if(res){
+          Alert.showConfirm('This will remove all the items', 'Abort?', function(res){
+            if(res == 1){
 
               BillService.getHeader($scope.header.DocNo).then(function(header){
                 // $scope.tenderHeader = header;
