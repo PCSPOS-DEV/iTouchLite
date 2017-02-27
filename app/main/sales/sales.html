@@ -48,15 +48,15 @@
           <!--<h3 class="title">Summary</h3>-->
           <div class="row sblock top">
             <div class="col label">Sub Total</div>
-            <div class="col value">{{cart.summery.SubTotal.roundTo(2).toFixed(2)}}</div>
+            <div class="col value">{{cart.summery.Total.roundTo(2).toFixed(2)}}</div>
           </div>
           <div class="row sblock">
             <div class="col label">Tax</div>
-            <div class="col value">{{cart.summery.Tax.roundTo(2).toFixed(2)}}</div>
+            <div class="col value">{{(cart.summery.Tax + cart.summery.Tax5DiscAmount).roundTo(2).toFixed(2)}}</div>
           </div>
           <div class="row sblock">
             <div class="col label">Discount</div>
-            <div class="col value">{{cart.summery.Discount.roundTo(2).toFixed(2)}}</div>
+            <div class="col value">{{(cart.summery.Discount+cart.summery.Tax5DiscAmount).roundTo(2).toFixed(2)}}</div>
           </div>
           <div class="row sblock">
             <div class="col label">Count</div>
