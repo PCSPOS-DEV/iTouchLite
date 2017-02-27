@@ -19,11 +19,7 @@ angular.module('itouch.services')
     this.CLASS_INFO = 'calm';
 
     this.showAlert = function (title, message, cssClass) {
-      return $ionicPopup.alert({
-        cssClass: cssClass || null,
-        title: title,
-        template: message
-      });
+      $cordovaDialogs.alert(message, title || 'Alert');
     }
 
     this.success = function (message, title) {
@@ -39,18 +35,22 @@ angular.module('itouch.services')
     }
 
     this.warning = function (message, title) {
-      return $ionicPopup.alert({
-        // cssClass: cssClass || null,
-        title: title || 'Warning!',
-        template: message
-      });
+      $cordovaDialogs.alert(message, title || 'Warning');
+    }
+
+    this.success = function (message, title) {
+      $cordovaDialogs.alert(message, title || 'Success');
     }
 
 
-    this.showConfirm = function (message, title) {
-      return $ionicPopup.confirm({
-        title: title,
-        template: message
-      });
+    this.showConfirm = function (message, title, func, buttons) {
+      // return $ionicPopup.confirm({
+      //   title: title,
+      //   template: message
+      // });
+      if(!buttons){
+        buttons = ['Yes', 'No'];
+      }
+      navigator.notification.confirm(message, func, title, buttons);
     }
   }]);
