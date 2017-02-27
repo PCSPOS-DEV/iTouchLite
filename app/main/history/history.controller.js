@@ -9,12 +9,12 @@ angular.module('itouch.controllers')
       $scope.search = { text: "" };
 
       $scope.$on("$ionicView.beforeEnter", function(event, data){
+        $scope.search.text = "";
         refresh();
       });
 
       var refresh = function () {
         HistoryService.getAll().then(function(items) {
-          console.log(items);
           $scope.items = _.values(items);
         });
       };
