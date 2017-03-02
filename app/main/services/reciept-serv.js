@@ -3,15 +3,14 @@ angular.module('itouch.services')
 .service('Reciept', ['$log', 'PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert',
   function ($log, PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert) {
   var self = this;
-  var data = null;
+  var printData = null;
   var printer = PrintService.getPrinter();
   var location = LocationService.currentLocation;
   console.log(location);
 
   self.getAll = function(){
     PrinterSettings.get().then(function(res){
-      $log.log(res);
-      data = res;
+      printData = res;
     });
   }
   self.getAll();
@@ -20,7 +19,7 @@ angular.module('itouch.services')
 
     printer.addTextAlign(printer.ALIGN_CENTER);
 
-    angular.forEach(data.Header, function(row){
+    angular.forEach(printData.Header, function(row){
       if(row.IsBold == "true"){
         printer.addTextStyle(false, false, true);
       } else {
@@ -61,7 +60,10 @@ angular.module('itouch.services')
       if(row.discounts){
         angular.forEach(row.discounts, function(discount){
           if(discount.Description1){
-            PrintService.addTabbedLine(discount.Description1, " -"+(discount.DiscountAmount ? discount.DiscountAmount.toFixed(2) : 0));
+            if(!discount.DiscountAmount){
+              discount.DiscountAmount = 0;
+            }
+            PrintService.addTabbedLine(discount.Description1, " "+(discount.DiscountAmount*-1).toFixed(2));
             subTotal -= discount.DiscountAmount ? discount.DiscountAmount : 0;
           }
 
@@ -84,7 +86,7 @@ angular.module('itouch.services')
       if(data.tenderDiscounts && data.tenderDiscounts.length > 0){
         var tenderDisAmount = 0;
         angular.forEach(data.tenderDiscounts, function(row){
-          PrintService.addLine(row.Description1, "-"+(row.Amount.toFixed(2)));
+          PrintService.addLine(row.Description1, (row.Amount > 0 ?"-":"+") + row.Amount.toFixed(2));
           tenderDisAmount += row.Amount;
         });
 
@@ -126,7 +128,7 @@ angular.module('itouch.services')
     var now = moment().format('DD/MM/YYYY hh:mm:ss A');
     var machine = SettingsService.getCurrentMachine();
 
-    angular.forEach(data.Footer, function(row){
+    angular.forEach(printData.Footer, function(row){
       if(row.IsBold == "true"){
         printer.addTextStyle(false, false, true);
       } else {
@@ -146,6 +148,8 @@ angular.module('itouch.services')
         printer = PrintService.getPrinter();
 
         fetchData(DocNo).then(function (data) {
+          printData = data.printData;
+
           if(data && data.header){
             self.creatRecieptHeader();
 
@@ -178,6 +182,7 @@ angular.module('itouch.services')
           printer = PrintService.getPrinter();
 
           fetchData(DocNo).then(function (data) {
+            printData = data.printData;
             if(data && data.header){
               self.creatRecieptHeader();
               PrintService.addTitle("Transaction Void");
@@ -208,6 +213,7 @@ angular.module('itouch.services')
           printer = PrintService.getPrinter();
 
           fetchData(DocNo).then(function (data) {
+            printData = data.printData;
             if(data && data.header){
               self.creatRecieptHeader();
               PrintService.addTitle("Abort");
@@ -247,7 +253,7 @@ angular.module('itouch.services')
     +"LEFT OUTER JOIN BillDiscounts AS bd ON bd.ItemId = de.ItemId AND bd.LineNumber = de.LineNumber AND de.DocNo = bd.DocNo "
     +"LEFT OUTER  JOIN Discounts AS d ON d.Id = bd.DiscountId AND bd.DiscountFrom = 'I' "
     +"LEFT OUTER  JOIN Reason AS r ON r.Code = de.ReasonId "
-    return DB.query(q + "WHERE de.DocNo = ? ORDER BY de.LineNumber", [DocNo]).then(function (res) {
+    return DB.query(q + "WHERE de.DocNo = ? ORDER BY de.LineNumber AND bd.SeqNo", [DocNo]).then(function (res) {
       var items = {};
       angular.forEach(DB.fetchAll(res), function (item) {
         if(item){
@@ -271,7 +277,6 @@ angular.module('itouch.services')
       });
 
       items = _.sortBy(_.values(items), 'LineNumber');
-      console.log(items);
       return items;
     });
   }
@@ -322,6 +327,7 @@ angular.module('itouch.services')
 
   var fetchData = function(DocNo){
     return $q.all({
+      printData: PrinterSettings.get(),
       header: self.getBillHeader(DocNo),
       items: self.getBillItems(DocNo),
       transactions: self.getBillTransactions(DocNo),
