@@ -208,7 +208,8 @@ angular.module('itouch.services')
           promises.push(self.addItemToCart(parentItem));
           items = _.map(items, function(item){
             item.ParentItemLineNumber = parentItem.LineNumber;
-            item.LineNumber = ++lineNumber;
+            lineNumber += 100;
+            item.LineNumber = lineNumber;
             promises.push(self.addItemToCart(item));
             return item;
           });

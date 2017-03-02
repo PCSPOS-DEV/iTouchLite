@@ -101,7 +101,7 @@ angular.module('itouch.controllers')
             $scope.TakeAway = false;
           }).then(function(){
             refresh().then(function () {
-              // selectLastItem();
+              $scope.selectItemWithLineNumber();
             });
           });
         }
@@ -111,7 +111,15 @@ angular.module('itouch.controllers')
           // console.log(currentPos);
           var ele = document.getElementById(lineNumber);
           if(ele){
-            $ionicScrollDelegate.$getByHandle('cart').scrollTo(0, (ele.getBoundingClientRect().top-83), true);
+            var top = ele.getBoundingClientRect().top;
+            if(top){
+              $ionicScrollDelegate.$getByHandle('cart').scrollTo(0, (-83), true);
+            } else {
+              $ionicScrollDelegate.$getByHandle('cart').scrollBottom();
+            }
+
+          } else {
+            $ionicScrollDelegate.$getByHandle('cart').scrollBottom();
           }
 
 
@@ -478,7 +486,7 @@ angular.module('itouch.controllers')
               text: '<b>Save</b>',
               type: 'button-positive',
               onTap: function (e) {
-                if (!$scope.data.amount) {
+                if (!$scope.data.amount || _.isNaN($scope.data.amount) || $scope.data.amount == 0) {
                   //don't allow the user to close unless he enters wifi password
                   e.preventDefault();
                 } else {
@@ -503,14 +511,10 @@ angular.module('itouch.controllers')
                 if($scope.qty.value){
                   $scope.salesKits.customQuantity = $scope.qty.value;
                 }
-                angular.forEach($scope.salesKits.selectedList, function(item, key) {
-                  $scope.salesKits.selectedList[key].AddedAt = new Date();
-                  // $scope.salesKits.selectedList[key].Price = 0;
-                });
                 $timeout(function () {
                   $scope.shownModal = 'sk';
                   $scope.skModalModal.show();
-                }, 100);
+                }, 500);
 
 
               } else {
@@ -519,7 +523,7 @@ angular.module('itouch.controllers')
                     var q = null;
                     if(data.Price == 0 && item.ZeroPrice == 'false'){
                       q = showPriceForm().then(function (amount) {
-                        if(amount){
+                        if(amount && amount > 0){
                           amount = parseFloat(amount);
                           item.Price = amount || 0;
                           item.OrgPrice = amount || 0;
@@ -582,7 +586,7 @@ angular.module('itouch.controllers')
                       } else {
                         CartItemService.addItemToCart(item).then(function (it) {
                           $scope.refreshCart().then(function () {
-                            $scope.scrollTo(it.LineNumber);
+                            // $scope.scrollTo(it.LineNumber);
                             $scope.qty.value = 1;
                             $scope.selectItemWithLineNumber(it.LineNumber);
                           })
@@ -616,7 +620,11 @@ angular.module('itouch.controllers')
        * @param item
        */
       $scope.selectItem = function (item) {
+        // if(!$scope.cart.selectedItem || !item || item.LineNumber != $scope.cart.selectedItem.LineNumber){
+          $scope.scrollTo(item ? item.LineNumber : null);
+        // }
         if(item){
+
           $scope.cart.items = _.map($scope.cart.items, function (item) {
             item.selected = false;
             return item;
@@ -658,14 +666,14 @@ angular.module('itouch.controllers')
             angular.forEach($scope.cart.items, function (item, key) {
               if($scope.cart.selectedItem && $scope.cart.selectedItem.ItemId == item.ItemId && $scope.cart.selectedItem.LineNumber == item.LineNumber){
                 $scope.cart.items[key] = item;
-                $scope.selectItem(item);
+                // $scope.selectItem(item);
               }
               if(item.TakeAway == 'false'){
                 $scope.TakeAway = false;
               }
             });
 
-          $ionicScrollDelegate.$getByHandle('cart').scrollBottom(true);
+          // $ionicScrollDelegate.$getByHandle('cart').scrollBottom(true);
         });
 
       }
@@ -722,19 +730,23 @@ angular.module('itouch.controllers')
         VoidTop: function (fn) {
           var item = $scope.cart.selectedItem;
           if (item && authorityCheck(fn)) {
-            if (item.ItemType == 'SKT') {
+            if(item.ItemType == 'PWI'){
+              return;
+            } else if (item.ItemType == 'SKT') {
               BillService.voidSalesKit(item).then(function () {
-                $scope.refreshCart();
+                $scope.refreshCart().then(function () {
+                  $scope.selectItemWithLineNumber();
+                });
               }, function (err) {
                 console.log(err);
-                $scope.refreshCart();
               });
-            } else if(item.ParentItemLineNumber == 0){
-              console.log(item);
+            } else if(item.ItemType == 'PWP'){
               var promises = [BillService.voidItem(item)];
               CartItemService.getChildItems(item.LineNumber).then(function(data){
-                angular.forEach(data, function(item){
-                  promises.push(BillService.voidItem(item));
+                angular.forEach(data, function(childItem){
+                  if(childItem){
+                    promises.push(BillService.voidItem(childItem));
+                  }
                 });
                 $q.all(promises).then(function(){
                   $scope.refreshCart().then(function () {
@@ -752,9 +764,14 @@ angular.module('itouch.controllers')
                   CartItemService.findSalesKitParent(item.ParentItemLineNumber).then(function (parentItem) {
                     SalesKitService.getSalesKit(parentItem.ItemId, businessDate).then(function (salesKit) {
                       if (salesKit) {
-                        $scope.salesKits = salesKit;
-                        $scope.salesKitUpdate = true;
-                        $scope.skModalModal.show();
+                        $timeout(function () {
+                          $scope.shownModal = 'sk';
+                          $scope.salesKits = salesKit;
+                          $scope.salesKitUpdateQty = parentItem.Qty;
+                          $scope.salesKitUpdate = true;
+                          $scope.skModalModal.show();
+                        }, 500);
+
                       }
                     });
                   });
@@ -869,28 +886,35 @@ angular.module('itouch.controllers')
           }
         },
         AbortFunction: function(fn){
-          Alert.showConfirm('This will remove all the items', 'Abort?', function(res){
-            if(res == 1){
+          if(authorityCheck(fn)) {
+            if(_.size($scope.cart.items) > 0){
+              Alert.showConfirm('This will remove all the items', 'Abort?', function(res){
+                if(res == 1){
 
-              BillService.getHeader($scope.header.DocNo).then(function(header){
-                // $scope.tenderHeader = header;
-                console.log($scope.header);
-                $scope.header.DocType = 'AV';
-                BillService.saveBill($scope.header, $scope.cart.items).then(function(res){
-                  Reciept.printAbort($scope.header.DocNo);
-                  refresh();
-                  initBill();
-                }, function(res){
-                  console.log(res);
-                });
+                  BillService.getHeader($scope.header.DocNo).then(function(header){
+                    // $scope.tenderHeader = header;
+                    console.log($scope.header);
+                    $scope.header.DocType = 'AV';
+                    BillService.saveBill($scope.header, $scope.cart.items).then(function(res){
+                      Reciept.printAbort($scope.header.DocNo);
+                      refresh();
+                      initBill();
+                    }, function(res){
+                      console.log(res);
+                    });
+                  });
+                }
               });
+            } else {
+              Alert.warning('No items in the cart!');
             }
-          });
+          }
+
         },
         FoodModifier: function(fn){
           if(authorityCheck(fn)){
             var item = $scope.cart.selectedItem;
-            if(item && item.ItemType != 'MOD' && item.ItemType != 'SKT' && item.ItemType != 'PWP') {
+            if(item && item.ItemType != 'MOD' && item.ItemType != 'SKT') {
               $scope.type = 'F';
               $scope.shownModal = 'mod';
               $scope.modals.modifiers.show();
@@ -901,7 +925,7 @@ angular.module('itouch.controllers')
         BeveragesModifiers: function(fn){
           if(authorityCheck(fn)){
             var item = $scope.cart.selectedItem;
-            if(item && item.ItemType != 'MOD' && item.ItemType != 'SKT' && item.ItemType != 'PWP') {
+            if(item && item.ItemType != 'MOD' && item.ItemType != 'SKT') {
               $scope.type = 'B';
               $scope.shownModal = 'mod';
               $scope.modals.modifiers.show();
