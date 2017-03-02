@@ -310,7 +310,7 @@ angular.module('itouch.services')
         return deferred.promise;
       }
 
-      var getHeaderDetailsForMode = function(shiftId, mode, discounted){
+      var getHeaderDetailsForMode = function(shiftId, mode, discounted, businessDate){
         var q = "SELECT ShiftId, "
           +"COUNT(*) AS ItemCount, "
           +"SUM(SubTotal) AS SubTotal, "
@@ -325,8 +325,8 @@ angular.module('itouch.services')
           +"SUM(Tax3DiscAmount) AS Tax3DiscAmount, "
           +"SUM(Tax4DiscAmount) AS Tax4DiscAmount, "
           +"SUM(Tax5DiscAmount) AS Tax5DiscAmount "
-        +"FROM BillHeader WHERE 1=1 ";
-        var data = [];
+        +"FROM BillHeader WHERE BusinessDate=? ";
+        var data = [businessDate];
 
         if(_.isUndefined(mode) || _.isNull(mode)){
 
@@ -349,7 +349,7 @@ angular.module('itouch.services')
         return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
       }
 
-      var getItemDetails = function(type, shiftId){
+      var getItemDetails = function(type, shiftId, businessDate){
         var q = "SELECT "
           +"COUNT(*) AS ItemCount, "
           +"SUM(d.SubTotal) AS SubTotal, "
@@ -364,13 +364,13 @@ angular.module('itouch.services')
           +"SUM(d.Tax3DiscAmount) AS Tax3DiscAmount, "
           +"SUM(d.Tax4DiscAmount) AS Tax4DiscAmount, "
           +"SUM(d.Tax5DiscAmount) AS Tax5DiscAmount "
-          +"FROM BillDetail AS d INNER JOIN BillHeader AS h ON d.DocNo = h.DocNo WHERE 1=1 ";
+          +"FROM BillDetail AS d INNER JOIN BillHeader AS h ON d.DocNo = h.DocNo WHERE  h.BusinessDate=? ";
         switch(type){
           case 'reverse':
             q += "AND Qty < 0 ";
             break;
         }
-        var data = [];
+        var data = [businessDate];
 
         if(!_.isUndefined(shiftId)){
           q += "AND ShiftId = ? ";
@@ -380,9 +380,9 @@ angular.module('itouch.services')
         return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
       }
 
-      var getReceiptCount = function(shiftId){
-        var q = "SELECT  COUNT(*) AS ItemCount FROM BillHeader WHERE DocType = 'SA' OR DocType = 'VD' "
-        var data = [];
+      var getReceiptCount = function(shiftId, bDate){
+        var q = "SELECT  COUNT(*) AS ItemCount FROM BillHeader WHERE BusinessDate=? AND DocType = 'SA' OR DocType = 'VD' "
+        var data = [bDate];
         if(shiftId){
           q += " AND ShiftId = ?"
           data.push(shiftId);
@@ -391,13 +391,13 @@ angular.module('itouch.services')
         return DB.query(q, data).then(function(res){ return DB.fetch(res); });
       }
 
-      var getVoidItemDetails = function(shiftId){
+      var getVoidItemDetails = function(shiftId, businessDate){
         var q = "SELECT "
           +"COUNT(*) AS ItemCount, "
           +"SUM(d.SubTotal) AS SubTotal, "
           +"SUM(d.DiscAmount) AS DiscAmount "
-          +"FROM VoidItems AS d WHERE 1=1 ";
-        var data = [];
+          +"FROM VoidItems AS d WHERE  BusinessDate=? ";
+        var data = [businessDate];
 
         if(!_.isUndefined(shiftId)){
           q += "AND ShiftId = ? ";
@@ -407,18 +407,18 @@ angular.module('itouch.services')
         return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
       }
 
-      self.getHeaderDetails = function(shiftId){
+      self.getHeaderDetails = function(shiftId, businessDate){
         return $q.all({
-          sales: getHeaderDetailsForMode(shiftId, 'SA'),
-          void: getHeaderDetailsForMode(shiftId, 'VD'),
-          float: getHeaderDetailsForMode(shiftId, 'RA'),
-          payout: getHeaderDetailsForMode(shiftId, 'PO'),
-          receiveIn: getHeaderDetailsForMode(shiftId, 'RI'),
-          cashDeclared: getHeaderDetailsForMode(shiftId, 'CD'),
-          reverse: getItemDetails('reverse', shiftId),
-          itemVoid: getVoidItemDetails(shiftId),
-          discounted: getHeaderDetailsForMode(shiftId, null, true),
-          recCount: getReceiptCount()
+          sales: getHeaderDetailsForMode(shiftId, 'SA', null, businessDate),
+          void: getHeaderDetailsForMode(shiftId, 'VD', null, businessDate),
+          float: getHeaderDetailsForMode(shiftId, 'RA', null, businessDate),
+          payout: getHeaderDetailsForMode(shiftId, 'PO', null, businessDate),
+          receiveIn: getHeaderDetailsForMode(shiftId, 'RI', null, businessDate),
+          cashDeclared: getHeaderDetailsForMode(shiftId, 'CD', null, businessDate),
+          reverse: getItemDetails('reverse', shiftId, businessDate),
+          itemVoid: getVoidItemDetails(shiftId, businessDate),
+          discounted: getHeaderDetailsForMode(shiftId, null, true, businessDate),
+          recCount: getReceiptCount(businessDate)
         }).then(function(data){
           data.sales = ItemService.calculateTotal(_.first(data.sales));
           data.discounted = ItemService.calculateTotal(_.first(data.discounted));
@@ -435,15 +435,15 @@ angular.module('itouch.services')
         });
       }
 
-      var getTransDetailsForMode = function(shiftId, cash, rounded){
-        var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount) AS Amount, SUM(ChangeAmount) AS ChangeAmount FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE Cash = ? AND DocType != 'CD' ";
-        var data = [cash];
+      var getTransDetailsForMode = function(shiftId, cash, rounded, bDate){
+        var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount) AS Amount, SUM(ChangeAmount) AS ChangeAmount FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE h.BusinessDate=? AND Cash = ? AND DocType != 'CD' ";
+        var data = [bDate, cash];
         // +"WHERE DocType = 'SA' "
-        if(!_.isUndefined(shiftId)){
+        if(shiftId){
           q += "AND ShiftId = ? ";
           data.push(shiftId);
         }
-        if(!_.isUndefined(rounded)){
+        if(rounded){
           q += "AND PayTypeId = -1 ";
         } else {
           q += "AND PayTypeId > 0 ";
@@ -452,11 +452,11 @@ angular.module('itouch.services')
         return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
       }
 
-      self.getTransDetails = function(shiftId){
+      self.getTransDetails = function(shiftId, bDate){
         return $q.all({
-          cash: getTransDetailsForMode(shiftId, 'true'),
-          nonCash: getTransDetailsForMode(shiftId, 'false'),
-          rounded: getTransDetailsForMode(shiftId, 'false', true)
+          cash: getTransDetailsForMode(shiftId, 'true', null, bDate),
+          nonCash: getTransDetailsForMode(shiftId, 'false', null, bDate),
+          rounded: getTransDetailsForMode(shiftId, 'false', true, bDate)
         }).then(function(data){
           data.cash = _.first(data.cash);
           data.nonCash = _.first(data.nonCash);

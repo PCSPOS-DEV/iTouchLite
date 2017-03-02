@@ -240,10 +240,10 @@ angular.module('itouch.services')
     }
     $q.all({
       shift: ShiftService.getById(shiftId),
-      header: ShiftService.getHeaderDetails(shiftId),
-      trans: ShiftService.getTransDetails(shiftId)
+      header: ShiftService.getHeaderDetails(shiftId, bDate.format('YYYY-MM-DD')),
+      trans: ShiftService.getTransDetails(shiftId, bDate.format('YYYY-MM-DD'))
     }).then(function(data){
-      console.log(data);
+      // console.log(data);
       if(data.header.void){
         data.header.sales.Total -= data.header.void.Total;
         data.header.sales.Discount -= data.header.void.Discount;

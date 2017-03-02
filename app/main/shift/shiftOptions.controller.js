@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService','$timeout',
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout) {
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService','$timeout', 'Reciept',
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept) {
       var self = this;
       var dayEnd = false;
 
@@ -85,7 +85,7 @@ angular.module('itouch.controllers')
         if(!dayEnd){
           ShiftService.getOpened().then(function(data){
             if(data.length == 0){
-              Alert.warning('No shifts available');
+              // Alert.warning('No shifts available');
             } else {
               $timeout(function(){
                 self.openShiftOpenModal();
@@ -98,6 +98,7 @@ angular.module('itouch.controllers')
       }
 
       var openCashPopUp = function(shift, dayEnd){
+        Reciept.openDrawer();
         $scope.data = {};
         var buttons = [
           {

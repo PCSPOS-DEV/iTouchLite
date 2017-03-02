@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q', '$ionicHistory', '$timeout', 'Alert',
-    function ($scope, ShiftService, $ionicPopup, $state, Report, $q, $ionicHistory, $timeout, Alert) {
+  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q', '$ionicHistory', '$timeout', 'Alert', 'Reciept',
+    function ($scope, ShiftService, $ionicPopup, $state, Report, $q, $ionicHistory, $timeout, Alert, Reciept) {
       $scope.shifts = [];
       $scope.shiftSelectionShown = true;
       $scope.shift = {};
@@ -94,6 +94,7 @@ angular.module('itouch.controllers')
           save: ShiftService.saveCurrent($scope.shift),
           addFloat: ShiftService.addFloat($scope.shift, $scope.shift.RA)
         }).then(function(){
+          Reciept.openDrawer();
 
           $scope.$emit('shift-changed');
           Report.printAddFloat($scope.shift.RA);
