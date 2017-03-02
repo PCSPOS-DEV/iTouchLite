@@ -7,7 +7,7 @@ angular.module('itouch.services')
 
     self.getBillList = function(businessDate){
       return DB.select(DB_CONFIG.tableNames.bill.header, 'DocNo, SubTotal, DiscAmount, Tax1Amount, Tax2Amount, Tax3Amount, Tax4Amount, Tax5Amount, Tax1DiscAmount, Tax2DiscAmount, Tax3DiscAmount, Tax4DiscAmount, Tax5DiscAmount',
-        { columns: "BusinessDate=? AND VoidDocNo IS NULL AND DocType = 'SA'", data: [businessDate] }).then(function(res){
+        { columns: "BusinessDate=? AND VoidDocNo IS NULL AND DocType = 'SA' ORDER BY SysDateTime DESC", data: [businessDate] }).then(function(res){
           var data = DB.fetchAll(res);
           if(data){
             data = _.map(data, function(bill){

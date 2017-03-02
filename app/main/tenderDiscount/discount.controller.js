@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('TenderDiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup',
-    function ($scope, DiscountService, $ionicPopup) {
+  .controller('TenderDiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert',
+    function ($scope, DiscountService, $ionicPopup, Alert) {
       var discountsSet = {
         type1: [],
         type2: []
@@ -56,7 +56,7 @@ angular.module('itouch.controllers')
                   text: '<b>Save</b>',
                   type: 'button-positive',
                   onTap: function (e) {
-                    if (!$scope.data.amount) {
+                    if (!$scope.data.amount || _.isNaN($scope.data.amount) || $scope.data.amount == 0) {
                       //don't allow the user to close unless he enters wifi password
                       e.preventDefault();
                     } else {
@@ -68,19 +68,22 @@ angular.module('itouch.controllers')
             });
 
             myPopup.then(function (res) {
-              console.log('Tapped!', res);
               saveDiscount(discount, res);
             });
           } else {
-            saveDiscount(discount);
+            saveDiscount(discount, parseFloat(discount.Amount));
           }
         }
 
       }
 
       var saveDiscount = function (discount, amount) {
+        amount = parseFloat(amount);
         DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy($scope.billItems), discount, amount).then(function () {
           $scope.$emit("discountModel-close");
+        }, function(ex){
+          $scope.$emit("discountModel-close");
+          Alert.warning(ex);
         });
         // $scope.$emit("refresh-cart");
 

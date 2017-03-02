@@ -21,23 +21,29 @@ angular.module('itouch.controllers')
       $scope.functions = billData.functions;
 
       $scope.updatedRoundedTotal = 0;
+      var submitted = false;
 
       $scope.$on("$ionicView.beforeEnter", function(event, data){
+        submitted = false;
         initBill();
       });
 
       var initBill = function(){
+        payTransactions = [];
+        $scope.payTransactions = [];
+        DiscountService.clearTenderDiscounts();
         $q.all({
           header: BillService.getHeader($stateParams.DocNo),
           items: CartItemService.getItems($stateParams.DocNo)
         }).then(function(data){
           console.log(data);
           if(data.header){
-            $scope.header = data.header;
             $scope.header = ItemService.calculateTotal(data.header);
             $scope.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
             $scope.header.UpdatedTenderTotal = data.header.Total.toFixed(2) || 0 ;
+            $scope.header.TenderTotal = data.header.Total.toFixed(2) || 0 ;
             $scope.header.UpdatedRoundedTotal = RoundingService.round(data.header.Total).toFixed(2);
+            $scope.tenderHeader = $scope.header;
             $scope.billItems = data.items;
           }
         }).then(function(){
@@ -45,19 +51,19 @@ angular.module('itouch.controllers')
 
       }
 
-      /**
-       * Executes when modal is shown. Data initializations should be done inside this
-       */
-      $scope.$on("modal.shown", function () {
-        if($scope.shownModal == 'tender'){
-
-          var rec_id = BillService.getCurrentReceiptId();
-          return BillService.getHeader(rec_id).then(function(header){
-            $scope.tenderHeader = header;
-            refreshData();
-          });
-        }
-      });
+      // /**
+      //  * Executes when modal is shown. Data initializations should be done inside this
+      //  */
+      // $scope.$on("modal.shown", function () {
+      //   if($scope.shownModal == 'tender'){
+      //
+      //     var rec_id = BillService.getCurrentReceiptId();
+      //     return BillService.getHeader(rec_id).then(function(header){
+      //       $scope.tenderHeader = header;
+      //       refreshData();
+      //     });
+      //   }
+      // });
 
       $scope.$on("refresh-cart", function () {
         if($scope.shownModal == 'tender'){
@@ -102,203 +108,176 @@ angular.module('itouch.controllers')
        */
       var seq = 0;
       $scope.selectTenderType = function (tenderType) {
-        var overTender = false;
-        var bill = _.map($scope.billItems, function (item) {
-          item.IsExported = true;
-          item.DocNo = $scope.tenderHeader.DocNo;
-          item.StdCost = item.StdCost.roundTo(2);
-          item.AlteredPrice = item.AlteredPrice.roundTo(2);
-          item.SubTotal = item.SubTotal.roundTo(2);
-          return item;
-        });
-        var item = _.first(bill);
-        var total = $scope.tenderHeader.Total;
-        var amount = null;
-        if(!$scope.tenderHeader.UpdatedTenderTotal){
-          $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total;
-        }
-        if(setValueManually){
-          // if(){
-            amount = parseFloat($scope.tenderHeader.UpdatedTenderTotal).roundTo(2);
-          // } else {
-          //   amount = parseFloat(tenderType.TenderAmount).roundTo(2)
-          // }
-        } else {
-          amount = parseFloat(tenderType.TenderAmount != '0' ? tenderType.TenderAmount : total ).roundTo(2);
-        }
-        // var amount = ($scope.tenderHeader.UpdatedTenderTotal || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
-        // var amount = ($scope.tenderHeader.UpdatedTenderTotal || tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
-        var diff = (($scope.tenderHeader.Total - parseFloat($scope.tenderHeader.TotalRounded))* -1).roundTo(2);
-        var changeAmount = 0;
-        if (amount > total) {
-          changeAmount = (amount- (total+diff)).roundTo(2);
-        }
-
-
-
-        if(item){
-          var transAmount = 0;
-          // console.log(tenderType);
+        if(!submitted){
+          var overTender = false;
+          var bill = _.map($scope.billItems, function (item) {
+            item.IsExported = true;
+            item.DocNo = $scope.tenderHeader.DocNo;
+            item.StdCost = item.StdCost.roundTo(2);
+            item.AlteredPrice = item.AlteredPrice.roundTo(2);
+            item.SubTotal = item.SubTotal.roundTo(2);
+            return item;
+          });
+          var item = _.first(bill);
+          var total = $scope.tenderHeader.Total;
+          var amount = null;
+          if(!$scope.tenderHeader.UpdatedTenderTotal){
+            $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total;
+          }
           if(setValueManually){
-            transAmount = parseFloat($scope.tenderHeader.UpdatedTenderTotal);
-          } else if(tenderType.Round == 'true'){
-            transAmount = total + diff;
+            // if(){
+            amount = parseFloat($scope.tenderHeader.UpdatedTenderTotal).roundTo(2);
+            // } else {
+            //   amount = parseFloat(tenderType.TenderAmount).roundTo(2)
+            // }
           } else {
-            transAmount = amount;
+            amount = parseFloat(tenderType.TenderAmount != '0' ? tenderType.TenderAmount : total ).roundTo(2);
+          }
+          // var amount = ($scope.tenderHeader.UpdatedTenderTotal || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
+          // var amount = ($scope.tenderHeader.UpdatedTenderTotal || tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
+          var diff = (($scope.tenderHeader.Total - parseFloat($scope.tenderHeader.TotalRounded))* -1).roundTo(2);
+          if(tenderType.Round == 'true')
+            var changeAmount = 0;
+          if (amount > total) {
+            changeAmount = (amount- (total+diff)).roundTo(2);
           }
 
-          if (total <= amount) {
-            console.log(diff);
-            if(diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
-              payTransactions.push({
-                BusinessDate: businessDate,
-                LocationId: SettingsService.getLocationId(),
-                MachineId: SettingsService.getMachineId(),
-                DocNo: $scope.tenderHeader.DocNo,
-                Cash: tenderType.Cash == 'false',
-                SeqNo: seq++,
-                PayTypeId: -1,
-                Amount: diff,
-                ChangeAmount: 0,
-                ConvRate: 0,
-                CurrencyId: 0,
-                IsExported: false
-              });
+
+
+          if(item){
+            var transAmount = 0;
+            // console.log(tenderType);
+            if(setValueManually){
+              transAmount = parseFloat($scope.tenderHeader.UpdatedTenderTotal);
+            } else if(tenderType.Round == 'true'){
+              transAmount = total + diff;
+            } else {
+              transAmount = amount;
             }
 
-            var stockTransactions = [];
-            angular.forEach(bill, function (item, key) {
-              stockTransactions.push({
-                BusinessDate: businessDate,
-                LocationId: item.LocationId,
-                LineNumber: item.LineNumber,
-                DocNo: $scope.tenderHeader.DocNo,
-                ItemId: item.ItemId,
-                SeqNo: 0,
-                DocType: "SA",
-                StdCost: item.StdCost,
-                Qty: item.Qty,
-                BaseUOMId: 1,
-                IsExported: false
+            if (total <= amount) {
+              submitted = true;
+              console.log(diff);
+              if(diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
+                payTransactions.push({
+                  BusinessDate: businessDate,
+                  LocationId: SettingsService.getLocationId(),
+                  MachineId: SettingsService.getMachineId(),
+                  DocNo: $scope.tenderHeader.DocNo,
+                  Cash: tenderType.Cash == 'false',
+                  SeqNo: seq++,
+                  PayTypeId: -1,
+                  Amount: diff,
+                  ChangeAmount: 0,
+                  ConvRate: 0,
+                  CurrencyId: 0,
+                  IsExported: false
+                });
+              }
 
+              var stockTransactions = [];
+              angular.forEach(bill, function (item, key) {
+                stockTransactions.push({
+                  BusinessDate: businessDate,
+                  LocationId: item.LocationId,
+                  LineNumber: item.LineNumber,
+                  DocNo: $scope.tenderHeader.DocNo,
+                  ItemId: item.ItemId,
+                  SeqNo: 0,
+                  DocType: "SA",
+                  StdCost: item.StdCost,
+                  Qty: item.Qty,
+                  BaseUOMId: 1,
+                  IsExported: false
+
+                });
               });
-            });
-            var header = _.omit($scope.tenderHeader, ["TaxAmount", "Total", "TenderTotal", "TotalRounded"]);
-            // header.DocType = TenderService.getDocType();
-            // header.LocationId = SettingsService.getLocationId();
-            // header.MachineId = SettingsService.getMachineId();
-            // header.BusinessDate = businessDate;
-            // header.SysDateTime = $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss');
-            // header.ShiftId = AuthService.getShift().Id;
-            // header.AuthBy = 0;
-            // header.VipId = 0;
-            // header.CashierId = AuthService.currentUser().Id;
-            // header.TableId = 0;
-            // header.DepAmount = 0;
-            // header.VoidDocNo = 0;
-            // header.ReprintCount = 0;
-            // header.OrderTag = "";
-            // header.Remarks = "";
-            // header.IsExported = true;
-            // header.IsClosed = true;
-            //
-            // header.Tax1Option = item.Tax1Option;
-            // header.Tax1Perc = item.Tax1Perc;
-            // header.Tax2Option = item.Tax2Option;
-            // header.Tax2Perc = item.Tax2Perc;
-            // header.Tax3Option = item.Tax3Option;
-            // header.Tax3Perc = item.Tax3Perc;
-            // header.Tax4Option = item.Tax4Option;
-            // header.Tax4Perc = item.Tax4Perc;
-            // header.Tax5Option = item.Tax5Option;
-            // header.Tax5Perc = item.Tax5Perc;
+              var header = _.omit($scope.tenderHeader, ["TaxAmount", "Total", "TenderTotal", "TotalRounded"]);
+
+              var total = 0;
+              angular.forEach(payTransactions, function (tx) {
+                total += parseFloat(tx.Amount);
+              });
+
+              if (total > $scope.tenderHeader.Total && tenderType.OverTender == 'true') {
+                overTender = {
+                  BusinessDate: businessDate,
+                  LocationId: SettingsService.getLocationId(),
+                  MachineId: SettingsService.getMachineId(),
+                  DocNo: $scope.tenderHeader.DocNo,
+                  PayTypeId: tenderType.Id,
+                  OverTenderTypeId: tenderType.OverTenderTypeId,
+                  SeqNo: 0,
+                  Amount: amount,
+                  ChangeAmount: changeAmount,
+                  IsExported: false
+                };
+              }
+
+              DiscountService.saveTenderDiscount($scope.tenderHeader.DocNo).then(function(){
+                BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
+                  BillService.saveReceiptId($scope.tenderHeader.DocNo);
+                  BillService.initHeader();
+                  payTransactions = [];
+                  overTender = [];
+
+                  numpadValue = "";
+                  setValueManually = false;
+                  if(tenderType.OpenDrawer == 'true'){
+                    Reciept.openDrawer();
+                  }
+                  Reciept.print(header.DocNo);
 
 
-            var total = 0;
-            angular.forEach(payTransactions, function (tx) {
-              total += parseFloat(tx.Amount);
-            });
-
-            if (total > $scope.tenderHeader.Total && tenderType.OverTender == 'true') {
-              overTender = {
-                BusinessDate: businessDate,
-                LocationId: SettingsService.getLocationId(),
-                MachineId: SettingsService.getMachineId(),
-                DocNo: $scope.tenderHeader.DocNo,
-                PayTypeId: tenderType.Id,
-                OverTenderTypeId: tenderType.OverTenderTypeId,
-                SeqNo: 0,
-                Amount: amount,
-                ChangeAmount: changeAmount,
-                IsExported: false
-              };
-            }
-
-            DiscountService.saveTenderDiscount($scope.tenderHeader.DocNo).then(function(){
-              BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
-                BillService.saveReceiptId($scope.tenderHeader.DocNo);
-                BillService.initHeader();
-                payTransactions = [];
-                overTender = [];
-
-                numpadValue = "";
-                setValueManually = false;
-                if(tenderType.OpenDrawer == 'true'){
-                  Reciept.openDrawer();
-                }
-                Reciept.print(header.DocNo);
-
-
-                if(changeAmount > 0 && tenderType.Cash == 'true'){
-                  $ionicPopup.alert({
-                    title: 'Balance',
-                    template: '<p>Balance: $'+ changeAmount.toFixed(2)+'</p>'
-                  }).then(function(){
-                    // $scope.$emit("refresh-cart");
-                    $rootScope.$emit("initBill");
-                  });
-                } else {
+                  if(changeAmount > 0 && tenderType.Cash == 'true'){
+                    $ionicPopup.alert({
+                      title: 'Balance',
+                      template: '<p>Balance: $'+ changeAmount.toFixed(2)+'</p>'
+                    });
+                  }
                   $ionicHistory.nextViewOptions({
                     disableAnimate: false,
                     disableBack: true
                   });
+
                   $rootScope.$emit("refresh-cart");
                   $state.go('app.sales', {}, {reload: true});
-                }
 
-              }, function (err) {
-                console.log(err);
+                }, function (err) {
+                  console.log(err);
+                });
               });
-            });
-          } else {
-            $scope.tenderHeader.Total = (total - amount).roundTo(2);
-            $scope.tenderHeader.TenderTotal = $scope.tenderHeader.Total.toFixed(2);
-            $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total.toFixed(2);
-            $scope.tenderHeader.TotalRounded = RoundingService.round($scope.tenderHeader.Total).toFixed(2);
-          }
+            } else {
+              $scope.tenderHeader.Total = (total - amount).roundTo(2);
+              $scope.tenderHeader.TenderTotal = $scope.tenderHeader.Total.toFixed(2);
+              $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total.toFixed(2);
+              $scope.tenderHeader.TotalRounded = RoundingService.round($scope.tenderHeader.Total).toFixed(2);
+            }
 
-          payTransactions.push({
-            BusinessDate: businessDate,
-            LocationId: SettingsService.getLocationId(),
-            MachineId: SettingsService.getMachineId(),
-            DocNo: $scope.tenderHeader.DocNo,
-            Cash: tenderType.Cash == 'true',
-            SeqNo: seq,
-            PayTypeId: tenderType.Id,
-            Amount: transAmount,
-            ChangeAmount: changeAmount,
-            ConvRate: 0,
-            CurrencyId: 0,
-            IsExported: false
-          });
-          $scope.payTransactions.push({
-            Desc1: tenderType.Description1,
-            Desc2: tenderType.Description2,
-            Amount: transAmount
-          });
+            payTransactions.push({
+              BusinessDate: businessDate,
+              LocationId: SettingsService.getLocationId(),
+              MachineId: SettingsService.getMachineId(),
+              DocNo: $scope.tenderHeader.DocNo,
+              Cash: tenderType.Cash == 'true',
+              SeqNo: seq,
+              PayTypeId: tenderType.Id,
+              Amount: transAmount,
+              ChangeAmount: changeAmount,
+              ConvRate: 0,
+              CurrencyId: 0,
+              IsExported: false
+            });
+            $scope.payTransactions.push({
+              Desc1: tenderType.Description1,
+              Desc2: tenderType.Description2,
+              Amount: transAmount
+            });
+          }
+          seq++;
+          $scope.numpadClear();
         }
-        seq++;
-        $scope.numpadClear();
+
       }
 
       /**
@@ -351,7 +330,10 @@ angular.module('itouch.controllers')
           console.log("Redemption");
         },
         Discount: function (fn) {
-          $scope.discountModal.show();
+          if(payTransactions.length == 0){
+            $scope.discountModal.show();
+          }
+
 
         },
         PaymentMade: function(fn){
@@ -459,7 +441,7 @@ angular.module('itouch.controllers')
       }
 
       $scope.close = function () {
-        $scope.$emit("tenderModel-close");
+        $state.go('app.sales', {}, {reload: true});
       }
 
       $scope.closePaymentsModal = function () {

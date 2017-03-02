@@ -54,7 +54,7 @@ angular.module('itouch.controllers')
                   text: '<b>Save</b>',
                   type: 'button-positive',
                   onTap: function (e) {
-                    if (!$scope.data.amount) {
+                    if (!$scope.data.amount || _.isNaN($scope.data.amount) || $scope.data.amount == 0) {
                       //don't allow the user to close unless he enters wifi password
                       e.preventDefault();
                     } else {
@@ -75,6 +75,7 @@ angular.module('itouch.controllers')
       }
 
       var saveDiscount = function (discount, amount) {
+        amount = parseFloat(amount);
         DiscountService.saveTempDiscountItem(angular.copy($scope.cart.selectedItem), discount, amount).then(function (item) {
           // $scope.cart.selectedItem.discounted = true;
           // console.log(item);

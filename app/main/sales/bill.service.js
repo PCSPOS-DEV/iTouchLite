@@ -669,8 +669,9 @@ angular.module('itouch.services')
         item.ByAmount = item.ByAmount || 0;
         item.KitType = item.KitType || "";
 
-        item.BusinessDate = item.BusinessDate || businessDate;
+        item.BusinessDate = item.BusinessDate || ControlService.getBusinessDate(true);
         item.MachineId = item.MachineId || SettingsService.getMachineId();
+        item.LocationId = item.LocationId || SettingsService.setLocationId();
         item.DocNo = ControlService.getDocId();
         if (!item.Qty) {
           item.Qty = 1;
@@ -882,23 +883,27 @@ angular.module('itouch.services')
 
       self.voidItem = function (item) {
         if(item.ItemId && item.ItemType && item.LineNumber){
-          DB.clearQueue();
-          item.SysDateTime = $filter('date')(ControlService.getBusinessDate(), "yyyy-MM-dd HH:mm:ss");
-          renameProperty(item, 'ParentItemLineNumber', 'ParentItemId')
-          item.ShiftId = ShiftService.getCurrentId();
-          item.CashierId = AuthService.currentUser().Id;
-          item.StaffId = 0;
-          item.IsExported = false;
+          return DB.max(DB_CONFIG.tableNames.bill.voidItems, 'SeqNo', { columns: 'ItemId=?', data:[item.ItemId] }).then(function(ln){
+            DB.clearQueue();
+            item.SysDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+            renameProperty(item, 'ParentItemLineNumber', 'ParentItemId')
+            item.ShiftId = ShiftService.getCurrentId();
+            item.CashierId = AuthService.currentUser().Id;
+            item.StaffId = 0;
+            item.IsExported = false;
+            item.SeqNo = ++ln;
 
 
-          return $q.all({
-            'removeItem': DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: 'ItemId=? AND ItemType=? AND LineNumber=?', data:[item.ItemId, item.ItemType, item.LineNumber] }),
-            'addVoidItem': DB.insert(DB_CONFIG.tableNames.bill.voidItems, _.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'IsExported', 'SysDateTime',
-              'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal' ])),
-            'header': self.updateHeaderTotals(item.DocNo)
+            return $q.all({
+              'removeItem': DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: 'ItemId=? AND ItemType=? AND LineNumber=?', data:[item.ItemId, item.ItemType, item.LineNumber] }),
+              'removeDiscounts': DB.delete(DB_CONFIG.tableNames.discounts.tempBillDiscounts, { columns: 'ItemId=? AND LineNumber=?', data:[item.ItemId, item.LineNumber] }),
+              'addVoidItem': DB.insert(DB_CONFIG.tableNames.bill.voidItems, _.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'IsExported', 'SysDateTime',
+                'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal', 'SeqNo' ])),
+              'header': self.updateHeaderTotals(item.DocNo)
+            });
           });
-
-
+        } else {
+          return $q.reject('item is not valid');
         }
       }
 
@@ -906,7 +911,10 @@ angular.module('itouch.services')
         if(item.ItemId && item.ItemType && item.LineNumber){
           var date = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss");;
 
-          return self.findSalesItems(item.LineNumber).then(function (items) {
+          return $q.all({
+                    items: self.findSalesItems(item.LineNumber),
+                    seqNo: DB.max(DB_CONFIG.tableNames.bill.voidItems, 'SeqNo', { columns: 'ItemId=?', data:[item.ItemId] })
+          }).then(function (data) {
             DB.clearQueue();
 
             item.SysDateTime = date;
@@ -915,27 +923,42 @@ angular.module('itouch.services')
             item.CashierId = AuthService.currentUser().Id;
             item.StaffId = 0;
             item.IsExported = false;
+            item.SeqNo = ++data.seqNo;
 
             var queue = [
               DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: 'ItemId=? AND ItemType=? AND LineNumber=?', data:[item.ItemId, item.ItemType, item.LineNumber] }),
               DB.insert(DB_CONFIG.tableNames.bill.voidItems, _.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'IsExported', 'SysDateTime',
-                'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal' ]))
+                'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal', 'SeqNo' ]))
             ];
-            angular.forEach(items, function (salesKitItem) {
-              salesKitItem.SysDateTime = date;
-              salesKitItem.ShiftId = ShiftService.getCurrentId();
-              salesKitItem.CashierId = AuthService.currentUser().Id;
-              salesKitItem.StaffId = 0;
-              salesKitItem.IsExported = false;
-              renameProperty(salesKitItem, 'ParentItemLineNumber', 'ParentItemId')
-              queue.push(DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: 'ItemId=? AND ItemType=? AND LineNumber=?', data:[salesKitItem.ItemId, salesKitItem.ItemType, salesKitItem.LineNumber] }));
-              queue.push(DB.insert(DB_CONFIG.tableNames.bill.voidItems, _.pick(salesKitItem, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'IsExported', 'SysDateTime',
-                'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal' ])));
+            angular.forEach(data.items, function (salesKitItem) {
+              var deferred = $q.defer();
+
+                salesKitItem.SysDateTime = date;
+                salesKitItem.ShiftId = ShiftService.getCurrentId();
+                salesKitItem.CashierId = AuthService.currentUser().Id;
+                salesKitItem.StaffId = 0;
+                salesKitItem.IsExported = false;
+                salesKitItem.SeqNo = ++data.seqNo;
+
+                renameProperty(salesKitItem, 'ParentItemLineNumber', 'ParentItemId');
+                $q.all([
+                  DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: 'ItemId=? AND ItemType=? AND LineNumber=?', data:[salesKitItem.ItemId, salesKitItem.ItemType, salesKitItem.LineNumber] }),
+                  DB.insert(DB_CONFIG.tableNames.bill.voidItems, _.pick(salesKitItem, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'IsExported', 'SysDateTime',
+                    'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal', 'SeqNo' ]))
+                ]).then(function(){
+                  deferred.resolve();
+                }, function (ex) {
+                  deferred.reject(ex);
+                });
+              queue.push(deferred.promise);
+
             });
             queue.push(self.updateHeaderTotals(item.DocNo));
 
             return $q.all(queue);
           });
+        }else {
+          return $q.reject('item is not valid');
         }
       }
 
@@ -1003,8 +1026,12 @@ angular.module('itouch.services')
       }
 
       self.refundItem = function (ItemId, LineNumber, reasonId, reference) {
-        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]}).then(function (res) {
-          var i = DB.fetch(res);
+        return $q.all({
+          item: DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]}),
+          discounts: DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, '*', {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]})
+        }).then(function (res) {
+          var i = DB.fetch(res.item);
+          var discounts = DB.fetchAll(res.discounts);
           if(i){
             i.SubTotal *= -1;
             i.Qty *= -1;
@@ -1021,10 +1048,17 @@ angular.module('itouch.services')
             i.DiscAmount = _.isNumber(i.DiscAmount) ? (i.DiscAmount *= -1).roundTo(2) : 0;
             i.ReasonId = reasonId;
             i.RefCode = reference;
-            return $q.all([
+
+            discounts = _.map(discounts, function (discount) {
+              discount.DiscountAmount *= -1;
+              return DB.update(DB_CONFIG.tableNames.discounts.tempBillDiscounts, discount, {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]});
+            });
+            var promises = [
               DB.update(DB_CONFIG.tableNames.bill.tempDetail, i, {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]}),
               self.updateHeaderTotals(i.DocNo)
-            ]);
+            ];
+            promises.concat(discounts);
+            return $q.all(promises);
           } else {
             return $q.reject("Invalid item");
           }

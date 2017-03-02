@@ -814,8 +814,9 @@ angular.module('itouch.config')
             { name: "SubTotal", type: "double NOT NULL" },
             { name: "DiscAmount", type: "double NOT NULL" },
             { name: "IsExported", type: "boolean NOT NULL" },
+            { name: "SeqNo", type: "int NOT NULL" },
           ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber"
+          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo"
         },
         {
           name: tableNames.refunds.reasons,

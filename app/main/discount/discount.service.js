@@ -16,17 +16,15 @@ angular.module('itouch.services')
 
       var location = LocationService.currentLocation;
 
-      var getNextSeqNumber = function (DocNo) {
-        return DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, 'MAX(SeqNo) AS sq', {columns: 'DocNo=?', data: [DocNo]}).then(function (res) {
+      var getNextSeqNumber = function (DocNo, ItemId) {
+        return DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, 'MAX(SeqNo) AS sq', {columns: 'DocNo=? AND ItemId=?', data: [DocNo, ItemId]}).then(function (res) {
           var line = DB.fetch(res);
           if(line){
             return ++line.sq || 1;
           } else {
             return 1;
           }
-
         }, function (err) {
-          console.log(err);
           return 1;
         });
 
@@ -165,7 +163,9 @@ angular.module('itouch.services')
         var q = "SELECT * FROM " + DB_CONFIG.tableNames.discounts.discounts + " AS d INNER JOIN "+DB_CONFIG.tableNames.discounts.discountsFor
           + " AS df ON d.DiscountFor = df.Id WHERE d.Id = ?";
         return DB.query(q, [id]).then(function (result) {
-          return DB.fetch(result);
+          var discount = DB.fetch(result);
+          renameProperty(discount, 'Id', 'DiscountId');
+          return discount;
         });
       }
 
@@ -288,11 +288,11 @@ angular.module('itouch.services')
       // }
 
       var processDiscountItem = function (item, discount) {
-        return getNextSeqNumber(item.ItemId).then(function (sn) {
+        return getNextSeqNumber(item.DocNo, item.ItemId).then(function (sn) {
           // renameProperty(discount, 'Id', 'DiscountId');
           renameProperty(discount, 'Percentage', 'DiscountPercentage');
           renameProperty(discount, 'Code', 'DiscountCode');
-          console.log(discount);
+          renameProperty(discount, 'Amount', 'DiscountAmount');
           discount = _.pick(discount, ['DiscountFrom', 'DiscountId', 'DiscountCode', 'DiscountFor', 'DiscountType', 'DiscountPercentage', 'DiscountAmount', 'SeqNo']);
           discount = _.extend(_.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'LineNumber']),discount);
           discount.SeqNo = sn;
@@ -301,12 +301,13 @@ angular.module('itouch.services')
           discount.BusinessDate =  discount.BusinessDate || businessDate;
           discount.MachineId =  discount.MachineId || machineId;
           discount.LocationId =  discount.LocationId || location.LocationId;
+          console.log(discount);
 
           return discount;
         });
       }
 
-      var processTendderDiscountItem = function (item, discount) {
+      var processTenderDiscountItem = function (item, discount) {
         var data = { item: null, discount: null };
         // return getNextSeqNumber(item.ItemId).then(function (sn) {
           // renameProperty(discount, 'Id', 'DiscountId');
@@ -340,19 +341,57 @@ angular.module('itouch.services')
             // console.log(discount);
             saveItemDiscount(discount);
             updateTempBillDetail(item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [item.DocNo, item.ItemId, item.LineNumber]});
-            return updateTempBillHeader(item.DocNo, _.pick(item, ['DiscAmount', 'Tax1DiscAmount', 'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount'])).then(function(){
-              return DB.executeQueue().then(function () {
-                return item;
-              }, function(ex){
-                console.log(ex);
-              });
+            // return updateTempBillHeader(item.DocNo, _.pick(item, ['DiscAmount', 'Tax1DiscAmount', 'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount'])).then(function(){
+            return DB.executeQueue().then(function () {
+              return BillService.updateHeaderTotals();
             });
+            // });
 
 
           });
         } else {
           return $q.reject("Not eligible for this discount amount");
         }
+
+      }
+
+      self.saveMultipleTempDiscountItem = function (discountSets) {
+        var promises = [];
+        DB.clearQueue();
+        angular.forEach(discountSets, function(discountSet){
+          if(discountSet.item && (discountSet.discount || discountSet.DiscountId)){
+            var prom;
+            if(discountSet.DiscountId){
+              prom = self.getDiscountById(discountSet.DiscountId);
+            } else {
+              prom = $q.when(discountSet.discount);
+            }
+
+            promises.push(prom.then(function(discount){
+              discountSet.item = ItemService.calculateTotal(discountSet.item);
+              discount.DiscountId = discountSet.DiscountId;
+              return processDiscountItem(discountSet.item, discount).then(function(dis){
+                calculateDiscountAmounts(discountSet.item, dis);
+                saveItemDiscount(dis);
+                updateTempBillDetail(discountSet.item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [discountSet.item.DocNo, discountSet.item.ItemId, discountSet.item.LineNumber]});
+                return DB.executeQueue().then(function () {
+                  return BillService.updateHeaderTotals();
+                }, function(ex){
+                  return $q.resolve();
+                });
+              });
+            }));
+          } else {
+            promises.push($q.reject('Invalid item'));
+          }
+        });
+        return $q.all(promises).then(function(){
+          console.log('dis done');
+          return true;
+        }, function(ex){
+          console.log('Discount fail '+ex);
+          return false;
+        });
 
       }
 
@@ -365,6 +404,9 @@ angular.module('itouch.services')
             return false;
           }
         }
+        if(item.Qty < 1){
+          return false;
+        }
         return true;
       }
 
@@ -372,6 +414,9 @@ angular.module('itouch.services')
         // console.log(item);
         if(item.BelowCost == 'false'){
           return (item.Total-item.Discount) >= item.StdCost;
+        }
+        if(item.Qty < 1){
+          return false;
         }
         return false;
       }
@@ -397,14 +442,19 @@ angular.module('itouch.services')
         if(!amount){
           amount = discount.Percentage ? (total * discount.Percentage || discount.DiscountPercentage) / 100 : parseFloat(discount.Amount);
         } else {
-          amount = parseFloat(discount.Amount);
+          amount = amount || parseFloat(discount.Amount);
         }
 
         // amount = parseFloat(amount);
         var headerDiscount = 0, headerSubDiscount = 0, totalEligibleDiscount = 0, headerTax5Disc = 0;
         var prec = 0;
         // discount.SeqNo = seq == null ? sn ;
-        var seqPromise = seq == null ? getNextSeqNumber(header.DocNo) : $q.when(seq);
+        var seqPromise;
+        if(seq == null){
+          seqPromise = getNextSeqNumber(header.DocNo);
+        } else {
+          seqPromise = $q.when(seq);
+        }
         seqPromise.then(function(s){
           if(!seq){
             seq = s;
@@ -424,8 +474,8 @@ angular.module('itouch.services')
 
             totalEligibleDiscount += item.TotalEligibleDiscount;
           });
-          if(amount > totalEligibleDiscount){
-            return false;
+          if(totalEligibleDiscount == 0 || amount > totalEligibleDiscount){
+            deferred.reject('Invalid Discount');
           } else {
             angular.forEach(_.values(items), function (item, key) {
               prec = item.TotalEligibleDiscount / totalEligibleDiscount;
@@ -449,7 +499,7 @@ angular.module('itouch.services')
 
 
 
-              queue.push(processTendderDiscountItem(item, angular.copy(discount)));
+              queue.push(processTenderDiscountItem(item, angular.copy(discount)));
             });
             var td = {};
 
@@ -472,8 +522,7 @@ angular.module('itouch.services')
               tenderDiscounts.header = header;
               deferred.resolve();
             }, function(ex){
-              return ex;
-              console.log(ex);
+              deferred.reject(ex);
             });
           }
         });
@@ -518,6 +567,10 @@ angular.module('itouch.services')
           return $q.resolve();
         }
 
+      }
+
+      self.clearTenderDiscounts = function(){
+        tenderDiscounts.discountSets = [];
       }
 
       return self;

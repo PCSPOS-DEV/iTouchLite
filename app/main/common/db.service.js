@@ -296,9 +296,9 @@ angular.module('itouch.services')
               deferred.resolve(result);
             }, function(transaction, error) {
               $log.log(error.message + " in " + query + " (params : "+values.join(", ")+")");
+              // throw new Error(error.message + " in " + query + " (params : "+values.join(", ")+")");
               deferred.reject(error.message + " in " + query + " (params : "+values.join(", ")+")");
-              throw new Error(error.message);
-              return false;
+              // return false;
             });
           });
         });
