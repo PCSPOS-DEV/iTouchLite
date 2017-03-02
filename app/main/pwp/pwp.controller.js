@@ -8,9 +8,11 @@ angular.module('itouch.controllers')
       $scope.title = "PWP";
       $scope.selectedRow = null;
       var selectedItem = null;
+      var submitted = false;
 
       $scope.$on("modal.shown", function(){
         if($scope.shownModal == 'pwp'){
+          submitted = false;
           $scope.pwp.selectedItems = {};
         }
       });
@@ -23,41 +25,6 @@ angular.module('itouch.controllers')
       }
 
       $scope.selectItem = function (item) {
-        // console.log(item);
-        // if(!$scope.pwp.Qty){
-        //   $scope.pwp.Qty = 0;
-        // }
-        // if($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty){
-        //   return true;
-        // }
-        // if($scope.pwp.selectedItems){
-        //   var exItem = $scope.pwp.selectedItems[item.SubItemId];
-        //   if(exItem){
-        //     item = exItem;
-        //     item.Qty++;
-        //     $scope.pwp.Qty++;
-        //     $scope.pwp.selectedItems[item.SubItemId] = item;
-        //   } else {
-        //     addPrice(item).then(function(item){
-        //       item.Qty = 1;
-        //       $scope.pwp.Qty++;
-        //       $scope.pwp.selectedItems[item.SubItemId] = item;
-        //     });
-        //
-        //   }
-        //
-        // } else {
-        //   item.Qty = 1;
-        //   addPrice(item).then(function(item){
-        //     item.MaxQuantity--;
-        //     $scope.pwp.Qty++;
-        //     // $scope.pwp.MaxQuantity--;
-        //     $scope.pwp.selectedItems = {};
-        //     $scope.pwp.selectedItems[item.SubItemId] = item;
-        //
-        //   });
-        //
-        // }
         addItem(item);
         $scope.selectRow(item);
       }
@@ -78,8 +45,10 @@ angular.module('itouch.controllers')
           value.selected = false;
           return value;
         });
+        if(item){
+          item.selected = true;
+        }
         $scope.selectedRow = item;
-        item.selected = true;
       }
 
       $scope.addSelected = function () {
@@ -102,7 +71,16 @@ angular.module('itouch.controllers')
             }
           } else {
             item.Qty = 1;
-            addPrice(item).then(function(item){
+            var promise;
+            if(item.SubItemPrice != 0){
+              item.Price = item.SubItemPrice;
+              item.OrgPrice = item.SubItemPrice;
+              item.AlteredPrice = item.SubItemPrice;
+              promise = $q.when(item);
+            } else {
+              promise = addPrice(item);
+            }
+            promise.then(function(item){
               // item.MaxQuantity--;
               $scope.pwp.Qty++;
               // $scope.pwp.MaxQuantity--;
@@ -126,6 +104,7 @@ angular.module('itouch.controllers')
       $scope.clearSelected = function () {
         if ($scope.selectedRow && $scope.selectedRow.Default != true) {
           removeSelectedItem($scope.selectedRow.SubItemId);
+          $scope.selectRow(null);
         }
       }
 
@@ -134,7 +113,8 @@ angular.module('itouch.controllers')
           if (item) {
             removeSelectedItem(key);
           }
-        })
+        });
+        $scope.selectRow(null);
       }
 
       var removeSelectedItem = function (itemId) {
@@ -151,82 +131,100 @@ angular.module('itouch.controllers')
       };
 
       $scope.save = function () {
-        if (!_.isEmpty($scope.pwp.selectedItems)) {
-          var items = {};
-          angular.forEach($scope.pwp.selectedItems, function(i){
-            items[i.SubItemId] = ItemService.getById(i.SubItemId);
-          });
-          $q.all(items).then(function(data){
-            // console.log(data);
-            var promises  = [];
-            $scope.pwp.item.ItemId = $scope.pwp.item.Id;
-            $scope.pwp.item.ItemType = 'PWP';
-            // promises.push(CartItemService.addItemToCart($scope.pwp.item));
-            items = _.map(data, function(item, key){
-              var exItem = $scope.pwp.selectedItems[key];
-              if(exItem){
-                if(exItem.DiscountId) {
-                  // console.log(exItem);
-                  DiscountService.getDiscountById(exItem.DiscountId).then(function(dis){
-                    // console.log(dis);
-                    // DiscountService.saveTempDiscountItem(item, dis).then(function (item) {
-                    //   // $scope.cart.selectedItem.discounted = true;
-                    //   // console.log(item);
-                    //   // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
-                    //   $scope.$emit("refresh-cart");
-                    //   $scope.$emit("discountModel-close");
-                    // }, function () {
-                    //   $scope.$emit("discountModel-close");
-                    // });
-                  });
-                } else if(exItem && exItem.Price){
-                  item.Price = exItem.Price;
-                }
-                item.Qty = exItem.Qty;
-                // renameProperty(item, 'SubItemId', 'ItemId');
-                item.ItemId = item.Id;
-                item.ItemType = 'PWI';
-                item.ParentItemLineNumber = $scope.pwp.item.LineNumber;
-                // return CartItemService.addItemToCart(item);
-                return item;
-              }
-              // return item;
+        if(!submitted){
+          if (!_.isEmpty($scope.pwp.selectedItems)) {
+            submitted = true;
+            var items = {};
+            angular.forEach($scope.pwp.selectedItems, function(i){
+              items[i.SubItemId] = ItemService.getById(i.SubItemId);
             });
-
-
-            CartItemService.addPWP($scope.pwp.item, items).then(function(data){
+            $q.all(items).then(function(data){
               // console.log(data);
-              $scope.$emit('refresh-cart');
-              $scope.$emit('pwpModal-close');
-            }, function(errors){
-              console.log(errors);
+              var promises  = [];
+              $scope.pwp.item.ItemId = $scope.pwp.item.Id;
+              $scope.pwp.item.ItemType = 'PWP';
+              // promises.push(CartItemService.addItemToCart($scope.pwp.item));
+              items = _.map(data, function(item, key){
+                var exItem = $scope.pwp.selectedItems[key];
+                if(exItem){
+                  // if(exItem.DiscountId) {
+                  //   // console.log(exItem);
+                  //   DiscountService.getDiscountById(exItem.DiscountId).then(function(dis){
+                  //     // console.log(dis);
+                  //     DiscountService.saveTempDiscountItem(item, dis).then(function (item) {
+                  //       // $scope.cart.selectedItem.discounted = true;
+                  //       // console.log(item);
+                  //       // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
+                  //       // $scope.$emit("refresh-cart");
+                  //     }, function (ex) {
+                  //       console.log(ex);
+                  //     });
+                  //   });
+                  // } else
+                  if(exItem.Price){
+                    item.Price = exItem.Price;
+                    item.OrgPrice = exItem.OrgPrice;
+                    item.AlteredPrice = exItem.AlteredPrice;
+                  }
+                  item.Qty = exItem.Qty;
+                  // renameProperty(item, 'SubItemId', 'ItemId');
+                  item.ItemId = item.Id;
+                  item.ItemType = 'PWI';
+                  item.ParentItemLineNumber = $scope.pwp.item.LineNumber;
+                  // return CartItemService.addItemToCart(item);
+                  return item;
+                }
+                // return item;
+              });
+
+
+              CartItemService.addPWP($scope.pwp.item, items).then(function(res){
+                var promises = [];
+                angular.forEach($scope.pwp.selectedItems, function(item, key){
+                  var deferred = $q.defer();
+                  var savedItem = _.findWhere(res, { ItemId: item.SubItemId });
+                  if(item.DiscountId){
+                    promises.push({ item: savedItem, DiscountId: item.DiscountId });
+                  }
+                });
+                // console.log(data);
+                return DiscountService.saveMultipleTempDiscountItem(promises).then(function(){
+                  $scope.$emit('refresh-cart');
+                  $scope.$emit('pwpModal-close');
+                }, function(errors){
+                  console.log(errors);
+                });
+              }, function(errors){
+                console.log(errors);
+              });
+              // console.log(promises);
+              // $q.all(promises).then(function(data){
+              //   // console.log(data);
+              //   $scope.$emit('refresh-cart');
+              //   $scope.$emit('pwpModal-close');
+              // }, function(errors){
+              //   console.log(errors);
+              // });
+
+              // console.log(data);
             });
-            // console.log(promises);
-            // $q.all(promises).then(function(data){
-            //   // console.log(data);
+
+            // operation.then(function () {
+            //   selectedItem = null;
             //   $scope.$emit('refresh-cart');
-            //   $scope.$emit('pwpModal-close');
-            // }, function(errors){
-            //   console.log(errors);
+            //   $scope.$emit('skModalModal-save');
+            //   $scope.selectItem(item);
+            // }).catch(function (err) {
+            //   console.log(err);
             // });
-
-            // console.log(data);
-          });
-
-          // operation.then(function () {
-          //   selectedItem = null;
-          //   $scope.$emit('refresh-cart');
-          //   $scope.$emit('skModalModal-save');
-          //   $scope.selectItem(item);
-          // }).catch(function (err) {
-          //   console.log(err);
-          // });
-        } else {
-          $ionicPopup.alert({
-            title: 'None Selected!',
-            template: 'Please select an item to proceed.'
-          });
+          } else {
+            $ionicPopup.alert({
+              title: 'None Selected!',
+              template: 'Please select an item to proceed.'
+            });
+          }
         }
+
 
 
       }

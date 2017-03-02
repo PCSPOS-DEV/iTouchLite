@@ -6,12 +6,12 @@ angular.module('itouch.services')
     function (DB, DB_CONFIG, $q, ItemService) {
       var self = this;
 
-      self.getAll = function () {
+      self.getAll = function (bDate) {
         return DB.query("SELECT " +
           "h.DocNo, h.DocType, h.SubTotal, h.DiscAmount, h.Tax1Amount, h.Tax2Amount, h.Tax3Amount, h.Tax4Amount, h.Tax5Amount, " +
           "h.Tax1DiscAmount, h.Tax2DiscAmount, h.Tax3DiscAmount, h.Tax4DiscAmount, h.Tax5DiscAmount, " +
           "d.LineNumber, d.Desc1, d.Desc2, d.Qty  " +
-          "FROM " + DB_CONFIG.tableNames.bill.header + " h INNER JOIN " + DB_CONFIG.tableNames.bill.detail + " d ON h.DocNo = d.DocNo ORDER BY h.DocNo DESC").then(function (res) {
+          "FROM " + DB_CONFIG.tableNames.bill.header + " h INNER JOIN " + DB_CONFIG.tableNames.bill.detail + " d ON h.DocNo = d.DocNo WHERE h.BusinessDate = ? ORDER BY h.DocNo DESC", [bDate]).then(function (res) {
           var items = DB.fetchAll(res);
           var bills = {};
           var total = 0;

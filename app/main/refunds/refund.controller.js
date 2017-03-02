@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('RefundCtrl', ['$scope', 'ReasonService', 'BillService',
-    function ($scope, ReasonService, BillService) {
+  .controller('RefundCtrl', ['$scope', 'ReasonService', 'BillService', 'Alert',
+    function ($scope, ReasonService, BillService, Alert) {
       $scope.reasons = [];
       $scope.refund = {
       };
@@ -31,12 +31,17 @@ angular.module('itouch.controllers')
       $scope.save = function () {
         var item = $scope.cart.selectedItem;
         if(item){
-          BillService.refundItem(item.ItemId, item.LineNumber, $scope.refund.reason.Code, $scope.refund.reference).then(function () {
-            $scope.clear();
-            $scope.$emit('refundModal-close');
-          }, function (err) {
-            console.log(err);
-          })
+          if($scope.refund.reason){
+            BillService.refundItem(item.ItemId, item.LineNumber, $scope.refund.reason.Code, $scope.refund.reference).then(function () {
+              $scope.clear();
+              $scope.$emit('refundModal-close');
+            }, function (err) {
+              console.log(err);
+            });
+          } else {
+            Alert.warning('Please select a reason before saving!');
+          }
+
         }
       }
 
