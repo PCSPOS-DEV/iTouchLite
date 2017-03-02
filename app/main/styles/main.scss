@@ -21,6 +21,19 @@ $ionicons-font-path: "../assets/fonts" !default;
 // Include all of Ionic
 @import "../../bower_components/ionic/scss/ionic";
 
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lato Regular'), local('Lato-Regular'), url(../assets/fonts/lato-regular.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+*{
+  font-family: Lato;
+  font-size: 14px;
+}
+
 .spinner svg {
   width: 28px;
   height: 28px;
@@ -52,7 +65,19 @@ $ionicons-font-path: "../assets/fonts" !default;
   text-align: center;
 }
 
-.modal *{
+.text-right{
+  text-align: right;
+}
+
+padding-right{
+  padding-right: 15px;
+}
+
+.text-left{
+  text-align: left;
+}
+
+.modal {
   background-color: rgba(7, 50, 82, 1);
   color: white;
 }
@@ -128,3 +153,11 @@ ion-modal-view ion-header-bar.bar.bar-header {
     font-size: 90px;
   }
 }
+
+.row.header, .item.item-divider.header{
+  background-color: steelblue;
+}
+
+.no-padding-top { padding-top: 0; }
+
+.bold, .table-header .col { font-weight: bolder; }

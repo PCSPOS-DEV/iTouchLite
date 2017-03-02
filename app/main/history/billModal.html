@@ -21,11 +21,11 @@
           <div class="row">
             <div class="col-10">{{item.Qty}}</div>
           <div class="col-80">{{print(item,'Desc')}}</div>
-          <div class="col-10 text-right">$ {{item.Total.toFixed(2)}}</div>
+          <div class="col-10 text-right"> {{item.Total.toFixed(2)}}</div>
           </div>
           <div class="row" ng-repeat="discount in item.discounts">
             <div class="col-60 col-offset-20">{{print(discount,'Description')}}</div>
-            <div class="col-20 text-right">-$ {{discount.DiscountAmount.toFixed(2)}}</div>
+            <div class="col-20 text-right"> {{(discount.DiscountAmount*-1).toFixed(2)}}</div>
           </div>
         </div>
       </div>

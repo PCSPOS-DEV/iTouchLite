@@ -4,13 +4,13 @@
       <div class="row summary">
         <div class="col col-50">
           <div class="row">
-            <div class="col col-50">
+            <div class="col col-50 underlined">
               <div class="row">
                 <div class="col">Receipt No</div>
                 <div class="col">{{ tenderHeader.DocNo }}</div>
               </div>
             </div>
-            <div class="col col-50">
+            <div class="col col-40 underlined">
               <div class="row">
                 <div class="col">NA</div>
                 <div class="col">{{ tenderHeader.Tax3Amount.toFixed(2) }}</div>
@@ -18,13 +18,13 @@
             </div>
           </div>
           <div class="row">
-            <div class="col col-50">
+            <div class="col col-50 underlined">
               <div class="row">
                 <div class="col">Discount</div>
                 <div class="col">{{ (tenderHeader.Discount+tenderHeader.Tax5DiscAmount).toFixed(2) }}</div>
               </div>
             </div>
-            <div class="col col-50">
+            <div class="col col-40 underlined">
               <div class="row">
                 <div class="col">NA</div>
                 <div class="col">{{ tenderHeader.Tax4Amount.toFixed(2) }}</div>
@@ -32,13 +32,13 @@
             </div>
           </div>
           <div class="row">
-            <div class="col col-50">
+            <div class="col col-50 underlined">
               <div class="row">
                 <div class="col">NA</div>
                 <div class="col">{{ tenderHeader.Tax1Amount.toFixed(2)}}</div>
               </div>
             </div>
-            <div class="col col-50">
+            <div class="col col-40 underlined">
               <div class="row">
                 <div class="col">GST 7%</div>
                 <div class="col">{{ (tenderHeader.Tax5Amount - tenderHeader.Tax5DiscAmount||0).toFixed(2) }}</div>
@@ -46,13 +46,13 @@
             </div>
           </div>
           <div class="row">
-            <div class="col col-50">
+            <div class="col col-50 underlined">
               <div class="row">
                 <div class="col">NA</div>
                 <div class="col">{{ tenderHeader.Tax2Amount.toFixed(2) }}</div>
               </div>
             </div>
-            <div class="col col-50">
+            <div class="col col-40 underlined">
               <div class="row">
                 <div class="col">&nbsp;</div>
                 <div class="col">&nbsp;</div>
@@ -64,14 +64,16 @@
 
         <div class="col col-50 totals">
           <div class="row">
-            <div class="col col-67">Sub Total</div>
-            <div class="col col-33">
-              <input class="total" type="text" ng-value="tenderHeader.UpdatedTenderTotal||tenderHeader.TenderTotal" ng-readonly="true" />
+            <div class="col col-60">Sub Total</div>
+            <div class="col col-40">
+              <div class="total">
+                <input class="total bold" type="text" ng-value="tenderHeader.UpdatedTenderTotal||tenderHeader.TenderTotal" ng-readonly="true" />
+              </div>
             </div>
           </div>
           <div class="row">
-            <div class="col col-67">Rounded Sub Total</div>
-            <div class="col col-33"><input class="total" type="text" ng-value="tenderHeader.TotalRounded" ng-readonly="true" /></div>
+            <div class="col col-60">Rounded Sub Total</div>
+            <div class="col col-40"><input class="total bold" type="text" ng-value="tenderHeader.TotalRounded" ng-readonly="true" /></div>
           </div>
         </div>
       </div>
@@ -83,15 +85,15 @@
                ng-click="selectTenderType(tenderType)">
           <span class="buttontext">
           {{ print(tenderType, 'Description')}}
-            {{tenderType.Round == 'true' ? ' ( $' + (tenderHeader.UpdatedRoundedTotal || tenderHeader.TotalRounded) +' )' : ''}}</span>
+            {{tenderType.Round == 'true' ? ' ( $' + (tenderHeader.TotalRounded || tenderHeader.TenderTotal) +' )' : ''}}</span>
             </a>
           </ion-scroll>
         </div>
         <div class="col col-20">
 
 
-          <div class="row">
-            <div class="col">
+          <div class="row no-padding-top">
+            <div class="col no-padding-top">
               <div class="num-pad">
                 <div class="button-row">
                   <a href="" ng-click="numpadClick('7')" class="button">7</a>
@@ -124,11 +126,12 @@
                 <a href="" class="button" ng-repeat="fn in functions.top">{{print(fn, 'Description')}}</a>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <a href="" class="button" ng-repeat="fn in functions.bottom" ng-click="invoke(fn.Name)">{{print(fn, 'Description')}}</a>
-              </div>
+            <div class="functions">
+              <a href="" class="button button-full" ng-repeat="fn in functions.bottom" ng-click="invoke(fn.Name)">{{print(fn, 'Description')}}</a>
             </div>
+            </div>
+          <div class="cancel-button">
+            <button ng-click="close()" class="button button-assertive button-full">Cancel</button>
           </div>
         </div>
       </div>

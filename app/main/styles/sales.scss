@@ -1,6 +1,6 @@
 *, p, a, li, div {
   //font-size: 12px; !important;
-  font-size: 12px;
+  //font-size: 12px;
 }
 
 .btn p {
@@ -118,7 +118,7 @@
 }
 
 
-.sales .table { height: 286px; width: 100%; overflow: hidden; }
+.sales .table { height: 300px; width: 100%; overflow: hidden; }
 
 /*cart*/
 
@@ -133,7 +133,7 @@
   border-right: 1px solid rgba(144, 153, 159, 0.83);
   border-bottom: 1px solid rgba(144, 153, 159, 0.83);
   padding: 0;
-  width: 721px;
+  width: 718px;
   margin-left: 3px;
 }
 
@@ -194,11 +194,11 @@
 .subplu .list .button { margin-left: 5px; min-width: 80px; }
 .subplu .list:first-child { margin-left: 0; }
 
-.sales .functions { padding-left: 10px; margin-top: 74px; }
+.sales .functions { padding-left: 10px; margin-top: 81px; }
 .sales .functions .button {
   width: 48%;
   font-size: 12px;
-  height: 46px;
+  height: 47px;
   margin-bottom: 3px;
   margin-right: 3px;
 }
@@ -209,4 +209,9 @@
 .sales .scroll-view.scroll-y {
   overflow-x: hidden;
   overflow-y: hidden;
+}
+
+.sales .quantity .list {
+  padding-right: 0;
+  padding-left: 0;
 }

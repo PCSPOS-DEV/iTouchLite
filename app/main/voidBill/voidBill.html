@@ -4,9 +4,13 @@
     <button class="button button-clear" ng-click="ctrl.close()"> <i class="ion-close-round"></i></button>
   </ion-header-bar>
   <ion-content>
+        <div class="row header" ng-if="ctrl.bills.length > 0">
+          <div class="col"> Receipt No  </div>
+          <div class="col text-right"> Amount  </div>
+        </div>
         <div class="row" ng-repeat="bill in ctrl.bills" ng-click="ctrl.voidBill(bill)">
           <div class="col"> {{ bill.DocNo }}  </div>
-          <div class="col"> {{ '$'+bill.Total.toFixed(2) }}  </div>
+          <div class="col text-right"> {{ '$'+bill.Total.toFixed(2) }}  </div>
         </div>
         <div class="no-data" ng-if="ctrl.bills.length == 0">
           <!--<p>-->

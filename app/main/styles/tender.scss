@@ -1,3 +1,24 @@
+.tender {
+  .functions{
+    height: 282px;
+  }
+
+  .functions, .cancel-button{
+    width: 167px;
+    margin-left: 5px;
+  }
+
+  .num-pad .button {
+    min-width: 54px;
+    min-height: 50px;
+  }
+
+  div.total {
+    background-color: #f8f8f8;
+    cursor: not-allowed;
+  }
+}
+
 .tender, .tender .bar{
   background-color: rgba(7, 50, 82, 1);
   color: white;
@@ -42,7 +63,7 @@
   max-width: 30%;
   margin: 5px;
   height: auto;
-  font-size: 12px;
+  font-size: 14px;
   background-color: rgba(32, 114, 112, 1);
 }
 
@@ -58,20 +79,21 @@
   max-width: 100%;
   margin: 2px;
   height: auto;
-  font-size: 12px;
 }
 
 .tender input.total {
   margin-right: 5px;
-  width: 131px;
+  width: 89%;
   margin-bottom: 2px;
   padding-bottom: 0px;
   text-align: right;
   float: right;
+  font-size: 20px;
 }
 
 .tender #tender-types {
-  height: 400px;
+  height: 560px;
+  width: 800px;
 }
 
 .tender .scroll-view.scroll-y {
@@ -82,4 +104,8 @@
 .tender .num-pad {
   float: right;
   margin-right: -4px;
+}
+
+.tender .underlined {
+  border-bottom: 1px solid white;
 }

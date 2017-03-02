@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('HistoryCtrl', ['$scope', 'HistoryService', 'BillService', 'CartItemService', 'PrinterSettings', '$ionicModal', 'Reciept',
-    function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept) {
+  .controller('HistoryCtrl', ['$scope', 'HistoryService', 'BillService', 'CartItemService', 'PrinterSettings', '$ionicModal', 'Reciept', 'ControlService',
+    function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept, ControlService) {
       $scope.items = [];
       $scope.selectedItem = null;
       $scope.search = { text: "" };
@@ -14,8 +14,25 @@ angular.module('itouch.controllers')
       });
 
       var refresh = function () {
-        HistoryService.getAll().then(function(items) {
+        var bDate = ControlService.getBusinessDate(true);
+        console.log(bDate);
+        HistoryService.getAll(bDate).then(function(items) {
           $scope.items = _.values(items);
+          $scope.items = _.map(items, function(item){
+            switch(item.DocType){
+              case 'VD':
+                item.BillType = 'Void';
+                break;
+              case 'AV':
+                item.BillType = 'Abort';
+                break;
+              default:
+                item.BillType = 'Sales';
+                break;
+            }
+            return item;
+          });
+
         });
       };
 
