@@ -2,7 +2,7 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory("ModifierService", ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
+  .factory("ModifierService", ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'CartItemService', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, CartItemService) {
     var self = this;
 
     self.TYPE_FOOD = 'F';
@@ -71,9 +71,32 @@ angular.module('itouch.services')
     }
 
     self.getItemModifiers = function(parentLineNumber){
-      return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', { columns: "ParentItemLineNumber = ? AND ItemType = 'MOD'", data: [parentLineNumber] }).then(function(res){
+      return DB.select(DB_CONFIG.tableNames.bill.tempDetail+" AS d INNER JOIN Item AS i ON d.ItemId = i.Id", 'd.*, i.Plu', { columns: "ParentItemLineNumber = ? AND ItemType = 'MOD'", data: [parentLineNumber] }).then(function(res){
         return DB.fetchAll(res);
       });
+    }
+
+    self.add = function(prentItemLineNumber, cart){
+      var promises = [DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: "ParentItemLineNumber=? AND ItemType = 'MOD'", data:[prentItemLineNumber] })];
+
+      angular.forEach(cart, function(item){
+        if(item.SubPluDesc1 && item.Description2){
+          item.Description1 = item.SubPluDesc1 + " " + item.Description1;
+          item.Description2 = item.SubPluDesc1 + " " + item.Description2;
+        }
+        item.LineNumber = ++prentItemLineNumber;
+
+        promises.push(CartItemService.addItemToCart(item));
+      });
+      return $q.all(promises);
+    }
+
+    var remove = function(item){
+      if(item.LineNumber && item.ItemId){
+        return
+      } else {
+        return $q.reject("invalid item");
+      }
     }
 
 

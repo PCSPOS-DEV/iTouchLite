@@ -11,6 +11,7 @@ angular.module('itouch.controllers')
       self.subPlus = [];
       self.cart = [];
       self.selectedCart = [];
+      self.removeList = [];
 
       $scope.$on('modal.shown', function(event, data){
         if($scope.shownModal = 'mod'){
@@ -21,7 +22,12 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           if(item){
             ModifierService.getItemModifiers(item.LineNumber).then(function(data){
-              self.selectedCart = data;
+              if(data.length > 0){
+                self.cart = _.map(data, function(item){
+                  item.existing = true;
+                  return item;
+                });
+              }
             });
           }
         }
@@ -69,18 +75,29 @@ angular.module('itouch.controllers')
 
       self.selectItem = function(item){
         if(item){
-          ModifierService.getSubPlu(item.Plu, item.PageNo, item.KeyNo).then(function(modifiers) {
-            if(_.isArray(modifiers)){
-              if(modifiers.length > 1){
-                self.subPlus = modifiers;
-                self.view = 2;
-              } else {
-                self.selectSubPlu(_.first(modifiers));
+          var exItem = _.findWhere(self.cart, { Plu: item.Plu });
+          if(!exItem){
+            ModifierService.getSubPlu(item.Plu, item.PageNo, item.KeyNo).then(function(modifiers) {
+              if(_.isArray(modifiers)){
+                if(modifiers.length > 1){
+                  self.subPlus = modifiers;
+                  self.view = 2;
+                } else {
+                  self.selectSubPlu(_.first(modifiers));
+                }
               }
-            }
-          }, function (err) {
-            console.log(err);
-          });
+            }, function (err) {
+              console.log(err);
+            });
+          } else {
+            angular.forEach(self.cart, function(it, key){
+              if(item.Plu == it.Plu){
+                self.removeList.push(it);
+                self.cart.splice(key, 1);
+              }
+            });
+          }
+
         }
       }
 
@@ -94,11 +111,8 @@ angular.module('itouch.controllers')
               item.ItemType = 'MOD';
               item.ParentItemLineNumber = $scope.cart.selectedItem.LineNumber;
               item.Qty = $scope.cart.selectedItem.Qty;
-              BillService.loadLineNewNumber($scope.cart.selectedItem.LineNumber).then(function(ln){
-                item.LineNumber = ln + 1;
-                self.cart.push(item);
-                self.view = 1;
-              });
+              self.cart.push(item);
+              self.view = 1;
 
             }
           }, function (err) {
@@ -109,14 +123,9 @@ angular.module('itouch.controllers')
 
 
       self.save = function () {
-        if(self.cart.length > 0){
-          var promises = [];
-          angular.forEach(self.cart, function(item){
-            item.Description1 = item.SubPluDesc1 + " " + item.Description1;
-            item.Description2 = item.SubPluDesc1 + " " + item.Description2;
-            promises.push(CartItemService.addItemToCart(item));
-          });
-          $q.all(promises).then(function(res){
+        var parentItem = $scope.cart.selectedItem;
+        if(parentItem && self.cart.length > 0){
+          ModifierService.add(parentItem.LineNumber, self.cart).then(function(res){
             $scope.$emit('refresh-cart');
             $scope.$emit('modifier.modal.close');
           }, function (err) {
