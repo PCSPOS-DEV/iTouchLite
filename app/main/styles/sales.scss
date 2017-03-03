@@ -194,24 +194,55 @@
 .subplu .list .button { margin-left: 5px; min-width: 80px; }
 .subplu .list:first-child { margin-left: 0; }
 
-.sales .functions { padding-left: 10px; margin-top: 81px; }
-.sales .functions .button {
-  width: 48%;
-  font-size: 12px;
-  height: 47px;
-  margin-bottom: 3px;
-  margin-right: 3px;
-}
-.sales #functions-bottom{
-  height: 368px;
-}
+.sales {
+  .button-area {
+    .summery {
+      margin-bottom: 10px;
+    }
 
-.sales .scroll-view.scroll-y {
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
+    .functions {
+      padding-left: 10px;
+      margin-top: 0px;
+    }
 
-.sales .quantity .list {
-  padding-right: 0;
-  padding-left: 0;
+    #functions-bottom{
+      height: 368px;
+    }
+
+    .functions .button {
+      width: 48%;
+      font-size: 12px;
+      height: 47px;
+      margin-bottom: 3px;
+      margin-right: 3px;
+    }
+
+    .scroll-view.scroll-y {
+      overflow-x: hidden;
+      overflow-y: hidden;
+    }
+
+    .quantity{
+      margin: 0 13px 10px 14px;
+
+      .list.list-inset {
+        margin: 0;
+        padding: 0;
+      }
+
+    }
+
+    div.info {
+      margin: 0 auto 8px auto;
+      max-width: 290px;
+      padding: 0;
+      font-weight: bold;
+      color: rgba(251,181,12,0.54);
+
+      .row {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+  }
 }
