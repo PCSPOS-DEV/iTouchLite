@@ -37,7 +37,6 @@ angular.module('itouch.controllers')
           header: BillService.getHeader($stateParams.DocNo),
           items: CartItemService.getItems($stateParams.DocNo)
         }).then(function(data){
-          console.log(data);
           if(data.header){
             $scope.header = ItemService.calculateTotal(data.header);
             $scope.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
@@ -161,7 +160,7 @@ angular.module('itouch.controllers')
             if (total <= amount) {
               submitted = true;
               console.log(diff);
-              if(diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
+              if(tenderType.Round == 'true' && diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
                 payTransactions.push({
                   BusinessDate: businessDate,
                   LocationId: SettingsService.getLocationId(),
