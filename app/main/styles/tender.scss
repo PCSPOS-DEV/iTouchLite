@@ -3,7 +3,7 @@
     height: 282px;
   }
 
-  .functions, .cancel-button{
+  .functions {
     width: 167px;
     margin-left: 5px;
   }
@@ -17,6 +17,43 @@
     background-color: #f8f8f8;
     cursor: not-allowed;
   }
+  .scroll-wrapper {
+    max-width: 760px;
+    overflow: hidden;
+  }
+
+  .bar-footer{
+    margin: 0;
+    padding: 0;
+
+    .pages {
+      margin: 0;
+      padding: 0;
+
+      .wrapper {
+        margin: 1px 0 0 0;
+        padding: 0;
+        width: 800px;
+
+        .button {
+          border-radius: 0;
+          padding-top: 7px;
+          border-left: 1px solid white;
+        }
+      }
+    }
+
+    .cancel-button {
+
+      .button {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        padding-bottom: 10px;
+        padding-top: 5px;
+      }
+    }
+  }
+
 }
 
 .tender, .tender .bar{
@@ -92,8 +129,8 @@
 }
 
 .tender #tender-types {
-  height: 560px;
-  width: 800px;
+  height: 530px;
+  width: 815px;
 }
 
 .tender .scroll-view.scroll-y {
@@ -108,4 +145,8 @@
 
 .tender .underlined {
   border-bottom: 1px solid white;
+}
+
+.bar-footer .bar-footer .pages .scroll:last-child{
+  border-left: none;
 }

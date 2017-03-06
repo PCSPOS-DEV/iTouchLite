@@ -38,7 +38,8 @@ var tableNames = {
     stockTransactions: 'StockTransactions',
     payTransactions: 'PayTrans',
     payTransactionsOverTender: 'PayTransOverTender',
-    voidItems: 'VoidItems'
+    voidItems: 'VoidItems',
+    denominations: 'Denominations'
   },
   salesKit: {
     salesKitApplicablePeriod: 'SalesKitApplicablePeriod',
@@ -819,9 +820,18 @@ angular.module('itouch.config')
           primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo"
         },
         {
+          name: tableNames.bill.denominations,
+          columns: [
+            { name: "Id", type: "INTEGER PRIMARY KEY AUTOINCREMENT" },
+            { name: "Desc", type: "TEXT NOT NULL" },
+            { name: "Value", type: "DOUBLE NOT NULL" }
+          ],
+          // keep: true
+        },
+        {
           name: tableNames.refunds.reasons,
           columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
+            { name: "Id", type: "INTEGER PRIMARY KEY" },
             { name: "Code", type: "TEXT NOT NULL" },
             { name: "Description1", type: "TEXT NOT NULL" },
             { name: "Description2", type: "TEXT NULL" },

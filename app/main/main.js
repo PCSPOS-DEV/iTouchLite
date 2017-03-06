@@ -224,6 +224,9 @@ angular.module('itouch', [
                       console.log(ex);
                       $state.go('app.sales');
                     });
+                  }],
+                  denominations: ['DenominationsService', function (DenominationsService) {
+                    return DenominationsService.getAll();
                   }]
                 }
               })

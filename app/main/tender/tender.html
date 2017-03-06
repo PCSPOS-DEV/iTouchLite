@@ -80,14 +80,16 @@
 
       <div class="row">
         <div class="col col-80 list">
-          <ion-scroll zooming="false" direction="y" id="tender-types">
-            <a ng-repeat="tenderType in tenderTypes" href="" class="button button-calm tender-item"
-               ng-click="selectTenderType(tenderType)">
+          <div class="scroll-wrapper">
+            <ion-scroll zooming="false" direction="y" id="tender-types">
+              <a ng-repeat="tenderType in tenderTypes" href="" class="button button-calm tender-item"
+                 ng-click="selectTenderType(tenderType)">
           <span class="buttontext">
           {{ print(tenderType, 'Description')}}
             {{tenderType.Round == 'true' ? ' ( $' + (tenderHeader.TotalRounded || tenderHeader.TenderTotal) +' )' : ''}}</span>
-            </a>
-          </ion-scroll>
+              </a>
+            </ion-scroll>
+          </div>
         </div>
         <div class="col col-20">
 
@@ -130,18 +132,28 @@
               <a href="" class="button button-full" ng-repeat="fn in functions.bottom" ng-click="invoke(fn.Name)">{{print(fn, 'Description')}}</a>
             </div>
             </div>
-          <div class="cancel-button">
-            <button ng-click="close()" class="button button-assertive button-full">Cancel</button>
-          </div>
+
         </div>
       </div>
     </div>
   </ion-content>
-  <!--<ion-footer-bar class="bar-stable">-->
-    <!--<div class="h1 title"></div>-->
-    <!--<div class="buttons">-->
-      <!--<button class="button button-primary button-outline" ng-click="save()">Save</button>-->
-      <!--<button class="button button-energized button-outline" ng-click="modalClose()">Cancel</button>-->
-    <!--</div>-->
-  <!--</ion-footer-bar>-->
+  <div class="bar bar-footer">
+    <div class="col page-bar row pages">
+      <div class="wrapper">
+        <ion-scroll direction="x">
+          <div class="button-bar">
+            <a class="button  button-positive" ng-repeat="denomination in denominations" ng-click="addDenomination(denomination.Value)">
+              <p class="desc1">{{ denomination.Desc }}</p>
+            </a>
+          </div>
+
+        </ion-scroll>
+      </div>
+    </div>
+    <div class="col">
+      <div class="cancel-button">
+        <button ng-click="close()" class="button button-assertive button-full">Cancel</button>
+      </div>
+    </div>
+  </div>
 </ion-view>
