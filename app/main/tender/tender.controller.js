@@ -126,7 +126,7 @@ angular.module('itouch.controllers')
           }
           if(value){
             amount = parseFloat(value).roundTo(2);
-          } else if(setValueManually){
+          } else if( (setValueManually && tenderType.TenderAmount == '0')){
             // if(){
             amount = parseFloat($scope.tenderHeader.UpdatedTenderTotal).roundTo(2);
             // } else {
@@ -149,7 +149,7 @@ angular.module('itouch.controllers')
           if(item){
             var transAmount = 0;
             // console.log(tenderType);
-            if(value || setValueManually){
+            if(value || (setValueManually && tenderType.TenderAmount == 0)){
               transAmount = parseFloat(value || $scope.tenderHeader.UpdatedTenderTotal);
             } else if(tenderType.Round == 'true'){
               transAmount = total + diff;
