@@ -159,7 +159,7 @@ angular.module('itouch.controllers')
 
             if (total <= amount) {
               submitted = true;
-              console.log(diff);
+              // console.log(diff);
               if(tenderType.Round == 'true' && diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
                 payTransactions.push({
                   BusinessDate: businessDate,
