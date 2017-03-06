@@ -14,7 +14,7 @@ angular.module('itouch.controllers')
       self.removeList = [];
 
       $scope.$on('modal.shown', function(event, data){
-        if($scope.shownModal = 'mod'){
+        if($scope.shownModal == 'mod'){
           // handle event
           self.view = 1;
           self.cart = [];

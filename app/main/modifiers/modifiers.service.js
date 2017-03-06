@@ -80,8 +80,8 @@ angular.module('itouch.services')
       var promises = [DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: "ParentItemLineNumber=? AND ItemType = 'MOD'", data:[prentItemLineNumber] })];
 
       angular.forEach(cart, function(item){
-        if(item.SubPluDesc1 && item.Description2){
-          item.Description1 = item.SubPluDesc1 + " " + item.Description1;
+        if(item.SubPluDesc1 && item.Description2 && item.SubPluDesc1 != "N/A"){
+          item.Description1 = item.SubPluDesc1  + " " + item.Description1;
           item.Description2 = item.SubPluDesc1 + " " + item.Description2;
         }
         item.LineNumber = ++prentItemLineNumber;
