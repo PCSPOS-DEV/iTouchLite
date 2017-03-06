@@ -30,7 +30,7 @@
         <ion-scroll zooming="false" direction="y" style="width: 200px; height: 300px;" delegate-handle="salesKitSelectedItems">
         <div class="selected-items">
           <div ng-repeat="item in salesKits.selectedList | orderObjectBy :'AddedAt' : false" class="row" ng-class="{selected: item.selected == true}" ng-click="selectRow(item)">
-            <div class="col col-75">{{print(item, 'Description')}}</div>
+            <div class="col col-75">{{print(item, 'Description') || print(item, 'Desc')}}</div>
             <div class="col col-25 text-right padding-right" style="padding-right: 15px;">{{item.Qty}}</div>
           </div>
         </div>

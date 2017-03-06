@@ -9,28 +9,43 @@ angular.module('itouch.controllers')
       $scope.selectedRow = null;
       var selectedItem = null;
       var submitted = false;
+      var oldItem = null;
 
       $scope.$on('modal.shown', function(event, modal) {
         if($scope.shownModal == 'sk') {
+          var item = $scope.cart.selectedItem;
+          // if(item && item.ItemType == 'SKT')
+
           submitted = false;
           $ionicScrollDelegate.$getByHandle('salesKit').scrollTop();
-          var customeQty = $scope.salesKitUpdate ? $scope.salesKitUpdateQty : $scope.qty.value;
+          var customQty = $scope.qty.value;
 
-          if (customeQty >= 1) {
-            // $scope.salesKits.Qty = customeQty;
-            $scope.salesKits.Qty = 0;
-            $scope.salesKits.Quantity = customeQty;
-            angular.forEach($scope.salesKits.list, function (item, key) {
-              item.Quantity *= customeQty;
-              $scope.salesKits.list[key] = item;
-            });
+
+
+          if($scope.salesKitUpdate) {
+            oldItem = $scope.cart.selectedItem;
+            customQty = oldItem.Qty;
+            $scope.salesKits.selectedList = {};
+          } else {
             angular.forEach($scope.salesKits.selectedList, function (item, key) {
-              item.Quantity *= customeQty;
-              item.Qty *= customeQty;
+              item.Quantity *= customQty;
+              item.Qty *= customQty;
               $scope.salesKits.selectedList[key].AddedAt = new Date();
 
               $scope.salesKits.selectedList[key] = item;
             });
+          }
+          angular.forEach($scope.salesKits.list, function (item, key) {
+            item.Quantity *= customQty;
+            $scope.salesKits.list[key] = item;
+          });
+
+          if (customQty >= 1) {
+            // $scope.salesKits.Qty = customeQty;
+            $scope.salesKits.Qty = 0;
+            $scope.salesKits.Quantity = customQty;
+
+
           }
         }
 
@@ -155,19 +170,21 @@ angular.module('itouch.controllers')
             var operations = [];
             item.Qty = $scope.salesKits.customQuantity;
             if($scope.salesKitUpdate){
-              var oldItem = $scope.cart.selectedItem;
+              // var oldItem = $scope.cart.selectedItem;
               // console.log(oldItem);
               operations.push(BillService.voidItem(oldItem));
               var item = angular.copy(selectedItem);
-              item.LineNumber = oldItem.LineNumber;
-              item.DocNo = oldItem.DocNo;
-              item.ParentItemLineNumber = oldItem.ParentItemLineNumber;
-              item.ItemType = 'SKI';
-              item.Price = item.AdditionalPrice;
-              if(!item.OrgPrice) item.OrgPrice = item.AdditionalPrice;
-              if(!item.AlteredPrice) item.AlteredPrice = item.AdditionalPrice;
-              if(!item.StdCost) item.StdCost = item.AdditionalPrice;
-              operations.push(CartItemService.addItemToCart(item, true));
+              angular.forEach($scope.salesKits.selectedList, function(item){
+                item.LineNumber = oldItem.LineNumber;
+                item.DocNo = oldItem.DocNo;
+                item.ParentItemLineNumber = oldItem.ParentItemLineNumber;
+                item.ItemType = 'SKI';
+                item.Price = item.AdditionalPrice;
+                if(!item.OrgPrice) item.OrgPrice = item.AdditionalPrice;
+                if(!item.AlteredPrice) item.AlteredPrice = item.AdditionalPrice;
+                if(!item.StdCost) item.StdCost = item.AdditionalPrice;
+                operations.push(CartItemService.addItemToCart(item, true));
+              });
 
             } else {
               operations.push(CartItemService.addSalesKitItemToCart(item));

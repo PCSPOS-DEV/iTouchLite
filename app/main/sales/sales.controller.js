@@ -508,13 +508,13 @@ angular.module('itouch.controllers')
             SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
               if(salesKit){
                 $scope.salesKits = salesKit;
+                $scope.shownModal = 'sk';
                 if($scope.qty.value){
                   $scope.salesKits.customQuantity = $scope.qty.value;
                 }
                 $timeout(function () {
-                  $scope.shownModal = 'sk';
                   $scope.skModalModal.show();
-                }, 500);
+                }, 1000);
 
 
               } else {
@@ -740,39 +740,42 @@ angular.module('itouch.controllers')
               }, function (err) {
                 console.log(err);
               });
-            } else if(item.ItemType == 'PWP'){
-              var promises = [BillService.voidItem(item)];
-              CartItemService.getChildItems(item.LineNumber).then(function(data){
-                angular.forEach(data, function(childItem){
-                  if(childItem){
-                    promises.push(BillService.voidItem(childItem));
-                  }
-                });
-                $q.all(promises).then(function(){
-                  $scope.refreshCart().then(function () {
-                    // console.log('void');
-                    $scope.selectItemWithLineNumber();
-                  });
-                }, function(err){
-                  console.log(err);
-                });
-              });
-            } else {
+            }
+            // else if(item.ItemType == 'PWP'){
+            //   var promises = [BillService.voidItem(item)];
+            //   CartItemService.getChildItems(item.LineNumber).then(function(data){
+            //     angular.forEach(data, function(childItem){
+            //       if(childItem){
+            //         promises.push(BillService.voidItem(childItem));
+            //       }
+            //     });
+            //     $q.all(promises).then(function(){
+            //       $scope.refreshCart().then(function () {
+            //         // console.log('void');
+            //         $scope.selectItemWithLineNumber();
+            //       });
+            //     }, function(err){
+            //       console.log(err);
+            //     });
+            //   });
+            // }
+            else {
 
               if (item.ItemType == 'SKI') {
                 if (item.Selectable == 'true') {
                   CartItemService.findSalesKitParent(item.ParentItemLineNumber).then(function (parentItem) {
                     SalesKitService.getSalesKit(parentItem.ItemId, businessDate).then(function (salesKit) {
                       if (salesKit) {
+                        $scope.shownModal = 'sk';
+                        $scope.salesKits = salesKit;
+                        $scope.salesKitUpdate = true;
                         $timeout(function () {
-                          $scope.shownModal = 'sk';
-                          $scope.salesKits = salesKit;
-                          $scope.salesKitUpdateQty = parentItem.Qty;
-                          $scope.salesKitUpdate = true;
                           $scope.skModalModal.show();
-                        }, 500);
+                        }, 1000);
 
                       }
+                    }, function(ex){
+                      console.log(ex);
                     });
                   });
                 }

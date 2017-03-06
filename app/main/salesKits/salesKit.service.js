@@ -386,5 +386,11 @@ angular.module('itouch.services')
 
       }
 
+      self.getCurrentChildItems = function(parentItemLineNumber){
+        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, 'Desc1, Desc2, Qty', { columns: 'ParentItemLineNumber=?', data: [parentItemLineNumber] }).then(function(res){
+          return DB.fetchAll(res);
+        });
+      }
+
       return self;
     }]);

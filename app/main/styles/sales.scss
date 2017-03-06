@@ -195,6 +195,12 @@
 .subplu .list:first-child { margin-left: 0; }
 
 .sales {
+
+  ion-scroll.ionic-scroll {
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
+
   .button-area {
     .summery {
       margin-bottom: 10px;
@@ -215,11 +221,6 @@
       height: 47px;
       margin-bottom: 3px;
       margin-right: 3px;
-    }
-
-    .scroll-view.scroll-y {
-      overflow-x: hidden;
-      overflow-y: hidden;
     }
 
     .quantity{

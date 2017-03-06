@@ -12,7 +12,7 @@
                 <div class="col text-right">Discount</div>
                 <div class="col text-right">Total</div>
               </div>
-              <ion-scroll zooming="false" direction="y" style="height: 253px"  delegate-handle="cart">
+              <ion-scroll class="cart" zooming="false" direction="y" style="height: 253px"  delegate-handle="cart">
                 <div class="row table-body" ng-repeat="item in cart.items | orderObjectBy :'LineNumber' track by $index"
                      ng-class="{ selected: item.selected, 'sales-kit': item.ItemType == 'SKT', 'sales-kit-item': item.ParentItemLineNumber != 0, 'modifier-item': item.ItemType == 'MOD', 'take-away': item.TakeAway == 'true' }"
                      ng-click="selectItem(item)" id="{{item.LineNumber}}">
