@@ -14,7 +14,9 @@ angular.module('itouch.controllers')
       $scope.location = LocationService.currentLocation;
 
       $scope.$on("modal.shown", function(event){
-        refresh();
+        if($scope.shownModal == 'billView'){
+          refresh();
+        }
       });
 
       var refresh = function () {
@@ -22,11 +24,17 @@ angular.module('itouch.controllers')
           $scope.settings = data;
         });
 
-        $q.all({
-          header: Reciept.getBillHeader($scope.selectedItem.DocNo),
-          items: Reciept.getBillItems($scope.selectedItem.DocNo),
-          transactions: Reciept.getBillTransactions($scope.selectedItem.DocNo)
-        }).then(function (data) {
+        Reciept.fetchData($scope.selectedItem.DocNo).then(function (data) {
+          // console.log(data);
+          data.header.Title = '';
+          switch(data.header.DocType){
+            case 'AV':
+              data.header.Title = 'Abort';
+              break;
+            case 'VD':
+              data.header.Title = 'Transaction Void '+data.header.SalesDocNo;
+              break;
+          }
           $scope.bill = data;
         }, function (ex) {
           console.log(ex);

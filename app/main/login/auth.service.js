@@ -96,5 +96,11 @@ angular.module("itouch.services")
       tempUser = user;
     }
 
+    self.getUserById = function(id){
+      return DB.select(DB_CONFIG.tableNames.auth.staff, '*', { columns: 'Id=?', data: [id] }).then(function(res){
+        return DB.fetch(res);
+      });
+    }
+
     return self;
   }]);

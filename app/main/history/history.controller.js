@@ -15,7 +15,6 @@ angular.module('itouch.controllers')
 
       var refresh = function () {
         var bDate = ControlService.getBusinessDate(true);
-        console.log(bDate);
         HistoryService.getAll(bDate).then(function(items) {
           $scope.items = _.values(items);
           $scope.items = _.map(items, function(item){
@@ -54,6 +53,7 @@ angular.module('itouch.controllers')
       }
 
       $scope.selectItem = function (item) {
+        $scope.shownModal = 'billView';
         $scope.selectedItem = item;
         $scope.modal.show();
       }

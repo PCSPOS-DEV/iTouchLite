@@ -6,7 +6,7 @@ angular.module('itouch.services')
   var printData = null;
   var printer = PrintService.getPrinter();
   var location = LocationService.currentLocation;
-  console.log(location);
+  // console.log(location);
 
   self.getAll = function(){
     PrinterSettings.get().then(function(res){
@@ -120,7 +120,7 @@ angular.module('itouch.services')
 
   }
 
-  self.creatRecieptFooter = function(DocNo){
+  self.creatRecieptFooter = function(header, footerData){
     printer.addTextAlign(printer.ALIGN_CENTER);
     var bDate = ControlService.getBusinessDate();
     var shift = ShiftService.getCurrent();
@@ -138,8 +138,8 @@ angular.module('itouch.services')
       printer.addText(row.Text+'\n');
     });
 
-    printer.addText('\nBDate: '+bDate.format('DD/MM/YYYY')+' Shift: '+ shift.Description1 +' M/C: '+ machine.Code +'\n');
-    printer.addText(now+' User: '+ user.Id + ' ' + DocNo +'\n');
+    printer.addText('\nBDate: '+header.BusinessDate+' Shift: '+ footerData.shift.Description1 +' M/C: '+ footerData.machine.Code +'\n');
+    printer.addText(header.SysDateTime+' User: '+ footerData.cashier.Id + ' ' + header.DocNo +'\n');
   }
 
   self.print = function(DocNo){
@@ -147,23 +147,25 @@ angular.module('itouch.services')
       try {
         printer = PrintService.getPrinter();
 
-        fetchData(DocNo).then(function (data) {
-          printData = data.printData;
+        if(printer){
+          self.fetchData(DocNo).then(function (data) {
+            printData = data.printData;
 
-          if(data && data.header){
-            self.creatRecieptHeader();
+            if(data && data.header){
+              self.creatRecieptHeader();
 
-            self.creatRecieptBody(data, true);
+              self.creatRecieptBody(data, true);
 
-            self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
+              self.creatRecieptFooter(data.header, data.footerData);
 
-            printer.addCut(printer.CUT_FEED);
+              printer.addCut(printer.CUT_FEED);
 
-            printer.send();
-          } else {
-            console.log("bill not available");
-          }
-        });
+              printer.send();
+            } else {
+              console.log("bill not available");
+            }
+          });
+        }
 
       } catch(e){
         console.log(e);
@@ -181,7 +183,7 @@ angular.module('itouch.services')
         try {
           printer = PrintService.getPrinter();
 
-          fetchData(DocNo).then(function (data) {
+          self.fetchData(DocNo).then(function (data) {
             printData = data.printData;
             if(data && data.header){
               self.creatRecieptHeader();
@@ -212,7 +214,7 @@ angular.module('itouch.services')
         try {
           printer = PrintService.getPrinter();
 
-          fetchData(DocNo).then(function (data) {
+          self.fetchData(DocNo).then(function (data) {
             printData = data.printData;
             if(data && data.header){
               self.creatRecieptHeader();
@@ -325,15 +327,22 @@ angular.module('itouch.services')
   //   });
   // }
 
-  var fetchData = function(DocNo){
+  self.fetchData = function(DocNo){
     return $q.all({
       printData: PrinterSettings.get(),
       header: self.getBillHeader(DocNo),
       items: self.getBillItems(DocNo),
       transactions: self.getBillTransactions(DocNo),
       tenderDiscounts: self.getTenderDiscounts(DocNo)
-    }, function(ex){
-      console.log(ex);
+    }).then(function(data){
+      return $q.all({
+        shift: ShiftService.getById(data.header.ShiftId),
+        machine: SettingsService.getMachine(data.header.MachineId),
+        cashier: AuthService.getUserById(data.header.CashierId)
+      }).then(function (footerData) {
+        data.footerData = footerData;
+        return data;
+      });
     });
   }
 
@@ -343,5 +352,207 @@ angular.module('itouch.services')
       printer.addPulse();
     }
   }
+
+    self.prepare = function(DocNo) {
+
+      self.fetchData(DocNo).then(function (data) {
+
+        if (data && data.header) {
+          self.creatRecieptHeader();
+
+          self.creatRecieptBody(data, true);
+
+          self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
+
+          printer.addCut(printer.CUT_FEED);
+
+          printer.send();
+        } else {
+          console.log("bill not available");
+        }
+      });
+    }
+
+    var prepBody = function(header, items){
+      var data = [];
+
+      var subTotal = 0;
+
+
+      data.push(newLine(horizontalLine()));
+
+      data.concat(itemBlock(items, subTotal));
+
+      if(header.DocType == 'SA' || header.DocType == 'VD'){
+        // console.log(data.tenderDiscounts);
+        data.push(itemLine('SUBTOTAL', "$"+subTotal.toFixed(2)));
+        if(data.tenderDiscounts && data.tenderDiscounts.length > 0){
+          var tenderDisAmount = 0;
+          angular.forEach(data.tenderDiscounts, function(row){
+            PrintService.addLine(row.Description1, (row.Amount > 0 ?"-":"+") + row.Amount.toFixed(2));
+            tenderDisAmount += row.Amount;
+          });
+
+          PrintService.addLine('SUBTOTAL After Discount', "$"+(subTotal-tenderDisAmount).toFixed(2));
+        }
+        PrintService.addLine('TOTAL', "$"+(data.header.Total.toFixed(2)));
+        var change = null, forfeited = null;
+        angular.forEach(data.transactions, function(row){
+          // console.log(row);
+          PrintService.addLine(row.Description1 || 'ROUNDED', "$"+(row.Amount.toFixed(2)));
+          if(row.ChangeAmount > 0){
+            if(row.Cash == 'true' ){
+              change = row.ChangeAmount.toFixed(2);
+            } else {
+              forfeited = row.ChangeAmount.toFixed(2);
+            }
+
+          }
+        });
+        if(change){
+          printer.addText('\nChange Due: $'+change+"\n");
+        } else if (forfeited){
+          printer.addText('\nForfeited : $'+forfeited+"\n");
+        }
+      }
+      printer.addText('\n');
+
+      if(withSubTotalSection && location.Tax5Option == 3){ //Tax inclusive
+        printer.addText('Inc of '+location.Tax5Desc1+' $'+ data.header.Tax.toFixed(2) +'\n\n');
+      }
+    }
+
+    var horizontalLine = function(){
+      var text = ' ';
+      for(var i = 1; i <= ($localStorage.printeSettings.maxCharsPerLine-2); i++){
+        text += "-";
+      }
+      text += ' \n';
+      return text;
+    }
+
+    var newLine = function(text, align, bold){
+      return { text: text, styles: { align: align ? align : 'normal', weight: bold ? bold : 'normal' } };
+    }
+
+    var itemBlock = function(items, subTotal){
+      var rows = [];
+      angular.forEach(items, function(row){
+        var sTotal = (row.SubTotal + row.Tax5Amount).roundTo(2);
+        var text = row.Desc1;
+        if(row.ParentItemLineNumber > 0){
+          text = '  '+ text;
+        }
+        if (row.ItemType == 'MOD'){
+          text += " **";
+        } else if(row.TakeAway == 'true'){
+          text += " *";
+        }
+
+
+        rows.push(newLine(itemLine(text, " "+(sTotal.toFixed(2)), ""+row.Qty)));
+
+        subTotal += sTotal;
+        if(row.discounts){
+          angular.forEach(row.discounts, function(discount){
+            if(discount.Description1){
+              if(!discount.DiscountAmount){
+                discount.DiscountAmount = 0;
+              }
+              rows.push(newLine(tabbedItemLine(discount.Description1, " "+(discount.DiscountAmount*-1)).toFixed(2)));
+              subTotal -= discount.DiscountAmount ? discount.DiscountAmount : 0;
+            }
+
+          });
+        }
+
+        if(row.ReasonId){
+          rows.push(newLine("\tReason    : "+row.ReasonDesc1+"\n"));
+          rows.push(newLine("\tReference : "+(row.RefCode ? row.RefCode : "")+"\n"));
+        }
+      });
+      return rows;
+    }
+
+    var tabbedItemLine = function(startBlock, endBlock){
+      if(startBlock) {
+        var lengths = {
+          start: startBlock.length,
+          end: endBlock ? endBlock.length : 0,
+          spaces: 0,
+          total: $localStorage.printeSettings.maxCharsPerTabbedLine,
+          startBlockMaxLength: 0
+        }
+        if (endBlock) {
+          lengths.startBlockMaxLength = lengths.total - 8;
+
+          lengths.spaces = lengths.startBlockMaxLength - startBlock.length;
+        } else {
+          lengths.startBlockMaxLength = lengths.total - 1;
+          lengths.spaces = lengths.total - startBlock.length;
+        }
+
+        if (startBlock.length > lengths.startBlockMaxLength) {
+          startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
+          startBlock += "...";
+        }
+
+        if (length.spaces < 1) {
+          length.spaces = 1;
+        }
+
+
+        var text = '\t' + startBlock + addSpaces(lengths.spaces);
+        if (lengths.end < 8) {
+          text += addSpaces(8 - lengths.end);
+        }
+        return text + endBlock + "\n";
+      }
+    }
+
+    var addSpaces = function(count){
+      var text = "";
+      for(var i = 1; i <= count; i++){
+        text += " ";
+      }
+      return text;
+    }
+
+    var itemLine = function(startBlock, endBlock, qtyBlock){
+
+      if(startBlock && endBlock){
+        var lengths  = {
+          start: startBlock.length,
+          end: endBlock.length,
+          qty: qtyBlock ? qtyBlock.length : 0,
+          spaces: 0,
+          total: $localStorage.printeSettings.maxCharsPerLine,
+          startBlockMaxLength: 0
+        }
+
+        lengths.startBlockMaxLength = lengths.total - (4 + 8 + 2); // 4: qty, 8: price
+
+        if(startBlock.length > lengths.startBlockMaxLength){
+          startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
+          startBlock += "...";
+        }
+
+        lengths.spaces = ((lengths.total - ((lengths.qty ? 4 : 0) + 8)) - lengths.start );
+        lengths.spaces  = lengths.spaces < 1 ? 1 : lengths.spaces;
+
+        if(qtyBlock){
+          addSpaces(3 - lengths.qty);
+          printer.addText(qtyBlock + " ");
+        }
+
+        var text = startBlock + addSpaces(lengths.spaces);
+
+        if(lengths.end < 8){
+          text += addSpaces(8 - lengths.end);
+        }
+
+        return endBlock + '\n';
+      }
+    }
 
 }]);

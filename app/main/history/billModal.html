@@ -16,21 +16,35 @@
       </div>
     </div>
     <div class="row body">
+      <div class="col title">
+        {{bill.header.Title}}
+      </div>
+    </div>
+    <div class="row body">
       <div class="col">
         <div ng-repeat="item in bill.items">
           <div class="row">
             <div class="col-10">{{item.Qty}}</div>
-          <div class="col-80">{{print(item,'Desc')}}</div>
+          <div class="col-80">{{print(item,'Desc')}}
+            <span ng-if="item.ItemType == 'MOD'">**</span>
+            <span ng-if="item.ItemType != 'MOD' && item.TakeAway == 'true'">*</span>
+          </div>
           <div class="col-10 text-right"> {{item.Total.toFixed(2)}}</div>
           </div>
-          <div class="row" ng-repeat="discount in item.discounts">
+          <div class="row" ng-repeat="discount in item.discounts" ng-if="discount.Description1">
             <div class="col-60 col-offset-20">{{print(discount,'Description')}}</div>
             <div class="col-20 text-right"> {{(discount.DiscountAmount*-1).toFixed(2)}}</div>
+          </div>
+          <div class="row" ng-if="item.ReasonId">
+            <div class="col">Reason : {{item.ReasonDesc1}}</div>
+          </div>
+          <div class="row" ng-if="item.ReasonId">
+            <div class="col">Reference : {{item.RefCode}}</div>
           </div>
         </div>
       </div>
     </div>
-    <div class="row body">
+    <div class="row body" ng-if="bill.header.DocType != 'AV'">
       <div class="col">
         <div class="row">
           <div class="col-80">SUBTOTAL</div>
@@ -40,12 +54,27 @@
           <div class="col-80">TOTAL</div>
           <div class="col-20 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
         </div>
-        <div class="row" ng-repeat="item in bill.transactions">
+        <div class="row body" ng-repeat="discount in bill.tenderDiscounts">
           <!--{{item.PayTypeId}}-->
-          <div class="col-80">{{print(item, 'Description').toUpperCase() || 'ROUNDED'}}</div>
-          <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
-          <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
+          <div class="col-80">{{print(discount, 'Description')}}</div>
+          <div class="col-20 text-right">$ {{ (discount.Amount * -1).toFixed(2)}}</div>
         </div>
+        <div ng-repeat="item in bill.transactions">
+          <div class="row body" >
+            <!--{{item.PayTypeId}}-->
+            <div class="col-80">{{print(item, 'Description').toUpperCase() || 'ROUNDED'}}</div>
+            <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
+          </div>
+          <div class="row body" ng-if="item.ChangeAmount > 0 && item.Cash == 'true'">
+            <!--{{item.PayTypeId}}-->
+            <div class="col">Change Due: $ {{item.ChangeAmount.toFixed(2)}}</div>
+          </div>
+          <div class="row body" ng-if="item.ChangeAmount > 0 && item.Cash == 'false'">
+            <!--{{item.PayTypeId}}-->
+            <div class="col">Forfeited: $ {{item.ChangeAmount.toFixed(2)}}</div>
+          </div>
+        </div>
+
         <div class="row" ng-if="location.Tax5Option == 3">
           <div class="col">
             {{'Inc of '+location.Tax5Desc1+' $'+ bill.header.Tax.toFixed(2)}}
@@ -57,6 +86,12 @@
     <div class="row footer">
       <div class="col">
         <p class="text-center" ng-repeat="item in settings.Footer">{{item.Text}}</p>
+      </div>
+    </div>
+    <div class="row footer">
+      <div class="col">
+        <p class="text-center">BDate: {{bill.header.BusinessDate}} Shift: {{bill.footerData.shift.Description1}} M/C: {{bill.footerData.machine.Code}}</p>
+        <p class="text-center">{{bill.header.SysDateTime}} User: {{bill.footerData.cashier.Code}}</p>
       </div>
     </div>
   </ion-content>

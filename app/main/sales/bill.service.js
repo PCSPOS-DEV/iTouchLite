@@ -1047,7 +1047,7 @@ angular.module('itouch.services')
             i.Tax5Amount = _.isNumber(i.Tax5Amount) ? (i.Tax5Amount *= -1).roundTo(2) : 0;
             i.DiscAmount = _.isNumber(i.DiscAmount) ? (i.DiscAmount *= -1).roundTo(2) : 0;
             i.ReasonId = reasonId;
-            i.RefCode = reference;
+            i.RefCode = reference ? reference : null;
 
             discounts = _.map(discounts, function (discount) {
               discount.DiscountAmount *= -1;
