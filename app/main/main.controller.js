@@ -1,7 +1,7 @@
 
 angular.module('itouch.controllers')
-.controller("AppCtrl", ['SyncService', '$scope', '$ionicLoading', 'LocationService', 'Logger', 'APP_CONFIG', 'AuthService', '$state', '$ionicHistory', 'Alert', 'CartItemService',
-  function (SyncService, $scope, $ionicLoading, LocationService, Logger, APP_CONFIG, AuthService, $state, $ionicHistory, Alert, CartItemService) {
+.controller("AppCtrl", ['SyncService', '$scope', '$ionicLoading', 'LocationService', 'Logger', 'APP_CONFIG', 'AuthService', '$state', '$ionicHistory', 'Alert', 'CartItemService', '$cordovaKeyboard', 'UploadService',
+  function (SyncService, $scope, $ionicLoading, LocationService, Logger, APP_CONFIG, AuthService, $state, $ionicHistory, Alert, CartItemService, $cordovaKeyboard, UploadService) {
     var currentUser = AuthService.currentUser();
 
     ionic.Platform.ready(function () {
@@ -10,27 +10,20 @@ angular.module('itouch.controllers')
       ionic.Platform.fullScreen();
     });
 
-
-    // $scope.$on('shift-changed', function(evt, shift){
-    //   console.log('shift-changed');
-    //   // var shift = ShiftService.getCurrent();
-    //   // $ionicHistory.nextViewOptions({
-    //   //   disableAnimate: false,
-    //   //   disableBack: true
-    //   // });
-    //   // if(shift){
-    //   //   $state.go('app.sales');
-    //   // } else {
-    //   //   $state.go('app.home');
-    //   // }
-    // });
-
     $scope.config = APP_CONFIG;
 
     $scope.sync = function () {
       SyncService.do().then(function () {
         $scope.$broadcast('sync');
         $scope.$broadcast("refresh-cart");
+      })
+    }
+
+    $scope.upload = function () {
+      UploadService.upload().then(function () {
+        Alert.success('Upload success');
+      }, function (err) {
+        Alert.error(err);
       })
     }
 
