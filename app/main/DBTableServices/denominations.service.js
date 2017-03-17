@@ -2,8 +2,8 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory("DenominationsService", ['DB', 'DB_CONFIG',
-    function (DB, DB_CONFIG) {
+  .factory("DenominationsService", ['DB', 'DB_CONFIG', '$q',
+    function (DB, DB_CONFIG, $q) {
       var self = this;
       self.table = DB_CONFIG.tableNames.bill.denominations;
 
@@ -20,6 +20,15 @@ angular.module('itouch.services')
 
       self.delete = function (where) {
          DB.delete(self.table, where);
+      }
+
+      self.addDefault = function(){
+        var arr = [2, 5, 10, 50, 100];
+        var prom = [];
+        angular.forEach(arr, function (item) {
+          prom.push(self.insert({ Desc: item.toFixed(2), Value: item }));
+        });
+        return $q.all(prom);
       }
 
       return self;
