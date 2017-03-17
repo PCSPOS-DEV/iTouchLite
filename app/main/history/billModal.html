@@ -20,6 +20,11 @@
         {{bill.header.Title}}
       </div>
     </div>
+    <div class="row body" ng-if="bill.header.OrderTag">
+      <div class="col">
+        Order Tag     : {{bill.header.OrderTag}}
+      </div>
+    </div>
     <div class="row body">
       <div class="col">
         <div ng-repeat="item in bill.items">
@@ -29,7 +34,7 @@
             <span ng-if="item.ItemType == 'MOD'">**</span>
             <span ng-if="item.ItemType != 'MOD' && item.TakeAway == 'true'">*</span>
           </div>
-          <div class="col-10 text-right"> {{item.Total.toFixed(2)}}</div>
+          <div class="col-10 text-right"> {{(item.SubTotal + item.Tax5Amount).toFixed(2)}}</div>
           </div>
           <div class="row" ng-repeat="discount in item.discounts" ng-if="discount.Description1">
             <div class="col-60 col-offset-20">{{print(discount,'Description')}}</div>
@@ -48,16 +53,21 @@
       <div class="col">
         <div class="row">
           <div class="col-80">SUBTOTAL</div>
-          <div class="col-20 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
-        </div>
-        <div class="row">
-          <div class="col-80">TOTAL</div>
-          <div class="col-20 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
+          <div class="col-20 text-right">$ {{bill.subTotal.toFixed(2)}}</div>
         </div>
         <div class="row body" ng-repeat="discount in bill.tenderDiscounts">
           <!--{{item.PayTypeId}}-->
           <div class="col-80">{{print(discount, 'Description')}}</div>
           <div class="col-20 text-right">$ {{ (discount.Amount * -1).toFixed(2)}}</div>
+        </div>
+        <div class="row body" ng-if="bill.tenderDiscounts && bill.tenderDiscounts.length > 0">
+          <!--{{item.PayTypeId}}-->
+          <div class="col-80">Sub Total After Discount</div>
+          <div class="col-20 text-right">$ {{ (bill.subTotal - bill.tenderDiscountTotal).toFixed(2) }}</div>
+        </div>
+        <div class="row">
+          <div class="col-80">TOTAL</div>
+          <div class="col-20 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
         </div>
         <div ng-repeat="item in bill.transactions">
           <div class="row body" >

@@ -35,6 +35,27 @@ angular.module('itouch.controllers')
               data.header.Title = 'Transaction Void '+data.header.SalesDocNo;
               break;
           }
+          var subTotal = 0;
+          data.items = _.map(data.items, function(item){
+            subTotal += (item.SubTotal + item.Tax5Amount).roundTo(2);
+            item.discounts = _.map(item.discounts, function(discount){
+              if(discount.Description1) {
+                subTotal -= discount.DiscountAmount;
+              }
+              return discount;
+            });
+
+            return item;
+          });
+
+          var tenderDiscountTotal = 0;
+          data.tenderDiscounts = _.map(data.tenderDiscounts, function(tDis){
+            tenderDiscountTotal += tDis.Amount;
+
+            return tDis;
+          });
+          data.subTotal = subTotal.roundTo(2);
+          data.tenderDiscountTotal = tenderDiscountTotal.roundTo(2);
           $scope.bill = data;
         }, function (ex) {
           console.log(ex);

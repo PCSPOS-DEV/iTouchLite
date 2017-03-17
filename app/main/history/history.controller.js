@@ -53,9 +53,11 @@ angular.module('itouch.controllers')
       }
 
       $scope.selectItem = function (item) {
-        $scope.shownModal = 'billView';
-        $scope.selectedItem = item;
-        $scope.modal.show();
+        if($scope.modal){
+          $scope.shownModal = 'billView';
+          $scope.selectedItem = item;
+          $scope.modal.show();
+        }
       }
 
       $scope.clearSearch = function(){
