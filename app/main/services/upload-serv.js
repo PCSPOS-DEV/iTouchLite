@@ -1,12 +1,15 @@
 'use strict';
 angular.module('itouch.services')
-  .service('UploadService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular',
-    function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular) {
+  .service('UploadService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval',
+    function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval) {
       var self = this;
       var entityId;
+      var macId;
+      var enableAutoUpload = true;
 
       self.getBills = function () {
         entityId = SettingsService.getEntityId();
+        macId = SettingsService.getMachineId();
         return DB.select(DB_CONFIG.tableNames.bill.header, '*', {
           columns: 'IsExported=?',
           data: [false]
@@ -32,6 +35,10 @@ angular.module('itouch.services')
                 columns: 'IsExported=? AND DocNo=?',
                 data: [false, header.DocNo]
               }).then(onSuccess),
+              StockTransactions: DB.select(DB_CONFIG.tableNames.bill.stockTransactions, '*', {
+                columns: 'IsExported=? AND DocNo=?',
+                data: [false, header.DocNo]
+              }).then(onSuccess)
             }));
           });
           return $q.all(promises);
@@ -42,6 +49,7 @@ angular.module('itouch.services')
       var onSuccess = function (res) {
         return _.map(DB.fetchAll(res), function (row) {
           row.EntityId = entityId;
+          row.MachineId = macId;
           return row;
         });
       }
@@ -59,6 +67,10 @@ angular.module('itouch.services')
           data: [DocNo]
         });
         DB.addUpdateToQueue(DB_CONFIG.tableNames.discounts.billDiscounts, {IsExported: true}, {
+          columns: 'DocNo=?',
+          data: [DocNo]
+        });
+        DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.stockTransactions, {IsExported: true}, {
           columns: 'DocNo=?',
           data: [DocNo]
         });
@@ -83,15 +95,29 @@ angular.module('itouch.services')
         });
       }
 
+      self.startAutoUpload = function () {
+        if(enableAutoUpload){
+          // console.log('auto upload started');
+          $interval(function() {
+            // console.log('upload');
+            self.upload();
+          }, 120000);
+        }
+      }
+
       var post = function (data) {
-        return Restangular.oneUrl("uplink", 'http://172.16.110.99/iTouchLiteSyncServices/iTouchLiteSyncService.svc/UpdateBill').customPOST(
-          JSON.stringify(data),
-          '', {},
-          {
-            // Authorization:'Basic ' + client,
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        );
+        var config = $localStorage.itouchConfig;
+        if(config && config.baseUrl){
+          return Restangular.oneUrl("uplink", config.baseUrl+'UpdateBill').customPOST(
+            JSON.stringify(data),
+            '', {},
+            {
+              // Authorization:'Basic ' + client,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          );
+        }
+
       }
 
       return self;

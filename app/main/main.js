@@ -43,6 +43,7 @@ angular.module('itouch', [
                 StatusBar.styleDefault();
             }
 
+            UploadService.startAutoUpload();
 
         });
     }])
