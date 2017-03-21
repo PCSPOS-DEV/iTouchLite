@@ -1,10 +1,15 @@
-<ion-view view-title="iSeries NX Lite" class="sales" hide-back-button="true">
+<ion-view view-title="iSeries NX Lite" class="sales" hide-back-button="true" can-swipe-back="false">
   <ion-content scroll="false">
+    <form action="" ng-submit="barcodeSubmit($event)" >
+      <input type="text" ng-model="data.barcode"  ng-blur="onBarcodeTextBlur()" id="barcodeText" />
+      <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
+
+    </form>
     <div class="row wrapper main-wrapper">
       <div class="col content-area">
         <div class="cart-area">
           <div class="row cart">
-            <div class="table">
+            <div class="table" ng-show="!cart.isEmpty">
               <div class="row table-header">
                 <div class="col col-50">Description</div>
                 <div class="col text-right">Qty</div>
@@ -24,19 +29,20 @@
                 </div>
               </ion-scroll>
             </div>
+            <img ng-show="cart.isEmpty" ng-src="{{'main/assets/img/cart_back.jpg'}}" alt="">
           </div>
           <div class="row wrapper button-wrapper">
             <div class="col buttons clearfix">
               <div class="clearfix">
-                <div class="btn" ng-repeat="k in range" ng-init="key = keys[k]"
-                     ng-style="{'background-color': key.Color }" ng-click="onKeyClick(key)">
-                  <div ng-hide="key.ImageName">
+                <button class="btn" ng-repeat="k in range" ng-init="key = keys[k]"
+                     ng-style="{'background-color': key.Color }" on-tap="onKeyClick(key)">
+                  <div>
                     <p class="desc1">{{ print(key, 'KeyDesc', 1) || print(key, 'PageDesc', 1) }}</p>
-                    <p>{{ print(key, 'KeyDesc', 2) || print(key, 'PageDesc', 2) }}</p>
-                    <p>{{ print(key, 'KeyDesc', 3) || print(key, 'PageDesc', 3) }}</p>
+                    <p class="desc2">{{ print(key, 'KeyDesc', 2) || print(key, 'PageDesc', 2) }}</p>
+                    <p class="desc3">{{ print(key, 'KeyDesc', 3) || print(key, 'PageDesc', 3) }}</p>
                   </div>
-                  <img ng-show="key.ImageName" width="75" src="{{'main/assets/'+key.ImageName}}" alt=" ">
-                </div>
+                  <img class="item-image" width="80" ng-src="{{ imageUrl(key.ImageName) }}" alt=" ">
+                </button>
               </div>
             </div>
           </div>
@@ -56,6 +62,10 @@
           <div class="row">
             <div class="col">Document No</div>
             <div class="col">: {{header.DocNo}}</div>
+          </div>
+          <div class="row">
+            <div class="col">Tag</div>
+            <div class="col">: {{header.OrderTag}}</div>
           </div>
         </div>
         <div class="summery">
@@ -81,12 +91,28 @@
             <div class="col total value">{{cart.summery.Total.roundTo(2).toFixed(2)}}</div>
           </div>
         </div>
-        <div class="quantity">
-          <div class="list list-inset">
-            <label class="item item-input">
-              <span class="input-label">Quantity</span>
-              <input type="number" id="qty" ng-model="qty.value" ng-blur="onQtyBlur()" ng-click="onQtyFocus()">
-            </label>
+        <div class="row qty-bc">
+          <div class="col">
+            <div class="quantity">
+              <div class="list list-inset">
+                <label class="item item-input">
+                  <span class="input-label">Qty</span>
+                  <input type="number" id="qty" ng-model="qty.value" ng-blur="onQtyBlur()" ng-click="onQtyFocus()">
+
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <li class="barcode-toggle item item-toggle">
+              Barcode
+              <label class="toggle toggle-dark">
+                <input type="checkbox" ng-model="data.barcodeMode" ng-change="onBarcodeModeChange()">
+                <div class="track">
+                  <div class="handle"></div>
+                </div>
+              </label>
+            </li>
           </div>
         </div>
 
@@ -113,11 +139,11 @@
   <div class="bar bar-footer">
     <div class="col page-bar row pages">
       <div class="">
-        <ion-scroll direction="x">
+        <ion-scroll direction="x" zooming="false" delegate-handle="pages-scroll">
           <div class="button-bar">
           <a class="button  button-positive" ng-click="changePage(page, $index)"
              ng-class="{'button-balanced': page.selected, 'button-positive': !page.selected}" ng-repeat="page in pages">
-            <p class="desc1">{{ print(page, "Description") }}</p>
+            <p class="desc1">{{ print(page, "Description", null, 14) }}</p>
           </a>
             </div>
 
@@ -125,7 +151,7 @@
       </div>
     </div>
     <div class="col">
-      <a class="button button-full button-calm tender-button" ng-click="openTenderForm()">
+      <a class="button button-full button-calm tender-button" ng-click="openTenderForm()" ng-disabled="tenderButtonClicked">
         <p class="desc1">Tender</p>
       </a>
     </div>
