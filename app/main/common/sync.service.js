@@ -6,10 +6,10 @@ angular.module('itouch.services')
   .service("SyncService", ['$q', 'AuthService', 'KeyBoardService', 'Alert', 'DB', 'ItemService', 'SubPLU1Service',
     'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', 'LocationService', 'FileService', 'TenderService',
     'FunctionsService', 'SalesKitService', 'DaysService', 'ShiftService', 'DiscountService', 'ReasonService', 'PrinterSettings',
-    'PWPService', 'ModifierService', 'DepartmentService', 'SettingsService', 'BillService',
+    'PWPService', 'ModifierService', 'DepartmentService', 'SettingsService', 'BillService', 'DenominationsService', 'ImageDownloadService',
     function ($q, AuthService, KeyBoardService, Alert, DB, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service,
               PriceGroupService, LocationService, FileService, TenderService, FunctionsService, SalesKitService, DaysService,
-              ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService, SettingsService, BillService) {
+              ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService, SettingsService, BillService, DenominationsService, ImageDownloadService) {
     var self = this;
     self.do = function () {
       Alert.showLoading();
@@ -40,14 +40,17 @@ angular.module('itouch.services')
           'Departments': DepartmentService.fetch(),
           'Modifiers': ModifierService.fetch(),
           'Machines': SettingsService.fetchMachines(),
-          // 'Images': FileService.fetch()
+          // 'Images': ImageDownloadService.downloadImages()
         })
         // FunctionsService.fetch()
           .then(function (values) {
           return DB.executeQueue().then(function () {
+            ImageDownloadService.downloadImages();
+            DenominationsService.addDefault();
             LocationService.get();
             console.log('sync done');
             Alert.hideLoading();
+
             return true;
           }, function (err) {
             Alert.hideLoading();
