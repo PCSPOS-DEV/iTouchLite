@@ -1,0 +1,40 @@
+<div class="row" ng-controller="GeneralSettingsCtrl as ctrl">
+  <div class="col">
+    <div class="col col-80 col-offset-10">
+      <div class="card">
+        <div class="item item-text-wrap">
+          <form novalidate ng-submit="ctrl.save()">
+            <div class="list">
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Base URL</span>
+                <input type="text" ng-model="ctrl.settings.url">
+              </label>
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Location ID</span>
+                <input type="text" ng-model="ctrl.settings.loc_id">
+              </label>
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Entity ID</span>
+                <input type="text" ng-model="ctrl.settings.ent_id">
+              </label>
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Machine ID</span>
+                <input type="text" ng-model="ctrl.settings.mac_id">
+              </label>
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Cash ID</span>
+                <input type="text" ng-model="ctrl.settings.cash_id">
+              </label>
+            </div>
+            <div class="row">
+              <div class="col">
+                <button class="button button-positive">Save</button>
+                <a href="#/login" class="button">Cancel</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
