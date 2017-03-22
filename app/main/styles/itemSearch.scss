@@ -1,0 +1,21 @@
+ion-modal-view.itemSearch {
+  top: 10%;
+  bottom: 10%;
+
+  .item.row .col {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .card {
+    margin-bottom: 10px;
+  }
+
+  div.row.buttons .col.button-col{
+    padding-right: 5px;
+  }
+
+  div.row.buttons .row,div.row.buttons .col{
+    padding: 0;
+  }
+}

@@ -161,3 +161,35 @@ ion-modal-view ion-header-bar.bar.bar-header {
 .no-padding-top { padding-top: 0; }
 
 .bold, .table-header .col { font-weight: bolder; }
+
+//for custom keyboard
+custom-keyboard-container > custom-keyboard > custom-keyboard-keys > custom-keyboard-key {
+  width: 10%;
+}
+
+custom-keyboard-container > custom-keyboard.fullKeyboard > custom-keyboard-keys > custom-keyboard-key:nth-child(10), custom-keyboard-container > custom-keyboard.fullKeyboard > custom-keyboard-keys > custom-keyboard-key:nth-child(12) {
+  background-color: #fff;
+}
+
+input[disabled], select[disabled], textarea[disabled], input[readonly]:not(.cloned-text-input), textarea[readonly]:not(.cloned-text-input), select[readonly] {
+  background-color: #fff;
+}
+
+.col-70 {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 70%;
+  -moz-box-flex: 0;
+  -moz-flex: 0 0 70%;
+  -ms-flex: 0 0 70%;
+  flex: 0 0 70%;
+  max-width: 70%;
+}
+
+
+
+ion-scroll.ionic-scroll.scroll-view {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  margin-left: 0;
+  border: none;
+}
