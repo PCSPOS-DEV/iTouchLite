@@ -13,12 +13,13 @@ angular.module('itouch.services')
      * @type {Array}
        */
     var queue = [];
+    var sqlLiteOff = false;
 
     /**
      * Initialize the database connection
      */
     self.init = function () {
-      if (window.sqlitePlugin) {
+      if (window.sqlitePlugin && sqlLiteOff == false) {
         self.db = window.sqlitePlugin.openDatabase({name: DB_CONFIG.name, location: 'default'});    //enables the sqllite plugin for development
       } else {
         self.db = window.openDatabase(DB_CONFIG.name, '1.0', 'database', -1);     //enables the websql for testing purposes
