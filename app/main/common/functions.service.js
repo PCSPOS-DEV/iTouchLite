@@ -17,10 +17,14 @@ angular.module('itouch.services')
 
     self.get = function(type){
       var deferred = $q.defer();
-      DB.select(DB_CONFIG.tableNames.keyboard.functions, "*", {columns: "Type = ? AND Inactive = ?", data: [type, false]}, 'Code').then(function(result){
-        deferred.resolve(DB.fetchAll(result));
+      var where = null;
+      if(type){
+        where = {columns: "Type = ? AND Inactive = ?", data: [type, false]}
+      }
+      DB.select(DB_CONFIG.tableNames.keyboard.functions, "*", where, 'Code').then(function(result){
+        var functions = DB.fetchAll(result);
+        deferred.resolve(functions);
       }, function(err){
-        throw new Error(err.message);
         deferred.reject(err.message);
       });
       return deferred.promise;
@@ -32,6 +36,30 @@ angular.module('itouch.services')
 
     self.getTenderFunctions = function(){
       return self.get('T');
+    }
+
+    self.insert = function(data, toQueue){
+      if(toQueue){
+        DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.functions, data);
+      } else {
+        return DB.insert(DB_CONFIG.tableNames.keyboard.functions, data);
+      }
+    }
+
+    self.update = function(data, where, toQueue){
+      if(toQueue){
+        DB.addUpdateToQueue(DB_CONFIG.tableNames.keyboard.functions, data, where);
+      } else {
+        return DB.update(DB_CONFIG.tableNames.keyboard.functions, data, where);
+      }
+    }
+
+
+    self.getNextCode = function(){
+      return DB.max(DB_CONFIG.tableNames.keyboard.functions, 'Code').then(function(code){
+        return ++code;
+      });
+
     }
 
     var table = {
@@ -131,16 +159,16 @@ angular.module('itouch.services')
         [1001, 'Drink Modifiers', null, 'BeveragesModifiers', false, true, 'V', 1, true],
         [1002, 'Full T/A', null, 'FullTakeaway', false, true, 'V', 1, true],
         [1003, 'Partial T/A', null, 'PartialTakeaway', false, true, 'V', 1, true],
-        // [1005, 'Tag', null, 'OrderTag', false, true, 'V', 1, true],
+        [1005, 'Tag', null, 'OrderTag', false, true, 'V', 1, true],
         [1006, 'Discount', null, 'Discount', false, true, 'V', 1, false],
         [1008, 'Refund Item', null, 'ItemReverse', false, true, 'V', 1, false],
         // [1009, 'Reports', null, 'winreportc40', false, true, 'V', 1, false],
         [1010, 'Shift Option', null, 'Shiftoption', false, false, 'V', 1, false],
         // [2000, 'KeyBoard', null, 'KeyBoardTop', false, true, 'V', 1, false],
-        [2001, '', null, 'ItemDetailTop', false, true, 'V', 1, false],
         // [2001, '', null, 'ItemDetailTop', false, true, 'V', 1, false],
-        // [2001, 'Item Detail', null, 'ItemDetailTop', false, true, 'V', 1, false],
-        // [2002, 'Search', null, 'SearchTop', false, true, 'V', 1, false],
+        // [2001, '', null, 'ItemDetailTop', false, true, 'V', 1, false],
+        [2001, 'Item Detail', null, 'ItemDetailTop', false, true, 'V', 1, false],
+        [2002, 'Search', null, 'SearchTop', false, true, 'V', 1, false],
         // [10000, 'Lock Machine', null, 'LockMachineTop', true, false, 'V', 1, true]
     ];
   }]);

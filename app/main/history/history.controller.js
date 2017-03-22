@@ -39,6 +39,7 @@ angular.module('itouch.controllers')
        * Initiating Sub PLU modal dialog
        */
       $ionicModal.fromTemplateUrl('main/history/billModal.html', {
+        id: 6,
         scope: $scope,
         animation: 'slide-in-up'
       }).then(function (modal) {

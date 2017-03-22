@@ -109,6 +109,7 @@ angular.module('itouch.services')
     self.printAddFloat = function(floatAmount){
       if(PrintService.isConnected()){
         try {
+          setParameters();
           printer = PrintService.getPrinter();
           self.creatRecieptHeader();
           PrintService.addHLine();

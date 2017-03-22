@@ -13,53 +13,56 @@ angular.module('itouch.controllers')
       };
       $scope.location = LocationService.currentLocation;
 
-      $scope.$on("modal.shown", function(event){
-        if($scope.shownModal == 'billView'){
+      $scope.$on("modal.shown", function(event, modal){
+        if(modal.id == 6){
           refresh();
         }
       });
 
       var refresh = function () {
-        PrinterSettings.get().then(function (data) {
-          $scope.settings = data;
-        });
+        if($scope.selectedItem){
+          PrinterSettings.get().then(function (data) {
+            $scope.settings = data;
+          });
 
-        Reciept.fetchData($scope.selectedItem.DocNo).then(function (data) {
-          // console.log(data);
-          data.header.Title = '';
-          switch(data.header.DocType){
-            case 'AV':
-              data.header.Title = 'Abort';
-              break;
-            case 'VD':
-              data.header.Title = 'Transaction Void '+data.header.SalesDocNo;
-              break;
-          }
-          var subTotal = 0;
-          data.items = _.map(data.items, function(item){
-            subTotal += (item.SubTotal + item.Tax5Amount).roundTo(2);
-            item.discounts = _.map(item.discounts, function(discount){
-              if(discount.Description1) {
-                subTotal -= discount.DiscountAmount;
-              }
-              return discount;
+          Reciept.fetchData($scope.selectedItem.DocNo).then(function (data) {
+            // console.log(data);
+            data.header.Title = '';
+            switch(data.header.DocType){
+              case 'AV':
+                data.header.Title = 'Abort';
+                break;
+              case 'VD':
+                data.header.Title = 'Transaction Void '+data.header.SalesDocNo;
+                break;
+            }
+            var subTotal = 0;
+            data.items = _.map(data.items, function(item){
+              subTotal += (item.SubTotal + item.Tax5Amount).roundTo(2);
+              item.discounts = _.map(item.discounts, function(discount){
+                if(discount.Description1) {
+                  subTotal -= discount.DiscountAmount;
+                }
+                return discount;
+              });
+
+              return item;
             });
 
-            return item;
-          });
+            var tenderDiscountTotal = 0;
+            data.tenderDiscounts = _.map(data.tenderDiscounts, function(tDis){
+              tenderDiscountTotal += tDis.Amount;
 
-          var tenderDiscountTotal = 0;
-          data.tenderDiscounts = _.map(data.tenderDiscounts, function(tDis){
-            tenderDiscountTotal += tDis.Amount;
-
-            return tDis;
+              return tDis;
+            });
+            data.subTotal = subTotal.roundTo(2);
+            data.tenderDiscountTotal = tenderDiscountTotal.roundTo(2);
+            $scope.bill = data;
+          }, function (ex) {
+            console.log(ex);
           });
-          data.subTotal = subTotal.roundTo(2);
-          data.tenderDiscountTotal = tenderDiscountTotal.roundTo(2);
-          $scope.bill = data;
-        }, function (ex) {
-          console.log(ex);
-        });
+        }
+
       };
 
       $scope.printReciept = function(DocNo){

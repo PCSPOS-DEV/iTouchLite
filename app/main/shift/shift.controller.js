@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q', '$ionicHistory', '$timeout', 'Alert', 'Reciept',
-    function ($scope, ShiftService, $ionicPopup, $state, Report, $q, $ionicHistory, $timeout, Alert, Reciept) {
+  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q', '$ionicHistory', '$timeout', 'Alert', 'Reciept', 'CartItemService',
+    function ($scope, ShiftService, $ionicPopup, $state, Report, $q, $ionicHistory, $timeout, Alert, Reciept, CartItemService) {
       $scope.shifts = [];
       $scope.shiftSelectionShown = true;
       $scope.shift = {};
@@ -115,15 +115,23 @@ angular.module('itouch.controllers')
       }
 
       var closeShift = function(shift){
-        Alert.showConfirm('Are you sure you want to close this shift ('+shift.Id+')?', 'Close Shift?', function(res){
-          if(res == 1){
-            ShiftService.closeShift(shift.Id || null).then(function(success){
-              $scope.$emit("shift-close", shift);
-            }, function(err){
-              console.log(err);
+        CartItemService.isEmpty().then(function (isEmpty) {
+          if(isEmpty){
+            Alert.showConfirm('Are you sure you want to close this shift ('+shift.Id+')?', 'Close Shift?', function(res){
+              if(res == 1){
+                ShiftService.closeShift(shift.Id || null).then(function(success){
+                  $scope.$emit("shift-close", shift);
+                }, function(err){
+                  console.log(err);
+                });
+              }
             });
+          } else {
+            Alert.warning('Unsaved items should be saved before closing the shift');
           }
         });
+
+
       }
 
     }]);

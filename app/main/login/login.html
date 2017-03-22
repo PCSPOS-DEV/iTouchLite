@@ -1,5 +1,5 @@
 <ion-view view-title="Login">
-  <ion-content>
+  <ion-content scroll="false">
     <div class="row">
       <div class="col">
         <div class="col col-50 col-offset-25">
@@ -8,7 +8,7 @@
               <h2 class="card-he">{{config.name}}</h2>
             </div>
             <div class="item item-text-wrap">
-              <form ng-submit="doLogin()" novalidate>
+              <form ng-submit="ctrl.doLogin()" novalidate>
                 <div class="list">
                   <label class="item item-input item-stacked-label">
                     <span class="input-label">Username</span>
@@ -16,7 +16,7 @@
                   </label>
                   <label class="item item-input item-stacked-label">
                     <span class="input-label">Password</span>
-                    <input type="password" ng-model="credentials.password">
+                    <input type="password" ng-model="credentials.password" />
                   </label>
                 </div>
                 <div class="row">
@@ -24,7 +24,7 @@
                     <button class="button button-block button-positive" type="submit">Log in</button>
                   </div>
                   <div class="col">
-                    <a href="#/settings" class="button button-block button-default">Configure</a>
+                    <a href="" ng-click="openAdminLogin()" class="button button-block button-default">Configure</a>
                   </div>
                 </div>
               </form>

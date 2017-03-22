@@ -183,7 +183,7 @@ angular.module('itouch.controllers')
                 if(!item.OrgPrice) item.OrgPrice = item.AdditionalPrice;
                 if(!item.AlteredPrice) item.AlteredPrice = item.AdditionalPrice;
                 if(!item.StdCost) item.StdCost = item.AdditionalPrice;
-                operations.push(CartItemService.addItemToCart(item, true));
+                operations.push(CartItemService.addItemToCart(oldItem.DocNo, item, true));
               });
 
             } else {

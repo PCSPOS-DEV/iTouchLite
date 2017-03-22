@@ -15,20 +15,31 @@ angular.module('itouch.controllers')
         2: 'Percentages'
       };
       $scope.title = '';
+      var submitted = false;
 
-      DiscountService.get().then(function(dis) {
-        angular.forEach(dis, function (item) {
-          if(item.DiscountType == '1'){
-            discountsSet.type1.push(item);
-          } else {
-            discountsSet.type2.push(item);
-          }
-        });
-
-        $scope.setType($scope.type);
-      }, function (er) {
-        console.log(er);
+      $scope.$on('modal.shown', function(event, data){
+        if($scope.shownModal == 'tenderDiscounts'){
+          submitted = false;
+          refresh();
+        }
       });
+
+
+      var refresh = function(){
+        DiscountService.get().then(function(dis) {
+          angular.forEach(dis, function (item) {
+            if(item.DiscountType == '1'){
+              discountsSet.type1.push(item);
+            } else {
+              discountsSet.type2.push(item);
+            }
+          });
+
+          $scope.setType($scope.type);
+        }, function (er) {
+          console.log(er);
+        });
+      }
 
 
       $scope.setType = function (t) {
@@ -38,9 +49,8 @@ angular.module('itouch.controllers')
       };
 
       $scope.selectDiscount = function (discount) {
-        // console.log($scope.cart);
-        // console.log(discount);
-        if(discount){
+        if(discount && submitted == false){
+          submitted = true;
           if(discount.DiscountType == 1 && discount.Amount == 0){
             $scope.data = {};
 
@@ -85,20 +95,7 @@ angular.module('itouch.controllers')
           $scope.$emit("discountModel-close");
           Alert.warning(ex);
         });
-        // $scope.$emit("refresh-cart");
-
-        // .then(function (item) {
-        //     // $scope.cart.selectedItem.discounted = true;
-        //     // console.log(item);
-        //     // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
-        //     $scope.$emit("refresh-cart");
-        //     $scope.$emit("discountModel-close");
-        //   }, function () {
-        //     $scope.$emit("discountModel-close");
-        //   });discountModel-close
       }
-
-
 
       $scope.close = function () {
         $scope.$emit('discountModel-close');

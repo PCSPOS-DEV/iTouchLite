@@ -9,8 +9,6 @@ angular.module('itouch.controllers')
       AuthService, CartItemService, ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService,
                                                PWPService,  $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state, $rootScope, Reciept, $cordovaToast) {
       $scope.header = header;
-      $scope.currentPage = {};
-      $scope.pages = [];
       $scope.keys = [];
       $scope.layout = null;
       $scope.key = {};
@@ -42,6 +40,13 @@ angular.module('itouch.controllers')
       var buttonClicked = {
         voidBill: false,
         barcode: false
+      };
+      keys = {};
+      $scope.keyboard = {
+        pages: [],
+        activePage: null,
+        keys: {},
+        activeKeys: {}
       };
 
       // document.querySelector("input#qty").addEventListener("keyup", function () {
@@ -92,8 +97,8 @@ angular.module('itouch.controllers')
         });
 
         $scope.$on("$ionicView.afterEnter", function(event, data){
-          if($scope.pages){
-            $scope.changePage(_.first($scope.pages), 0);
+          if($scope.keyboard.pages){
+            $scope.changePage(_.first($scope.keyboard.pages), 0);
             var scroll = $ionicScrollDelegate.$getByHandle('pages-scroll');
             if(scroll){
               $timeout(function () {
@@ -175,9 +180,8 @@ angular.module('itouch.controllers')
           loadLayout();
           loadFunctions();
           refresh().then(function () {
-            // selectLastItem();
+            $scope.selectItemWithLineNumber();
           });
-
         }
         /**
          * Opens the Business Date picker
@@ -383,29 +387,46 @@ angular.module('itouch.controllers')
         },
         loadPages = function (layoutId) {
           return KeyBoardService.getPages(layoutId).then(function (pages) {
-            $scope.pages = pages;
-            $scope.changePage(_.first($scope.pages), 1);
+            $scope.keyboard.pages = pages;
             loadKeys(layoutId);
-            return $scope.currentPage;
+            return $scope.keyboard.activePage;
           });
         },
         loadKeys = function (layoutId) {
           return KeyBoardService.getKeys(layoutId).then(function (keys) {
-            var keyCount = $scope.pages.length * 32;
-            var keySet = {};
-            for (var i in _.range(1, keyCount + 1)) {
-              keySet[i] = _.findWhere(keys, {KeyNo: parseInt(i)});
-            }
-            $scope.key = keySet[1];
-            $scope.keys = keySet;
-            $scope.range = _.range(1, 33);
-            return keySet;
+            $scope.keyboard.keys = keys;
+            $scope.changePage(_.first($scope.keyboard.pages), 1);
+            // var keyCount = $scope.pages.length * 32;
+            // var keySet = {};
+            // for (var i in _.range(1, keyCount + 1)) {
+            //   keySet[i] = _.findWhere(keys, {KeyNo: parseInt(i)});
+            // }
+            // $scope.key = keySet[1];
+            // $scope.keys = keySet;
+            // $scope.range = _.range(1, 33);
+            return keys;
           });
         };
         // loadLayout();
 
       var errHandler = function (err) {
         console.log(err.message);
+      }
+
+      var getActiveKeys = function(pageId){
+        var keys = {};
+        var keyObj = {};
+        if($scope.keyboard.keys[pageId]){
+          keys = $scope.keyboard.keys[pageId];
+          // console.log(keys);
+        }
+
+        for(var i = 1; i <= 31; i++){
+          keyObj[i] = keys[i] ? keys[i] : {}
+        }
+        keyObj[32] = keys[0] ? keys[0] : {};
+        // console.log(keyObj);
+        return keyObj;
       }
 
       /**
@@ -433,15 +454,17 @@ angular.module('itouch.controllers')
       $scope.changePage = function (page, $index) {
         $scope.data.barcodeMode = false;
         if(page){
-          $scope.pages = _.map($scope.pages, function (p, key) {
+          $scope.keyboard.pages = _.map($scope.keyboard.pages, function (p, key) {
             p.selected = false;
             return p;
           });
-          $scope.currentPage = page;
+          $scope.keyboard.activePage = page;
           page.selected = true;
-          $scope.range = _.range((32 * $index) + 1, (32 * $index) + 33);
-          console.log(page);
-          // $scope.selectedKeys = keys[page.Id];
+          // $scope.range = _.range((32 * $index) + 1, (32 * $index) + 33);
+          // console.log(page);
+          if($scope.keyboard.activePage){
+            $scope.keyboard.activeKeys = getActiveKeys($scope.keyboard.activePage.Id);
+          }
         }
 
       }
@@ -454,11 +477,10 @@ angular.module('itouch.controllers')
       $scope.onKeyClick = function (item) {
         $scope.data.barcodeMode = false;
         if(item){
-          //TODO: add additional pages
-          // if(item.Type == 'P'){
-          //   $scope.changePage(item);
-          //   return false;
-          // }
+          if(item.Type == 'P'){
+            $scope.keyboard.activeKeys = getActiveKeys(item.SubPage);
+            return false;
+          }
 
           $scope.selectedItem = angular.copy(item);
           if (item.SubPLU1Code == "") {
@@ -488,7 +510,9 @@ angular.module('itouch.controllers')
       }
 
       var showPriceForm = function(){
+        var wasBCMOn = $scope.data.barcodeMode == true;
         if(!priceFormShown){
+          $scope.data.barcodeMode = false;
           priceFormShown = true;
           $scope.data.amount = "";
           return $ionicPopup.show({
@@ -513,6 +537,9 @@ angular.module('itouch.controllers')
             ]
           }).finally(function (res) {
             priceFormShown = false;
+            if(wasBCMOn){
+              $scope.data.barcodeMode = true;
+            }
             return res;
           });
         } else {
@@ -525,15 +552,15 @@ angular.module('itouch.controllers')
           $scope.qty.value = 1;
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
-          if(salesKit && !salesKit.isEmpty){
-            $scope.salesKits = salesKit;
-            $scope.shownModal = 'sk';
+            if(salesKit && !salesKit.isEmpty){
+              $scope.salesKits = salesKit;
+              $scope.shownModal = 'sk';
             if($scope.qty.value){
               $scope.salesKits.customQuantity = $scope.qty.value;
             }
             $timeout(function () {
               $scope.skModalModal.show();
-            }, 1000);
+            }, 500);
 
 
           } else {
@@ -612,7 +639,7 @@ angular.module('itouch.controllers')
                     });
                     ;
                   } else {
-                    CartItemService.addItemToCart(item).then(function (it) {
+                    CartItemService.addItemToCart($scope.header.DocNo, item).then(function (it) {
                       $scope.refreshCart().then(function () {
                         // $scope.scrollTo(it.LineNumber);
                         $scope.qty.value = 1;
@@ -659,7 +686,7 @@ angular.module('itouch.controllers')
        */
       $scope.selectItem = function (item) {
         // if(!$scope.cart.selectedItem || !item || item.LineNumber != $scope.cart.selectedItem.LineNumber){
-          $scope.scrollTo(item ? item.LineNumber : null);
+
         // }
         if(item){
 
@@ -711,7 +738,7 @@ angular.module('itouch.controllers')
                 $scope.TakeAway = false;
               }
               if($scope.cart.selectedItem && $scope.cart.selectedItem.LineNumber == item.LineNumber){
-                $scope.selectItem(item);
+                // $scope.selectItem(item);
               }
             });
 
@@ -736,6 +763,7 @@ angular.module('itouch.controllers')
        */
       $scope.invoke = function (fn) {
         if (!_.isUndefined($scope.salesFunctions[fn.Name])) {
+          $scope.data.barcodeMode = false;
           $scope.salesFunctions[fn.Name](fn);
         } else {
           throw new Error("Function " + fn.Name + " is not available.");
@@ -752,11 +780,17 @@ angular.module('itouch.controllers')
               }
             });
             if(key || key == 0){
+              if(!$scope.cart.selectedItem || $scope.cart.selectedItem.LineNumber != lineNumber){
+                $scope.scrollTo(lineNumber);
+              } else {
+                console.log('same');
+              }
               $scope.selectItem($scope.cart.items[key]);
             } else {
               var last = $scope.cart.items[Object.keys($scope.cart.items)[Object.keys($scope.cart.items).length-1]];
               if(last){
                 $scope.selectItem(last);
+                $scope.scrollTo(last.LineNumber);
               } else {
                 $scope.selectItem(null);
               }
@@ -891,7 +925,9 @@ angular.module('itouch.controllers')
             if(authorityCheck(fn)){
               var qty = angular.copy(item.Qty);
               BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, ++qty).then(function () {
-                $scope.refreshCart();
+                $scope.refreshCart().then(function () {
+                  $scope.selectItemWithLineNumber(item.LineNumber);
+                });
               }, function (err) {
                 console.log(err);
               });
@@ -905,7 +941,9 @@ angular.module('itouch.controllers')
               var qty = angular.copy(item.Qty);
               if(qty > 1){
                 BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, --qty).then(function () {
-                  $scope.refreshCart();
+                  $scope.refreshCart().then(function () {
+                    $scope.selectItemWithLineNumber(item.LineNumber);
+                  });
                 }, function (err) {
                   console.log(err);
                 });
@@ -1161,7 +1199,7 @@ angular.module('itouch.controllers')
            selectItem(item);
          }, function(ex){
            // Alert.warning(ex);
-           $cordovaToast.showShortTop(ex).then(function(success) {
+           $cordovaToast.showShortBottom(ex).then(function(success) {
              // success
              document.getElementById("barcodeText").focus();
            }, function (error) {
@@ -1181,7 +1219,11 @@ angular.module('itouch.controllers')
 
       $scope.onBarcodeTextBlur = function(){
         if($scope.data.barcodeMode){
-          document.getElementById("barcodeText").focus();
+          $scope.data.barcode = "";
+          $timeout(function() {
+            document.getElementById("barcodeText").focus();
+          },750);
+
         }
       }
 

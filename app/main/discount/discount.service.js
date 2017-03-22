@@ -20,7 +20,7 @@ angular.module('itouch.services')
         return DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, 'MAX(SeqNo) AS sq', {columns: 'DocNo=? AND ItemId=?', data: [DocNo, ItemId]}).then(function (res) {
           var line = DB.fetch(res);
           if(line){
-            return ++line.sq || 1;
+            return ++line.sq;
           } else {
             return 1;
           }
@@ -200,34 +200,9 @@ angular.module('itouch.services')
         DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.tempDetail, _.pick(item, 'SubTotal', 'DiscAmount', 'Tax5DiscAmount'), {columns:'ItemId=? AND LineNumber=?', data: [item.ItemId, item.LineNumber]});
       }
 
-      var updateTempBillHeader = function (DocNo, item) {
-        var def = $q.defer();
-        BillService.getHeader(DocNo).then(function(header){
-          if(header){
-            header.DiscAmount += item.DiscAmount;
-            header.Tax1DiscAmount += item.Tax1DiscAmount;
-            header.Tax2DiscAmount += item.Tax2DiscAmount;
-            header.Tax3DiscAmount += item.Tax3DiscAmount;
-            header.Tax4DiscAmount += item.Tax4DiscAmount;
-            header.Tax5DiscAmount += item.Tax5DiscAmount;
-            updateTempHeader(header);
-            def.resolve();
-          } else {
-            def.reject("header not found");
-          }
-        }, function(ex){
-          def.reject(ex);
-        });
-        return def.promise;
-      }
-
-      var updateTempHeader = function (header) {
-        DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.tempHeader, _.pick(header, 'SubTotal', 'DiscAmount', 'Tax5DiscAmount'), {columns:'DocNo=?', data: [header.DocNo]});
-      }
-
 
       // var total = null;
-      var calculateDiscountAmounts = function (item, discount, amount) {
+      var calculateDiscountAmounts = function (item, discount) {
         // if(total == null){
         //   total = 0;
         // }
@@ -245,63 +220,36 @@ angular.module('itouch.services')
             // totalDiscount  = (item.Total < discount.Amount ? item.Total : discount.Amount).roundTo(2);
             // subDiscount = ((totalDiscount * (100-item.Tax5Perc)) / 100).roundTo(2);
 
-            totalDiscount = amount ? parseFloat(amount) : discount.Amount;
+            totalDiscount = discount.Amount;
             subDiscount = ((totalDiscount * (100-item.Tax5Perc)) / 100).roundTo(2);
           }
 
-
-        // } else {
-        //   discount.Percentage = parseFloat(discount.Percentage || discount.DiscountPercentage);
-        //   totalDiscount = addDiscountAmount(item.Total, discount.Percentage);
-        //   subDiscount = addDiscountAmount((item.SubTotal - item.DiscAmount), discount.Percentage);
-        // }
         totalDiscount = totalDiscount.roundTo(2);
-        item.Discount += totalDiscount;
-        item.DiscAmount += subDiscount;
-        item.Tax5DiscAmount += (totalDiscount - subDiscount).roundTo(2);
+        item.Discount = (item.Discount + totalDiscount).roundTo(2);
+        item.DiscAmount = (item.DiscAmount + subDiscount).roundTo(2);
+        item.Tax5DiscAmount = (item.Tax5DiscAmount +(totalDiscount - subDiscount)).roundTo(2);
         discount.DiscountAmount = totalDiscount;
-        // total = (total + totalDiscount).roundTo(2);
-        // console.log(totalDiscount);
-        // console.log(item);
+
         return  {item: angular.copy(item), discount: angular.copy(discount)};
       }
-
-      // var processItem = function (item, discount, customDiscountAmount) {
-      //
-      //     item = ItemService.calculateTotal(item);
-      //     calculateDiscountAmounts(item, discount, customDiscountAmount);
-      //     discount.DiscountAmount = item.Discount;
-      //
-      //     renameProperty(discount, 'Id', 'DiscountId');
-      //     renameProperty(discount, 'Percentage', 'DiscountPercentage');
-      //     renameProperty(discount, 'Code', 'DiscountCode');
-      //     discount = _.pick(discount, ['DiscountFrom', 'DiscountId', 'DiscountCode', 'DiscountFor', 'DiscountType', 'DiscountPercentage', 'DiscountAmount']);
-      //     discount = _.extend(_.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'LineNumber']),discount);
-      //     discount.SeqNo = sn;
-      //     discount.DiscountFrom = 'I';
-      //     discount.DocNo =  discount.DocNo || DocNo;
-      //     discount.BusinessDate =  discount.BusinessDate || businessDate;
-      //     discount.MachineId =  discount.MachineId || machineId;
-      //     discount.LocationId =  discount.LocationId || location.LocationId;
-      //
-      //     return true;
-      // }
 
       var processDiscountItem = function (item, discount) {
         return getNextSeqNumber(item.DocNo, item.ItemId).then(function (sn) {
           // renameProperty(discount, 'Id', 'DiscountId');
           renameProperty(discount, 'Percentage', 'DiscountPercentage');
           renameProperty(discount, 'Code', 'DiscountCode');
-          renameProperty(discount, 'Amount', 'DiscountAmount');
+          if(!discount.DiscountAmount){
+            renameProperty(discount, 'Amount', 'DiscountAmount');
+          }
           discount = _.pick(discount, ['DiscountFrom', 'DiscountId', 'DiscountCode', 'DiscountFor', 'DiscountType', 'DiscountPercentage', 'DiscountAmount', 'SeqNo']);
           discount = _.extend(_.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'LineNumber']),discount);
           discount.SeqNo = sn;
           discount.DiscountFrom = 'I';
+          discount.DiscountType = ""+parseInt(discount.DiscountType );
           discount.DocNo =  discount.DocNo || DocNo;
           discount.BusinessDate =  discount.BusinessDate || businessDate;
           discount.MachineId =  discount.MachineId || machineId;
           discount.LocationId =  discount.LocationId || location.LocationId;
-          console.log(discount);
 
           return discount;
         });
@@ -317,6 +265,7 @@ angular.module('itouch.services')
           discount = _.pick(discount, ['DiscountFrom', 'DiscountId', 'DiscountCode', 'DiscountFor', 'DiscountType', 'DiscountPercentage', 'DiscountAmount', 'SeqNo']);
           discount = _.extend(_.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'LineNumber']),discount);
           discount.DiscountFrom = 'T';
+          discount.DiscountType = ""+parseInt(discount.DiscountType );
           discount.DocNo =  discount.DocNo || DocNo;
           discount.BusinessDate =  discount.BusinessDate || businessDate;
           discount.MachineId =  discount.MachineId || machineId;
@@ -329,25 +278,17 @@ angular.module('itouch.services')
         // });
       }
 
-      self.saveTempDiscountItem = function (item, discount, amount) {
+      self.saveTempDiscountItem = function (item, discount) {
         DB.clearQueue();
-        ItemService.calculateTotal(item);
-        var discountAmounts = calculateDiscountAmounts(item, discount, amount);
-        item = discountAmounts.item;
-        discount = discountAmounts.discount;
-        if(checkAmountEligibility(item)){
-          return processDiscountItem(item, discount).then(function (discount) {
-            // console.log(item);
-            // console.log(discount);
+        // item = ItemService.calculateTotal(item);
+        var discountAmounts = calculateDiscountAmounts(item, discount);
+        if(checkAmountEligibility(discountAmounts.item)){
+          return processDiscountItem(discountAmounts.item, discountAmounts.discount).then(function (discount) {
             saveItemDiscount(discount);
-            updateTempBillDetail(item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [item.DocNo, item.ItemId, item.LineNumber]});
-            // return updateTempBillHeader(item.DocNo, _.pick(item, ['DiscAmount', 'Tax1DiscAmount', 'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount'])).then(function(){
+            updateTempBillDetail(discountAmounts.item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [discountAmounts.item.DocNo, discountAmounts.item.ItemId, discountAmounts.item.LineNumber]});
             return DB.executeQueue().then(function () {
               return BillService.updateHeaderTotals();
             });
-            // });
-
-
           });
         } else {
           return $q.reject("Not eligible for this discount amount");
@@ -374,11 +315,7 @@ angular.module('itouch.services')
                 calculateDiscountAmounts(discountSet.item, dis);
                 saveItemDiscount(dis);
                 updateTempBillDetail(discountSet.item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [discountSet.item.DocNo, discountSet.item.ItemId, discountSet.item.LineNumber]});
-                return DB.executeQueue().then(function () {
-                  return BillService.updateHeaderTotals();
-                }, function(ex){
-                  return $q.resolve();
-                });
+                return true;
               });
             }));
           } else {
@@ -386,13 +323,10 @@ angular.module('itouch.services')
           }
         });
         return $q.all(promises).then(function(){
-          console.log('dis done');
-          return true;
-        }, function(ex){
-          console.log('Discount fail '+ex);
-          return false;
+          return DB.executeQueue().then(function () {
+            return BillService.updateHeaderTotals();
+          });
         });
-
       }
 
       self.checkItemEligibility = function (item) {
@@ -412,13 +346,22 @@ angular.module('itouch.services')
 
       var checkAmountEligibility = function(item){
         // console.log(item);
+        var total = item.SubTotal + item.Tax5Amount;
+        var discount = item.DiscAmount + item.Tax5DiscAmount;
+        if(discount > total){
+          return false;
+        }
         if(item.BelowCost == 'false'){
-          return (item.Total-item.Discount) >= item.StdCost;
+          if(item.StdCost > 0){
+            if((total-discount) < item.StdCost){
+              return false;
+            }
+          }
         }
         if(item.Qty < 1){
           return false;
         }
-        return false;
+        return true;
       }
 
       var seq = null;
@@ -464,7 +407,7 @@ angular.module('itouch.services')
             // totalDiscount  = (item.Total < discountPerItem ? item.Total : discount.Amount).roundTo(2);
             // subDiscount = ((totalDiscount * (100-item.Tax5Perc)) / 100).roundTo(2);
             item = ItemService.calculateTotal(item);
-            if(!self.checkItemEligibility(item)){
+            if(!checkAmountEligibility(item)){
               item.TotalEligibleDiscount = 0;
             } else if(item.BelowCost == 'true' || item.StdCost == 0){
               item.TotalEligibleDiscount  = item.Total;

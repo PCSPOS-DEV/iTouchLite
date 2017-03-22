@@ -130,23 +130,23 @@ angular.module('itouch.services')
       }
 
       self.getSalesKit = function (itemId, BusinessDate) {
-        var deferred = $q.defer();
         var salesKit;
         var q = 'SELECT * FROM '+DB_CONFIG.tableNames.salesKit.salesKitItems+' AS sk  INNER JOIN '+
           DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sk.ItemId  WHERE sk.SalesKitId = ?';
 
-        DB.query(q, [itemId]).then(function (res) {
+        return DB.query(q, [itemId]).then(function (res) {
           var salesKitItems = DB.fetchAll(res);
-          ItemService.getById(itemId).then(function (sk) {
+          return ItemService.getById(itemId).then(function (sk) {
             salesKit = sk;
             if(salesKitItems.length > 0){
+              var promises = [];
               angular.forEach(salesKitItems, function (ski) {
                 salesKit.selected = angular.copy(ski);
                 salesKit.list = {};
                 salesKit.selectedList = {};
                 ski.SalesKitId = itemId;
                 // console.log(salesKit);
-                  return DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]}).then(function (res) {
+                  promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]}).then(function (res) {
                     var selections = _.map(DB.fetchAll(res), function (row) {
                       row.SalesKitId = itemId;
                       row.Qty = 0;
@@ -170,19 +170,21 @@ angular.module('itouch.services')
                       ski.Selectable = false;
                       salesKit.selectedList[ski.ItemId] = ski;
                     }
-                });
+                    salesKit.isEmpty = _.isEmpty(salesKit.list);
+                    return true;
+                }));
               });
 
-
-              deferred.resolve(salesKit);
+              return $q.all(promises).then(function () {
+                return salesKit;
+              });
             } else {
-              deferred.resolve(false);
+              return $q.resolve(false);
             }
           });
         }, function (err) {
-          deferred.reject(err.message);
+          return $q.reject(err.message);
         });
-        return deferred.promise;
       }
 
       self.getSalesKitWithId= function (salesKitId) {

@@ -3,9 +3,9 @@
  */
 angular.module('itouch.controllers')
   .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService',
-    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q', 'ItemService', 'denominations',
+    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q', 'ItemService', 'denominations', 'Alert',
     function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService,
-              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q, ItemService, denominations) {
+              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q, ItemService, denominations, Alert) {
     $scope.tenderTypes = [];
       $scope.title = "Tender";
       $scope.tenderHeader = billData.header;
@@ -211,14 +211,14 @@ angular.module('itouch.controllers')
                   OverTenderTypeId: tenderType.OverTenderTypeId,
                   SeqNo: 0,
                   Amount: amount,
-                  ChangeAmount: changeAmount,
+                  ChangeAmount: changeAmount || 0,
                   IsExported: false
                 };
               }
 
               DiscountService.saveTenderDiscount($scope.tenderHeader.DocNo).then(function(){
                 BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
-                  BillService.saveReceiptId($scope.tenderHeader.DocNo);
+                  ControlService.counterDocId($scope.tenderHeader.DocNo);
                   BillService.initHeader();
                   payTransactions = [];
                   overTender = [];
@@ -242,6 +242,7 @@ angular.module('itouch.controllers')
                     disableBack: true
                   });
 
+                  $rootScope.$emit("initBill");
                   $rootScope.$emit("refresh-cart");
                   $state.go('app.sales', {}, {reload: true});
 
@@ -265,7 +266,7 @@ angular.module('itouch.controllers')
               SeqNo: seq,
               PayTypeId: tenderType.Id,
               Amount: transAmount,
-              ChangeAmount: changeAmount,
+              ChangeAmount: changeAmount || 0,
               ConvRate: 0,
               CurrencyId: 0,
               IsExported: false
@@ -333,6 +334,7 @@ angular.module('itouch.controllers')
         },
         Discount: function (fn) {
           if(payTransactions.length == 0){
+            $scope.shownModal = 'tenderDiscounts';
             $scope.discountModal.show();
           }
 
@@ -461,9 +463,13 @@ angular.module('itouch.controllers')
 
       $scope.addDenomination = function(value){
         var cashId = SettingsService.getCashId();
-        console.log(cashId);
+        // console.log(cashId);
         TenderService.getTenderTypeById(cashId).then(function (tenderType) {
-          $scope.selectTenderType(tenderType, value);
+          if(tenderType){
+            $scope.selectTenderType(tenderType, value);
+          } else {
+            Alert.error('Incorrect Cash ID configured. Please contact administrator');
+          }
         });
       }
 

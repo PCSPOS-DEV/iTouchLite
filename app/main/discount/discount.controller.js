@@ -14,20 +14,31 @@ angular.module('itouch.controllers')
         2: 'Percentages'
       };
       $scope.title = '';
+      var  submitted = false;
 
-      DiscountService.get().then(function(dis) {
-        angular.forEach(dis, function (item) {
-          if(item.DiscountType == '1'){
-            discountsSet.type1.push(item);
-          } else {
-            discountsSet.type2.push(item);
-          }
-        });
-
-        $scope.setType($scope.type);
-      }, function (er) {
-        console.log(er);
+      $scope.$on('modal.shown', function(event, data){
+        if($scope.shownModal == 'itemDiscounts'){
+          submitted = false;
+          refresh();
+        }
       });
+
+
+      var refresh = function(){
+        DiscountService.get().then(function(dis) {
+          angular.forEach(dis, function (item) {
+            if(item.DiscountType == '1'){
+              discountsSet.type1.push(item);
+            } else {
+              discountsSet.type2.push(item);
+            }
+          });
+
+          $scope.setType($scope.type);
+        }, function (er) {
+          console.log(er);
+        });
+      }
 
 
       $scope.setType = function (t) {
@@ -38,7 +49,6 @@ angular.module('itouch.controllers')
 
       $scope.selectDiscount = function (discount) {
         if(discount){
-          console.log(discount);
           if(discount.DiscountType == 1 && discount.Amount == 0){
             $scope.data = {};
 
@@ -66,26 +76,31 @@ angular.module('itouch.controllers')
             });
 
             myPopup.then(function (res) {
-              saveDiscount(discount, res);
+              saveDiscount(angular.copy(discount), res);
             });
           } else {
-            saveDiscount(discount);
+            saveDiscount(angular.copy(discount));
           }
         }
       }
 
       var saveDiscount = function (discount, amount) {
-        amount = parseFloat(amount);
-        DiscountService.saveTempDiscountItem(angular.copy($scope.cart.selectedItem), discount, amount).then(function (item) {
-          // $scope.cart.selectedItem.discounted = true;
-          // console.log(item);
-          // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
-          $scope.$emit("refresh-cart");
-          $scope.$emit("discountModel-close");
-        }, function (err) {
-          Alert.error(err);
-          $scope.$emit("discountModel-close");
-        });
+        if(submitted == false){
+          submitted = true;
+          if(amount){
+            discount.Amount = parseFloat(amount);
+          }
+          DiscountService.saveTempDiscountItem(angular.copy($scope.cart.selectedItem), angular.copy(discount)).then(function (item) {
+            // $scope.cart.selectedItem.discounted = true;
+            // console.log(item);
+            // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
+            $scope.$emit("refresh-cart");
+            $scope.$emit("discountModel-close");
+          }, function (err) {
+            Alert.error(err);
+            $scope.$emit("discountModel-close");
+          });
+        }
       }
 
       $scope.close = function () {

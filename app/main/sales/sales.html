@@ -1,7 +1,7 @@
 <ion-view view-title="iSeries NX Lite" class="sales" hide-back-button="true" can-swipe-back="false">
   <ion-content scroll="false">
     <form action="" ng-submit="barcodeSubmit($event)" >
-      <input type="text" ng-model="data.barcode"  ng-blur="onBarcodeTextBlur()" id="barcodeText" />
+      <input type="text" ng-model="data.barcode"  ng-blur="onBarcodeTextBlur()" ng-disabled="!data.barcodeMode" id="barcodeText" />
       <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
 
     </form>
@@ -34,8 +34,8 @@
           <div class="row wrapper button-wrapper">
             <div class="col buttons clearfix">
               <div class="clearfix">
-                <button class="btn" ng-repeat="k in range" ng-init="key = keys[k]"
-                     ng-style="{'background-color': key.Color }" on-tap="onKeyClick(key)">
+                <button class="btn" ng-repeat="key in keyboard.activeKeys"
+                     ng-style="{'background-color': key.Colour }" on-tap="onKeyClick(key)">
                   <div>
                     <p class="desc1">{{ print(key, 'KeyDesc', 1) || print(key, 'PageDesc', 1) }}</p>
                     <p class="desc2">{{ print(key, 'KeyDesc', 2) || print(key, 'PageDesc', 2) }}</p>
@@ -142,7 +142,7 @@
         <ion-scroll direction="x" zooming="false" delegate-handle="pages-scroll">
           <div class="button-bar">
           <a class="button  button-positive" ng-click="changePage(page, $index)"
-             ng-class="{'button-balanced': page.selected, 'button-positive': !page.selected}" ng-repeat="page in pages">
+             ng-class="{'button-balanced': page.selected, 'button-positive': !page.selected}" ng-repeat="page in keyboard.pages">
             <p class="desc1">{{ print(page, "Description", null, 14) }}</p>
           </a>
             </div>

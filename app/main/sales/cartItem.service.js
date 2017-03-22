@@ -117,7 +117,7 @@ angular.module('itouch.services')
         return cart.summery;
       }
 
-      self.addItemToCart = function (item, salesKit) {
+      self.addItemToCart = function (DocNo, item, salesKit) {
 
         item = angular.copy(item);
         var cartItem = null;
@@ -125,7 +125,7 @@ angular.module('itouch.services')
           cartItem = self.findItem(item.Id, item.ItemType, item.LineNumber, item.parentItemLineNumber);
         }
 
-        return BillService.findItems(item.ItemId, item.ItemType, item.parentItemLineNumber).then(function (items) {
+        return BillService.findItems(item.ItemId, DocNo, item.ItemType, item.parentItemLineNumber).then(function (items) {
           var ndItem = getItem(items);
           if(item.OpenKey){
             if(item.customQuantity){
@@ -300,7 +300,8 @@ angular.module('itouch.services')
       }
 
       self.isEmpty = function(){
-        return DB.query("SELECT COUNT(*) AS c FROM "+DB_CONFIG.tableNames.bill.tempDetail).then(function(res){
+        var rec_id = BillService.getCurrentReceiptId();
+        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, "COUNT(*) AS c", { columns: 'DocNo=?', data:[rec_id] }).then(function(res){
           var count = DB.fetch(res).c;
           if(count == 0){
             return true;

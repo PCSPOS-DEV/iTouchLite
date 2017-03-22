@@ -33,15 +33,26 @@ angular.module('itouch.services')
     }
 
     self.get = function () {
+      var locationPromise;
       if(self.currentLocation && self.currentLocation.Id == SettingsService.getLocationId()){
-        return $q.when(self.currentLocation);
+        locationPromise = $q.when(self.currentLocation);
       } else {
-        return DB.query("SELECT * FROM " + DB_CONFIG.tableNames.locations.locations + " WHERE Id = ?", [SettingsService.getLocationId()]).then(function (result) {
-          self.currentLocation = DB.fetch(result);
-          $localStorage.location = self.currentLocation;
-          return self.currentLocation;
+        locationPromise = DB.query("SELECT * FROM " + DB_CONFIG.tableNames.locations.locations + " WHERE Id = ?", [SettingsService.getLocationId()]).then(function (result) {
+          var loc = DB.fetch(result);
+          if(loc){
+            self.currentLocation = loc;
+            $localStorage.location = loc;
+            return self.currentLocation;
+          } else {
+            return $q.reject('Invalid Location Id');
+          }
         });
       }
+      return locationPromise.then(function(location){
+        renameProperty(location, 'PriceLevel', 'PriceLevelId');
+        renameProperty(location, 'Id', 'LocationId');
+        return location;
+      });
     }
 
     self.save = function (items) {

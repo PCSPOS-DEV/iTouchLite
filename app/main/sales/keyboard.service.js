@@ -130,21 +130,45 @@ angular.module('itouch.services')
     }
 
     self.getKeys = function (layoutId) {
-      var deferred = $q.defer();
-      DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.keys + " WHERE KeyboardLayoutId = ?", [layoutId]).then(function (result) {
-        keys = DB.fetchAll(result);
-        // deferred.resolve(keys);
-      }, function (err) {
-        deferred.reject(err.message);
+      return $q.all({
+        keys: DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.keys + " WHERE KeyboardLayoutId = ? AND PageKeyNo IS NOT NULL ORDER BY PageKeyNo, KeyNo", [layoutId]).then(function (result) {
+          return DB.fetchAll(result);
+        }),
+        keyboard: DB.query("SELECT * FROM view_keyboard WHERE KeyboardLayoutMasterId = ? ORDER BY MainPageId, KeyNo", [layoutId]).then(function (result) {
+          return DB.fetchAll(result);
+        })
+      }).then(function (data) {
+        var keys = data.keys.concat(data.keyboard);
+        if(keys.length > 0){
+          var keyObject = {};
+          _.each(data.keyboard, function (key) {
+
+            if(!keyObject[key.MainPageId]){
+              keyObject[key.MainPageId] = [];
+            }
+            keyObject[key.MainPageId][key.KeyNo%32] = key;
+
+
+          });
+          _.each(data.keys, function (key) {
+
+            if(!keyObject[key.PageKeyNo]){
+              keyObject[key.PageKeyNo] = [];
+            }
+            keyObject[key.PageKeyNo][key.KeyNo % 32] = key;
+
+
+          });
+          return keyObject;
+        }
+        return {};
       });
-      DB.query("SELECT * FROM view_keyboard WHERE KeyboardLayoutMasterId = ?", [layoutId]).then(function (data) {
-        keys = keys.concat(DB.fetchAll(data));
-        deferred.resolve(keys);
-      }, function (err) {
-        deferred.reject(err.message);
-        console.log(err);
-      });
-      return deferred.promise;
+
+      // DB.query("SELECT * FROM view_keyboard WHERE KeyboardLayoutMasterId = ?", [layoutId]).then(function (data) {
+      //   keys = keys.concat(DB.fetchAll(data));
+      //   deferred.resolve(keys);
+      // });
+      // return deferred.promise;
     }
 
     self.getKeysForPage = function (pageId) {

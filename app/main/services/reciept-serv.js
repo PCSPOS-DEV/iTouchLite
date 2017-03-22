@@ -41,6 +41,9 @@ angular.module('itouch.services')
 
     printer.addTextAlign(printer.ALIGN_LEFT);
     PrintService.addHLine();
+    if(data.header.OrderTag){
+      printer.addText("  Order Tag    : "+data.header.OrderTag+"\n");
+    }
 
     angular.forEach(data.items, function(row){
       var sTotal = (row.SubTotal + row.Tax5Amount).roundTo(2);
@@ -138,7 +141,7 @@ angular.module('itouch.services')
       printer.addText(row.Text+'\n');
     });
 
-    printer.addText('\nBDate: '+header.BusinessDate+' Shift: '+ footerData.shift.Description1 +' M/C: '+ footerData.machine.Code +'\n');
+    printer.addText('\nBDate: '+header.BusinessDate+' Shift: '+ (footerData.shift ? footerData.shift.Description1: '' ) +' M/C: '+ (footerData.machine ? footerData.machine.Code : '') +'\n');
     printer.addText(header.SysDateTime+' User: '+ footerData.cashier.Id + ' ' + header.DocNo +'\n');
   }
 
@@ -151,7 +154,7 @@ angular.module('itouch.services')
           self.fetchData(DocNo).then(function (data) {
             printData = data.printData;
 
-            if(data && data.header){
+            if(data && data.header && data.footerData){
               self.creatRecieptHeader();
 
               self.creatRecieptBody(data, true);
@@ -191,7 +194,7 @@ angular.module('itouch.services')
               PrintService.addTitle(data.header.SalesDocNo);
               self.creatRecieptBody(data, data.header.Tax, true);
 
-              self.creatRecieptFooter(data.header.DocNo);
+              self.creatRecieptFooter(data.header, data.footerData);
 
               printer.addCut(printer.CUT_FEED);
 
@@ -222,7 +225,7 @@ angular.module('itouch.services')
 
               self.creatRecieptBody(data, false);
 
-              self.creatRecieptFooter(data.header.DocNo, data.header.Tax);
+              self.creatRecieptFooter(data.header, data.footerData);
 
               printer.addCut(printer.CUT_FEED);
 

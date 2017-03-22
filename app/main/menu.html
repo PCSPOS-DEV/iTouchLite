@@ -9,7 +9,10 @@
         </button>
       </ion-nav-buttons>
     </ion-nav-bar>
-    <ion-nav-view name="menuContent"></ion-nav-view>
+    <ion-pane>
+      <ion-nav-view name="menuContent"></ion-nav-view>
+    </ion-pane>
+
   </ion-side-menu-content>
     <!--<ion-content scroll="false">-->
         <!--<ion-nav-view name="menuContent" hide-nav-bar="false" class="main-view"></ion-nav-view>-->
@@ -34,12 +37,12 @@
         <ion-item menu-close href="#/app/history">
           History
         </ion-item>
-        <ion-item menu-close href="#/app/printer-setup">
-          Printer Setup
+        <ion-item menu-close href="" ng-click="openAdminLogin()">
+          Admin Panel
         </ion-item>
-        <ion-item menu-close href="" ng-click="sync()">
-          Sync
-        </ion-item>
+        <!--<ion-item menu-close href="" ng-click="sync()">-->
+          <!--Sync-->
+        <!--</ion-item>-->
         <ion-item menu-close href="" ng-click="upload()">
           Upload
         </ion-item>

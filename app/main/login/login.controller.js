@@ -1,8 +1,11 @@
 /**
  * Created by shalitha on 17/5/16.
  */
+var onLogin;
 angular.module('itouch.controllers')
-  .controller("LoginCtrl", ['$scope', 'AuthService', '$state', 'Alert', function ($scope, AuthService, $state, Alert) {
+  .controller("LoginCtrl", ['$scope', 'AuthService', '$state', 'Alert', '$cordovaKeyboard', '$ionicModal', '$state',
+    function ($scope, AuthService, $state, Alert, $cordovaKeyboard, $ionicModal, $state) {
+    var self = this;
     $scope.credentials = {
       username: null,
       password: null
@@ -24,7 +27,7 @@ angular.module('itouch.controllers')
           console.log('enter');
       });
 
-    $scope.doLogin = function () {
+    self.doLogin = function () {
       if($scope.credentials.username && $scope.credentials.password){
         AuthService.attempt($scope.credentials.username, $scope.credentials.password).then(function () {
           $state.go('app.home');
@@ -34,8 +37,33 @@ angular.module('itouch.controllers')
         });
       }
     }
-
     $scope.loadConfig = function () {
       AuthService.syncUsers();
     }
+
+    $scope.openAdminLogin = function(){
+      if($scope.discountModal){
+        $scope.discountModal.show();
+      }
+
+    }
+
+    /**
+     * Initiating discount modal dialog
+     */
+    $ionicModal.fromTemplateUrl('main/adminPanel/adminLoginModal.html', {
+      scope: $scope,
+      backdropClickToClose: false,
+      animation: 'slide-in-up'
+    }).then(function (modal) {
+      $scope.discountModal = modal;
+    });
+
+    $scope.$on("loginlModal-close", function(event, data){
+      $scope.discountModal.hide();
+      if(data && data.login){
+        $state.go('app.admin');
+      }
+    });
+
   }]);
