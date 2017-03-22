@@ -9,14 +9,13 @@ angular.module('itouch', [
     'ionic-datepicker',
     'angularMoment',
     // 'peanuthub-custom-keyboard',
-    'tandibar/ng-rollbar',
     'itouch.logger',
     'itouch.config',
     'itouch.controllers',
     'itouch.services'
     // TODO: load other modules selected during generation
 ])
-    .run(['$ionicPlatform', 'DB', 'PrintService', 'Alert', 'UploadService', 'Rollbar', function ($ionicPlatform, DB, PrintService, Alert, UploadService, Rollbar) {
+    .run(['$ionicPlatform', 'DB', 'PrintService', 'Alert', 'UploadService', function ($ionicPlatform, DB, PrintService, Alert, UploadService) {
       // console.error = Rollbar.error;
       // console.warn = Rollbar.warning;
       // console.info = Rollbar.info;
@@ -58,8 +57,8 @@ angular.module('itouch', [
         });
     }])
 
-    .config(['$stateProvider', '$urlRouterProvider', 'RestangularProvider', '$provide', 'ionicDatePickerProvider', '$localStorageProvider', 'RollbarProvider',
-        function ($stateProvider, $urlRouterProvider, RestangularProvider, $provide, ionicDatePickerProvider, $localStorageProvider, RollbarProvider) {
+    .config(['$stateProvider', '$urlRouterProvider', 'RestangularProvider', '$provide', 'ionicDatePickerProvider', '$localStorageProvider',
+        function ($stateProvider, $urlRouterProvider, RestangularProvider, $provide, ionicDatePickerProvider, $localStorageProvider) {
 
           // RollbarProvider.init({
           //   accessToken: 'c141337316fb46668bcbb9575b9cd911',
