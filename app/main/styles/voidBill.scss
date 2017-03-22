@@ -10,7 +10,13 @@
     cursor: pointer;
   }
 
+
+
   //.row:first {
   //  border-bottom: 1px solid white;
   //}
+}
+
+.voidBill div.table .row.active {
+  background-color: rgba(21,170,84, 1);
 }

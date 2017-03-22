@@ -7,8 +7,9 @@ angular.module('itouch.services')
 
     self.getBillList = function(businessDate){
       return DB.select(DB_CONFIG.tableNames.bill.header, 'DocNo, SubTotal, DiscAmount, Tax1Amount, Tax2Amount, Tax3Amount, Tax4Amount, Tax5Amount, Tax1DiscAmount, Tax2DiscAmount, Tax3DiscAmount, Tax4DiscAmount, Tax5DiscAmount',
-        { columns: "BusinessDate=? AND VoidDocNo IS NULL AND DocType = 'SA' ORDER BY SysDateTime DESC", data: [businessDate] }).then(function(res){
+        { columns: "BusinessDate=? AND (VoidDocNo IS NULL OR VoidDocNo = '' ) AND DocType = 'SA' ORDER BY SysDateTime DESC", data: [businessDate] }).then(function(res){
           var data = DB.fetchAll(res);
+          // console.log(data);
           if(data){
             data = _.map(data, function(bill){
               return ItemService.calculateTotal(bill);
@@ -29,7 +30,7 @@ angular.module('itouch.services')
         var orgHeader = angular.copy(data.header);
         data.header = reverse(data.header, ['Qty', 'SubTotal', 'DiscAmount', 'Tax1Amount', 'Tax2Amount', 'Tax3Amount', 'Tax4Amount', 'Tax5Amount', 'Tax1DiscAmount', 'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount']);
         data.header.DocType = 'VD';
-        data.header.DocNo = BillService.generateReceiptId();
+        data.header.DocNo = BillService.getCurrentReceiptId();
         orgHeader.VoidDocNo = data.header.DocNo;
 
         data.items = _.map(data.items, function(item){
