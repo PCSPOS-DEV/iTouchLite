@@ -139,10 +139,13 @@ angular.module('itouch.controllers')
           }
           // var amount = ($scope.tenderHeader.UpdatedTenderTotal || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
           // var amount = ($scope.tenderHeader.UpdatedTenderTotal || tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
-          var diff = ((total - roundedTotal)* -1).roundTo(2);
-          if(tenderType.Round == 'true')
-            var changeAmount = 0;
-          if (amount > total) {
+          var diff = 0;
+
+          if(tenderType.Round == 'true'){
+            diff = ((total - roundedTotal)* -1).roundTo(2);
+          }
+          var changeAmount = 0;
+          if (amount > roundedTotal) {
             changeAmount = (amount- (total+diff)).roundTo(2);
           }
 
