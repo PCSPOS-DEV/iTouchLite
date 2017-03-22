@@ -1,0 +1,54 @@
+<ion-modal-view ng-controller="ItemDetailsCtrl as ctrl" class="itemDetails">
+  <ion-header-bar>
+    <h1 class="title">Item Detail</h1>
+    <button class="button button-clear" ng-click="close()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content>
+    <div class="list">
+
+      <div class="item">
+        <div class="row">
+          <div class="col">Code</div>
+          <div class="col">{{ctrl.item.Plu}}/{{ctrl.item.SubPlu1}}/{{ctrl.item.SubPlu2}}/{{ctrl.item.SubPlu3}}</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="row">
+          <div class="col">Description</div>
+          <div class="col">{{print(ctrl.item, "Description")}}</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="row">
+          <div class="col">Promotional Price</div>
+          <div class="col">N/A</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="row">
+          <div class="col">Normal Price</div>
+          <div class="col">{{ctrl.item.OrgPrice}}</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="row">
+          <div class="col">Discountable</div>
+          <div class="col">{{ctrl.item.NoDiscount == 'false' ? 'Yes' : 'No' }}</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="row">
+          <div class="col">Multi Discount</div>
+          <div class="col">{{ctrl.item.MultiDiscount == 'true' ? 'Yes' : 'No' }}</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="row">
+          <div class="col">Below Cost</div>
+          <div class="col">{{ctrl.item.BelowCost == 'true' ? 'Yes' : 'No' }}</div>
+        </div>
+      </div>
+
+    </div>
+  </ion-content>
+</ion-modal-view>

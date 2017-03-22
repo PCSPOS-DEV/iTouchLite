@@ -1,0 +1,57 @@
+<ion-modal-view class="itemSearch" ng-controller="ItemSearchCtrl as ctrl">
+  <ion-header-bar>
+    <h1 class="title">Search</h1>
+    <button class="button button-clear" ng-click="ctrl.close()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content scroll="false">
+    <div class="list list-inset">
+      <form ng-submit="ctrl.onSearchSubmit($event)">
+      <label class="item item-input">
+        <i class="icon ion-search placeholder-icon"></i>
+        <input type="search" placeholder="Search" ng-model="ctrl.data.searchText" autofocus>
+      </label>
+        <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="list">
+      <div class="item item-text-wrap">
+        <div class="row header">
+          <div class="col-20">PLU</div>
+          <div class="col-70">Description</div>
+          <div class="col-10">Price</div>
+        </div>
+        <ion-scroll zooming="false" direction="y" style="height: 330px" delegate-handle="itemSearch">
+          <div class="item row" ng-repeat="item in ctrl.data.items" ng-click="ctrl.selectItem(item)" ng-class="{ active: item.active }">
+            <div class="col col-20">{{ item.Plu }}</div>
+            <div class="col col-70">{{ print(item, 'Description') }}</div>
+            <div class="col col-10">{{ item.OrgPrice }}</div>
+          </div>
+        </ion-scroll>
+      </div>
+      </div>
+    </div>
+    <div class="row buttons">
+      <div class="col-50 col-offset-50">
+        <div class="row">
+          <div class="col button-col">
+            <button class="button button-full button-positive icon ion-checkmark-round save" ng-click="ctrl.save()"></button>
+          </div>
+          <div class="col button-col">
+            <button class="button button-full button-assertive icon ion-close-round cancel" ng-click="ctrl.close()"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </ion-content>
+  <!--<ion-footer-bar class="bar-stable">-->
+    <!--<div class="h1 title"></div>-->
+    <!--<div class="buttons">-->
+      <!--<button class="button button-primary button-outline" ng-click="save()">Save</button>-->
+      <!--<button class="button button-energized button-outline" ng-click="modalClose()">Cancel</button>-->
+    <!--</div>-->
+  <!--</ion-footer-bar>-->
+</ion-modal-view>
