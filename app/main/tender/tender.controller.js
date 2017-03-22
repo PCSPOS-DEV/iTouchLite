@@ -120,6 +120,8 @@ angular.module('itouch.controllers')
           });
           var item = _.first(bill);
           var total = $scope.tenderHeader.Total;
+          var roundedTotal = parseFloat($scope.tenderHeader.TotalRounded);
+          // var total = $scope.tenderHeader.TotalRounded;
           var amount = null;
           if(!$scope.tenderHeader.UpdatedTenderTotal){
             $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total;
@@ -137,7 +139,7 @@ angular.module('itouch.controllers')
           }
           // var amount = ($scope.tenderHeader.UpdatedTenderTotal || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
           // var amount = ($scope.tenderHeader.UpdatedTenderTotal || tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
-          var diff = (($scope.tenderHeader.Total - parseFloat($scope.tenderHeader.TotalRounded))* -1).roundTo(2);
+          var diff = ((total - roundedTotal)* -1).roundTo(2);
           if(tenderType.Round == 'true')
             var changeAmount = 0;
           if (amount > total) {
@@ -157,7 +159,7 @@ angular.module('itouch.controllers')
               transAmount = amount;
             }
 
-            if (total <= amount) {
+            if (roundedTotal <= amount) {
               submitted = true;
               // console.log(diff);
               if(tenderType.Round == 'true' && diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
