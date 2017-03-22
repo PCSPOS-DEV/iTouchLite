@@ -11,17 +11,22 @@
     <meta name="apple-mobile-web-app-capable" content="yes"> <!-- can be saved to home screen on ios -->
     <title>ITouchLite</title>
 
+
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/peanuthub-custom-keyboard/dist/peanuthub-custom-keyboard.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:css main/styles/app.css -->
     <!-- inject:css -->
+    <link rel="stylesheet" href="main/styles/adminPanel.css">
     <link rel="stylesheet" href="main/styles/billView.css">
     <link rel="stylesheet" href="main/styles/discount.css">
     <link rel="stylesheet" href="main/styles/history.css">
     <link rel="stylesheet" href="main/styles/home.css">
+    <link rel="stylesheet" href="main/styles/itemDetails.css">
+    <link rel="stylesheet" href="main/styles/itemSearch.css">
     <link rel="stylesheet" href="main/styles/main.css">
     <link rel="stylesheet" href="main/styles/modifier.css">
     <link rel="stylesheet" href="main/styles/pwp.css">
@@ -39,7 +44,7 @@
 
     <!-- the nav bar will be updated as we navigate between views -->
     <!-- <ion-nav-bar> can be removed when using sidemenu (contained in menu.html) -->
-    <ion-nav-bar class="bar-stable">
+    <ion-nav-bar class="bar-dark">
       <ion-nav-back-button></ion-nav-back-button>
     </ion-nav-bar>
     <!-- the current view will be rendered in the <ion-nav-view> directive -->
@@ -69,6 +74,10 @@
     <script src="bower_components/moment/moment.js"></script>
     <script src="bower_components/angular-moment/angular-moment.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/peanuthub-custom-keyboard/dist/peanuthub-custom-keyboard.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular-bindonce/bindonce.js"></script>
+    <script src="bower_components/ng-rollbar/ng-rollbar.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -83,10 +92,11 @@
     <script src="main/shift/shiftOptions.controller.js"></script>
     <script src="main/shift/shift.service.js"></script>
     <script src="main/shift/shift.controller.js"></script>
-    <script src="main/settings/settings.controller.js"></script>
+    <script src="main/services/upload-serv.js"></script>
     <script src="main/services/report-serv.js"></script>
     <script src="main/services/reciept-serv.js"></script>
     <script src="main/services/print-service-serv.js"></script>
+    <script src="main/services/image-download-serv.js"></script>
     <script src="main/salesKits/salesKit.service.js"></script>
     <script src="main/salesKits/salesKit.controller.js"></script>
     <script src="main/sales/tax.service.js"></script>
@@ -100,8 +110,6 @@
     <script src="main/pwp/pwp.service.js"></script>
     <script src="main/pwp/pwp.controller.js"></script>
     <script src="main/promotions/days.service.js"></script>
-    <script src="main/printerSetup/printerSetup.controller.js"></script>
-    <script src="main/printerSetup/print.service.js"></script>
     <script src="main/modifiers/modifiers.service.js"></script>
     <script src="main/modifiers/modifier.controller.js"></script>
     <script src="main/main.controller.js"></script>
@@ -202,6 +210,8 @@
     <script src="main/items/subplu2.service.js"></script>
     <script src="main/items/subplu1.service.js"></script>
     <script src="main/items/priceGroup.service.js"></script>
+    <script src="main/items/itemSearch.controller.js"></script>
+    <script src="main/items/itemDetails.controller.js"></script>
     <script src="main/items/item.service.js"></script>
     <script src="main/items/departments.service.js"></script>
     <script src="main/home/home.controller.js"></script>
@@ -210,7 +220,12 @@
     <script src="main/history/billView.controller.js"></script>
     <script src="main/discount/discount.service.js"></script>
     <script src="main/discount/discount.controller.js"></script>
+    <script src="main/directives/ngEnter.js"></script>
     <script src="main/directives/clearable-input-dir.js"></script>
+    <script src="main/DBTableServices/voidItems.service.js"></script>
+    <script src="main/DBTableServices/tempBillHeader.service.js"></script>
+    <script src="main/DBTableServices/tempBillDiscounts.service.js"></script>
+    <script src="main/DBTableServices/tempBillDetail.service.js"></script>
     <script src="main/DBTableServices/denominations.service.js"></script>
     <script src="main/config/settings.service.js"></script>
     <script src="main/config/db.config.js"></script>
@@ -227,6 +242,12 @@
     <script src="main/common/db.service.js"></script>
     <script src="main/common/common.js"></script>
     <script src="main/common/alert.service.js"></script>
+    <script src="main/adminPanel/settings.controller.js"></script>
+    <script src="main/adminPanel/printerSetup.controller.js"></script>
+    <script src="main/adminPanel/print.service.js"></script>
+    <script src="main/adminPanel/functions.controller.js"></script>
+    <script src="main/adminPanel/adminPanel.controller.js"></script>
+    <script src="main/adminPanel/adminLogin.controller.js"></script>
     <script src="app.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
