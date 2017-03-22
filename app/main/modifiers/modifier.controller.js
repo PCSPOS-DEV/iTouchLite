@@ -125,7 +125,7 @@ angular.module('itouch.controllers')
       self.save = function () {
         var parentItem = $scope.cart.selectedItem;
         if(parentItem && self.cart.length > 0){
-          ModifierService.add(parentItem.LineNumber, self.cart).then(function(res){
+          ModifierService.add(parentItem.DocNo, parentItem.LineNumber, angular.copy(self.cart)).then(function(res){
             $scope.$emit('refresh-cart');
             $scope.$emit('modifier.modal.close');
           }, function (err) {

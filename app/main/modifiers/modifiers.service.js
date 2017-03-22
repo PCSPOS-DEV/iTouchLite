@@ -76,7 +76,7 @@ angular.module('itouch.services')
       });
     }
 
-    self.add = function(prentItemLineNumber, cart){
+    self.add = function(DocNo, prentItemLineNumber, cart){
       var promises = [DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: "ParentItemLineNumber=? AND ItemType = 'MOD'", data:[prentItemLineNumber] })];
 
       angular.forEach(cart, function(item){
@@ -86,7 +86,7 @@ angular.module('itouch.services')
         }
         item.LineNumber = ++prentItemLineNumber;
 
-        promises.push(CartItemService.addItemToCart(item));
+        promises.push(CartItemService.addItemToCart(DocNo, item));
       });
       return $q.all(promises);
     }
