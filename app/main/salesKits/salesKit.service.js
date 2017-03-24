@@ -108,6 +108,7 @@ angular.module('itouch.services')
           Restangular.one("GetSalesKitSelections").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
             var items = JSON.parse(res);
             if (items) {
+              console.log(items);
               self.saveSalesKitSelections(items);
               deferred.resolve();
             } else {
@@ -131,13 +132,15 @@ angular.module('itouch.services')
 
       self.getSalesKit = function (itemId, BusinessDate) {
         var salesKit;
-        var q = 'SELECT * FROM '+DB_CONFIG.tableNames.salesKit.salesKitItems+' AS sk  INNER JOIN '+
+        var q = 'SELECT *, sk.Id AS SaleKitItemsId FROM '+DB_CONFIG.tableNames.salesKit.salesKitItems+' AS sk  INNER JOIN '+
           DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sk.ItemId  WHERE sk.SalesKitId = ?';
 
         return DB.query(q, [itemId]).then(function (res) {
           var salesKitItems = DB.fetchAll(res);
           return ItemService.getById(itemId).then(function (sk) {
             salesKit = sk;
+            console.log(sk);
+            console.log(salesKitItems);
             if(salesKitItems.length > 0){
               var promises = [];
               angular.forEach(salesKitItems, function (ski) {
@@ -146,7 +149,7 @@ angular.module('itouch.services')
                 salesKit.selectedList = {};
                 ski.SalesKitId = itemId;
                 // console.log(salesKit);
-                  promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]}).then(function (res) {
+                  promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.SaleKitItemsId]}).then(function (res) {
                     var selections = _.map(DB.fetchAll(res), function (row) {
                       row.SalesKitId = itemId;
                       row.Qty = 0;
@@ -170,12 +173,14 @@ angular.module('itouch.services')
                       ski.Selectable = false;
                       salesKit.selectedList[ski.ItemId] = ski;
                     }
-                    salesKit.isEmpty = _.isEmpty(salesKit.list);
-                    return true;
+
+                    return selections;
                 }));
               });
 
-              return $q.all(promises).then(function () {
+              return $q.all(promises).then(function (sk) {
+                console.log(sk);
+                salesKit.isEmpty = _.isEmpty(salesKit.list);
                 return salesKit;
               });
             } else {

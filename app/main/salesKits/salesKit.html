@@ -14,7 +14,7 @@
             <button class="button button-energized" ng-repeat="skit in salesKits.list" ng-click="selectComponent(skit)">Component {{$index+1}} <span class="badge badge-assertive">{{skit.Quantity - skit.Qty}}</span></button>
           </div>
         </div>
-        <ion-scroll zooming="false" direction="y" style="width: 620px; height: 470px;" delegate-handle="salesKit">
+        <ion-scroll zooming="false" direction="y" style="height: 470px;" delegate-handle="salesKit">
           <div class="row wrapper">
             <div class="col">
               <button class="button sk-item button-calm" ng-repeat="item in salesKits.selected.Selections" ng-click="selectItem(item)">{{item.Description1}}</button>
