@@ -94,6 +94,7 @@ angular.module('itouch.controllers')
 
         $scope.$on("$ionicView.beforeEnter", function(event, data){
           initBill();
+          loadFunctions();
         });
 
         $scope.$on("$ionicView.afterEnter", function(event, data){
@@ -350,20 +351,25 @@ angular.module('itouch.controllers')
        * Initiating shift modal dialog
        */
       $ionicModal.fromTemplateUrl('main/login/loginModal.html', {
+        id: 12,
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
       }).then(function (modal) {
-        $scope.LoginlModal = modal;
-        // $scope.LoginlModal.show();
+        $scope.modals.loginlModal = modal;
+        // $scope.modals.loginlModal.show();
 
       });
 
       /**
        * Biding an event to catch modal close call
        */
-      $scope.$on('loginlModal-close', function () {
-        $scope.LoginlModal.hide();
+      $scope.$on('loginlModal-close', function (modal, close) {
+        $scope.modals.loginlModal.hide();
+        modalOpen = false;
+        if(close){
+          onGoingFunction = false;
+        }
         // console.log(AuthService.getTempUser());
         if(onGoingFunction){
           $scope.invoke(onGoingFunction);
@@ -539,6 +545,7 @@ angular.module('itouch.controllers')
             priceFormShown = false;
             if(wasBCMOn){
               $scope.data.barcodeMode = true;
+              $scope.onBarcodeTextBlur();
             }
             return res;
           });
@@ -764,7 +771,14 @@ angular.module('itouch.controllers')
       $scope.invoke = function (fn) {
         if (!_.isUndefined($scope.salesFunctions[fn.Name])) {
           $scope.data.barcodeMode = false;
-          $scope.salesFunctions[fn.Name](fn);
+          // if(authorityCheck(fn)) {
+            if((fn.Transact == 'false' && _.isEmpty($scope.cart.items)) || (fn.Transact == 'true' && !_.isEmpty($scope.cart.items)) || fn.Code == 102){
+              $scope.salesFunctions[fn.Name](fn);
+            } else {
+              Alert.warning('Action not allowed');
+            }
+
+          // }
         } else {
           throw new Error("Function " + fn.Name + " is not available.");
         }
@@ -884,38 +898,42 @@ angular.module('itouch.controllers')
           }
         },
         Discount: function (fn) {
-          var item = $scope.cart.selectedItem;
-          var condition = true;
-          var errors = [];
-          if(!item){
-            errors.push("No item selected");
-            condition = false;
-          } else {
-            if(!item){
-              errors.push("No item selected");
-              condition = false;
-            }
-            if(item.ItemType != 'NOR' && item.ItemType != 'SKT' && item.ItemType != 'PWP'){
-              errors.push("Not an eligible item type");
-              condition = false;
-            }
-            if(!DiscountService.checkItemEligibility(item)){
-              errors.push("Not an eligible item");
-              condition = false;
-            }
+          if (authorityCheck(fn)) {
+            var item = $scope.cart.selectedItem;
+            if(item){
+              var condition = true;
+              var errors = [];
+              if (!item) {
+                errors.push("No item selected");
+                condition = false;
+              } else {
+                if (!item) {
+                  errors.push("No item selected");
+                  condition = false;
+                }
+                if (item.ItemType != 'NOR' && item.ItemType != 'SKT' && item.ItemType != 'PWP') {
+                  errors.push("Not an eligible item type");
+                  condition = false;
+                }
+                if (!DiscountService.checkItemEligibility(item)) {
+                  errors.push("Not an eligible item");
+                  condition = false;
+                }
 
-            if(!authorityCheck(fn)){
-              errors.push("Not authorized");
-              condition = false;
+                // if (!authorityCheck(fn)) {
+                //   errors.push("Not authorized");
+                //   condition = false;
+                // }
+              }
+
+
+              if (condition) {
+                $scope.shownModal = 'itemDiscounts';
+                $scope.discountModal.show();
+              } else {
+                Alert.error(errors.join(" | "));
+              }
             }
-          }
-
-
-          if (condition) {
-            $scope.shownModal = 'itemDiscounts';
-            $scope.discountModal.show();
-          } else {
-            Alert.error(errors.join(" | "));
           }
 
         },
@@ -1058,35 +1076,37 @@ angular.module('itouch.controllers')
           }
         },
         OrderTag: function(){
-          $scope.data.tag = "";
-          $ionicPopup.show({
-            template: '<input type="tel" ng-model="data.tag">',
-            title: 'Order Tag',
-            subTitle: '',
-            scope: $scope,
-            buttons: [
-              {text: 'Cancel'},
-              {
-                text: '<b>Save</b>',
-                type: 'button-positive',
-                onTap: function (e) {
-                  if (!$scope.data.tag) {
-                    //don't allow the user to close unless he enters wifi password
-                    e.preventDefault();
-                  } else {
-                    return $scope.data.tag;
+          if (authorityCheck(fn)) {
+            $scope.data.tag = "";
+            $ionicPopup.show({
+              template: '<input type="tel" ng-model="data.tag">',
+              title: 'Order Tag',
+              subTitle: '',
+              scope: $scope,
+              buttons: [
+                {text: 'Cancel'},
+                {
+                  text: '<b>Save</b>',
+                  type: 'button-positive',
+                  onTap: function (e) {
+                    if (!$scope.data.tag) {
+                      //don't allow the user to close unless he enters wifi password
+                      e.preventDefault();
+                    } else {
+                      return $scope.data.tag;
+                    }
                   }
                 }
-              }
-            ]
-          }).then(function(tag){
-            console.log(tag);
-            BillService.setOrderTag($scope.header.DocNo, tag).then(function(){
-              refresh();
-            }, function(ex){
-              console.log(ex);
-            })
-          });
+              ]
+            }).then(function (tag) {
+              console.log(tag);
+              BillService.setOrderTag($scope.header.DocNo, tag).then(function () {
+                refresh();
+              }, function (ex) {
+                console.log(ex);
+              })
+            });
+          }
         },
         SearchTop: function (fn) {
           if(authorityCheck(fn)) {
@@ -1109,6 +1129,7 @@ angular.module('itouch.controllers')
        * @param Function fn
        * @returns {boolean}
        */
+      var modalOpen = false;
       var authorityCheck = function (fn) {
         var authorized = false;
         var tempUser = AuthService.getTempUser();
@@ -1120,8 +1141,13 @@ angular.module('itouch.controllers')
           if(AuthService.isAuthorized(fn.AccessLevel, AuthService.currentUser())){
             authorized = true;
           } else {
-            $scope.LoginlModal.show();
-            onGoingFunction = fn;
+            if(!modalOpen){
+              $timeout(function() {
+                $scope.modals.loginlModal.show();
+                modalOpen = true;
+              }, 500);
+              onGoingFunction = fn;
+            }
           }
         }
 
@@ -1150,6 +1176,7 @@ angular.module('itouch.controllers')
       $scope.$on('voidBill.modal.close', function () {
         if($scope.modals.voidBillModal){
           $scope.modals.voidBillModal.hide();
+          buttonClicked.voidBill = false;
         }
       });
 
@@ -1195,21 +1222,17 @@ angular.module('itouch.controllers')
        if(!buttonClicked.barcode){
          buttonClicked.barcode = true;
          // alert($scope.data.barcode);
-         ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
-           selectItem(item);
-         }, function(ex){
-           // Alert.warning(ex);
-           $cordovaToast.showShortBottom(ex).then(function(success) {
-             // success
-             document.getElementById("barcodeText").focus();
-           }, function (error) {
-             // error
+         if($scope.data.barcode && $scope.data.barcode != ""){
+           ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
+             selectItem(item);
+           }, function(ex){
+             Alert.warning(ex);
+           }).finally(function () {
+             $scope.data.barcode = "";
+             buttonClicked.barcode = false;
              document.getElementById("barcodeText").focus();
            });
-         }).finally(function () {
-           $scope.data.barcode = "";
-           buttonClicked.barcode = false;
-         });
+         }
        }
       }
 
@@ -1223,9 +1246,22 @@ angular.module('itouch.controllers')
           $timeout(function() {
             document.getElementById("barcodeText").focus();
           },750);
-
+        } else {
+          $timeout(function() {
+            document.getElementById("barcodeText").blur();
+          },750);
         }
       }
+
+      if(window.cordova){
+        $("#barcodeText").on('touchstart', function(e) {
+          cordova.plugins.Keyboard.hideKeyboardAccessoryBar(false);
+        });
+        $("#barcodeText").on('blur', function(e) {
+          cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        });
+      }
+
 
       $scope.onBarcodeTextFocus = function(){
         // if (window.cordova && window.cordova.plugins.Keyboard) {
