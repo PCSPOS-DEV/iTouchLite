@@ -428,8 +428,8 @@ angular.module('itouch.services')
               } else {
                 discountAmount = (amount - headerDiscount).roundTo(2);
               }
-              var subDiscount = ((discountAmount * (100-item.Tax5Perc)) / 100).roundTo(2);
-              var tax5Disc = (discountAmount - subDiscount).roundTo(2);
+              var tax5Disc = ((discountAmount * item.Tax5Perc) / (100+item.Tax5Perc)).roundTo(2);
+              var subDiscount = (discountAmount - tax5Disc).roundTo(2);
 
               item.Discount += discountAmount;
               discount.DiscountAmount = angular.copy(discountAmount);
