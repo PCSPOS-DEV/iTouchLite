@@ -49,27 +49,25 @@ angular.module('itouch.controllers')
         activeKeys: {}
       };
 
-      // document.querySelector("input#qty").addEventListener("keyup", function () {
-      //   this.value = this.value.replace(/\D/, "")
-      // });
-
-      $scope.onQtyFocus = function () {
-        // if($scope.qty.value == 1){
-          $scope.qty.value = "";
-        // }
-        // if(CustomKeyboard){
-        //   CustomKeyboard.open(document.getElementById('decimal').value, 9, function (value) {
-        //     //fired every time when value changed
-        //     document.getElementById('decimal').value = value;
-        //   }, function (value) {
-        //     alert('Editing ended with ' + value);
-        //   });
-        // }
-      };
-
-        $scope.onQtyBlur = function ($event) {
-          if($scope.qty.value == ""){
-            $scope.qty.value = 1;
+        $scope.numberPickerObject = {
+          inputValue: 1, //Optional
+          minValue: 1,
+          maxValue: 9007199254740991,
+          precision: 3,  //Optional
+          decimalStep: 0.25,  //Optional
+          format: "WHOLE",  //Optional - "WHOLE" or "DECIMAL"
+          unit: "",  //Optional - "m", "kg", "℃" or whatever you want
+          titleLabel: 'Set Qty',  //Optional
+          setLabel: 'Set',  //Optional
+          closeLabel: 'Close',  //Optional
+          setButtonType: 'button-positive',  //Optional
+          closeButtonType: 'button-stable',  //Optional
+          callback: function (val) {    //Mandatory
+            if(val){
+              $scope.qty.value = val;
+            } else {
+              $scope.qty.value = 1;
+            }
           }
         };
 
@@ -1211,12 +1209,6 @@ angular.module('itouch.controllers')
           }
         });
 
-      // $("#barcodeText").scannerDetection(function(){
-      //   $timeout(function(){
-      //     $scope.barcodeSubmit();
-      //   }, 1000);
-      // });
-      //
       $scope.barcodeSubmit = function(e){
         e.preventDefault();
        if(!buttonClicked.barcode){
@@ -1253,24 +1245,5 @@ angular.module('itouch.controllers')
         }
       }
 
-      if(window.cordova){
-        $("#barcodeText").on('touchstart', function(e) {
-          cordova.plugins.Keyboard.hideKeyboardAccessoryBar(false);
-        });
-        $("#barcodeText").on('blur', function(e) {
-          cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-        });
-      }
 
-
-      $scope.onBarcodeTextFocus = function(){
-        // if (window.cordova && window.cordova.plugins.Keyboard) {
-        //   cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-        //   cordova.plugins.Keyboard.close();
-        // }
-      }
-
-      // $scope.closeModal = function(index){
-      //
-      // }
     }]);

@@ -8,7 +8,7 @@ angular.module('itouch', [
     'ngOrderObjectBy',
     'ionic-datepicker',
     'angularMoment',
-    // 'peanuthub-custom-keyboard',
+    'ionic-numberpicker',
     'itouch.logger',
     'itouch.config',
     'itouch.controllers',
