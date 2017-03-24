@@ -9,7 +9,7 @@
           <div class="col"> Receipt No  </div>
           <div class="col text-right"> Amount  </div>
         </div>
-        <ion-scroll zooming="false" direction="y" style="height: 300px" delegate-handle="itemSearch">
+        <ion-scroll zooming="false" direction="y" style="height: 300px" delegate-handle="itemSearch" ng-if="ctrl.data.bills.length != 0">
           <div class="row" ng-repeat="bill in ctrl.data.bills" ng-click="ctrl.onItemTap(bill)" ng-class="{ active: bill.active }">
             <div class="col"> {{ bill.DocNo }}  </div>
             <div class="col text-right"> {{ '$'+bill.Total.toFixed(2) }}  </div>
