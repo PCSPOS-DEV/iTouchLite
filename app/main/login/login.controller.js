@@ -52,6 +52,7 @@ angular.module('itouch.controllers')
      * Initiating discount modal dialog
      */
     $ionicModal.fromTemplateUrl('main/adminPanel/adminLoginModal.html', {
+      id: 10,
       scope: $scope,
       backdropClickToClose: false,
       animation: 'slide-in-up'

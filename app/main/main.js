@@ -75,7 +75,9 @@ angular.module('itouch', [
           //   debug: true
           // });
           var appConfig = $localStorageProvider.get('itouchConfig');
-          RestangularProvider.setBaseUrl(appConfig.baseUrl);
+          if(appConfig){
+            RestangularProvider.setBaseUrl(appConfig.baseUrl);
+          }
 
             $stateProvider
                 .state('login', {
