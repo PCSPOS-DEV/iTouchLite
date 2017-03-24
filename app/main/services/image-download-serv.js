@@ -1,7 +1,7 @@
 'use strict';
 angular.module('itouch.services')
-  .service('ImageDownloadService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', '$cordovaFileTransfer', '$localStorage', 'Alert', 'KeyBoardService',
-    function ($log, DB, DB_CONFIG, $q, SettingsService, $cordovaFileTransfer, $localStorage, Alert, KeyBoardService) {
+  .service('ImageDownloadService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', '$cordovaFileTransfer', '$localStorage', 'Alert', 'KeyBoardService', '$cordovaFile',
+    function ($log, DB, DB_CONFIG, $q, SettingsService, $cordovaFileTransfer, $localStorage, Alert, KeyBoardService, $cordovaFile) {
       var self = this;
       var entityId;
 
@@ -31,9 +31,10 @@ angular.module('itouch.services')
       }
 
       self.downloadImages = function(){
-        self.getImageNames().then(function (images) {
-          if(images.length > 0){
+        return self.getImageNames().then(function (images) {
+          if(window.cordova && images && images.length > 0){
             var promises = [];
+
             angular.forEach(images, function(row){
               if(row.ImageName){
                 promises.push(self.downloadFile(row.ImageName));
@@ -41,8 +42,23 @@ angular.module('itouch.services')
             });
 
             return ionic.Platform.ready(function() {
-              return $q.all(promises)
+              return $q.all([
+                $cordovaFile.moveDir(cordova.file.dataDirectory, 'userImages', cordova.file.dataDirectory, 'tempUserImages'),
+                $cordovaFile.createDir(cordova.file.dataDirectory, 'userImages', false)
+              ]).then(function () {
+                return $q.all(promises).then(function(){
+                  return $cordovaFile.removeDir(cordova.file.dataDirectory, 'tempUserImages');
+                }, function (ex) {
+                  return $q.all([
+                    $cordovaFile.removeDir(cordova.file.dataDirectory, 'userImages'),
+                    $cordovaFile.moveDir(cordova.file.dataDirectory, 'tempUserImages', cordova.file.dataDirectory, 'userImages')
+                  ]);
+                });
+              });
+
             });
+          } else {
+            return $q.reject('no images in the db');
           }
         });
         // self.downloadFile('PCSlogo.png');

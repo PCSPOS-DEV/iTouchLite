@@ -6,61 +6,81 @@ angular.module('itouch.services')
   .service("SyncService", ['$q', 'AuthService', 'KeyBoardService', 'Alert', 'DB', 'ItemService', 'SubPLU1Service',
     'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', 'LocationService', 'FileService', 'TenderService',
     'FunctionsService', 'SalesKitService', 'DaysService', 'ShiftService', 'DiscountService', 'ReasonService', 'PrinterSettings',
-    'PWPService', 'ModifierService', 'DepartmentService', 'SettingsService', 'BillService', 'DenominationsService', 'ImageDownloadService',
+    'PWPService', 'ModifierService', 'DepartmentService', 'SettingsService', 'BillService', 'DenominationsService', 'ImageDownloadService', '$http', 'AppConfig',
     function ($q, AuthService, KeyBoardService, Alert, DB, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service,
               PriceGroupService, LocationService, FileService, TenderService, FunctionsService, SalesKitService, DaysService,
-              ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService, SettingsService, BillService, DenominationsService, ImageDownloadService) {
+              ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService, SettingsService, BillService, DenominationsService, ImageDownloadService, $http, AppConfig) {
     var self = this;
     self.do = function () {
       Alert.showLoading();
-      DB.clearQueue();
-      DB.createTables();
-      return DB.executeQueue().then(function () {
-        return $q.all({
-          'Users': AuthService.fetchUsers(),
-          'Layouts': KeyBoardService.fetchLayout(),
-          'Keys': KeyBoardService.fetchKeys(),
-          'Pages': KeyBoardService.fetchPages(),
-          'Items': ItemService.fetch(),
-          'SubPLU1': SubPLU1Service.fetch(),
-          'SubPLU2': SubPLU2Service.fetch(),
-          'SubPLU3': SubPLU3Service.fetch(),
-          'PriceGroups': PriceGroupService.fetch(),
-          'Locations': LocationService.fetch(),
-          'TenderTypes': TenderService.fetchTenderTypes(),
-          'Functions': FunctionsService.fetch(),
-          'SalesKits': SalesKitService.fetch(),
-          'PromotionDays': DaysService.fetch(),
-          'Shifts': ShiftService.fetch(),
-          'Discounts': DiscountService.fetch(),
-          'Reasons': ReasonService.fetch(),
-          'PrinterSettings': PrinterSettings.fetch(),
-          'ItemsByPWP': PWPService.fetchItemsByPWP(),
-          'PWP': PWPService.fetchPWP(),
-          'Departments': DepartmentService.fetch(),
-          'Modifiers': ModifierService.fetch(),
-          'Machines': SettingsService.fetchMachines(),
-          // 'Images': ImageDownloadService.downloadImages()
-        })
-        // FunctionsService.fetch()
-          .then(function (values) {
+      var url = AppConfig.getBaseUrl();
+      if(url){
+        return $http({
+          method: 'GET',
+          url: url.slice(0,-1),
+          timeout: 2000,
+          cache: false
+        }).then(function () {
+          DB.clearQueue();
+          DB.createTables();
           return DB.executeQueue().then(function () {
-            ImageDownloadService.downloadImages();
-            DenominationsService.addDefault();
-            LocationService.get();
-            console.log('sync done');
-            Alert.hideLoading();
+            return $q.all({
+              'Users': AuthService.fetchUsers(),
+              'Layouts': KeyBoardService.fetchLayout(),
+              'Keys': KeyBoardService.fetchKeys(),
+              'Pages': KeyBoardService.fetchPages(),
+              'Items': ItemService.fetch(),
+              'SubPLU1': SubPLU1Service.fetch(),
+              'SubPLU2': SubPLU2Service.fetch(),
+              'SubPLU3': SubPLU3Service.fetch(),
+              'PriceGroups': PriceGroupService.fetch(),
+              'Locations': LocationService.fetch(),
+              'TenderTypes': TenderService.fetchTenderTypes(),
+              'Functions': FunctionsService.fetch(),
+              'SalesKits': SalesKitService.fetch(),
+              'PromotionDays': DaysService.fetch(),
+              'Shifts': ShiftService.fetch(),
+              'Discounts': DiscountService.fetch(),
+              'Reasons': ReasonService.fetch(),
+              'PrinterSettings': PrinterSettings.fetch(),
+              'ItemsByPWP': PWPService.fetchItemsByPWP(),
+              'PWP': PWPService.fetchPWP(),
+              'Departments': DepartmentService.fetch(),
+              'Modifiers': ModifierService.fetch(),
+              'Machines': SettingsService.fetchMachines(),
+              // 'Images': ImageDownloadService.downloadImages()
+            })
+            // FunctionsService.fetch()
+              .then(function (values) {
 
-            return true;
-          }, function (err) {
-            Alert.hideLoading();
-            console.error(err);
+                return DB.executeQueue().then(function () {
+                  DenominationsService.addDefault();
+                  LocationService.get();
+                  return ImageDownloadService.downloadImages().then(function () {
+                    console.log('sync done');
+                  }, function (ex) {
+                    console.log('sync error', ex);
+                    Alert.error(ex);
+                  }).finally(function () {
+                    Alert.hideLoading();
+                  });
+                }, function (err) {
+                  Alert.hideLoading();
+                });
+              });
+
+          }, function (ex) {
+            Alert.error('Unable to connect to Server');
           });
         }, function (err) {
           Alert.hideLoading();
           console.log(err);
+          Alert.error('Unable to connect to Server');
         });
-      });
+      } else {
+        Alert.error("Base URL not configured");
+      }
+
       // self.upload();
     }
 
