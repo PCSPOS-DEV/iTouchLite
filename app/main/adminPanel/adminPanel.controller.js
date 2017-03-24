@@ -2,8 +2,8 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller("AdminPanelCtrl", ['$log', '$rootScope', '$scope',
-    function ($log, $rootScope, $scope) {
+  .controller("AdminPanelCtrl", ['$log', '$rootScope', '$scope', '$ionicHistory', '$ionicNavBarDelegate', '$state',
+    function ($log, $rootScope, $scope, $ionicHistory, $ionicNavBarDelegate, $state) {
       var self = this;
 
       self.changePage = function(page){
@@ -26,7 +26,18 @@ angular.module('itouch.controllers')
       $scope.$on("$ionicView.afterEnter", function(event, data){
         $scope.loadingHide();
         self.changePage(_.first(self.pages));
+        $ionicNavBarDelegate.showBackButton(true);
       });
+
+      self.goBack = function(){
+        var back = $ionicHistory.backView();
+        if(back){
+          $ionicHistory.goBack();
+        } else {
+          $state.go('login');
+        }
+
+      }
 
 
 

@@ -1,4 +1,11 @@
 <ion-view view-title="iSeries NX Lite" no-scroll="true">
+  <ion-nav-bar class="bar-dark">
+    <ion-nav-buttons side="primary">
+    <button class="button icon button-clear ion-chevron-left" ng-click="ctrl.goBack()">
+
+    </button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
   <ion-content class="padding admin-panel">
     <div class="wrapper" ng-include="ctrl.page.template"></div>
   </ion-content>

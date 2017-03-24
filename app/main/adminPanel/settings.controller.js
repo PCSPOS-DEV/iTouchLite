@@ -38,13 +38,13 @@ angular.module('itouch.controllers')
       SettingsService.setMachineId(self.settings.mac_id);
       SettingsService.setCashId(self.settings.cash_id);
       Restangular.setBaseUrl(self.settings.url);
+      AppConfig.setBaseUrl(self.settings.url);
       SettingsService.save();
 
       SyncService.do().then(function () {
         SettingsService.setEntityId(self.settings.ent_id);
         SettingsService.setLocationId(self.settings.loc_id);
         SettingsService.setMachineId(self.settings.mac_id);
-        AppConfig.setBaseUrl(self.settings.url);
         SettingsService.save();
       });
 

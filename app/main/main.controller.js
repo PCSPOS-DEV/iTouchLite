@@ -142,8 +142,8 @@ angular.module('itouch.controllers')
     }
 
     $scope.openAdminLogin = function(){
-      if($scope.adminLoginModal){
-        $scope.adminLoginModal.show();
+      if(adminLoginModal){
+        adminLoginModal.show();
       }
 
     }
@@ -151,18 +151,22 @@ angular.module('itouch.controllers')
     /**
      * Initiating discount modal dialog
      */
+    var adminLoginModal;
     $ionicModal.fromTemplateUrl('main/adminPanel/adminLoginModal.html', {
+      id: 10,
       scope: $scope,
       backdropClickToClose: false,
       animation: 'slide-in-up'
     }).then(function (modal) {
-      $scope.adminLoginModal = modal;
+      adminLoginModal = modal;
     });
 
     $scope.$on("loginlModal-close", function(event, data){
-      $scope.adminLoginModal.hide();
-      if(data && data.login){
-        $state.go('app.admin');
+      if(adminLoginModal){
+        adminLoginModal.hide();
+        if(data && data.login){
+          $state.go('app.admin');
+        }
       }
     });
 

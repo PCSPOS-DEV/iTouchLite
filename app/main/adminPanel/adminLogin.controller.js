@@ -8,6 +8,15 @@ angular.module('itouch.controllers')
       password: null
     };
 
+    $scope.$on("modal.shown", function(event, modal){
+      if(modal.id == 10){
+        $scope.credentials = {
+          username: null,
+          password: null
+        };
+      }
+    });
+
     $scope.doLogin = function () {
       if($scope.credentials.username && $scope.credentials.password && $scope.credentials.username == 'pcs' && $scope.credentials.password == '099419'){
         $scope.$emit("loginlModal-close", { login: true });
