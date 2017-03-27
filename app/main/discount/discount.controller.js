@@ -25,6 +25,8 @@ angular.module('itouch.controllers')
 
 
       var refresh = function(){
+        discountsSet.type1 = [];
+        discountsSet.type2 = [];
         DiscountService.get().then(function(dis) {
           angular.forEach(dis, function (item) {
             if(item.DiscountType == '1'){
@@ -76,7 +78,9 @@ angular.module('itouch.controllers')
             });
 
             myPopup.then(function (res) {
-              saveDiscount(angular.copy(discount), res);
+              if(res){
+                saveDiscount(angular.copy(discount), res);
+              }
             });
           } else {
             saveDiscount(angular.copy(discount));
