@@ -12,7 +12,7 @@ angular.module('itouch.controllers')
       var oldItem = null;
 
       $scope.$on('modal.shown', function(event, modal) {
-        if($scope.shownModal == 'sk') {
+        if(modal.id == 1) {
           var item = $scope.cart.selectedItem;
           // if(item && item.ItemType == 'SKT')
 
@@ -98,6 +98,8 @@ angular.module('itouch.controllers')
           var sk = $scope.salesKits.list[$scope.selectedRow.SalesKitId];
           if (sk && sk.Qty < sk.Quantity && $scope.selectedRow.Default != true) {
             addItem($scope.selectedRow);
+          } else {
+            Alert.warning('Child item quantity exceeded!');
           }
         }
       }

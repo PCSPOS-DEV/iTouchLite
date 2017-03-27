@@ -139,8 +139,6 @@ angular.module('itouch.services')
           var salesKitItems = DB.fetchAll(res);
           return ItemService.getById(itemId).then(function (sk) {
             salesKit = sk;
-            console.log(sk);
-            console.log(salesKitItems);
             if(salesKitItems.length > 0){
               var promises = [];
               angular.forEach(salesKitItems, function (ski) {
@@ -148,7 +146,6 @@ angular.module('itouch.services')
                 salesKit.list = {};
                 salesKit.selectedList = {};
                 ski.SalesKitId = itemId;
-                // console.log(salesKit);
                   promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.SaleKitItemsId]}).then(function (res) {
                     var selections = _.map(DB.fetchAll(res), function (row) {
                       row.SalesKitId = itemId;
@@ -179,8 +176,7 @@ angular.module('itouch.services')
               });
 
               return $q.all(promises).then(function (sk) {
-                console.log(sk);
-                salesKit.isEmpty = _.isEmpty(salesKit.list);
+                salesKit.isEmpty = _.isEmpty(salesKit.list) && _.isEmpty(salesKit.selectedList);
                 return salesKit;
               });
             } else {
