@@ -178,7 +178,7 @@ angular.module('itouch.controllers')
               });
 
 
-              CartItemService.addPWP($scope.pwp.item, items).then(function(res){
+              CartItemService.addPWP($scope.header.DocNo, $scope.pwp.item, items).then(function(res){
                 var items = [];
                 angular.forEach($scope.pwp.selectedItems, function(item, key){
                   var deferred = $q.defer();
@@ -189,7 +189,7 @@ angular.module('itouch.controllers')
                 });
                 // console.log(data);
                 if(items.length > 0){
-                  return DiscountService.saveMultipleTempDiscountItem(items).then(function(){
+                  return DiscountService.saveMultipleTempDiscountItem($scope.header.DocNo, items).then(function(){
                     $scope.$emit('refresh-cart');
                     $scope.$emit('pwpModal-close');
                   }, function(errors){

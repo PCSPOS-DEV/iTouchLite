@@ -200,17 +200,17 @@ angular.module('itouch.services')
         return nDI;
       }
 
-      self.addPWP = function(parentItem, items){
+      self.addPWP = function(DocNo, parentItem, items){
         return BillService.loadLineNewNumber().then(function(lineNumber){
 
           var promises = [];
           parentItem.LineNumber = lineNumber;
-          promises.push(self.addItemToCart(parentItem));
+          promises.push(self.addItemToCart(DocNo, parentItem));
           items = _.map(items, function(item){
             item.ParentItemLineNumber = parentItem.LineNumber;
             lineNumber += 100;
             item.LineNumber = lineNumber;
-            promises.push(self.addItemToCart(item));
+            promises.push(self.addItemToCart(DocNo, item));
             return item;
           });
           return $q.all(promises);
