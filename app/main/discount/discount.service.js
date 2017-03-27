@@ -10,7 +10,7 @@ angular.module('itouch.services')
         discountSets: []
       };
 
-      var businessDate = $filter('date')(ControlService.getBusinessDate(), "yyyy-MM-dd");
+      var businessDate = ControlService.getBusinessDate(true);
       var DocNo = BillService.getCurrentReceiptId();
       var machineId = SettingsService.getMachineId();
 
@@ -246,8 +246,8 @@ angular.module('itouch.services')
           discount.SeqNo = sn;
           discount.DiscountFrom = 'I';
           discount.DiscountType = ""+parseInt(discount.DiscountType );
-          discount.DocNo =  discount.DocNo || DocNo;
-          discount.BusinessDate =  discount.BusinessDate || businessDate;
+          discount.DocNo =  discount.DocNo || BillService.getCurrentReceiptId();
+          discount.BusinessDate =  discount.BusinessDate || ControlService.getBusinessDate(true);
           discount.MachineId =  discount.MachineId || machineId;
           discount.LocationId =  discount.LocationId || location.LocationId;
 
@@ -266,8 +266,8 @@ angular.module('itouch.services')
           discount = _.extend(_.pick(item, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'LineNumber']),discount);
           discount.DiscountFrom = 'T';
           discount.DiscountType = ""+parseInt(discount.DiscountType );
-          discount.DocNo =  discount.DocNo || DocNo;
-          discount.BusinessDate =  discount.BusinessDate || businessDate;
+          discount.DocNo =  discount.DocNo || BillService.getCurrentReceiptId();
+          discount.BusinessDate =  discount.BusinessDate || ControlService.getBusinessDate(true);
           discount.MachineId =  discount.MachineId || machineId;
           discount.LocationId =  discount.LocationId || location.LocationId;
 
@@ -287,7 +287,7 @@ angular.module('itouch.services')
             saveItemDiscount(discount);
             updateTempBillDetail(discountAmounts.item, { columns: 'DocNo=? AND ItemId=? AND LineNumber=?', data: [discountAmounts.item.DocNo, discountAmounts.item.ItemId, discountAmounts.item.LineNumber]});
             return DB.executeQueue().then(function () {
-              return BillService.updateHeaderTotals();
+              return BillService.updateHeaderTotals(item.DocNo);
             });
           });
         } else {
@@ -296,7 +296,7 @@ angular.module('itouch.services')
 
       }
 
-      self.saveMultipleTempDiscountItem = function (discountSets) {
+      self.saveMultipleTempDiscountItem = function (DocNo, discountSets) {
         var promises = [];
         DB.clearQueue();
         angular.forEach(discountSets, function(discountSet){
@@ -324,7 +324,7 @@ angular.module('itouch.services')
         });
         return $q.all(promises).then(function(){
           return DB.executeQueue().then(function () {
-            return BillService.updateHeaderTotals();
+            return BillService.updateHeaderTotals(DocNo);
           });
         });
       }
