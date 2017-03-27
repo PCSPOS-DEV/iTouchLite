@@ -238,8 +238,8 @@ angular.module('itouch.controllers')
 
                   if(changeAmount > 0 && tenderType.Cash == 'true'){
                     $ionicPopup.alert({
-                      title: 'Balance',
-                      template: '<p>Balance: $'+ changeAmount.toFixed(2)+'</p>'
+                      title: 'Change',
+                      template: '<p style="font-size: 18px; text-align: center;">$'+ changeAmount.toFixed(2)+'</p>'
                     });
                   }
                   $ionicHistory.nextViewOptions({
