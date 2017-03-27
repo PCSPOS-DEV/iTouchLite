@@ -91,11 +91,11 @@ angular.module('itouch.services')
               }
             }));
           });
-          return $q.all(promises);
-          //   .catch(function(err){
-          //   console.log(err);
-          //   return err;
-          // });
+          return $q.all(promises)
+            .catch(function(err){
+            console.log(err);
+            return $q.reject(err);
+          });
         });
       }
 
