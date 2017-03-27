@@ -736,7 +736,7 @@ angular.module('itouch.controllers')
               $scope.TakeAway = false;
             }
             if ($scope.cart.selectedItem && $scope.cart.selectedItem.LineNumber == item.LineNumber) {
-              // $scope.selectItem(item);
+              $scope.selectItemWithLineNumber(item.LineNumber);
             }
           });
 

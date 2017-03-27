@@ -346,14 +346,21 @@ angular.module('itouch.services')
 
       var checkAmountEligibility = function(item){
         // console.log(item);
+
         var total = item.SubTotal + item.Tax5Amount;
-        var discount = item.DiscAmount + item.Tax5DiscAmount;
+        var discount = (item.DiscAmount + item.Tax5DiscAmount).roundTo(2);
+
+        if(discount > 0){
+          if(item.MultiDiscount == "false"){
+            return false;
+          }
+        }
         if(discount > total){
           return false;
         }
         if(item.BelowCost == 'false'){
           if(item.StdCost > 0){
-            if((total-discount) < item.StdCost){
+            if((total-discount) < (item.StdCost * item.Qty)){
               return false;
             }
           }
