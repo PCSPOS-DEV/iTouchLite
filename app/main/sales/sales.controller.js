@@ -29,7 +29,8 @@ angular.module('itouch.controllers')
       $scope.pwp = null;
       $scope.qty = {value: 1};
       $scope.modals = {
-        modifiers: null
+        modifiers: null,
+        salesKit: null
       };
       $scope.TakeAway = false;
       $scope.shift = shift;
@@ -301,18 +302,20 @@ angular.module('itouch.controllers')
        * Initiating shift modal dialog
        */
       $ionicModal.fromTemplateUrl('main/salesKits/salesKit.html', {
+        id: 1,
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
       }).then(function (modal) {
-        $scope.skModalModal = modal;
+        $scope.modals.salesKit = modal;
       });
 
       /**
        * Biding an event to catch modal close call
        */
       $scope.$on('skModalModal-close', function () {
-        $scope.skModalModal.hide();
+        $scope.qty.value = 1;
+        $scope.modals.salesKit.hide();
       });
 
       /**
@@ -321,7 +324,7 @@ angular.module('itouch.controllers')
       $scope.$on('skModalModal-save', function () {
         $scope.salesKitUpdate = false;
         $scope.qty.value = 1;
-        $scope.skModalModal.hide();
+        $scope.modals.salesKit.hide();
       });
 
       /**
@@ -355,7 +358,6 @@ angular.module('itouch.controllers')
         animation: 'slide-in-up'
       }).then(function (modal) {
         $scope.modals.loginlModal = modal;
-        // $scope.modals.loginlModal.show();
 
       });
 
@@ -564,8 +566,8 @@ angular.module('itouch.controllers')
               $scope.salesKits.customQuantity = $scope.qty.value;
             }
             $timeout(function () {
-              $scope.skModalModal.show();
-            }, 500);
+              $scope.modals.salesKit.show();
+            }, 200);
 
 
           } else {
@@ -575,14 +577,6 @@ angular.module('itouch.controllers')
                 if (data.Price == 0 && item.ZeroPrice == 'false') {
                   q = showPriceForm().then(function (amount) {
                     if (amount && amount > 0) {
-                      // if(CustomKeyboard){
-                      //   CustomKeyboard.open(document.getElementById('decimal').value, 9, function (value) {
-                      //     //fired every time when value changed
-                      //     document.getElementById('decimal').value = value;
-                      //   }, function (value) {
-                      //     alert('Editing ended with ' + value);
-                      //   });
-                      // }
                       amount = parseFloat(amount);
                       item.Price = amount || 0;
                       item.OrgPrice = amount || 0;
@@ -858,8 +852,10 @@ angular.module('itouch.controllers')
                         $scope.salesKits = salesKit;
                         $scope.salesKitUpdate = true;
                         $timeout(function () {
-                          $scope.skModalModal.show();
-                        }, 1000);
+                          if($scope.modals.salesKit){
+                            $scope.modals.salesKit.show();
+                          }
+                        }, 500);
 
                       }
                     }, function (ex) {
@@ -1237,11 +1233,11 @@ angular.module('itouch.controllers')
           $scope.data.barcode = "";
           $timeout(function () {
             document.getElementById("barcodeText").focus();
-          }, 750);
+          }, 500);
         } else {
           $timeout(function () {
             document.getElementById("barcodeText").blur();
-          }, 750);
+          }, 500);
         }
       }
 
