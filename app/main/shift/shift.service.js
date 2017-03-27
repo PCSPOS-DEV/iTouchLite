@@ -298,6 +298,12 @@ angular.module('itouch.services')
         var deferred = $q.defer();
         DB.clearQueue();
         DB.addDeleteToQueue("ShiftStatus");
+        DB.addDeleteToQueue(DB_CONFIG.tableNames.bill.header, { columns: 'IsExported = ?', data: ['true'] });
+        DB.addDeleteToQueue(DB_CONFIG.tableNames.bill.detail, { columns: 'IsExported = ?', data: ['true'] });
+        DB.addDeleteToQueue(DB_CONFIG.tableNames.bill.payTransactions, { columns: 'IsExported = ?', data: ['true'] });
+        DB.addDeleteToQueue(DB_CONFIG.tableNames.bill.payTransactionsOverTender, { columns: 'IsExported = ?', data: ['true'] });
+        DB.addDeleteToQueue(DB_CONFIG.tableNames.bill.voidItems, { columns: 'IsExported = ?', data: ['true'] });
+        DB.addDeleteToQueue(DB_CONFIG.tableNames.discounts.billDiscounts, { columns: 'IsExported = ?', data: ['true'] });
 
         DB.executeQueue().then(function(){
           $localStorage.shift = null;
