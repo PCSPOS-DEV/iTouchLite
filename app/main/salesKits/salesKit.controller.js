@@ -13,9 +13,7 @@ angular.module('itouch.controllers')
 
       $scope.$on('modal.shown', function(event, modal) {
         if(modal.id == 1) {
-          var item = $scope.cart.selectedItem;
-          // if(item && item.ItemType == 'SKT')
-
+          $scope.selectedRow = null;
           submitted = false;
           $ionicScrollDelegate.$getByHandle('salesKit').scrollTop();
           var customQty = $scope.qty.value;
