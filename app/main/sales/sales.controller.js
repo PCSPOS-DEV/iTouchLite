@@ -560,12 +560,11 @@ angular.module('itouch.controllers')
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
           if (salesKit && !salesKit.isEmpty) {
-            $scope.salesKits = salesKit;
-            $scope.shownModal = 'sk';
-            if ($scope.qty.value) {
-              $scope.salesKits.customQuantity = $scope.qty.value;
-            }
             $timeout(function () {
+              $scope.modals.salesKit.data = {
+                salesKit: salesKit,
+                update: false
+              };
               $scope.modals.salesKit.show();
             }, 200);
 
@@ -848,11 +847,12 @@ angular.module('itouch.controllers')
                   CartItemService.findSalesKitParent(item.ParentItemLineNumber).then(function (parentItem) {
                     SalesKitService.getSalesKit(parentItem.ItemId, businessDate).then(function (salesKit) {
                       if (salesKit) {
-                        $scope.shownModal = 'sk';
-                        $scope.salesKits = salesKit;
-                        $scope.salesKitUpdate = true;
                         $timeout(function () {
                           if($scope.modals.salesKit){
+                            $scope.modals.salesKit.data = {
+                              salesKit: salesKit,
+                              update: true
+                            };
                             $scope.modals.salesKit.show();
                           }
                         }, 500);

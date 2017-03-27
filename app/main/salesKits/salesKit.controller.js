@@ -10,41 +10,47 @@ angular.module('itouch.controllers')
       var selectedItem = null;
       var submitted = false;
       var oldItem = null;
+      var update = false;
+      var customQty = 0;
 
       $scope.$on('modal.shown', function(event, modal) {
         if(modal.id == 1) {
           $scope.selectedRow = null;
           submitted = false;
           $ionicScrollDelegate.$getByHandle('salesKit').scrollTop();
-          var customQty = $scope.qty.value;
+          customQty = $scope.qty.value;
 
 
+          if(modal.data){
+            $scope.salesKits = modal.data.salesKit;
+            if(modal.data.update) {
+              update = true;
+              oldItem = $scope.cart.selectedItem;
+              customQty = oldItem.Qty;
+              $scope.salesKits.selectedList = {};
+            } else {
+              angular.forEach($scope.salesKits.selectedList, function (item, key) {
+                item.Quantity *= customQty;
+                item.Qty *= customQty;
+                $scope.salesKits.selectedList[key].AddedAt = new Date();
 
-          if($scope.salesKitUpdate) {
-            oldItem = $scope.cart.selectedItem;
-            customQty = oldItem.Qty;
-            $scope.salesKits.selectedList = {};
-          } else {
-            angular.forEach($scope.salesKits.selectedList, function (item, key) {
+                $scope.salesKits.selectedList[key] = item;
+              });
+            }
+            angular.forEach($scope.salesKits.list, function (item, key) {
               item.Quantity *= customQty;
-              item.Qty *= customQty;
-              $scope.salesKits.selectedList[key].AddedAt = new Date();
-
-              $scope.salesKits.selectedList[key] = item;
+              $scope.salesKits.list[key] = item;
             });
+
+            if (customQty >= 1) {
+              // $scope.salesKits.Qty = customeQty;
+              $scope.salesKits.Qty = 0;
+              $scope.salesKits.Quantity = customQty;
+
+
+            }
           }
-          angular.forEach($scope.salesKits.list, function (item, key) {
-            item.Quantity *= customQty;
-            $scope.salesKits.list[key] = item;
-          });
 
-          if (customQty >= 1) {
-            // $scope.salesKits.Qty = customeQty;
-            $scope.salesKits.Qty = 0;
-            $scope.salesKits.Quantity = customQty;
-
-
-          }
         }
 
 
@@ -168,11 +174,12 @@ angular.module('itouch.controllers')
             });
             item.selectedList = selectedList;
             var operations = [];
-            item.Qty = $scope.salesKits.customQuantity;
-            if($scope.salesKitUpdate){
+            var voidProm = null;
+            item.Qty = customQty;
+            if(update){
               // var oldItem = $scope.cart.selectedItem;
               // console.log(oldItem);
-              operations.push(BillService.voidItem(oldItem));
+              voidProm = BillService.voidItem(oldItem);
               var item = angular.copy(selectedItem);
               angular.forEach($scope.salesKits.selectedList, function(item){
                 item.LineNumber = oldItem.LineNumber;
@@ -187,20 +194,25 @@ angular.module('itouch.controllers')
               });
 
             } else {
+              voidProm = $q.when(true);
               operations.push(CartItemService.addSalesKitItemToCart(item));
             }
 
-            $q.all(operations).then(function (item) {
-              selectedItem = null;
-              $scope.refreshCart().then(function(){
-                $scope.scrollTo(item.LineNumber);
-                $scope.qty.value = 1;
-                $scope.selectItemWithLineNumber(item.LineNumber);
-              });
-              $scope.$emit('skModalModal-save');
+            voidProm.then(function () {
+              return $q.all(operations).then(function (item) {
+                selectedItem = null;
+                $scope.refreshCart().then(function(){
+                  $scope.scrollTo(item.LineNumber);
+                  $scope.qty.value = 1;
+                  $scope.selectItemWithLineNumber(item.LineNumber);
+                });
+                $scope.$emit('skModalModal-save');
 
+              })
             }).catch(function (err) {
               console.log(err);
+            }).finally(function () {
+              submitted = false;
             });
           } else {
             Alert.warning('All the child items must be selected before proceeding');
