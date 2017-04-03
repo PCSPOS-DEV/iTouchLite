@@ -38,9 +38,9 @@ angular.module('itouch.services')
       }
 
       self.saveReceiptId = function (docNo) {
-        console.log(docNo);
+        // console.log(docNo);
         ControlService.saveDocId(docNo);
-        console.log(ControlService.getNextDocId());
+        // console.log(ControlService.getNextDocId());
       }
 
       self.getCurrentReceiptId = function () {
@@ -50,7 +50,7 @@ angular.module('itouch.services')
       var location = LocationService.currentLocation;
       renameProperty(location, 'PriceLevel', 'PriceLevelId');
       renameProperty(location, 'Id', 'LocationId');
-      console.log(location);
+      // console.log(location);
       if (!location) {
         LocationService.get().then(function (loc) {
           if(loc){

@@ -201,15 +201,15 @@ angular.module('itouch', [
                         }
                     }
                 })
-                .state('app.printerSetup', {
-                    url: '/printer-setup',
-                    views: {
-                        'menuContent': {
-                            templateUrl: 'main/printerSetup/printerSetup.html',
-                            controller: 'PrinterSetupCtrl as ctrl'
-                        }
-                    }
-                })
+                // .state('app.printerSetup', {
+                //     url: '/printer-setup',
+                //     views: {
+                //         'menuContent': {
+                //             templateUrl: 'main/printerSetup/printerSetup.html',
+                //             controller: 'PrinterSetupCtrl as ctrl'
+                //         }
+                //     }
+                // })
               .state('app.shift', {
                 url: '/shift',
                 views: {
