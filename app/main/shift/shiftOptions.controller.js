@@ -223,23 +223,25 @@ angular.module('itouch.controllers')
           }
 
           var businessDate = angular.copy(ControlService.getBusinessDate());
-          ShiftService.dayEnd().then(function () {
-            dayEnd = false;
-            $scope.$emit('shift-changed');
-            Report.printShiftClosingReport(null, businessDate);
-            Alert.success('Day end completed')
-            $ionicHistory.nextViewOptions({
-              disableAnimate: false,
-              disableBack: true
-            });
-            UploadService.upload().finally(function () {
-              $state.go('app.home');
-            });
+          Report.printShiftClosingReport(null, businessDate);
+          $timeout(function () {
+            ShiftService.dayEnd().then(function () {
+              dayEnd = false;
+              $scope.$emit('shift-changed');
+              Alert.success('Day end completed')
+              $ionicHistory.nextViewOptions({
+                disableAnimate: false,
+                disableBack: true
+              });
+              UploadService.upload().finally(function () {
+                $state.go('app.home');
+              });
 
-          }, function (err) {
-            dayEnd = false;
-            console.log(err);
-          });
+            }, function (err) {
+              dayEnd = false;
+              console.log(err);
+            });
+          }, 500);
         });
       }
 
@@ -275,6 +277,12 @@ angular.module('itouch.controllers')
           $log.log('date is not valid');
         }
 
+      }
+
+      self.test = function () {
+        var bdate = ControlService.getNextBusinessDate();
+        bdate.subtract(1, 'days');
+        Report.printShiftClosingReport(null, bdate);
       }
 
     }]);
