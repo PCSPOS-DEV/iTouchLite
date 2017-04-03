@@ -281,6 +281,9 @@ angular.module('itouch.services')
       self.saveTempDiscountItem = function (item, discount) {
         DB.clearQueue();
         // item = ItemService.calculateTotal(item);
+        if(item.DiscAmount > 0){
+          item.isDiscounted = true;
+        }
         var discountAmounts = calculateDiscountAmounts(item, discount);
         if(checkAmountEligibility(discountAmounts.item)){
           return processDiscountItem(discountAmounts.item, discountAmounts.discount).then(function (discount) {
@@ -302,6 +305,9 @@ angular.module('itouch.services')
         angular.forEach(discountSets, function(discountSet){
           if(discountSet.item && (discountSet.discount || discountSet.DiscountId)){
             var prom;
+            if(discountSet.item.DiscAmount > 0){
+              discountSet.item.isDiscounted = true;
+            }
             if(discountSet.DiscountId){
               prom = self.getDiscountById(discountSet.DiscountId);
             } else {
@@ -350,7 +356,7 @@ angular.module('itouch.services')
         var total = item.SubTotal + item.Tax5Amount;
         var discount = (item.DiscAmount + item.Tax5DiscAmount).roundTo(2);
 
-        if(discount > 0){
+        if(item.isDiscounted){
           if(item.MultiDiscount == "false"){
             return false;
           }
@@ -411,6 +417,9 @@ angular.module('itouch.services')
           }
           discount.SeqNo = seq++;
           angular.forEach(items, function (item, key) {
+            if(item.DiscAmount > 0){
+              item.isDiscounted = true;
+            }
             // totalDiscount  = (item.Total < discountPerItem ? item.Total : discount.Amount).roundTo(2);
             // subDiscount = ((totalDiscount * (100-item.Tax5Perc)) / 100).roundTo(2);
             item = ItemService.calculateTotal(item);

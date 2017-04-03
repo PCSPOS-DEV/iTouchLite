@@ -201,12 +201,12 @@ angular.module('itouch.controllers')
               });
               var header = _.omit($scope.tenderHeader, ["TaxAmount", "Total", "TenderTotal", "TotalRounded"]);
 
-              var total = 0;
-              angular.forEach(payTransactions, function (tx) {
-                total += parseFloat(tx.Amount);
-              });
+              // var total = 0;
+              // angular.forEach(payTransactions, function (tx) {
+              //   total += parseFloat(tx.Amount);
+              // });
 
-              if (total > $scope.tenderHeader.Total && tenderType.OverTender == 'true') {
+              if (amount > $scope.tenderHeader.Total && tenderType.OverTender == 'true') {
                 overTender = {
                   BusinessDate: businessDate,
                   LocationId: SettingsService.getLocationId(),
@@ -215,8 +215,8 @@ angular.module('itouch.controllers')
                   PayTypeId: tenderType.Id,
                   OverTenderTypeId: tenderType.OverTenderTypeId,
                   SeqNo: 0,
-                  Amount: amount,
-                  ChangeAmount: changeAmount || 0,
+                  Amount: (amount - total).roundTo(2),
+                  ChangeAmount: 0,
                   IsExported: false
                 };
               }
@@ -271,7 +271,7 @@ angular.module('itouch.controllers')
               SeqNo: seq,
               PayTypeId: tenderType.Id,
               Amount: transAmount,
-              ChangeAmount: changeAmount || 0,
+              ChangeAmount: tenderType.Cash == 'true' ? changeAmount || 0 : 0,
               ConvRate: 0,
               CurrencyId: 0,
               IsExported: false
