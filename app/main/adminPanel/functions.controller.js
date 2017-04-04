@@ -31,10 +31,13 @@ angular.module('itouch.controllers')
 
         FunctionsService.get().then(function(fns){
           fns = _.map(fns, function(fn){
-            if(fn && currentUser && (fn['Description'+currentUser.DescriptionLevel] == null || fn['Description'+currentUser.DescriptionLevel] == '')){
-              fn.undefined = true;
+            if(fn){
               fn.Inactive = fn.Inactive == 'true';
               fn.Transact = fn.Transact == 'true';
+
+              if(currentUser && (fn['Description'+currentUser.DescriptionLevel] == null || fn['Description'+currentUser.DescriptionLevel] == '')){
+                fn.undefined = true;
+              }
             }
             return fn;
           });
@@ -54,6 +57,7 @@ angular.module('itouch.controllers')
             fn.active = false;
             return fn;
           });
+          // console.log(fn.Transact);
           fn.active = true;
 
         }
