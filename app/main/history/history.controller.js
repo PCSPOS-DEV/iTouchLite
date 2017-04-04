@@ -29,6 +29,7 @@ angular.module('itouch.controllers')
                 item.BillType = 'Sales';
                 break;
             }
+            item.Total = item.Total.toFixed(2);
             return item;
           });
 

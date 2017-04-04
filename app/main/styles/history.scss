@@ -2,6 +2,10 @@
   .col, .history .card .row { padding: 0;}
   .align-right { text-align: right; }
   .item { padding: 10px; }
+
+  .row{
+    flex-wrap: wrap;
+  }
 }
 
 ion-modal-view.billView {
