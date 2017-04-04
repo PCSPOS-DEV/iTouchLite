@@ -18,6 +18,8 @@ angular.module('itouch.services')
   self.creatRecieptHeader = function(){
 
     printer.addTextAlign(printer.ALIGN_CENTER);
+    PrintService.addImage();
+    PrintService.addLineBreak();
 
     angular.forEach(printData.Header, function(row){
       if(row.IsBold == "true"){

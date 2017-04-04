@@ -41,6 +41,7 @@ angular.module('itouch.services')
                 console.log('device created');
                 self.status = 'created';
                 printer = deviceObj;
+                // self.addImage();
                 //Displays the successful print message
                 // printer.startMonitor();
                 printer.onpapernearend = onReceive;
@@ -345,6 +346,19 @@ angular.module('itouch.services')
           // }
           // this.Success = res.success;
           // this.finish = true;
+      }
+
+      self.addImage = function () {
+        try {
+          var canvas = document.getElementById('canvas');
+          if (canvas.getContext) {
+            var context = canvas.getContext('2d');
+            printer.addImage(context, 0, 0, canvas.width, canvas.height);
+          }
+        }
+        catch (e) {
+          alert(e.message);
+        }
       }
 
       return self;

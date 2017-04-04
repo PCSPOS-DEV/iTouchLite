@@ -12,6 +12,8 @@ angular.module('itouch.controllers')
         disableBack: true
       });
 
+      $scope.setImages();
+
       $state.go('app.sales');
 
     }

@@ -34,6 +34,9 @@ angular.module('itouch.services')
 
     printer.addTextAlign(printer.ALIGN_CENTER);
 
+    PrintService.addImage();
+    PrintService.addLineBreak();
+
     angular.forEach(data.Header, function(row){
       if(row.IsBold == "true"){
         printer.addTextStyle(false, false, true);

@@ -1,0 +1,36 @@
+<div class="row" ng-controller="ImageSetupCtrl as ctrl">
+    <div class="col col-50 col-offset-25">
+      <div class="list card">
+
+        <div class="item">
+          <h2>Logo</h2>
+        </div>
+
+        <!--<div class="item item-image">-->
+          <img class="image-center padding" id="logo_image" height="100" ng-src="{{ctrl.images.logo}}">
+        <!--</div>-->
+
+        <a class="item item-icon-left assertive" ng-click="ctrl.pickLogo()">
+          <i class="icon ion-edit"></i>
+          Change
+        </a>
+
+      </div>
+      <div class="list card">
+
+        <div class="item">
+          <h2>Cart Background</h2>
+        </div>
+
+        <!--<div class="item item-image">-->
+        <img class="image-center padding" id="cart_background_image" height="100" ng-src="{{ctrl.images.cart_background}}">
+        <!--</div>-->
+
+        <a class="item item-icon-left assertive" ng-click="ctrl.pickCartBack()">
+          <i class="icon ion-edit"></i>
+          Change
+        </a>
+
+      </div>
+    </div>
+  </div>

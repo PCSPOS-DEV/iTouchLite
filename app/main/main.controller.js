@@ -4,11 +4,48 @@ angular.module('itouch.controllers')
   function (SyncService, $scope, $ionicLoading, LocationService, Logger, $localStorage, AuthService, $state, $ionicHistory, Alert, CartItemService, $cordovaKeyboard, UploadService, $ionicModal) {
     var currentUser = AuthService.currentUser();
 
+    $scope.loadLogo = function() {
+      try {
+        if($localStorage && $localStorage.images){
+          var image = new Image();
+          image.style.width = "100px";
+          image.style.height = "100px";
+          image.src = $localStorage.images.logo;
+          image.onload = function () {
+            // show message
+            // alert('Image:Width' + image.width + 'px, Height' + image.height + 'px');
+            // draw image
+            var canvas = document.getElementById('canvas');
+            if (canvas.getContext) {
+              canvas.width = image.width;
+              canvas.height = image.height;
+              var context = canvas.getContext('2d');
+              context.drawImage(image, 0, 0);
+            }
+          }
+        }
+
+      }
+      catch (e) {
+        alert(e.message);
+      }
+    }
+
+    $scope.setImages = function () {
+      if($localStorage.images){
+        $scope.images = $localStorage.images;
+        $scope.loadLogo();
+      }
+    }
+    $scope.setImages();
+
     ionic.Platform.ready(function () {
       LocationService.get();
       Logger.init();
       ionic.Platform.fullScreen();
     });
+
+
 
     $scope.config = $localStorage.itouchConfig;
 
