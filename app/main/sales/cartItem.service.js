@@ -303,9 +303,11 @@ angular.module('itouch.services')
         })
       }
 
-      self.isEmpty = function(){
-        var rec_id = BillService.getCurrentReceiptId();
-        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, "COUNT(*) AS c", { columns: 'DocNo=?', data:[rec_id] }).then(function(res){
+      self.isEmpty = function(DocNo){
+        if(!DocNo){
+            DocNo = BillService.getCurrentReceiptId();
+        }
+        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, "COUNT(*) AS c", { columns: 'DocNo=?', data:[DocNo] }).then(function(res){
           var count = DB.fetch(res).c;
           if(count == 0){
             return true;
