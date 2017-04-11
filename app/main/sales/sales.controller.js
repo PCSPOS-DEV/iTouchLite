@@ -973,9 +973,36 @@ angular.module('itouch.controllers')
 
         },
         CallSuspendBill: function (fn) {
+            if(!buttonClicked.recallSuspendBillModal){
+                buttonClicked.recallSuspendBillModal = true;
           if (authorityCheck(fn)) {
-            console.log('tada');
+                    CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
+                        if(empty){
+                            $ionicModal.fromTemplateUrl('main/recallSuspendedBill/recallSuspendedBill.html', {
+                                id: 14,
+                                scope: $scope,
+                                backdropClickToClose: true,
+                                animation: 'slide-in-up'
+                            }).then(function (modal) {
+                                $scope.modals.recallSuspendBillModal = modal;
+                                $scope.modals.recallSuspendBillModal.show();
+                                buttonClicked.recallSuspendBillModal = false;
+                            });
+                        } else {
+                            SuspendService.suspend($scope.header.DocNo).then(function () {
+                                refresh();
+                            }, function (ex) {
+                                console.log(ex);
+                            }, function () {
+                                buttonClicked.recallSuspendBillModal = false;
+                            });
           }
+                    });
+
+
+                }
+            }
+
         },
         Shiftoption: function (fn) {
           if (authorityCheck(fn)) {
@@ -1173,6 +1200,13 @@ angular.module('itouch.controllers')
           buttonClicked.voidBill = false;
         }
       });
+
+        $scope.$on('recallSuspendBill.modal.close', function () {
+            if ($scope.modals.recallSuspendBillModal) {
+                $scope.modals.recallSuspendBillModal.hide();
+                buttonClicked.recallSuspendBillModal = false;
+            }
+        });
 
       $ionicModal.fromTemplateUrl('main/items/itemSearch.html', {
         scope: $scope,

@@ -13,7 +13,7 @@ angular.module('itouch.services')
         'Pax', 'ShiftId', 'VipId', 'CashierId', 'StaffId', 'AuthBy', 'SubTotal', 'DepAmount', 'DiscAmount', 'Tax1DiscAmount',
         'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount', 'Tax1Amount','Tax2Amount','Tax3Amount','Tax4Amount','Tax5Amount','Tax1Option',
         'Tax2Option', 'Tax3Option', 'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'ReprintCount',
-        'Remarks', 'OrderTag', 'IsExported', 'IsClosed'];
+        'Remarks', 'OrderTag'];
 
       self.generateReceiptId = function () {
         return ControlService.getNextDocId();
@@ -98,9 +98,12 @@ angular.module('itouch.services')
        * @returns {Array}
        */
       self.validate = function (item) {
-        var required = ['LocationId', 'MachineId', 'DocNo', 'PluType', 'ItemId', 'SuspendDepDocNo', 'OrderedBy', 'TakeAway',
-          'ParentItemLineNumber', 'PriceLevelId', 'Price', 'Qty', 'DepAmount', 'Tax1Option', 'Tax2Option', 'Tax3Option',
-          'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'NoDiscount', 'MultiDiscount', 'PriceChanged', 'Taxable', 'BelowCost', 'Comm'];
+        var required = ['BusinessDate','LocationId', 'MachineId', 'DocNo', 'DocType', 'SysDateTime', 'VoidDocNo', 'TableId',
+            'SuspendDepDocNo', 'OrderedBy', 'SpecialOrderRemark', 'ServingTime', 'TakeAway', 'ItemType', 'ParentItemLineNumber', 'PromoPwpId',
+            'Pax', 'ShiftId', 'VipId', 'CashierId', 'StaffId', 'AuthBy', 'SubTotal', 'DepAmount', 'DiscAmount', 'Tax1DiscAmount',
+            'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount', 'Tax1Amount','Tax2Amount','Tax3Amount','Tax4Amount','Tax5Amount','Tax1Option',
+            'Tax2Option', 'Tax3Option', 'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'ReprintCount',
+            'Remarks', 'OrderTag'];
         var errors = [];
         if(item){
           angular.forEach(required, function (attribute) {
@@ -115,12 +118,28 @@ angular.module('itouch.services')
         return errors;
       }
 
-      self.insert = function(DocNo, item){
-       return DB.update(self.table, item, { columns: 'DocNo=?', data: [DocNo] });
+      self.insert = function(DocNo, item, queue){
+        item = _.pick(item, columnList);
+        var errors = [];
+        // var errors = self.validate(item);
+        if(errors.length == 0){
+          if(queue){
+              DB.addInsertToQueue(self.table, item, { columns: 'DocNo=?', data: [DocNo] });
+          }  else {
+              return DB.insert(self.table, item, { columns: 'DocNo=?', data: [DocNo] });
+          }
+        } else {
+          return queue ? errors.join(', ') : $q.reject(errors.join(', '));
+        }
       }
 
-      self.update = function(DocNo, values){
-        return DB.update(self.table, values, { columns: 'DocNo=?', data: [DocNo] });
+      self.update = function(DocNo, values, queue){
+        values = _.pick(values, columnList);
+          if(queue){
+              DB.addUpdateToQueue(self.table, values, { columns: 'DocNo=?', data: [DocNo] });
+          }  else {
+              return DB.update(self.table, values, { columns: 'DocNo=?', data: [DocNo] });
+          }
       }
 
 

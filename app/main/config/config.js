@@ -7,6 +7,7 @@ angular.module('itouch.config')
       $localStorage.itouchConfig = {
         // baseUrl: 'http://172.16.110.99/iTouchLiteSyncServices/iTouchLiteSyncService.svc/',
         baseUrl: 'http://172.16.110.114:89/iTouchLiteSyncServices/iTouchLiteSyncService.svc/',
+        outletServerUrl: 'http://172.16.110.114:89/iTouchLiteSyncServices/iTouchLiteSyncService.svc/',
         name: 'ITouch Lite',
         version: '0.1',
         debug: true
@@ -21,7 +22,15 @@ angular.module('itouch.config')
         if(url){
           $localStorage.itouchConfig.baseUrl = url
         }
-      }
+      },
+        getOutletServerUrl: function () {
+            return $localStorage.itouchConfig.outletServerUrl;
+        },
+        setOutletServerUrl: function (url) {
+            if(url){
+                $localStorage.itouchConfig.outletServerUrl = url
+            }
+        }
     };
 
   }])

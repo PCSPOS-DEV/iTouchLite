@@ -1,0 +1,35 @@
+<ion-modal-view class="voidBill" ng-controller="RecallSuspendedBillCtrl as ctrl">
+  <ion-header-bar>
+  <h1 class="title">Recall Suspended Bill</h1>
+    <button class="button button-clear" ng-click="ctrl.close()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content>
+      <div class="table">
+        <div class="row header" ng-if="ctrl.data.bills.length > 0">
+          <div class="col"> Receipt No  </div>
+          <div class="col text-right"> Amount  </div>
+        </div>
+        <ion-scroll zooming="false" direction="y" style="height: 300px" delegate-handle="itemSearch" ng-if="ctrl.data.bills.length != 0">
+          <div class="row" ng-repeat="bill in ctrl.data.bills" ng-click="ctrl.onItemTap(bill)" ng-class="{ active: bill.active }">
+            <div class="col"> {{ bill.DocNo }}  </div>
+            <div class="col text-right"> {{ '$'+bill.Total.toFixed(2) }}  </div>
+          </div>
+        </ion-scroll>
+        <div class="no-data" ng-if="ctrl.data.bills.length == 0">
+          <!--<p>-->
+          <i class="icon ion-android-warning"></i>
+          <!--</p>-->
+          <p>No records found</p>
+        </div>
+      </div>
+
+    <div class="row buttons">
+      <!--<div class="col button-col">-->
+        <!--<button class="button button-block button-default icon ion-search save" ng-click="ctrl.view()"></button>-->
+      <!--</div>-->
+      <div class="col button-col">
+        <button class="button button-block button-assertive icon ion-checkmark-round save" ng-click="ctrl.recallBill()"></button>
+      </div>
+    </div>
+  </ion-content>
+</ion-modal-view>

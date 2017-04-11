@@ -2,8 +2,8 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory("TempBillDetailService", ['LocationService', 'ControlService', '$localStorage', 'ErrorService', 'DB', 'DB_CONFIG', 'TenderService', 'SettingsService', '$filter', 'AuthService', '$q', 'ShiftService',
-    function (LocationService, ControlService, $localStorage, ErrorService, DB, DB_CONFIG, TenderService, SettingsService, $filter, AuthService, $q, ShiftService) {
+  .factory("TempBillDetailService", ['LocationService', 'ControlService', '$localStorage', 'ErrorService', 'DB', 'DB_CONFIG', 'TenderService', 'SettingsService', '$filter', 'AuthService', '$q', 'TaxService',
+    function (LocationService, ControlService, $localStorage, ErrorService, DB, DB_CONFIG, TenderService, SettingsService, $filter, AuthService, $q, TaxService) {
       var self = this;
       self.table = DB_CONFIG.tableNames.bill.tempDetail;
 
@@ -39,7 +39,7 @@ angular.module('itouch.services')
           item.PriceChanged = item.PriceChanged || false;
           item.DepAmount = item.DepAmount || 0;
           item.ByAmount = item.ByAmount || 0;
-          item.KitType = item.KitType || "";
+          item.KitType = item.KitType || 0;
 
           item.BusinessDate = item.BusinessDate || ControlService.getBusinessDate(true);
           item.MachineId = item.MachineId || SettingsService.getMachineId();
@@ -48,7 +48,7 @@ angular.module('itouch.services')
             item.Qty = 1;
           }
           if(!item.Price || item.ItemType != 'SKI'){
-            item = self.calculateTax(item);
+            item = TaxService.calculateTax(item);
           }
           if(!item.OrgPrice) item.OrgPrice = item.Price;
           if(!item.AlteredPrice) item.AlteredPrice = item.Price;
@@ -97,14 +97,18 @@ angular.module('itouch.services')
         return errors;
       }
 
-      self.insert = function(DocNo, item){
+      self.insert = function(DocNo, item, queue){
         item.DocNo = DocNo;
         return self.prepareItem(item).then(function(item){
           var errors = self.validate(item);
           if(errors.length == 0){
-            return DB.insert(self.table, item);
+              if(queue){
+                  return DB.addInsertToQueue(self.table, item);
+              }  else {
+                  return DB.insert(self.table, item);
+              }
           } else {
-            return $q.reject("Unable to save to DB "+errors.join(', '));
+            return queue ? errors.join(', ') : $q.reject(errors.join(', '));
           }
         });
       }

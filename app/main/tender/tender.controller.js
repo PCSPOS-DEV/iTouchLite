@@ -3,9 +3,9 @@
  */
 angular.module('itouch.controllers')
   .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService',
-    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q', 'ItemService', 'denominations', 'Alert',
+    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q', 'ItemService', 'denominations', 'Alert', 'Restangular', 'AppConfig',
     function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService,
-              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q, ItemService, denominations, Alert) {
+              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q, ItemService, denominations, Alert, Restangular, AppConfig) {
     $scope.tenderTypes = [];
       $scope.title = "Tender";
       $scope.tenderHeader = billData.header;
@@ -44,7 +44,13 @@ angular.module('itouch.controllers')
             $scope.header.TenderTotal = data.header.Total.toFixed(2) || 0 ;
             $scope.header.UpdatedRoundedTotal = RoundingService.round(data.header.Total).toFixed(2);
             $scope.tenderHeader = $scope.header;
-            $scope.billItems = data.items;
+            $scope.billItems = _.map(data.items, function (item) {
+              if(item.SuspendDepDocNo){
+                  $scope.header.isSuspended = true;
+                  $scope.header.SuspendDocNo = item.SuspendDepDocNo;
+              }
+              return item;
+            });
           }
         }).then(function(){
         });
@@ -221,6 +227,20 @@ angular.module('itouch.controllers')
                 };
               }
 
+              if($scope.header.isSuspended){
+                var outletUrl = AppConfig.getOutletServerUrl();
+              //  $scope.header.SuspendDocNo
+                 if(outletUrl){
+                     Restangular.oneUrl("DeleteSuspendBill", outletUrl + "DeleteSuspendBill").get({ SuspendDocNo: $scope.header.SuspendDocNo }).then(function (res) {
+                         if(res == 'success'){
+                             return true;
+                         } else {
+                             return $q.reject('Invalid service');
+                         }
+                     });
+                 }
+
+              }
               DiscountService.saveTenderDiscount($scope.tenderHeader.DocNo).then(function(){
                 BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
                   ControlService.counterDocId($scope.tenderHeader.DocNo);
