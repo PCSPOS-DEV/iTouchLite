@@ -4,10 +4,10 @@
 angular.module('itouch.controllers')
   .controller("SalesCtrl", ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal',
     'AuthService', 'CartItemService', 'ControlService', 'ionicDatePicker', 'FunctionsService', '$filter', 'SalesKitService', 'DiscountService', 'BillService', 'ShiftService',
-    'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup', 'header', 'user', 'shift', '$state', '$rootScope', 'Reciept', '$cordovaToast',
+    'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup', 'header', 'user', 'shift', '$state', '$rootScope', 'Reciept', '$cordovaToast', 'SuspendService',
     function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal,
               AuthService, CartItemService, ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService,
-              PWPService, $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state, $rootScope, Reciept, $cordovaToast) {
+              PWPService, $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state, $rootScope, Reciept, $cordovaToast, SuspendService) {
       $scope.header = header;
       $scope.keys = [];
       $scope.layout = null;
@@ -763,10 +763,11 @@ angular.module('itouch.controllers')
         if (!_.isUndefined($scope.salesFunctions[fn.Name])) {
           $scope.data.barcodeMode = false;
           // if(authorityCheck(fn)) {
-          if ((fn.Transact == 'false' && _.isEmpty($scope.cart.items)) || (fn.Transact == 'true' && !_.isEmpty($scope.cart.items)) || fn.Code == 102) {
-            $scope.salesFunctions[fn.Name](fn);
-          } else {
+
+          if ((fn.Transact == 'true' && _.isEmpty($scope.cart.items))) {
             Alert.warning('Action not allowed');
+          } else {
+            $scope.salesFunctions[fn.Name](fn);
           }
 
           // }
@@ -975,7 +976,7 @@ angular.module('itouch.controllers')
         CallSuspendBill: function (fn) {
             if(!buttonClicked.recallSuspendBillModal){
                 buttonClicked.recallSuspendBillModal = true;
-          if (authorityCheck(fn)) {
+                if (authorityCheck(fn)) {
                     CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
                         if(empty){
                             $ionicModal.fromTemplateUrl('main/recallSuspendedBill/recallSuspendedBill.html', {
@@ -996,7 +997,7 @@ angular.module('itouch.controllers')
                             }, function () {
                                 buttonClicked.recallSuspendBillModal = false;
                             });
-          }
+                        }
                     });
 
 
