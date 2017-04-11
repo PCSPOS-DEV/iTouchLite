@@ -6,21 +6,16 @@ angular.module('itouch.services')
   .service("SyncService", ['$q', 'AuthService', 'KeyBoardService', 'Alert', 'DB', 'ItemService', 'SubPLU1Service',
     'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', 'LocationService', 'FileService', 'TenderService',
     'FunctionsService', 'SalesKitService', 'DaysService', 'ShiftService', 'DiscountService', 'ReasonService', 'PrinterSettings',
-    'PWPService', 'ModifierService', 'DepartmentService', 'SettingsService', 'BillService', 'DenominationsService', 'ImageDownloadService', '$http', 'AppConfig',
+    'PWPService', 'ModifierService', 'DepartmentService', 'SettingsService', 'BillService', 'DenominationsService', 'ImageDownloadService', 'Restangular', 'AppConfig',
     function ($q, AuthService, KeyBoardService, Alert, DB, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service,
               PriceGroupService, LocationService, FileService, TenderService, FunctionsService, SalesKitService, DaysService,
-              ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService, SettingsService, BillService, DenominationsService, ImageDownloadService, $http, AppConfig) {
+              ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService, SettingsService, BillService, DenominationsService, ImageDownloadService, Restangular, AppConfig) {
     var self = this;
     self.do = function () {
       Alert.showLoading();
       var url = AppConfig.getBaseUrl();
       if(url){
-        return $http({
-          method: 'GET',
-          url: url.slice(0,-1),
-          timeout: 2000,
-          cache: false
-        }).then(function () {
+          return checkStatus().then(function () {
           DB.clearQueue();
           DB.createTables();
           return DB.executeQueue().then(function () {
@@ -125,4 +120,22 @@ angular.module('itouch.services')
         console.log(error);
       });
     }
+
+        var checkStatus = function (url) {
+            var url = AppConfig.getBaseUrl();
+            if(url) {
+                return Restangular.oneUrl("checkStatus", url + "test").withHttpConfig({timeout: 3000}).get().then(function (res) {
+                    if (res == 'true' || res == true) {
+                        return true;
+                    } else {
+                        return $q.reject('Invalid service');
+                    }
+                }, function (err) {
+                    console.log(err);
+                    return $q.reject(err.statusText);
+                });
+            } else {
+              return $q.reject('Base URL not configured');
+            }
+        }
   }]);
