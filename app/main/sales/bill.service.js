@@ -674,6 +674,7 @@ angular.module('itouch.services')
         item.ByAmount = item.ByAmount || 0;
         item.KitType = item.KitType || 0;
         item.BuyRate = item.BuyRate || 0;
+        item.ReasonId = item.ReasonId || 0;
 
         item.BusinessDate = item.BusinessDate || ControlService.getBusinessDate(true);
         item.MachineId = item.MachineId || SettingsService.getMachineId();
