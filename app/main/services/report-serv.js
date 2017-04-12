@@ -211,6 +211,12 @@ angular.module('itouch.services')
     });
   }
 
+  self.getBillTransactionOT= function (DocNo) {
+      return DB.query("SELECT pt.Amount, pt.ChangeAmount, pt.Cash, pt.OverTenderType  FROM " + DB_CONFIG.tableNames.bill.payTransactions + " AS pt WHERE DocNo = ?", [DocNo]).then(function (res) {
+          return DB.fetch(res);
+      });
+  }
+
   self.getBillDiscounts = function (DocNo) {
     return DB.query("SELECT *  FROM " + DB_CONFIG.tableNames.discounts.billDiscounts + " WHERE DocNo = ?", [DocNo]).then(function (res) {
       // return _.map(DB.fetchAll(res), function (item) {
@@ -224,7 +230,8 @@ angular.module('itouch.services')
     $q.all({
       header: self.getBillHeader(DocNo),
       items: self.getBillItems(DocNo),
-      transactions: self.getBillTransactions(DocNo)
+      transactions: self.getBillTransactions(DocNo),
+      transactionOT: self.getBillTransactionOT(DocNo)
     }).then(function(data){
       self.creatRecieptHeader();
       self.creatRecieptBody(data);

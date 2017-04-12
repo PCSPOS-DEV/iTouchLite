@@ -85,37 +85,39 @@ angular.module('itouch.services')
 
 
 
-    if(withSubTotalSection){
-      // console.log(data.tenderDiscounts);
-      PrintService.addLine('SUBTOTAL', "$"+subTotal.toFixed(2));
-      if(data.tenderDiscounts && data.tenderDiscounts.length > 0){
-        var tenderDisAmount = 0;
-        angular.forEach(data.tenderDiscounts, function(row){
-          PrintService.addLine(row.Description1, (row.Amount > 0 ?"-":"+") + row.Amount.toFixed(2));
-          tenderDisAmount += row.Amount;
-        });
+    if(withSubTotalSection) {
+        // console.log(data.tenderDiscounts);
+        PrintService.addLine('SUBTOTAL', "$" + subTotal.toFixed(2));
+        if (data.tenderDiscounts && data.tenderDiscounts.length > 0) {
+            var tenderDisAmount = 0;
+            angular.forEach(data.tenderDiscounts, function (row) {
+                PrintService.addLine(row.Description1, (row.Amount > 0 ? "-" : "+") + row.Amount.toFixed(2));
+                tenderDisAmount += row.Amount;
+            });
 
-        PrintService.addLine('SUBTOTAL After Discount', "$"+(subTotal-tenderDisAmount).toFixed(2));
-      }
-      PrintService.addLine('TOTAL', "$"+(data.header.Total.toFixed(2)));
-      var change = null, forfeited = null;
-      angular.forEach(data.transactions, function(row){
-        // console.log(row);
-        PrintService.addLine(row.Description1 || 'ROUNDED', "$"+(row.Amount.toFixed(2)));
-        if(row.ChangeAmount > 0){
-          if(row.Cash == 'true' ){
-            change = row.ChangeAmount.toFixed(2);
-          } else {
-            forfeited = row.ChangeAmount.toFixed(2);
-          }
-
+            PrintService.addLine('SUBTOTAL After Discount', "$" + (subTotal - tenderDisAmount).toFixed(2));
         }
-      });
-      if(change){
-        printer.addText('\nChange Due: $'+change+"\n");
-      } else if (forfeited){
-        printer.addText('\nForfeited : $'+forfeited+"\n");
-      }
+        PrintService.addLine('TOTAL', "$" + (data.header.Total.toFixed(2)));
+        var change = null, forfeited = null;
+        angular.forEach(data.transactions, function (row) {
+            // console.log(row);
+            PrintService.addLine(row.Description1 || 'ROUNDED', "$" + (row.Amount.toFixed(2)));
+            if (row.ChangeAmount > 0) {
+                if (row.Cash == 'true') {
+                    change = row.ChangeAmount.toFixed(2);
+                } else {
+                    forfeited = row.ChangeAmount.toFixed(2);
+                }
+
+            }
+        });
+        if (data.transactionOT) {
+            if (data.transactionOT.OverTenderTypeId == 3) {
+                printer.addText('\nChange Due: $' + (data.transactionOT.Amount||0).toFixed(2) + "\n");
+            } else {
+                printer.addText('\nForfeited : $' + (data.transactionOT.Amount||0).toFixed(2) + "\n");
+            }
+        }
     }
     printer.addText('\n');
 
@@ -304,6 +306,12 @@ angular.module('itouch.services')
     });
   }
 
+  self.getBillTransactionOT= function (DocNo) {
+      return DB.query("SELECT pt.Amount, pt.ChangeAmount, pt.OverTenderTypeId  FROM " + DB_CONFIG.tableNames.bill.payTransactionsOverTender + " AS pt WHERE DocNo = ?", [DocNo]).then(function (res) {
+          return DB.fetch(res);
+      });
+  }
+
   self.getBillDiscounts = function (DocNo) {
     return DB.query("SELECT *  FROM " + DB_CONFIG.tableNames.discounts.billDiscounts + " WHERE DocNo = ?", [DocNo]).then(function (res) {
       // return _.map(DB.fetchAll(res), function (item) {
@@ -338,7 +346,8 @@ angular.module('itouch.services')
       header: self.getBillHeader(DocNo),
       items: self.getBillItems(DocNo),
       transactions: self.getBillTransactions(DocNo),
-      tenderDiscounts: self.getTenderDiscounts(DocNo)
+      tenderDiscounts: self.getTenderDiscounts(DocNo),
+      transactionOT: self.getBillTransactionOT(DocNo)
     }).then(function(data){
       return $q.all({
         shift: ShiftService.getById(data.header.ShiftId),
@@ -348,6 +357,8 @@ angular.module('itouch.services')
         data.footerData = footerData;
         return data;
       });
+    }, function (ex) {
+        console.log(ex);
     });
   }
 
@@ -371,7 +382,7 @@ angular.module('itouch.services')
 
           printer.addCut(printer.CUT_FEED);
 
-          printer.send();
+          // printer.send();
         } else {
           console.log("bill not available");
         }

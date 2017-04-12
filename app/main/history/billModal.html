@@ -75,15 +75,16 @@
             <div class="col-80">{{print(item, 'Description').toUpperCase() || 'ROUNDED'}}</div>
             <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
           </div>
-          <div class="row body" ng-if="item.ChangeAmount > 0 && item.Cash == 'true'">
-            <!--{{item.PayTypeId}}-->
-            <div class="col">Change Due: $ {{item.ChangeAmount.toFixed(2)}}</div>
-          </div>
-          <div class="row body" ng-if="item.ChangeAmount > 0 && item.Cash == 'false'">
-            <!--{{item.PayTypeId}}-->
-            <div class="col">Forfeited: $ {{item.ChangeAmount.toFixed(2)}}</div>
-          </div>
         </div>
+
+        <div class="row body" ng-if="bill.transactionOT">
+          <!--{{item.PayTypeId}}-->
+          <div class="col">{{ bill.transactionOT.OverTenderTypeId == 3 ? 'Change Due' : 'Forfeited' }}: $ {{ bill.transactionOT.Amount.toFixed(2)}}</div>
+        </div>
+        <!--<div class="row body" ng-if="item.ChangeAmount > 0 && item.Cash == 'false'">-->
+          <!--&lt;!&ndash;{{item.PayTypeId}}&ndash;&gt;-->
+          <!--<div class="col">Forfeited: $ {{item.ChangeAmount.toFixed(2)}}</div>-->
+        <!--</div>-->
 
         <div class="row" ng-if="location.Tax5Option == 3">
           <div class="col">
