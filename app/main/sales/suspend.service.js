@@ -67,24 +67,14 @@ angular.module('itouch.services')
 
         self.suspend = function (DocNo) {
             return self.getBill(DocNo).then(function (bill) {
-               var promises = [];
-                // angular.forEach(bills, function (bill) {
-                    var DocNo = bill.SuspendBillHeader.DocNo;
-
-                    // bill.SuspendNo = "S98564";
-                    promises.push(post(bill).then(function (res) {
-                        if (res == 'success') {
-                            return self.removeBill(DocNo);
-                        } else {
-                            return $q.reject(res);
-                        }
-                    }));
-                // });
-                return $q.all(promises)
-                    .catch(function(err){
-                        console.log(err);
-                        return $q.reject(err);
-                    });
+                var header = _.first(bill.SuspendBillHeader);
+                return post(bill).then(function (res) {
+                    if (res == 'success') {
+                        return self.removeBill(header.DocNo);
+                    } else {
+                        return $q.reject(res);
+                    }
+                });
             });
         }
 

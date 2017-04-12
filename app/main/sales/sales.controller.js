@@ -994,7 +994,7 @@ angular.module('itouch.controllers')
                                 refresh();
                             }, function (ex) {
                                 console.log(ex);
-                            }, function () {
+                            }).finally(function () {
                                 buttonClicked.recallSuspendBillModal = false;
                             });
                         }
