@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('HistoryCtrl', ['$scope', 'HistoryService', 'BillService', 'CartItemService', 'PrinterSettings', '$ionicModal', 'Reciept', 'ControlService',
-    function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept, ControlService) {
+  .controller('HistoryCtrl', ['$scope', 'HistoryService', 'BillService', 'CartItemService', 'PrinterSettings', '$ionicModal', 'Reciept', 'ControlService', '$ionicScrollDelegate',
+    function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept, ControlService, $ionicScrollDelegate) {
       $scope.items = [];
       $scope.selectedItem = null;
       $scope.search = { text: "" };
@@ -11,6 +11,7 @@ angular.module('itouch.controllers')
       $scope.$on("$ionicView.beforeEnter", function(event, data){
         $scope.search.text = "";
         refresh();
+        $ionicScrollDelegate.scrollTop();
       });
 
       var refresh = function () {

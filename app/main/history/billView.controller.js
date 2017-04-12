@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept', 'LocationService',
-    function ($scope, PrinterSettings, HistoryService, $q, Reciept, LocationService) {
+  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept', 'LocationService', '$ionicScrollDelegate',
+    function ($scope, PrinterSettings, HistoryService, $q, Reciept, LocationService, $ionicScrollDelegate) {
       $scope.settings = {};
       $scope.bill = {
         header: null,
@@ -16,6 +16,7 @@ angular.module('itouch.controllers')
       $scope.$on("modal.shown", function(event, modal){
         if(modal.id == 6){
           refresh();
+          $ionicScrollDelegate.scrollTop();
         }
       });
 
