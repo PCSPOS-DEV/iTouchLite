@@ -23,6 +23,7 @@ angular.module('itouch.controllers')
 
           if(modal.data){
             $scope.salesKits = modal.data.salesKit;
+            update = modal.data.update;
             if(modal.data.update) {
               update = true;
               oldItem = $scope.cart.selectedItem;
