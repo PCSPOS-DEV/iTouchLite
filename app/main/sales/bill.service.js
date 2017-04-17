@@ -978,7 +978,7 @@ angular.module('itouch.services')
 
       self.findItems = function (itemId, docNo, itemType, parentLineNumber) {
         if(itemType == 'NOR' || itemType == 'SKI'){
-          var q = 'SELECT *, (SELECT COUNT(*) FROM TempBillDetail AS ct WHERE ct.ParentItemLineNumber == mt.LineNumber) AS ChildCount FROM TempBillDetail AS mt WHERE 1 = 1';
+          var q = "SELECT *, (SELECT COUNT(*) FROM TempBillDetail AS ct WHERE ct.ParentItemLineNumber == mt.LineNumber) AS ChildCount FROM TempBillDetail AS mt WHERE SuspendDepDocNo IS NOT NULL AND SuspendDepDocNo = ''";
           var data = [];
           if(itemId){
             q += ' AND ItemId = ?';

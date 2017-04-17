@@ -105,38 +105,48 @@ angular.module('itouch.services')
 
         self.fetchSuspendedBills = function(){
             return Restangular.one("GetSuspendHeaders").get().then(function (res) {
-                var bills = JSON.parse(res);
-                if (bills && bills.length > 0) {
-                    return bills;
-                } else {
-                    return $q.reject("Unable to fetch suspended bills");
+                try {
+                    var bills = JSON.parse(res);
+                    if (bills && bills.length > 0) {
+                        return bills;
+                    } else {
+                        return $q.reject("Unable to fetch suspended bills");
+                    }
+                } catch (e){
+                    return [];
                 }
             });
         }
 
         self.recallBill = function (DocNo) {
             return Restangular.one("GetSuspendBill").get({DocNo: DocNo}).then(function (res) {
-                var bills = JSON.parse(res);
-                var header = _.first(bills.DBSuspendBillHeader);
-                if(header){
-                    DB.clearQueue();
-                    _.forEach(bills.DBSuspendBillDetail, function (item) {
-                        item.SuspendDepDocNo = angular.copy(header.DocNo);
-                        item.BusinessDate = ControlService.getBusinessDate(true);
-                        item.DocNo = BillService.getCurrentReceiptId();
-                        TempBillDetailService.insert(item.DocNo, item, true);
-                    });
-                    _.forEach(bills.DBSuspendBillDiscounts, function (discount) {
-                      discount.BusinessDate = ControlService.getBusinessDate(true);
-                      discount.DocNo = BillService.getCurrentReceiptId();
-                      TempBillDiscountsService.insert(discount, true);
-                    });
-                    header.BusinessDate = ControlService.getBusinessDate(true);
-                    header.DocNo = BillService.getCurrentReceiptId();
-                    TempBillHeaderService.update(header.DocNo, header, true);
+                try {
+                    var bills = JSON.parse(res);
+                    var header = _.first(bills.DBSuspendBillHeader);
+                    if(header){
+                        DB.clearQueue();
+                        _.forEach(bills.DBSuspendBillDetail, function (item) {
+                            item.SuspendDepDocNo = angular.copy(header.DocNo);
+                            item.BusinessDate = ControlService.getBusinessDate(true);
+                            item.DocNo = BillService.getCurrentReceiptId();
+                            TempBillDetailService.insert(item.DocNo, item, true);
+                        });
+                        _.forEach(bills.DBSuspendBillDiscounts, function (discount) {
+                            discount.BusinessDate = ControlService.getBusinessDate(true);
+                            discount.DocNo = BillService.getCurrentReceiptId();
+                            TempBillDiscountsService.insert(discount, true);
+                        });
+                        header.BusinessDate = ControlService.getBusinessDate(true);
+                        header.DocNo = BillService.getCurrentReceiptId();
+                        TempBillHeaderService.update(header.DocNo, header, true);
 
-                    return DB.executeQueue();
+                        return DB.executeQueue();
+                    }
+                } catch (e){
+                    $log.error(e);
+                    return $q.reject('Unable to recall bill');
                 }
+
 
 
             });
