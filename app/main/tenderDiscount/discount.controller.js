@@ -19,6 +19,7 @@ angular.module('itouch.controllers')
 
       $scope.$on('modal.shown', function(event, data){
         if($scope.shownModal == 'tenderDiscounts'){
+          $scope.type = 2;
           submitted = false;
           refresh();
         }
@@ -83,6 +84,8 @@ angular.module('itouch.controllers')
               if(res){
                 saveDiscount(discount, res);
               }
+            }).finally(function () {
+                submitted = false;
             });
           } else {
             saveDiscount(discount, parseFloat(discount.Amount));
@@ -94,10 +97,12 @@ angular.module('itouch.controllers')
       var saveDiscount = function (discount, amount) {
         amount = parseFloat(amount);
         DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy($scope.billItems), discount, amount).then(function () {
-          $scope.$emit("discountModel-close");
+
         }, function(ex){
-          $scope.$emit("discountModel-close");
           Alert.warning(ex);
+        }).finally(function () {
+            submitted = false;
+            $scope.$emit("discountModel-close");
         });
       }
 

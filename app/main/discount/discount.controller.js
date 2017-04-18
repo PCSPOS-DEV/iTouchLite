@@ -14,10 +14,11 @@ angular.module('itouch.controllers')
         2: 'Percentages'
       };
       $scope.title = '';
-      var  submitted = false;
+      var submitted = false;
 
       $scope.$on('modal.shown', function(event, data){
         if($scope.shownModal == 'itemDiscounts'){
+          $scope.type = 2;
           submitted = false;
           refresh();
         }
@@ -99,10 +100,11 @@ angular.module('itouch.controllers')
             // console.log(item);
             // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
             $scope.$emit("refresh-cart");
-            $scope.$emit("discountModel-close");
           }, function (err) {
             Alert.error(err);
-            $scope.$emit("discountModel-close");
+          }).finally(function () {
+              submitted = false;
+              $scope.$emit("discountModel-close");
           });
         }
       }
