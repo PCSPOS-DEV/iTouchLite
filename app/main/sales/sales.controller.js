@@ -968,7 +968,13 @@ angular.module('itouch.controllers')
           if (authorityCheck(fn)) {
             var item = $scope.cart.selectedItem;
             if (item && item.ItemType == 'NOR') {
-              $scope.refundModal.show();
+              if(!ItemService.isRefunded(item)){
+                  $scope.refundModal.show();
+              } else {
+                  BillService.toggleRefundItem(item.ItemId, item.LineNumber).then(function () {
+                      $scope.refreshCart();
+                  });
+              }
             }
           }
 

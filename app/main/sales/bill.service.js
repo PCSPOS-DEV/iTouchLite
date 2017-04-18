@@ -1043,7 +1043,7 @@ angular.module('itouch.services')
         });
       }
 
-      self.refundItem = function (ItemId, LineNumber, reasonId, reference) {
+      self.toggleRefundItem = function (ItemId, LineNumber, reasonId, reference) {
         return $q.all({
           item: DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]}),
           discounts: DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, '*', {columns: 'ItemId=? AND LineNumber=?', data: [ItemId, LineNumber]})
@@ -1064,8 +1064,16 @@ angular.module('itouch.services')
             i.Tax4Amount = _.isNumber(i.Tax4Amount) ? (i.Tax4Amount *= -1).roundTo(2) : 0;
             i.Tax5Amount = _.isNumber(i.Tax5Amount) ? (i.Tax5Amount *= -1).roundTo(2) : 0;
             i.DiscAmount = _.isNumber(i.DiscAmount) ? (i.DiscAmount *= -1).roundTo(2) : 0;
-            i.ReasonId = reasonId;
-            i.RefCode = reference ? reference : null;
+            if(reasonId){
+                i.ReasonId = reasonId;
+            } else {
+                i.ReasonId = 0;
+            }
+            if(reference){
+                i.RefCode = reference;
+            } else {
+                i.RefCode = null;
+            }
 
             discounts = _.map(discounts, function (discount) {
               discount.DiscountAmount *= -1;

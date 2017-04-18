@@ -32,7 +32,7 @@ angular.module('itouch.controllers')
         var item = $scope.cart.selectedItem;
         if(item){
           if($scope.refund.reason){
-            BillService.refundItem(item.ItemId, item.LineNumber, $scope.refund.reason.Code, $scope.refund.reference).then(function () {
+            BillService.toggleRefundItem(item.ItemId, item.LineNumber, $scope.refund.reason.Code, $scope.refund.reference).then(function () {
               $scope.clear();
               $scope.$emit('refundModal-close');
             }, function (err) {
