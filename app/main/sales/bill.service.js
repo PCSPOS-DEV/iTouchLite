@@ -472,10 +472,16 @@ angular.module('itouch.services')
       }
 
       self.getDiscounts = function(docNo){
-        return DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
+        return DB.select(DB_CONFIG.tableNames.discounts.billDiscounts, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
           return DB.fetchAll(rs);
         });
       }
+
+        self.getTempDiscounts = function(docNo){
+            return DB.select(DB_CONFIG.tableNames.discounts.tempBillDiscounts, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
+                return DB.fetchAll(rs);
+            });
+        }
 
       self.getBill = function(docNo){
         return $q.all({
