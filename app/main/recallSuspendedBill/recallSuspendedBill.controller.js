@@ -9,6 +9,7 @@ angular.module('itouch.controllers')
         bills: [],
         selectedItem: null
       };
+      self.loading = true;
 
       $scope.$on('modal.shown', function(event, data){
         if(data.id == 14){
@@ -17,8 +18,14 @@ angular.module('itouch.controllers')
       });
 
       var refresh = function () {
-          SuspendService.fetchSuspendedBills().then(function(data){
+          self.loading = true;
+        SuspendService.fetchSuspendedBills().then(function(data){
           self.data.bills = data;
+        }).finally(function () {
+            $timeout(function () {
+                self.loading = false;
+            }, 500);
+
         });
       }
 

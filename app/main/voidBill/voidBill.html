@@ -4,7 +4,7 @@
     <button class="button button-clear" ng-click="ctrl.close()"> <i class="ion-close-round"></i></button>
   </ion-header-bar>
   <ion-content>
-      <div class="table">
+      <div class="table" ng-hide="ctrl.loading">
         <div class="row header" ng-if="ctrl.data.bills.length > 0">
           <div class="col"> Receipt No  </div>
           <div class="col text-right"> Amount  </div>
@@ -22,8 +22,9 @@
           <p>No records found</p>
         </div>
       </div>
+      <loading-pane show="ctrl.loading"></loading-pane>
 
-    <div class="row buttons">
+    <div class="row buttons" ng-hide="ctrl.loading">
       <div class="col button-col">
         <button class="button button-block button-default icon ion-search save" ng-click="ctrl.view()"></button>
       </div>

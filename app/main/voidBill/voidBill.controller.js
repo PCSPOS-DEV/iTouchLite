@@ -9,6 +9,7 @@ angular.module('itouch.controllers')
         bills: [],
         selectedItem: null
       };
+      self.loading = true;
 
       $scope.$on('modal.shown', function(event, data){
         if(data.id == 5){
@@ -17,8 +18,14 @@ angular.module('itouch.controllers')
       });
 
       var refresh = function () {
+
+        self.loading = true;
         VoidBillService.getBillList(ControlService.getBusinessDate(true)).then(function(data){
           self.data.bills = data;
+        }).finally(function () {
+            $timeout(function () {
+                self.loading = false;
+            }, 500);
         });
       }
 
