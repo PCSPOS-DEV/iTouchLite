@@ -728,17 +728,22 @@ angular.module('itouch.controllers')
           $scope.cart.items = items;
           $scope.cart.isEmpty = _.isEmpty(items);
           $scope.cart.summery = CartItemService.getSummery();
-          angular.forEach($scope.cart.items, function (item, key) {
-            if ($scope.cart.selectedItem && $scope.cart.selectedItem.ItemId == item.ItemId && $scope.cart.selectedItem.LineNumber == item.LineNumber) {
-              $scope.cart.items[key] = item;
-            }
-            if (item.TakeAway == 'false') {
-              $scope.TakeAway = false;
-            }
-            if ($scope.cart.selectedItem && $scope.cart.selectedItem.LineNumber == item.LineNumber) {
-              $scope.selectItemWithLineNumber(item.LineNumber);
-            }
-          });
+          if(!$scope.cart.isEmpty){
+              angular.forEach($scope.cart.items, function (item, key) {
+                  if ($scope.cart.selectedItem && $scope.cart.selectedItem.ItemId == item.ItemId && $scope.cart.selectedItem.LineNumber == item.LineNumber) {
+                      $scope.cart.items[key] = item;
+                  }
+                  if (item.TakeAway == 'false') {
+                      $scope.TakeAway = false;
+                  }
+                  if ($scope.cart.selectedItem && $scope.cart.selectedItem.LineNumber == item.LineNumber) {
+                      $scope.selectItemWithLineNumber(item.LineNumber);
+                  }
+              });
+          } else {
+              $scope.cart.selectedItem = null;
+          }
+
 
           // $ionicScrollDelegate.$getByHandle('cart').scrollBottom(true);
         });
