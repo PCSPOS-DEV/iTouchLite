@@ -816,7 +816,7 @@ angular.module('itouch.controllers')
       $scope.salesFunctions = {
         VoidTop: function (fn) {
           var item = $scope.cart.selectedItem;
-          if (item && authorityCheck(fn)) {
+          if (item) {
             if (item.ItemType == 'PWI') {
               return;
             } else if (item.ItemType == 'SKT') {
@@ -883,18 +883,21 @@ angular.module('itouch.controllers')
           } else {
             if (!buttonClicked.voidBill) {
               buttonClicked.voidBill = true;
-              $scope.shownModal = 'voidBill';
-              $ionicModal.fromTemplateUrl('main/voidBill/voidBill.html', {
-                id: 5,
-                scope: $scope,
-                backdropClickToClose: true,
-                animation: 'slide-in-up'
-              }).then(function (modal) {
-                $scope.modals.voidBillModal = modal;
-                $scope.modals.voidBillModal.show();
-              });
+                if(authorityCheck(fn)){
+                    $scope.shownModal = 'voidBill';
+                    $ionicModal.fromTemplateUrl('main/voidBill/voidBill.html', {
+                        id: 5,
+                        scope: $scope,
+                        backdropClickToClose: true,
+                        animation: 'slide-in-up'
+                    }).then(function (modal) {
+                        $scope.modals.voidBillModal = modal;
+                        $scope.modals.voidBillModal.show();
+                    });
+                } else {
+                    buttonClicked.voidBill = false;
+                }
             }
-
           }
         },
         Discount: function (fn) {
