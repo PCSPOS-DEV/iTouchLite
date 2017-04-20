@@ -657,20 +657,6 @@ angular.module('itouch.config')
           ]
         },
         {
-          name: tableNames.keyboard.functions,
-          columns: [
-            { name: "Code", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "Description1", type: "TEXT" },
-            { name: "Description2", type: "TEXT" },
-            { name: "Name", type: "TEXT NOT NULL" },
-            { name: "Inactive", type: "BOOLEAN" },
-            { name: "Transact", type: "BOOLEAN" },
-            { name: "Type", type: "TEXT" },
-            { name: "AccessLevel", type: "INT" },
-            { name: "DisplayOnTop", type: "BOOLEAN" }
-          ]
-        },
-        {
           name: tableNames.salesKit.salesKitApplicablePeriod,
           columns: [
             { name: "Id", type: "INT NOT NULL PRIMARY KEY" },

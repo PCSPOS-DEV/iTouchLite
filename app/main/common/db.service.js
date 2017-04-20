@@ -97,7 +97,6 @@ angular.module('itouch.services')
     };
 
 
-
     /**
      * Execute a query
      * @param query

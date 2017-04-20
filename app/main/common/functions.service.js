@@ -8,10 +8,14 @@ angular.module('itouch.services')
     self.fetch = function(){
       var deferred = $q.defer();
       DB.createTable(table);
-      angular.forEach(functions, function(fn){
-        DB.addQueryToQueue("INSERT INTO "+ DB_CONFIG.tableNames.keyboard.functions + " VALUES(?,?,?,?,?,?,?,?,?)", fn);
+      DB.select(DB_CONFIG.tableNames.keyboard.functions, 'COUNT(*) AS count').then(function(res){
+          if(DB.fetch(res)['count'] == 0){
+              angular.forEach(functions, function(fn){
+                  DB.addQueryToQueue("INSERT INTO "+ DB_CONFIG.tableNames.keyboard.functions + " VALUES(?,?,?,?,?,?,?,?,?)", fn);
+              });
+          }
+          deferred.resolve(true);
       });
-      deferred.resolve(true);
       return deferred.promise;
     };
 
@@ -74,7 +78,8 @@ angular.module('itouch.services')
         { name: "Type", type: "TEXT" },
         { name: "AccessLevel", type: "INT" },
         { name: "DisplayOnTop", type: "BOOLEAN" }
-      ]
+      ],
+        keep: true
     };
     var functions = [
         [1, 'Void Transaction', null, 'VoidFunction', true, false, 'V', 1, false],
