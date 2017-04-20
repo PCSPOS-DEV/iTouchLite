@@ -207,13 +207,12 @@ angular.module('itouch.controllers')
                   $scope.qty.value = 1;
                   $scope.selectItemWithLineNumber(item.LineNumber);
                 });
-                $scope.$emit('skModalModal-save');
-
-              })
+              }).finally(function () {
+                  $scope.$emit('skModalModal-save');
+                  // submitted = false;
+              });
             }).catch(function (err) {
               console.log(err);
-            }).finally(function () {
-              submitted = false;
             });
           } else {
             Alert.warning('All the child items must be selected before proceeding');
