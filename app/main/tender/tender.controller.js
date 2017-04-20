@@ -23,6 +23,9 @@ angular.module('itouch.controllers')
 
       $scope.updatedRoundedTotal = 0;
       var submitted = false;
+      $scope.modals = {
+        loginModal: null
+      };
 
       $scope.$on("$ionicView.beforeEnter", function(event, data){
         submitted = false;
@@ -34,7 +37,7 @@ angular.module('itouch.controllers')
         $scope.payTransactions = [];
         DiscountService.clearTenderDiscounts();
         $q.all({
-          header: BillService.getHeader($stateParams.DocNo),
+          header: BillService.getTempHeader($stateParams.DocNo),
           items: CartItemService.getItems($stateParams.DocNo)
         }).then(function(data){
           if(data.header){
@@ -56,20 +59,6 @@ angular.module('itouch.controllers')
         });
 
       }
-
-      // /**
-      //  * Executes when modal is shown. Data initializations should be done inside this
-      //  */
-      // $scope.$on("modal.shown", function () {
-      //   if($scope.shownModal == 'tender'){
-      //
-      //     var rec_id = BillService.getCurrentReceiptId();
-      //     return BillService.getHeader(rec_id).then(function(header){
-      //       $scope.tenderHeader = header;
-      //       refreshData();
-      //     });
-      //   }
-      // });
 
       $scope.$on("refresh-cart", function () {
         if($scope.shownModal == 'tender'){
@@ -99,13 +88,6 @@ angular.module('itouch.controllers')
           console.log(er);
         });
         payTransactions = [];
-      }
-
-      /**
-       * Tells the sales controller to close the tender modal
-       */
-      $scope.modalClose = function () {
-        $scope.$emit("close-tenderModel");
       }
 
       /**
@@ -309,43 +291,14 @@ angular.module('itouch.controllers')
       }
 
       /**
-       * Initiating discount modal dialog
-       */
-      $ionicModal.fromTemplateUrl('main/tenderDiscount/discount.html', {
-        scope: $scope,
-        backdropClickToClose: false,
-        animation: 'slide-in-up'
-      }).then(function (modal) {
-        $scope.discountModal = modal;
-      });
-
-      /**
-       * Initiating discount modal dialog
-       */
-      $ionicModal.fromTemplateUrl('main/tender/paymentsMade.html', {
-        scope: $scope,
-        backdropClickToClose: false,
-        animation: 'slide-in-up'
-      }).then(function (modal) {
-        $scope.paymentsMadeModal = modal;
-      });
-
-      /**
-       * Biding an event to catch modal close call
-       */
-      $scope.$on('discountModel-close', function () {
-        $scope.discountModal.hide();
-      });
-
-      /**
        * Invokes the given named function from $scope.tenderFunctions
        * @param name
        */
-      $scope.invoke = function (name) {
-        if (!_.isUndefined($scope.tenderFunctions[name])) {
-          $scope.tenderFunctions[name]();
+      $scope.invoke = function (fn) {
+        if (!_.isUndefined($scope.tenderFunctions[fn.Name])) {
+          $scope.tenderFunctions[fn.Name](fn);
         } else {
-          throw new Error("Function " + name + " is not available.");
+          throw new Error("Function " + fn.Name + " is not available.");
         }
       };
 
@@ -358,15 +311,18 @@ angular.module('itouch.controllers')
           console.log("Redemption");
         },
         Discount: function (fn) {
-          if(payTransactions.length == 0){
-            $scope.shownModal = 'tenderDiscounts';
-            $scope.discountModal.show();
+          if (authorityCheck(fn)) {
+            if (payTransactions.length == 0) {
+              $scope.shownModal = 'tenderDiscounts';
+              $scope.discountModal.show();
+            }
           }
-
 
         },
         PaymentMade: function(fn){
-          $scope.paymentsMadeModal.show();
+          if (authorityCheck(fn)) {
+            $scope.paymentsMadeModal.show();
+          }
         },
         TenderStaff: function(){
 
@@ -459,7 +415,7 @@ angular.module('itouch.controllers')
           if(AuthService.isAuthorized(fn.AccessLevel, AuthService.currentUser())){
             authorized = true;
           } else {
-            $scope.LoginlModal.show();
+              $scope.modals.loginlModal.show();
             onGoingFunction = fn;
           }
         }
@@ -497,5 +453,64 @@ angular.module('itouch.controllers')
           }
         });
       }
+
+      /* Modals */
+
+        /**
+         * Initiating shift modal dialog
+         */
+        $ionicModal.fromTemplateUrl('main/login/loginModal.html', {
+            id: 12,
+            scope: $scope,
+            backdropClickToClose: false,
+            animation: 'slide-in-up'
+        }).then(function (modal) {
+            $scope.modals.loginlModal = modal;
+
+        });
+
+        /**
+         * Biding an event to catch modal close call
+         */
+        $scope.$on('loginlModal-close', function (modal, close) {
+            $scope.modals.loginlModal.hide();
+            modalOpen = false;
+            if (close) {
+                onGoingFunction = false;
+            }
+            // console.log(AuthService.getTempUser());
+            if (onGoingFunction) {
+                $scope.invoke(onGoingFunction);
+            }
+        });
+
+        /**
+         * Initiating discount modal dialog
+         */
+        $ionicModal.fromTemplateUrl('main/tenderDiscount/discount.html', {
+            scope: $scope,
+            backdropClickToClose: false,
+            animation: 'slide-in-up'
+        }).then(function (modal) {
+            $scope.discountModal = modal;
+        });
+
+        /**
+         * Initiating discount modal dialog
+         */
+        $ionicModal.fromTemplateUrl('main/tender/paymentsMade.html', {
+            scope: $scope,
+            backdropClickToClose: false,
+            animation: 'slide-in-up'
+        }).then(function (modal) {
+            $scope.paymentsMadeModal = modal;
+        });
+
+        /**
+         * Biding an event to catch modal close call
+         */
+        $scope.$on('discountModel-close', function () {
+            $scope.discountModal.hide();
+        });
 
     }]);
