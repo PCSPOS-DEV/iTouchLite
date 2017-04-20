@@ -35,9 +35,14 @@ angular.module('itouch.controllers')
               fn.Inactive = fn.Inactive == 'true';
               fn.Transact = fn.Transact == 'true';
 
-              if(currentUser && (fn['Description'+currentUser.DescriptionLevel] == null || fn['Description'+currentUser.DescriptionLevel] == '')){
-                fn.undefined = true;
+              if(currentUser){
+                if(_.isUndefined(fn['Description'+currentUser.DescriptionLevel])){
+                  fn.undefined = false;
+                } else if((fn['Description'+currentUser.DescriptionLevel] == null || fn['Description'+currentUser.DescriptionLevel] == '')){
+                  fn.undefined = true;
+                }
               }
+
             }
             return fn;
           });
