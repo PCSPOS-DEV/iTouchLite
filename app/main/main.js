@@ -145,7 +145,7 @@ angular.module('itouch', [
                     resolve: {
                       header: ['BillService', 'PrintService', function(BillService, PrintService){
                         var rec_id = BillService.getCurrentReceiptId();
-                        return BillService.getHeader(rec_id).then(function(header){
+                        return BillService.getTempHeader(rec_id).then(function(header){
                           if(!header){
                             return BillService.initHeader().then(function(header){
                               return header;
@@ -252,7 +252,7 @@ angular.module('itouch', [
                     var def = $q.defer();
                     // def.resolve({});
                     $q.all({
-                      header: BillService.getHeader(docNo),
+                      header: BillService.getTempHeader(docNo),
                       items: CartItemService.fetchItemsFromDb(docNo),
                       functions: FunctionsService.getTenderFunctions().then(function (fns) {
                         return {

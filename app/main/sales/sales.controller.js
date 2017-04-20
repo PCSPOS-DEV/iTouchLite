@@ -120,7 +120,7 @@ angular.module('itouch.controllers')
 
       var initBill = function () {
         $scope.data.barcodeMode = false;
-        BillService.getHeader(BillService.getCurrentReceiptId()).then(function (header) {
+        BillService.getTempHeader(BillService.getCurrentReceiptId()).then(function (header) {
           if (!header) {
             return BillService.initHeader().then(function (header) {
               $scope.header = header;
@@ -207,7 +207,7 @@ angular.module('itouch.controllers')
       var refresh = function () {
         // nu = false;
         var rec_id = BillService.getCurrentReceiptId();
-        return BillService.getHeader(rec_id).then(function (header) {
+        return BillService.getTempHeader(rec_id).then(function (header) {
           var promise;
           if (!header) {
             return BillService.initHeader().then(function (header) {
@@ -1027,7 +1027,7 @@ angular.module('itouch.controllers')
               Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
                 if (res == 1) {
 
-                  BillService.getHeader($scope.header.DocNo).then(function (header) {
+                  BillService.getTempHeader($scope.header.DocNo).then(function (header) {
                     // $scope.tenderHeader = header;
                     // console.log($scope.header);
                     $scope.header.DocType = 'AV';

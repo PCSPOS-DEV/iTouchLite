@@ -133,7 +133,7 @@ angular.module('itouch.services')
 
       self.initHeader = function () {
         return self.createTempHeader().then(function(success){
-          return self.getHeader();
+          return self.getTempHeader();
         });
       }
       // initHeader();
@@ -146,7 +146,7 @@ angular.module('itouch.services')
       }
       initItems();
 
-      // self.getHeader = function () {
+      // self.getTempHeader = function () {
       //   return initHeader();
       // }
 
@@ -392,7 +392,7 @@ angular.module('itouch.services')
           return item;
         });
 
-        self.getBill(bill.header.DocNo).then(function(bill){
+        self.getTempBill(bill.header.DocNo).then(function(bill){
           bill.header.IsExported = false;
           bill.header.DocType = billHeader.DocType || 'SA';
           bill.items = _.map(bill.items, function (item) {
@@ -449,7 +449,7 @@ angular.module('itouch.services')
        * TODO filter
        * @returns {Promise.<TResult>|*}
        */
-      self.getHeader = function(DocNo){
+      self.getTempHeader = function(DocNo){
         var where;
         if(DocNo){
           where = { columns: ' DocNo=? ', data: [DocNo] };
@@ -459,7 +459,7 @@ angular.module('itouch.services')
         });
       }
 
-      self.getItems = function(docNo){
+      self.getTempItems = function(docNo){
         return DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
           return DB.fetchAll(rs);
         });
@@ -483,11 +483,11 @@ angular.module('itouch.services')
             });
         }
 
-      self.getBill = function(docNo){
+      self.getTempBill = function(docNo){
         return $q.all({
-          header: self.getHeader(docNo),
-          items: self.getItems(docNo),
-          discounts: self.getDiscounts(docNo)
+          header: self.getTempHeader(docNo),
+          items: self.getTempItems(docNo),
+          discounts: self.getTempDiscounts(docNo)
         });
       }
 
@@ -1159,7 +1159,7 @@ angular.module('itouch.services')
 
       self.updateHeaderTotals = function(DocNo, items){
         var promises = {
-          header: self.getHeader(DocNo)
+          header: self.getTempHeader(DocNo)
         };
         if(!items){
           promises.items = self.getItems(DocNo);

@@ -49,7 +49,7 @@ angular.module('itouch.services')
         });
       }
 
-      self.getHeader = function (DocNo) {
+      self.getTempHeader = function (DocNo) {
         return DB.query("SELECT *  FROM " + DB_CONFIG.tableNames.bill.header + " WHERE DocNo = ?", [DocNo]).then(function (res) {
           var item = DB.fetch(res);
           item = ItemService.calculateTotal(item);
