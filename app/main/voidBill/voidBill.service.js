@@ -24,7 +24,8 @@ angular.module('itouch.services')
         header: BillService.getBillHeader(DocNo),
         items: BillService.getBillDetails(DocNo),
         transactions: BillService.getTransactions(DocNo),
-        discounts: BillService.getDiscounts(DocNo)
+        discounts: BillService.getDiscounts(DocNo),
+        overTender: BillService.getTransactionsOT(DocNo)
 
       }).then(function(data){
         var orgHeader = angular.copy(data.header);
@@ -43,6 +44,11 @@ angular.module('itouch.services')
           return reverse(item, ['Amount', 'ChangeAmount']);
         });
 
+        data.overTender = _.map(data.overTender, function(item){
+            item.DocNo = data.header.DocNo;
+            return reverse(item, ['Amount', 'ChangeAmount']);
+        });
+
         data.discounts = _.map(data.discounts, function(item){
           item.DocNo = data.header.DocNo;
           return reverse(item, ['DiscountAmount']);
@@ -53,6 +59,7 @@ angular.module('itouch.services')
         DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.header, orgHeader, { columns: 'DocNo=?', data:[orgHeader.DocNo] });
         DB.addInsertToQueue(DB_CONFIG.tableNames.bill.detail, data.items);
         DB.addInsertToQueue(DB_CONFIG.tableNames.bill.payTransactions, data.transactions);
+        DB.addInsertToQueue(DB_CONFIG.tableNames.bill.payTransactionsOverTender, data.overTender);
         DB.addInsertToQueue(DB_CONFIG.tableNames.discounts.billDiscounts, data.discounts);
         return DB.executeQueue().then(function(){
           ControlService.counterDocId(data.header.DocNo);

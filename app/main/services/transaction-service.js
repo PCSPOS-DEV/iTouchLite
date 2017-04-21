@@ -57,7 +57,7 @@ angular.module('itouch.services')
       +"FROM BillDetail AS d INNER JOIN BillHeader AS h ON d.DocNo = h.DocNo WHERE  h.BusinessDate=? ";
     switch(type){
       case 'reverse':
-        q += "AND Qty < 0 ";
+        q += "AND RefCode NOT NULL ";
         break;
     }
     var data = [businessDate];
@@ -213,7 +213,7 @@ angular.module('itouch.services')
   }
 
   self.getGst = function (bDate, shiftId) {
-    var q = "SELECT SUM(Tax5Amount) AS Tax5Amount, SUM(Tax5DiscAmount) AS Tax5DiscAmount FROM BillHeader WHERE BusinessDate = ? AND DocType != 'CD' AND DocType != 'RA'  ";
+    var q = "SELECT SUM(Tax5Amount) AS Tax5Amount, SUM(Tax5DiscAmount) AS Tax5DiscAmount, COUNT(*) AS ItemCount FROM BillHeader WHERE BusinessDate = ? AND DocType != 'CD' AND DocType != 'RA'  ";
     var data = [bDate];
     if(_.isUndefined(shiftId) || _.isNull(shiftId)){ } else {
       q += "AND ShiftId = ? ";
