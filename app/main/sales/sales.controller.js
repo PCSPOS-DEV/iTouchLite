@@ -1035,15 +1035,15 @@ angular.module('itouch.controllers')
                     // $scope.tenderHeader = header;
                     // console.log($scope.header);
                       return BillService.updateHeaderTotals(header.DocNo).then(function(){
-                    $scope.header.DocType = 'AV';
+                          $scope.header.DocType = 'AV';
                           return BillService.saveBill($scope.header, $scope.cart.items).then(function (res) {
-                      Reciept.printAbort($scope.header.DocNo);
-                      refresh();
-                      initBill();
-                    }, function (res) {
-                      console.log(res);
-                    });
-                  });
+                              Reciept.printAbort($scope.header.DocNo);
+                              refresh();
+                              initBill();
+                          }, function (res) {
+                              console.log(res);
+                          });
+                      });
 
                   });
                 }
@@ -1176,6 +1176,8 @@ angular.module('itouch.controllers')
         if (tempUser) {
           if (AuthService.isAuthorized(fn.AccessLevel, tempUser)) {
             authorized = true;
+          } else {
+              Alert.warning('Access denied!');
           }
         } else {
           if (AuthService.isAuthorized(fn.AccessLevel, AuthService.currentUser())) {
@@ -1267,7 +1269,8 @@ angular.module('itouch.controllers')
             ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
               selectItem(item);
             }, function (ex) {
-              Alert.warning(ex);
+                $cordovaToast.show(ex, 'long', 'top');
+              // Alert.warning(ex);
             }).finally(function () {
               $scope.data.barcode = "";
               buttonClicked.barcode = false;

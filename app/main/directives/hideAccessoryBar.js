@@ -11,12 +11,12 @@ function select () {
   // Functions
   function postLink (scope, element, attrs, ngModel) {
     // / Hide/show accessory bar on ios
-    element.on("touchstart focus", function (e) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(false);
-    });
-    element.on("blur", function (e) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-    });
+    // element.on("touchstart focus", function (e) {
+    //   cordova.plugins.Keyboard.hideKeyboardAccessoryBar(false);
+    // });
+    // element.on("blur", function (e) {
+    //   cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    // });
 
   }
 }
