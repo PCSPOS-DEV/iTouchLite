@@ -1034,14 +1034,17 @@ angular.module('itouch.controllers')
                   BillService.getTempHeader($scope.header.DocNo).then(function (header) {
                     // $scope.tenderHeader = header;
                     // console.log($scope.header);
+                      return BillService.updateHeaderTotals(header.DocNo).then(function(){
                     $scope.header.DocType = 'AV';
-                    BillService.saveBill($scope.header, $scope.cart.items).then(function (res) {
+                          return BillService.saveBill($scope.header, $scope.cart.items).then(function (res) {
                       Reciept.printAbort($scope.header.DocNo);
                       refresh();
                       initBill();
                     }, function (res) {
                       console.log(res);
                     });
+                  });
+
                   });
                 }
               });
