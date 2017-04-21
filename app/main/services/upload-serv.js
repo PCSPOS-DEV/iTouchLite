@@ -77,26 +77,35 @@ angular.module('itouch.services')
         return DB.executeQueue();
       }
 
+      var uploading = false;
       self.upload = function () {
-        return self.getBills().then(function (bills) {
-          var promises = [];
-          angular.forEach(bills, function (bill) {
-            var DocNo = bill.BillHeader.DocNo;
-            bill.BillHeader = [bill.BillHeader];
-            promises.push(post(bill).then(function (res) {
-              if (res == 'success') {
-                return self.setExported(DocNo);
-              } else {
-                return $q.reject(res);
-              }
-            }));
-          });
-          return $q.all(promises)
-            .catch(function(err){
-            console.log(err);
-            return $q.reject(err);
-          });
-        });
+        if(!uploading){
+            uploading = true;
+            return self.getBills().then(function (bills) {
+                var promises = [];
+                angular.forEach(bills, function (bill) {
+                    var DocNo = bill.BillHeader.DocNo;
+                    bill.BillHeader = [bill.BillHeader];
+                    promises.push(post(bill).then(function (res) {
+                        if (res == 'success') {
+                            return self.setExported(DocNo);
+                        } else {
+                            return $q.reject(res);
+                        }
+                    }));
+                });
+                return $q.all(promises)
+                    .catch(function(err){
+                        console.log(err);
+                        return $q.reject(err);
+                    }).finally(function () {
+                        uploading = false;
+                    });
+            });
+        } else {
+          return $q.resolve();
+        }
+
       }
 
       self.startAutoUpload = function () {
