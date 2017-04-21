@@ -152,7 +152,7 @@ angular.module('itouch.controllers')
                   changeAmount = (transAmount- (total+diff)).roundTo(2);
               }
 
-            if (roundedTotal <= amount) {
+            if (roundedTotal <= transAmount || (roundedTotal < 0 &&  roundedTotal >= transAmount) ) {
               submitted = true;
               // console.log(diff);
               if(tenderType.Round == 'true' && diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
