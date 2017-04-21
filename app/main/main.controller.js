@@ -56,13 +56,19 @@ angular.module('itouch.controllers')
       })
     }
 
-    $scope.upload = function () {
-      UploadService.upload().then(function () {
-        Alert.success('Upload success');
-      }, function (err) {
-        Alert.error(err);
-      })
-    }
+      var uploadClicked = false;
+      $scope.upload = function () {
+        if (!uploadClicked) {
+          uploadClicked = true;
+          UploadService.upload().then(function () {
+              Alert.success('Upload success');
+          }, function (err) {
+              Alert.error(err);
+          }).finally(function () {
+              uploadClicked = false;
+          });
+        }
+      }
 
     $scope.loadingShow = function () {
       $ionicLoading.show({
