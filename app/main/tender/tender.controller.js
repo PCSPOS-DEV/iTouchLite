@@ -133,9 +133,6 @@ angular.module('itouch.controllers')
             diff = ((total - roundedTotal)* -1).roundTo(2);
           }
           var changeAmount = 0;
-          if (amount > roundedTotal) {
-            changeAmount = (amount- (total+diff)).roundTo(2);
-          }
 
 
 
@@ -149,6 +146,11 @@ angular.module('itouch.controllers')
             } else {
               transAmount = amount;
             }
+
+
+              if (transAmount > roundedTotal) {
+                  changeAmount = (transAmount- (total+diff)).roundTo(2);
+              }
 
             if (roundedTotal <= amount) {
               submitted = true;
@@ -194,7 +196,7 @@ angular.module('itouch.controllers')
               //   total += parseFloat(tx.Amount);
               // });
 
-              if (amount > $scope.tenderHeader.Total && tenderType.OverTender == 'true') {
+              if (transAmount > roundedTotal && tenderType.OverTender == 'true') {
                 overTender = {
                   BusinessDate: businessDate,
                   LocationId: SettingsService.getLocationId(),
@@ -203,7 +205,7 @@ angular.module('itouch.controllers')
                   PayTypeId: tenderType.Id,
                   OverTenderTypeId: tenderType.OverTenderTypeId,
                   SeqNo: 0,
-                  Amount: (amount - total).roundTo(2),
+                  Amount: (transAmount - roundedTotal).roundTo(2),
                   ChangeAmount: 0,
                   IsExported: false
                 };
