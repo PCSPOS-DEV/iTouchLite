@@ -471,6 +471,12 @@ angular.module('itouch.services')
         });
       }
 
+        self.getTransactionsOT = function(docNo){
+            return DB.select(DB_CONFIG.tableNames.bill.payTransactionsOverTender, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
+                return DB.fetchAll(rs);
+            });
+        }
+
       self.getDiscounts = function(docNo){
         return DB.select(DB_CONFIG.tableNames.discounts.billDiscounts, '*', { columns: 'DocNo=?', data: [docNo||ControlService.getDocId()] }).then(function(rs){
           return DB.fetchAll(rs);

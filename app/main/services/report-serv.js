@@ -356,7 +356,7 @@ angular.module('itouch.services')
           PrintService.addLineBreak();
 
           PrintService.addTextLine(location.Tax5Desc1);
-          PrintService.addReportLine('TAX TOTAL', (data.gst.Tax5Amount-data.gst.Tax5DiscAmount).roundTo(2).toFixed(2));
+          PrintService.addReportLine('TAX TOTAL', (data.gst.Tax5Amount-data.gst.Tax5DiscAmount).roundTo(2).toFixed(2), ""+ (data.gst ? data.gst.ItemCount : 0));
           PrintService.addLineBreak();
           PrintService.addLineBreak();
 
