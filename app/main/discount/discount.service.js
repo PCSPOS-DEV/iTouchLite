@@ -7,7 +7,8 @@ angular.module('itouch.services')
       var self = this;
       var tenderDiscounts = {
         header: null,
-        discountSets: []
+        items: {},
+        discounts: []
       };
 
       var businessDate = ControlService.getBusinessDate(true);
@@ -416,7 +417,13 @@ angular.module('itouch.services')
             seq = s;
           }
           discount.SeqNo = seq++;
-          angular.forEach(items, function (item, key) {
+          items = _.map(items, function (item, key) {
+            var dItem = tenderDiscounts.items[item.LineNumber];
+
+            if(dItem){
+              item = dItem;
+            }
+
             if(item.DiscAmount > 0){
               item.isDiscounted = true;
             }
@@ -432,7 +439,11 @@ angular.module('itouch.services')
             }
 
             totalEligibleDiscount += item.TotalEligibleDiscount;
+            return item;
           });
+
+
+
           if(totalEligibleDiscount == 0 || amount > totalEligibleDiscount){
             deferred.reject('Invalid Discount');
           } else {
@@ -448,9 +459,10 @@ angular.module('itouch.services')
               var subDiscount = (discountAmount - tax5Disc).roundTo(2);
 
               item.Discount += discountAmount;
+              item.Discount = item.Discount.roundTo(2);
               discount.DiscountAmount = angular.copy(discountAmount);
-              item.DiscAmount = subDiscount;
-              item.Tax5DiscAmount = tax5Disc;
+              item.DiscAmount += subDiscount.roundTo(2);
+              item.Tax5DiscAmount += tax5Disc.roundTo(2);
 
               headerDiscount += discountAmount;
               headerSubDiscount += subDiscount;
@@ -474,11 +486,13 @@ angular.module('itouch.services')
               header.UpdatedTenderTotal = header.Total.toFixed(2);
               header.UpdatedRoundedTotal = RoundingService.round(header.Total).toFixed(2);
               header.TotalRounded = RoundingService.round(header.Total).toFixed(2);
-              td.discounts = _.pluck(items, 'discount');
-              td.items = _.pluck(items, 'item');
-              console.log(td);
-              tenderDiscounts.discountSets.push(td);
+              // td.discounts = _.pluck(items, 'discount');
+              angular.forEach(_.pluck(items, 'item'), function (item) {
+                  tenderDiscounts.items[item.LineNumber] = item;
+              });
+              tenderDiscounts.discounts = _.pluck(items, 'discount');
               tenderDiscounts.header = header;
+              console.log(td);
               deferred.resolve();
             }, function(ex){
               deferred.reject(ex);
@@ -495,26 +509,24 @@ angular.module('itouch.services')
       self.saveTenderDiscount = function (DocNo) {
         // var deferred = $q.defer();
         // console.log(tenderDiscounts);
-        if(tenderDiscounts.discountSets.length > 0){
+        if(tenderDiscounts.discounts.length > 0){
           DB.clearQueue();
-          angular.forEach(tenderDiscounts.discountSets, function(td){
-            angular.forEach(td.items, function(item){
+          angular.forEach(tenderDiscounts.discounts, function(dis){
+              saveItemDiscount(dis);
+          });
+
+          angular.forEach(tenderDiscounts.items, function(item){
               // console.log(item);
               updateTempBillDetail(item);
 
-            });
-
-            angular.forEach(td.discounts, function(item){
-              // console.log(item);
-              saveItemDiscount(item);
-            });
           });
 
           return DB.executeQueue().then(function () {
-            tenderDiscounts  = {
-              header: null,
-              discountSets: []
-            };;
+            tenderDiscounts = {
+                header: null,
+                items: {},
+                discounts: []
+            };
             DB.clearQueue();
             return BillService.updateHeaderTotals(DocNo)
           }, function(ex){
@@ -529,7 +541,10 @@ angular.module('itouch.services')
       }
 
       self.clearTenderDiscounts = function(){
-        tenderDiscounts.discountSets = [];
+          tenderDiscounts = {
+              items: {},
+              discounts: []
+          };
       }
 
       return self;
