@@ -23,7 +23,8 @@ var tableNames = {
     subPLU3: 'SubPLU3',
     priceGroups: 'PriceGroups',
     modifiers: 'ModifiersKeyInfo',
-    departments: 'Departments'
+    departments: 'Departments',
+    barcodes: 'ItemBarcodes'
   },
   locations: {
     locations: 'Locations'
@@ -202,6 +203,15 @@ angular.module('itouch.config')
             {name: 'PopUpRemark', type: 'BIT'}
           ]
         },
+          {
+              name: tableNames.item.barcodes,
+              columns: [
+                  { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
+                  { name: "ItemId", type: "INT NOT NULL" },
+                  { name: "Barcode", type: "TEXT NOT NULL" },
+                  { name: "Remarks", type: "TEXT NULL" },
+              ]
+          },
         {
           name: tableNames.item.subPLU1,
           columns: [

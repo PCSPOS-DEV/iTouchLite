@@ -14,6 +14,13 @@ angular.module('itouch.services')
     }
 
     self.fetch = function () {
+        return $q.all({
+          items: self.fetchItems(),
+          barcodes: self.fetchBarcodes()
+        });
+    }
+
+    self.fetchItems = function () {
       var deferred = $q.defer();
       try {
         Restangular.one("GetItemsByLocations").get({LocationId: SettingsService.getLocationId()}).then(function (res) {
@@ -39,6 +46,32 @@ angular.module('itouch.services')
       return deferred.promise;
     }
 
+    self.fetchBarcodes = function () {
+        var deferred = $q.defer();
+        try {
+            Restangular.one("GetItemBarcode").get({LocationId: SettingsService.getLocationId()}).then(function (res) {
+                try {
+                    var barcodes = JSON.parse(res);
+                } catch(ex){
+                    deferred.reject("No results");
+                }
+                if (barcodes) {
+                    self.saveBarcodes(barcodes);
+                    deferred.resolve();
+                } else {
+                    deferred.reject('Unknown machine');
+                }
+            }, function (err) {
+                console.error(err);
+                deferred.reject('Unable to fetch data from the server');
+            });
+        } catch (ex) {
+            deferred.reject(ex);
+        }
+
+        return deferred.promise;
+    }
+
     self.getItems = function () {
       var deferred = $q.defer();
       DB.query("SELECT * FROM " + DB_CONFIG.tableNames.item.item + "", []).then(function (result) {
@@ -50,6 +83,10 @@ angular.module('itouch.services')
     }
     self.save = function (items) {
       DB.addInsertToQueue(DB_CONFIG.tableNames.item.item, items);
+    }
+
+    self.saveBarcodes = function (barcodes) {
+        DB.addInsertToQueue(DB_CONFIG.tableNames.item.barcodes, barcodes);
     }
 
     self.get = function (plu, subPLU1, subPLU2, subPLU3) {
@@ -173,11 +210,13 @@ angular.module('itouch.services')
         location = SettingsService.getLocationId();
         if(location){
           var query = "SELECT i.Id, i.Description1, i.Description2, PriceGroupId, i.Plu, i.ZeroPrice, i.AutoBundle, i.BelowCost, PluType, Taxable, MultiDiscount, NoDiscount FROM Item AS i "
+            +"INNER JOIN ItemBarcodes AS b ON i.Id = b.ItemId "
             +"INNER JOIN SubPLU1 AS s1 ON i.SubPlu1Id = s1.Id "
             +"INNER JOIN SubPLU2 AS s2 ON i.SubPlu2Id = s2.Id "
             +"INNER JOIN SubPLU3 AS s3 ON i.SubPlu3Id = s3.Id "
-            +"WHERE i.HouseBarCode = ?";
-          DB.query(query, [barcode]).then(function (result) {
+            +"WHERE Housebarcode = ? OR b.Barcode = ? LIMIT 1";
+          barcode = ""+barcode;
+          DB.query(query, [barcode, barcode]).then(function (result) {
             var item = DB.fetch(result);
             if(item){
               self.getPrice(item.Plu, item.PriceGroupId, item.Taxable).then(function (data) {
