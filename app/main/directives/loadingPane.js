@@ -7,7 +7,7 @@ angular.module('itouch')
           scope: {
               show: '@'
           },
-          template: '<div class="loading" ng-show="show">'
+          template: '<div class="loading-pane" ng-show="show">'
                       +'<ion-spinner class="spinner-energized text-center" icon="lines"></ion-spinner>'
                     +'</div>'
       };
