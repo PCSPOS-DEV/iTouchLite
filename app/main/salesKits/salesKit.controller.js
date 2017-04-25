@@ -18,6 +18,7 @@ angular.module('itouch.controllers')
           $scope.selectedRow = null;
           submitted = false;
           $ionicScrollDelegate.$getByHandle('salesKit').scrollTop();
+          $ionicScrollDelegate.$getByHandle('salesKitSelectedItems').scrollTop();
           customQty = $scope.qty.value;
 
 
