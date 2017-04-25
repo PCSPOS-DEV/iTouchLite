@@ -92,9 +92,10 @@ angular.module('itouch.controllers')
       };
 
       $scope.$on("$ionicView.beforeEnter", function (event, data) {
-        initBill();
-        loadFunctions();
-        $scope.user = AuthService.currentUser();
+          initBill();
+          loadLayout();
+          loadFunctions();
+          $scope.user = AuthService.currentUser();
       });
 
       $scope.$on("$ionicView.afterEnter", function (event, data) {
