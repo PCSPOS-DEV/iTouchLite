@@ -262,7 +262,7 @@ angular.module('itouch.services')
     +"LEFT OUTER JOIN BillDiscounts AS bd ON bd.ItemId = de.ItemId AND bd.LineNumber = de.LineNumber AND de.DocNo = bd.DocNo "
     +"LEFT OUTER  JOIN Discounts AS d ON d.Id = bd.DiscountId AND bd.DiscountFrom = 'I' "
     +"LEFT OUTER  JOIN Reason AS r ON r.Code = de.ReasonId "
-    return DB.query(q + "WHERE de.DocNo = ? ORDER BY de.LineNumber AND bd.SeqNo", [DocNo]).then(function (res) {
+    return DB.query(q + "WHERE de.DocNo = ? AND de.ItemType != 'RND' ORDER BY de.LineNumber AND bd.SeqNo", [DocNo]).then(function (res) {
       var items = {};
       angular.forEach(DB.fetchAll(res), function (item) {
         if(item){

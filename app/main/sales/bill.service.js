@@ -2,8 +2,8 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory("BillService", ['LocationService', 'ControlService', '$localStorage', 'ErrorService', 'DB', 'DB_CONFIG', 'TenderService', 'SettingsService', '$filter', 'AuthService', '$q', 'ShiftService', 'TempBillDetailService', 'VoidItemsService', 'TempBillDiscountsService', 'TempBillHeaderService',
-    function (LocationService, ControlService, $localStorage, ErrorService, DB, DB_CONFIG, TenderService, SettingsService, $filter, AuthService, $q, ShiftService, TempBillDetailService, VoidItemsService, TempBillDiscountsService, TempBillHeaderService) {
+  .factory("BillService", ['LocationService', 'ControlService', '$localStorage', 'ErrorService', 'DB', 'DB_CONFIG', 'TenderService', 'SettingsService', '$filter', 'AuthService', '$q', 'ShiftService', 'TempBillDetailService', 'VoidItemsService', 'TempBillDiscountsService', 'TempBillHeaderService', 'TaxService',
+    function (LocationService, ControlService, $localStorage, ErrorService, DB, DB_CONFIG, TenderService, SettingsService, $filter, AuthService, $q, ShiftService, TempBillDetailService, VoidItemsService, TempBillDiscountsService, TempBillHeaderService, TaxService) {
       var self = this;
       var bill = {
         header: null,
@@ -1164,6 +1164,7 @@ angular.module('itouch.services')
       }
 
       self.updateHeaderTotals = function(DocNo, items){
+        var location = LocationService.currentLocation;
         var promises = {
           header: self.getTempHeader(DocNo)
         };
@@ -1184,21 +1185,147 @@ angular.module('itouch.services')
             data.header.Tax3DiscAmount = 0;
             data.header.Tax4DiscAmount = 0;
             data.header.Tax5DiscAmount = 0;
+
+            var itemTotalForTax = 0, itemDiscountTotal = 0, itemSubTotal = 0, arrExclusive = [];
+            var tax1Diff = 0,
+                tax2Diff = 0,
+                tax3Diff = 0,
+                tax4Diff = 0,
+                tax5Diff = 0;
             angular.forEach(data.items, function(item){
-              data.header.SubTotal += item.SubTotal;
-              data.header.DiscAmount += item.DiscAmount;
-              data.header.Tax1Amount += item.Tax1Amount;
-              data.header.Tax2Amount += item.Tax2Amount;
-              data.header.Tax3Amount += item.Tax3Amount;
-              data.header.Tax4Amount += item.Tax4Amount;
-              data.header.Tax5Amount += item.Tax5Amount;
-              data.header.Tax1DiscAmount += item.Tax1DiscAmount;
-              data.header.Tax2DiscAmount += item.Tax2DiscAmount;
-              data.header.Tax3DiscAmount += item.Tax3DiscAmount;
-              data.header.Tax4DiscAmount += item.Tax4DiscAmount;
-              data.header.Tax5DiscAmount += item.Tax5DiscAmount;
+
+              if(item.Taxable == 'true'){
+                  itemTotalForTax += (item.OrgPrice * item.Qty).roundTo(2);
+                  // itemDiscountTotal
+
+                  if(location.Tax5Option != 3){
+                      if(item.Price != 0){
+                          arrExclusive.push(_.pick(item, ['Qty', 'OrgPrice', 'DiscAmount', 'AlteredPrice', 'TakeAway', 'Taxable', 'ItemType']));
+                      }
+                  }
+              }
+
+              if(location.Tax5Option != 3){
+                  itemSubTotal += (item.Qty * item.OrgPrice).roundTo(2);
+              }
+
+
+
+
+
+              // data.header.SubTotal += item.SubTotal;
+              // data.header.DiscAmount += item.DiscAmount;
+              // data.header.Tax1Amount += item.Tax1Amount;
+              // data.header.Tax2Amount += item.Tax2Amount;
+              // data.header.Tax3Amount += item.Tax3Amount;
+              // data.header.Tax4Amount += item.Tax4Amount;
+              // data.header.Tax5Amount += item.Tax5Amount;
+              // data.header.Tax1DiscAmount += item.Tax1DiscAmount;
+              // data.header.Tax2DiscAmount += item.Tax2DiscAmount;
+              // data.header.Tax3DiscAmount += item.Tax3DiscAmount;
+              // data.header.Tax4DiscAmount += item.Tax4DiscAmount;
+              // data.header.Tax5DiscAmount += item.Tax5DiscAmount;
             });
-            return updateTempHeader(data.header);
+              var tempHeader = {};
+
+              if(location.Tax5Option == 3){
+                  tempHeader.SubTotal = itemTotalForTax;
+                  tempHeader.AlteredPrice = itemTotalForTax;
+                  tempHeader.Qty = 1;
+                  tempHeader.DiscAmount = itemDiscountTotal;
+                  tempHeader.Taxable = true;
+
+                  tempHeader = TaxService.calculateHeaderTax(tempHeader);
+              } else {
+
+              }
+
+              data.header.SubTotal = tempHeader.SubTotal;
+              data.header.DiscAmount = tempHeader.DiscAmount;
+              data.header.Tax1Amount = tempHeader.Tax1Amount;
+              data.header.Tax2Amount = tempHeader.Tax2Amount;
+              data.header.Tax3Amount = tempHeader.Tax3Amount;
+              data.header.Tax4Amount = tempHeader.Tax4Amount;
+              data.header.Tax5Amount = tempHeader.Tax5Amount;
+              data.header.Tax1DiscAmount = tempHeader.Tax1DiscAmount;
+              data.header.Tax2DiscAmount = tempHeader.Tax2DiscAmount;
+              data.header.Tax3DiscAmount = tempHeader.Tax3DiscAmount;
+              data.header.Tax4DiscAmount = tempHeader.Tax4DiscAmount;
+              data.header.Tax5DiscAmount = tempHeader.Tax5DiscAmount;
+
+              var columns = 'SUM(Tax1Amount) AS Tax1Amount, SUM(Tax2Amount) AS Tax2Amount, SUM(Tax3Amount) AS Tax3Amount, SUM(Tax4Amount) AS Tax4Amount, SUM(Tax5Amount) AS Tax5Amount, SUM(Tax1DiscAmount) AS Tax1DiscAmount, SUM(Tax2DiscAmount) AS Tax2DiscAmount, SUM(Tax3DiscAmount) AS Tax3DiscAmount,  SUM(Tax4DiscAmount) AS Tax4DiscAmount,  SUM(Tax5DiscAmount) AS Tax5DiscAmount';
+              return DB.select(DB_CONFIG.tableNames.bill.tempDetail, columns, { columns: 'DocNo = ?', data: [data.header.DocNo] }).then(function (res) {
+                 var sum = DB.fetch(res);
+                  var adjPromise = null;
+                 if(sum){
+                   sum.Tax1Amount = sum.Tax1Amount ? sum.Tax1Amount.roundTo(2) : 0;
+                   sum.Tax2Amount = sum.Tax2Amount ? sum.Tax2Amount.roundTo(2) : 0;
+                   sum.Tax3Amount = sum.Tax3Amount ? sum.Tax3Amount.roundTo(2) : 0;
+                   sum.Tax4Amount = sum.Tax4Amount ? sum.Tax4Amount.roundTo(2) : 0;
+                   sum.Tax5Amount = sum.Tax5Amount ? sum.Tax5Amount.roundTo(2) : 0;
+                   sum.Tax1DiscAmount = sum.Tax1DiscAmount ? sum.Tax1DiscAmount.roundTo(2) : 0;
+                   sum.Tax2DiscAmount = sum.Tax2DiscAmount ? sum.Tax2DiscAmount.roundTo(2) : 0;
+                   sum.Tax3DiscAmount = sum.Tax3DiscAmount ? sum.Tax3DiscAmount.roundTo(2) : 0;
+                   sum.Tax4DiscAmount = sum.Tax4DiscAmount ? sum.Tax4DiscAmount.roundTo(2) : 0;
+                   sum.Tax5DiscAmount = sum.Tax5DiscAmount ? sum.Tax5DiscAmount.roundTo(2) : 0;
+
+                   tax1Diff = tempHeader.Tax1Amount - sum.Tax1Amount;
+                   tax2Diff = tempHeader.Tax2Amount - sum.Tax2Amount;
+                   tax3Diff = tempHeader.Tax3Amount - sum.Tax3Amount;
+                   tax4Diff = tempHeader.Tax4Amount - sum.Tax4Amount;
+                   tax5Diff = tempHeader.Tax5Amount - sum.Tax5Amount;
+
+
+
+                   if(tax1Diff > 0 || tax2Diff > 0 || tax3Diff > 0 || tax4Diff > 0 || tax5Diff > 0){
+                     var tempItem = {
+                       DocNo: data.header.DocNo,
+                       BusinessDate: data.header.BusinessDate,
+                         LocationId: data.header.LocationId,
+                         MachineId: data.header.MachineId,
+                         ItemId: 0,
+                         LineNumber: -1,
+                         ItemType: 'RND',
+                         Qty: 1,
+                         Tax1Amount: tax1Diff,
+                         Tax2Amount: tax2Diff,
+                         Tax3Amount: tax3Diff,
+                         Tax4Amount: tax4Diff,
+                         Tax5Amount: tax5Diff,
+                         PluType: 0,
+                         NoDiscount: true,
+                         MultiDiscount: false,
+                         Taxable: false,
+                         BelowCost: false
+                     };
+                     if(location.Tax5Option == 3){
+                       tempItem.SubTotal = tax5Diff * -1;
+                     } else {
+                       tempItem.SubTotal = 0;
+                     }
+                     tempItem.Desc1 = 'Rounded';
+                     tempItem.Desc2 = 'Rounded';
+                     tempItem.TakeAway = false;
+                     tempItem.OrderedDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+                     tempItem = prepareItem(tempItem);
+                     adjPromise = DB.insert(DB_CONFIG.tableNames.bill.tempDetail, tempItem);
+
+                   } else {
+                       adjPromise = $q.when(true);
+                   }
+                 } else {
+                     adjPromise = $q.when(true);
+                 }
+
+                return adjPromise.then(function () {
+                    return updateTempHeader(data.header);
+                });
+
+              }, function (err) {
+                  console.log(err);
+              });
+
+
           } else {
             return $q.reject("No valid bill for this DocNo");
           }
