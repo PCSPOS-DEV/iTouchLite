@@ -1196,6 +1196,7 @@ angular.module('itouch.services')
 
               if(item.Taxable == 'true'){
                   itemTotalForTax += (item.OrgPrice * item.Qty).roundTo(2);
+                  itemDiscountTotal += item.DiscAmount + item.Tax5DiscAmount;
                   // itemDiscountTotal
 
                   if(location.Tax5Option != 3){
