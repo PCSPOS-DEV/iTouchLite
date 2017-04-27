@@ -450,11 +450,11 @@ angular.module('itouch.services')
             angular.forEach(_.values(items), function (item, key) {
               prec = item.TotalEligibleDiscount / totalEligibleDiscount;
               var discountAmount = 0;
-              if(key != _.size(items) - 1){
+              // if(key != _.size(items) - 1){
                 discountAmount = (amount * prec).roundTo(2);
-              } else {
-                discountAmount = (amount - headerDiscount).roundTo(2);
-              }
+              // } else {
+              //   discountAmount = (amount - headerDiscount).roundTo(2);
+              // }
               var tax5Disc = ((discountAmount * item.Tax5Perc) / (100+item.Tax5Perc)).roundTo(2);
               var subDiscount = (discountAmount - tax5Disc).roundTo(2);
 
@@ -472,13 +472,13 @@ angular.module('itouch.services')
 
               queue.push(processTenderDiscountItem(item, angular.copy(discount)));
             });
-            var td = {};
 
             return $q.all(queue).then(function(items){
 
-              header.Discount += headerDiscount;
-              header.DiscAmount += headerSubDiscount;
-              header.Tax5DiscAmount += headerTax5Disc;
+              header.Discount += amount;
+              var tax5DiscAmount = ((amount * location.Tax5Perc) / (100+location.Tax5Perc)).roundTo(2);
+              header.Tax5DiscAmount += tax5DiscAmount;
+              header.DiscAmount += (amount - tax5DiscAmount).roundTo(2);
               header = ItemService.calculateTotal(header);
 
               header.TenderTotal = header.Total.roundTo(2);
@@ -492,7 +492,16 @@ angular.module('itouch.services')
               });
               tenderDiscounts.discounts = _.pluck(items, 'discount');
               tenderDiscounts.header = header;
-              console.log(td);
+
+              if(amount != headerDiscount){ //add adjustment discount record
+                var tempDiscount = angular.copy(_.first(tenderDiscounts.discounts));
+                tempDiscount.ItemId = 0;
+                tempDiscount.LineNumber = -1;
+                tempDiscount.DiscountAmount = (amount - headerDiscount).roundTo(2);
+
+                tenderDiscounts.discounts.push(tempDiscount);
+
+              }
               deferred.resolve();
             }, function(ex){
               deferred.reject(ex);
