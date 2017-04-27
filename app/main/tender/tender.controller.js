@@ -146,6 +146,7 @@ angular.module('itouch.controllers')
             } else {
               transAmount = amount;
             }
+            transAmount = transAmount.roundTo(2);
 
 
               if (transAmount > roundedTotal) {
