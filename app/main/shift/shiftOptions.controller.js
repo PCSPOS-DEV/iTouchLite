@@ -33,7 +33,7 @@ angular.module('itouch.controllers')
           unOpened: ShiftService.getUnOpened(),
           toBeDeclared: ShiftService.getDeclareCashShifts(),
           dayEndPossible: ShiftService.dayEndPossible()
-        }).then(function(data){
+        }).then(function(data){          
           self.shiftData = data;
         }, function(ex){
           console.log(ex);
@@ -70,6 +70,7 @@ angular.module('itouch.controllers')
       self.openShiftExitModal = function(){
         Alert.showConfirm('Are you sure?', 'Exit current shift', function(val){
           if(val == 1){
+            dayEnd=false;
             ShiftService.clearCurrent();
             showReopenModal();
           }
@@ -83,7 +84,7 @@ angular.module('itouch.controllers')
 
       var showReopenModal = function(){
         if(!dayEnd){
-          ShiftService.getOpened().then(function(data){
+          ShiftService.getOpened().then(function(data){           
             if(data.length == 0){
               // Alert.warning('No shifts available');
             } else {
@@ -134,7 +135,6 @@ angular.module('itouch.controllers')
         });
 
         myPopup.then(function(cash) {
-          console.log(shift);
           var promise = null;
           if(cash == 'later'){
 

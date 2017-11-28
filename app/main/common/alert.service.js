@@ -52,5 +52,6 @@ angular.module('itouch.services')
         buttons = ['Yes', 'No'];
       }
       navigator.notification.confirm(message, func, title, buttons);
+
     }
   }]);

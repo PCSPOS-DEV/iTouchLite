@@ -13,15 +13,21 @@ angular.module('itouch.services')
       try {
         Restangular.one("GetModifiersKeyInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
           try {
-            var items = JSON.parse(res);
+            if(!_.isUndefined(res)){
+              var items = JSON.parse(res);
+              if (items) {
+              self.save(items);
+              deferred.resolve(items);
+              }
+              else {
+               deferred.reject('Unknown machine');
+              }
+            }
+            else{
+               deferred.resolve();
+            }
           } catch(ex){
             deferred.reject("No results");
-          }
-          if (items) {
-            self.save(items);
-            deferred.resolve(items);
-          } else {
-            deferred.reject('Unknown machine');
           }
         }, function (err) {
           console.error(err);

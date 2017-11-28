@@ -2,8 +2,8 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory("SuspendService", ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService',
-      function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService) {
+  .factory("SuspendService", ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService','Reciept',
+      function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService,Reciept) {
       var self = this;
 
         var self = this;
@@ -67,14 +67,17 @@ angular.module('itouch.services')
 
         self.suspend = function (DocNo) {
             return self.getBill(DocNo).then(function (bill) {
-                var header = _.first(bill.SuspendBillHeader);
-                return post(bill).then(function (res) {
-                    if (res == 'success') {
+                var header = _.first(bill.SuspendBillHeader);               
+                return post(bill).then(function (res) {                    
+                     Reciept.printSuspend(res);
+                     return self.removeBill(header.DocNo);
+                    /*if (res == 'success') {                       
                         return self.removeBill(header.DocNo);
                     } else {
                         return $q.reject(res);
-                    }
+                    }*/
                 });
+
             });
         }
 
@@ -121,7 +124,7 @@ angular.module('itouch.services')
         self.recallBill = function (DocNo) {
             return Restangular.one("GetSuspendBill").get({DocNo: DocNo}).then(function (res) {
                 try {
-                    var bills = JSON.parse(res);
+                    var bills = JSON.parse(res);                    
                     var header = _.first(bills.DBSuspendBillHeader);
                     if(header){
                         DB.clearQueue();
@@ -131,11 +134,13 @@ angular.module('itouch.services')
                             item.DocNo = BillService.getCurrentReceiptId();
                             TempBillDetailService.insert(item.DocNo, item, true);
                         });
+                        
                         _.forEach(bills.DBSuspendBillDiscounts, function (discount) {
                             discount.BusinessDate = ControlService.getBusinessDate(true);
-                            discount.DocNo = BillService.getCurrentReceiptId();
-                            TempBillDiscountsService.insert(discount, true);
+                            discount.DocNo = BillService.getCurrentReceiptId();   
+                            TempBillDiscountsService.insert(discount, false);
                         });
+                        
                         header.BusinessDate = ControlService.getBusinessDate(true);
                         header.DocNo = BillService.getCurrentReceiptId();
                         TempBillHeaderService.update(header.DocNo, header, true);

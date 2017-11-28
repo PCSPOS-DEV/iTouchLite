@@ -602,6 +602,7 @@ angular.module('itouch.config')
           columns: [
             { name: "BusinessDate", type: "date" },
             { name: "LocationId", type: "int NOT NULL" },
+            { name: "MachineId", type: "int NOT NULL" },
             { name: "LineNumber", type: "int NOT NULL" },
             { name: "DocNo", type: "text NOT NULL" },
             { name: "ItemId", type: "int NOT NULL" },
@@ -612,7 +613,7 @@ angular.module('itouch.config')
             { name: "BaseUOMId", type: "int NULL" },
             { name: "IsExported", type: "boolean NOT NULL" }
           ],
-          primaryKey: "BusinessDate, LocationId, LineNumber, DocNo, ItemId, SeqNo",
+          primaryKey: "BusinessDate,MachineId,LocationId, LineNumber, DocNo, ItemId, SeqNo",
           keep: true
         },
         {

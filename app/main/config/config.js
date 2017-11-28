@@ -8,6 +8,8 @@ angular.module('itouch.config')
         // baseUrl: 'http://172.16.110.99/iTouchLiteSyncServices/iTouchLiteSyncService.svc/',
         baseUrl: 'http://172.16.110.114:89/iTouchLiteSyncServices/iTouchLiteSyncService.svc/',
         outletServerUrl: 'http://172.16.110.114:89/iTouchLiteSyncServices/iTouchLiteSyncService.svc/',
+        //baseUrl: 'http://localhost:49952/iTouchLiteSyncService.svc/',
+        //outletServerUrl: 'http://localhost:49952/iTouchLiteSyncService.svc/',
         name: 'ITouch Lite',
         version: '0.1',
         debug: true

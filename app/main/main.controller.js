@@ -99,12 +99,14 @@ angular.module('itouch.controllers')
      * @returns String
      */
     $scope.print = function (object, attribute, level, trimFrom) {
+      currentUser = AuthService.currentUser();      
       if(currentUser){
         var name = attribute + currentUser.DescriptionLevel;
         if(level){
           name += level;
         }
-        if(_.isUndefined(object) || _.isUndefined(object[name])){
+      
+        if(_.isUndefined(object) || _.isUndefined(object[name]) || _.isNull(object[name])){
           return null;
         } else {
           if(trimFrom && trimFrom > 0 && object[name].length > trimFrom){
@@ -114,7 +116,13 @@ angular.module('itouch.controllers')
           }
         }
       }
+      else
+      {
+        var name = attribute +1;
+        return object[name];
+      }      
     }
+
 
     /**
      *
@@ -135,10 +143,10 @@ angular.module('itouch.controllers')
     $scope.logout = function () {
       Alert.showConfirm('Are you sure?', 'Logout', function(res){
         if(res == 1){
-          CartItemService.isEmpty().then(function(empty){
+          CartItemService.isEmpty().then(function(empty){            
             if(!empty){
               Alert.warning('Cart is not empty!');
-            } else {
+            } else {              
               $scope.go('login', true);
             }
           });
@@ -148,6 +156,7 @@ angular.module('itouch.controllers')
 
     $scope.imageUrl = function(imageName){
       if(imageName){
+       
         if(window.cordova){
           var name = imageName.substr(imageName.lastIndexOf('/') + 1);
       //     if(imageExists(name)){
@@ -164,6 +173,7 @@ angular.module('itouch.controllers')
       //     }
         }
       } else {
+
         return null;
       }
 

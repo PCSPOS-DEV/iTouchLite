@@ -31,7 +31,7 @@ angular.module('itouch.services')
         cart.summery.Tax3DiscAmount = 0;
         cart.summery.Tax4DiscAmount = 0;
         cart.summery.Tax5DiscAmount = 0;
-
+        var TotalForTaxItem=0;
         if (!_.isEmpty(cart.items)) {
           angular.forEach(cart.items, function (item) {
             cart.summery.SubTotal += item.SubTotal;
@@ -47,9 +47,13 @@ angular.module('itouch.services')
             cart.summery.Tax3DiscAmount += item.Tax3DiscAmount || 0;
             cart.summery.Tax4DiscAmount += item.Tax4DiscAmount || 0;
             cart.summery.Tax5DiscAmount += item.Tax5DiscAmount || 0;
-            cart.summery.Tax += item.Tax || 0;
+            cart.summery.Tax += item.Tax || 0;           
             cart.summery.Total += item.Total || 0;
             cart.summery.Discount += item.Discount || 0;
+            cart.summery.Tax5Perc=item.Tax5Perc;
+            if(item.Taxable=='true'){
+             TotalForTaxItem+= item.Total || 0;
+            }
           });
           cart.summery.SubTotal = cart.summery.SubTotal.roundTo(2);
           cart.summery.Count = cart.summery.Count.roundTo(2);
@@ -64,10 +68,14 @@ angular.module('itouch.services')
           cart.summery.Tax3DiscAmount = cart.summery.Tax3DiscAmount.roundTo(2);
           cart.summery.Tax4DiscAmount = cart.summery.Tax4DiscAmount.roundTo(2);
           cart.summery.Tax5DiscAmount = cart.summery.Tax5DiscAmount.roundTo(2);
-          cart.summery.Tax = (cart.summery.Tax - cart.summery.Tax5DiscAmount).roundTo(2);
+          //cart.summery.Tax = (cart.summery.Tax - cart.summery.Tax5DiscAmount).roundTo(2);          
           cart.summery.Total = cart.summery.Total.roundTo(2);
           cart.summery.Discount = cart.summery.Discount.roundTo(2);
-
+          /*Yi Yi Po*/
+          var TotalTax=((TotalForTaxItem/(100+cart.summery.Tax5Perc)) * cart.summery.Tax5Perc).roundTo(2);          
+          cart.summery.Tax=(TotalTax-cart.summery.Tax5DiscAmount).roundTo(2);
+          /*--*/
+          
         }
       };
 
@@ -118,7 +126,7 @@ angular.module('itouch.services')
       }
 
       self.addItemToCart = function (DocNo, item, salesKit) {
-
+     
         item = angular.copy(item);
         var cartItem = null;
         // if(item){
@@ -126,6 +134,7 @@ angular.module('itouch.services')
         // }
 
         return BillService.findItems(item.ItemId, DocNo, item.ItemType, item.ParentItemLineNumber).then(function (items) {
+         
           var ndItem = getItem(items);
           if(item.OpenKey){
             if(item.customQuantity){
@@ -133,8 +142,7 @@ angular.module('itouch.services')
             }
             if(!item.Qty){
               item.Qty = 1;
-            }
-
+            }            
             return BillService.addItem(item);
 
           } else if (ndItem && !salesKit && ndItem.TakeAway == 'false' && ndItem.ChildCount == 0) {
@@ -155,7 +163,6 @@ angular.module('itouch.services')
             if(ndItem && salesKit){
               item.LineNumber = ndItem.LineNumber + 10;
             }
-
             return BillService.addItem(item);
           }
         });
@@ -164,6 +171,7 @@ angular.module('itouch.services')
       }
 
       self.addSalesKitItemToCart = function(item){
+        
         var item = angular.copy(item);
 
         return BillService.addSalesKitItem(item).then(function () {
@@ -307,8 +315,8 @@ angular.module('itouch.services')
         if(!DocNo){
             DocNo = BillService.getCurrentReceiptId();
         }
-        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, "COUNT(*) AS c", { columns: 'DocNo=?', data:[DocNo] }).then(function(res){
-          var count = DB.fetch(res).c;
+        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, "COUNT(*) AS c", { columns: 'DocNo=? AND ItemType !=? ', data:[DocNo,'RND'] }).then(function(res){
+          var count = DB.fetch(res).c;                    
           if(count == 0){
             return true;
           } else {

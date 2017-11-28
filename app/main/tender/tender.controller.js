@@ -3,9 +3,9 @@
  */
 angular.module('itouch.controllers')
   .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService',
-    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q', 'ItemService', 'denominations', 'Alert', 'Restangular', 'AppConfig',
+    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q', 'ItemService', 'denominations', '$ionicScrollDelegate', 'Alert', 'Restangular', 'AppConfig','$timeout',
     function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService,
-              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q, ItemService, denominations, Alert, Restangular, AppConfig) {
+              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q, ItemService, denominations,$ionicScrollDelegate,Alert, Restangular, AppConfig,$timeout) {
     $scope.tenderTypes = [];
       $scope.title = "Tender";
       $scope.tenderHeader = billData.header;
@@ -27,12 +27,14 @@ angular.module('itouch.controllers')
         loginModal: null
       };
 
-      $scope.$on("$ionicView.beforeEnter", function(event, data){
-        submitted = false;
+      $scope.$on("$ionicView.beforeEnter", function(event, data){        
+        submitted = false;        
+        DiscountService.clearTempTenderDiscounts();
         initBill();
       });
 
       var initBill = function(){
+        //console.log($stateParams.DocNo);
         payTransactions = [];
         $scope.payTransactions = [];
         DiscountService.clearTenderDiscounts();
@@ -41,7 +43,12 @@ angular.module('itouch.controllers')
           items: CartItemService.getItems($stateParams.DocNo)
         }).then(function(data){
           if(data.header){
+            /*Yi Yi Po (25-07-2017)*/     
+            //data.header.DiscAmount=data.header.DiscAmount-(data.header.Tax1DiscAmount + data.header.Tax2DiscAmount + data.header.Tax3DiscAmount+ data.header.Tax4DiscAmount + data.header.Tax5DiscAmount);
+            /*---*/
+            
             $scope.header = ItemService.calculateTotal(data.header);
+            $scope.header.CashierId=AuthService.currentUser().Id;
             $scope.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
             $scope.header.UpdatedTenderTotal = data.header.Total.toFixed(2) || 0 ;
             $scope.header.TenderTotal = data.header.Total.toFixed(2) || 0 ;
@@ -72,11 +79,12 @@ angular.module('itouch.controllers')
         dotClicked = false;
 
         CartItemService.fetchItemsFromDb().then(function(bill) {
+
           $scope.billItems = bill;
           // BillService.getBillSummary(bill).then(function (summary) {
           // originalHeader = angular.copy(CartItemService.getSummery());
           // originalHeader.DocNo = TenderService.generateReceiptId();
-          $scope.tenderHeader = CartItemService.getSummery($scope.tenderHeader);
+          $scope.tenderHeader = CartItemService.getSummery($scope.tenderHeader);          
           // $scope.tenderHeader = angular.copy(originalHeader);
           $scope.tenderHeader.TenderTotal = $scope.tenderHeader.Total.toFixed(2);
           // $scope.tenderHeader.TotalRounded = $scope.tenderHeader.Total.roundTo(2, .25).toFixed(2);
@@ -98,6 +106,7 @@ angular.module('itouch.controllers')
       $scope.selectTenderType = function (tenderType, value) {
         if(!submitted){
           var overTender = false;
+         
           var bill = _.map($scope.billItems, function (item) {
             item.IsExported = true;
             item.DocNo = $scope.tenderHeader.DocNo;
@@ -110,6 +119,7 @@ angular.module('itouch.controllers')
           var total = $scope.tenderHeader.Total;
           var roundedTotal = parseFloat($scope.tenderHeader.TotalRounded);
           // var total = $scope.tenderHeader.TotalRounded;
+          
           var amount = null;
           if(!$scope.tenderHeader.UpdatedTenderTotal){
             $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total;
@@ -153,8 +163,11 @@ angular.module('itouch.controllers')
                   changeAmount = (transAmount- (total+diff)).roundTo(2);
               }
 
-            if (roundedTotal <= transAmount || (roundedTotal < 0 &&  roundedTotal >= transAmount) ) {
-              submitted = true;
+            var currentTenderTotal=(total - amount).roundTo(2);
+            //if (roundedTotal <= transAmount || (roundedTotal < 0 &&  roundedTotal >= transAmount) ) 
+            if (currentTenderTotal==0 || roundedTotal <= transAmount || (roundedTotal < 0 &&  roundedTotal >= transAmount) ) 
+            {
+                submitted = true;
               // console.log(diff);
               if(tenderType.Round == 'true' && diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
                 payTransactions.push({
@@ -178,10 +191,11 @@ angular.module('itouch.controllers')
                 stockTransactions.push({
                   BusinessDate: businessDate,
                   LocationId: item.LocationId,
+                  MachineId:item.MachineId,
                   LineNumber: item.LineNumber,
                   DocNo: $scope.tenderHeader.DocNo,
                   ItemId: item.ItemId,
-                  SeqNo: 0,
+                  SeqNo: 1,
                   DocType: "SA",
                   StdCost: item.StdCost,
                   Qty: item.Qty,
@@ -196,20 +210,36 @@ angular.module('itouch.controllers')
               // angular.forEach(payTransactions, function (tx) {
               //   total += parseFloat(tx.Amount);
               // });
-
+               
               if (transAmount > roundedTotal && tenderType.OverTender == 'true') {
-                overTender = {
-                  BusinessDate: businessDate,
-                  LocationId: SettingsService.getLocationId(),
-                  MachineId: SettingsService.getMachineId(),
-                  DocNo: $scope.tenderHeader.DocNo,
-                  PayTypeId: tenderType.Id,
-                  OverTenderTypeId: tenderType.OverTenderTypeId,
-                  SeqNo: 0,
-                  Amount: (transAmount - roundedTotal).roundTo(2),
-                  ChangeAmount: 0,
-                  IsExported: false
-                };
+                var OverTenderAmount=OverTenderAmount=(transAmount - roundedTotal).roundTo(2);
+                if(SettingsService.getCashId()!=tenderType.Id){
+                    OverTenderAmount=(transAmount-$scope.tenderHeader.UpdatedTenderTotal).roundTo(2); 
+                 }
+                if(OverTenderAmount!=0){
+                  var payOverTenderAmount=OverTenderAmount;
+                  var payOverChangeAmount=0;
+                  if(tenderType.OverTenderTypeId==3){
+                    payOverTenderAmount=roundedTotal;
+                    payOverChangeAmount=OverTenderAmount;
+                  }
+                  overTender = {
+                    BusinessDate: businessDate,
+                    LocationId: SettingsService.getLocationId(),
+                    MachineId: SettingsService.getMachineId(),
+                    DocNo: $scope.tenderHeader.DocNo,
+                    PayTypeId: tenderType.Id,
+                    OverTenderTypeId: tenderType.OverTenderTypeId,
+                    SeqNo: 1,
+                    Amount:payOverTenderAmount,
+                    ChangeAmount:payOverChangeAmount,
+                    //Amount:OverTenderAmount,
+                    //ChangeAmount: 0,
+                    IsExported: false
+                  };
+                 
+                 
+                }
               }
 
               if($scope.header.isSuspended){
@@ -260,11 +290,33 @@ angular.module('itouch.controllers')
                   console.log(err);
                 });
               });
-            } else {
+            }
+             else {
               $scope.tenderHeader.Total = (total - amount).roundTo(2);
               $scope.tenderHeader.TenderTotal = $scope.tenderHeader.Total.toFixed(2);
               $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total.toFixed(2);
               $scope.tenderHeader.TotalRounded = RoundingService.round($scope.tenderHeader.Total).toFixed(2);
+            }           
+           
+            var payTransAmount=transAmount;
+            if(tenderType.OverTenderTypeId==3){             
+              if(tenderType.Round=='true'){
+                if(setValueManually==false){             
+                  payTransAmount=roundedTotal;       
+                }
+                else{
+                  if(transAmount>roundedTotal){
+                    payTransAmount=roundedTotal;
+                  }
+                }
+               }
+             }
+            if(value)
+            {
+              if(value>payTransAmount)
+                 payTransAmount=payTransAmount;
+               else
+                 payTransAmount=value;
             }
 
             payTransactions.push({
@@ -275,7 +327,8 @@ angular.module('itouch.controllers')
               Cash: tenderType.Cash == 'true',
               SeqNo: seq,
               PayTypeId: tenderType.Id,
-              Amount: transAmount,
+              //Amount: transAmount,
+              Amount: payTransAmount,
               ChangeAmount: tenderType.Cash == 'true' ? changeAmount || 0 : 0,
               ConvRate: 0,
               CurrencyId: 0,
@@ -290,7 +343,7 @@ angular.module('itouch.controllers')
           seq++;
           $scope.numpadClear();
         }
-
+        
       }
 
       /**
@@ -315,6 +368,9 @@ angular.module('itouch.controllers')
         },
         Discount: function (fn) {
           if (authorityCheck(fn)) {
+             /*Yi Yi Po(24/07/2017)*/
+            $ionicScrollDelegate.scrollTop();
+            /*--*/
             if (payTransactions.length == 0) {
               $scope.shownModal = 'tenderDiscounts';
               $scope.discountModal.show();
@@ -407,6 +463,7 @@ angular.module('itouch.controllers')
        * @param Function fn
        * @returns {boolean}
        */
+      var modalOpen = false;
       var authorityCheck = function (fn) {
         var authorized = false;
         var tempUser = AuthService.getTempUser();
@@ -414,12 +471,21 @@ angular.module('itouch.controllers')
           if(AuthService.isAuthorized(fn.AccessLevel, tempUser)){
             authorized = true;
           }
+          else {
+              Alert.warning('Access denied!');
+          }
         } else {
           if(AuthService.isAuthorized(fn.AccessLevel, AuthService.currentUser())){
             authorized = true;
           } else {
-              $scope.modals.loginlModal.show();
+            if (!modalOpen) {
+              $timeout(function () {
+                $scope.modals.loginlModal.show();
+                modalOpen = true;
+              }, 500);
+              //$scope.modals.loginlModal.show();
             onGoingFunction = fn;
+          }
           }
         }
 
@@ -429,6 +495,9 @@ angular.module('itouch.controllers')
       }
 
       $scope.close = function () {
+        /*Yi Yi Po(25-07-2017)*/
+        DiscountService.clearTempTenderDiscounts();
+        /*---*/
         $state.go('app.sales', {}, {reload: true});
       }
 

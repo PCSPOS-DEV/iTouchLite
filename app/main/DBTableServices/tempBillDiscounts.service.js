@@ -8,7 +8,7 @@ angular.module('itouch.services')
       self.table = DB_CONFIG.tableNames.discounts.tempBillDiscounts;
 
 
-      var columnList = ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'SeqNo', 'DiscountFrom', 'DiscountId', 'DiscountCode', 'DiscountFor', 'DiscountType', 'DiscountAmount', 'DiscountPercentage'];
+      var columnList = ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId','LineNumber', 'SeqNo', 'DiscountFrom', 'DiscountId', 'DiscountCode', 'DiscountFor', 'DiscountType', 'DiscountAmount', 'DiscountPercentage'];
 
 
 

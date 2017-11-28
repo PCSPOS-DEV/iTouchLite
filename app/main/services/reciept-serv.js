@@ -1,12 +1,42 @@
 'use strict';
 angular.module('itouch.services')
-.service('Reciept', ['$log', 'PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert',
-  function ($log, PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert) {
+.service('Reciept', ['$log', 'PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert','Restangular','DiscountService','BillService',
+  function ($log, PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert,Restangular,DiscountService,BillService) {
   var self = this;
   var printData = null;
   var printer = PrintService.getPrinter();
   var location = LocationService.currentLocation;
   // console.log(location);
+
+  self.formatDate=function(dateVal){
+    var newDate = new Date(dateVal);
+
+    var sMonth =self.padValue(newDate.getMonth() + 1);
+    var sDay = self.padValue(newDate.getDate());
+    var sYear =newDate.getFullYear();
+    var sHour =newDate.getHours();
+    var sMinute =self.padValue(newDate.getMinutes());
+    var sSecond=self.padValue(newDate.getSeconds());
+    var sAMPM = "AM";
+
+    var iHourCheck = parseInt(sHour);
+
+    if (iHourCheck > 12) {
+        sAMPM = "PM";
+        sHour = iHourCheck - 12;
+    }
+    else if (iHourCheck === 0) {
+        sHour = "12";
+    }
+
+    sHour = self.padValue(sHour);
+
+    //return sDay + "-" + sMonth + "-" + sYear + " " + sHour + ":" + sMinute +":"+sSecond+ " " + sAMPM;
+    return sAMPM;
+  }
+  self.padValue=function(value){
+     return (value < 10) ? "0" + value : value;
+  }
 
   self.getAll = function(){
     PrinterSettings.get().then(function(res){
@@ -19,8 +49,7 @@ angular.module('itouch.services')
 
     printer.addTextAlign(printer.ALIGN_CENTER);
     PrintService.addImage();
-    PrintService.addLineBreak();
-
+    PrintService.addLineBreak();    
     angular.forEach(printData.Header, function(row){
       if(row.IsBold == "true"){
         printer.addTextStyle(false, false, true);
@@ -43,8 +72,26 @@ angular.module('itouch.services')
 
     printer.addTextAlign(printer.ALIGN_LEFT);
     PrintService.addHLine();
+
+    if(data.header.ReprintCount)
+    {
+      if(data.header.DocType=='SA'){
+      var sysDT=data.header.SysDateTime.split(" ");
+      if(sysDT.length==1)
+       {
+         sysDT=data.header.SysDateTime.split('T');
+       }           
+      printer.addText("[RE-PRINTED  "+data.header.ReprintCount+" x]\n");
+      printer.addText("[Transacted at "+sysDT[1]+sysDT[2]+"]\n\n");    
+     }
+    }
     if(data.header.OrderTag){
       printer.addText("  Order Tag    : "+data.header.OrderTag+"\n");
+    }
+
+   if(data.header.HeaderTitle)
+    {
+      PrintService.addTitle(data.header.HeaderTitle +"\n");
     }
 
     angular.forEach(data.items, function(row){
@@ -53,14 +100,16 @@ angular.module('itouch.services')
       if(row.ParentItemLineNumber > 0){
         text = '  '+ text;
       }
-      if (row.ItemType == 'MOD'){
+      //if (row.ItemType == 'MOD'){
+      if (row.NoDiscount == 'true'){
         text += " **";
       } else if(row.TakeAway == 'true'){
         text += " *";
       }
 
-
-      PrintService.addLine(text, " "+(sTotal.toFixed(2)), ""+row.Qty);
+      if(row.ItemType!='RND'){
+       PrintService.addLine(text, " "+(sTotal.toFixed(2)), ""+row.Qty);
+      }
       subTotal += sTotal;
       if(row.discounts){
         angular.forEach(row.discounts, function(discount){
@@ -90,8 +139,9 @@ angular.module('itouch.services')
         PrintService.addLine('SUBTOTAL', "$" + subTotal.toFixed(2));
         if (data.tenderDiscounts && data.tenderDiscounts.length > 0) {
             var tenderDisAmount = 0;
-            angular.forEach(data.tenderDiscounts, function (row) {
-                PrintService.addLine(row.Description1, (row.Amount > 0 ? "-" : "+") + row.Amount.toFixed(2));
+            angular.forEach(data.tenderDiscounts, function (row) { 
+                PrintService.addLine(row.Description1, " " + (row.Amount * -1).toFixed(2));
+                //PrintService.addLine(row.Description1, (row.Amount > 0 ? "-" : "+") + row.Amount.toFixed(2));
                 tenderDisAmount += row.Amount;
             });
 
@@ -101,7 +151,7 @@ angular.module('itouch.services')
         var change = null, forfeited = null;
         angular.forEach(data.transactions, function (row) {
             // console.log(row);
-            PrintService.addLine(row.Description1 || 'ROUNDED', "$" + (row.Amount.toFixed(2)));
+            PrintService.addLine(row.Description1 || 'ROUNDED', "$" + ((row.Amount+row.ChangeAmount).toFixed(2)));
             if (row.ChangeAmount > 0) {
                 if (row.Cash == 'true') {
                     change = row.ChangeAmount.toFixed(2);
@@ -113,7 +163,8 @@ angular.module('itouch.services')
         });
         if (data.transactionOT) {
             if (data.transactionOT.OverTenderTypeId == 3) {
-                printer.addText('\nChange Due: $' + (data.transactionOT.Amount||0).toFixed(2) + "\n");
+                //printer.addText('\nChange Due: $' + (data.transactionOT.Amount||0).toFixed(2) + "\n");
+                printer.addText('\nChange Due: $' + (data.transactionOT.ChangeAmount||0).toFixed(2) + "\n");
             } else {
                 printer.addText('\nForfeited : $' + (data.transactionOT.Amount||0).toFixed(2) + "\n");
             }
@@ -131,8 +182,10 @@ angular.module('itouch.services')
     printer.addTextAlign(printer.ALIGN_CENTER);
     var bDate = ControlService.getBusinessDate();
     var shift = ShiftService.getCurrent();
-    var user = AuthService.currentUser();
-    var now = moment().format('DD/MM/YYYY hh:mm:ss A');
+    var bd = new Date(header.BusinessDate);
+    var businessDate=self.padValue(bd.getDate())+'-'+self.padValue((bd.getMonth()+1))+'-'+bd.getFullYear();
+   
+    var curtSysDateTime=moment().format('DD-MM-YYYY hh:mm:ss a');
     var machine = SettingsService.getCurrentMachine();
 
     angular.forEach(printData.Footer, function(row){
@@ -144,45 +197,64 @@ angular.module('itouch.services')
 
       printer.addText(row.Text+'\n');
     });
-
-    printer.addText('\nBDate: '+header.BusinessDate+' Shift: '+ (footerData.shift ? footerData.shift.Description1: '' ) +' M/C: '+ (footerData.machine ? footerData.machine.Code : '') +'\n');
-    printer.addText(header.SysDateTime+' User: '+ footerData.cashier.Id + ' ' + header.DocNo +'\n');
+    printer.addText('\nBDate: '+businessDate+' Shift: '+ (footerData.shift ? footerData.shift.Description1: '' ) +' M/C: '+ (footerData.machine ? footerData.machine.Code : '') +'\n');
+    if(footerData.cashier){
+    printer.addText(curtSysDateTime+' User: '+ footerData.cashier.Code + ' ' + header.DocNo +'\n');
+    }
+    else{
+       AuthService.getUserById(header.CashierId).then(function(data){
+        printer.addText(curtSysDateTime+' User: '+ data.Code + ' ' + header.DocNo +'\n');   
+      });
+    }
+    //printer.addText('\nBDate: '+header.BusinessDate+' Shift: '+ (footerData.shift ? footerData.shift.Description1: '' ) +' M/C: '+ (footerData.machine ? footerData.machine.Code : '') +'\n');
+    //printer.addText(header.SysDateTime+sampm+' User: '+ footerData.cashier.Code + ' ' + header.DocNo +'\n');
   }
 
-  self.print = function(DocNo){
-    if(PrintService.isConnected()){
-      try {
-        printer = PrintService.getPrinter();
+  self.print = function(DocNo){        
+      BillService.getBillHeader(DocNo).then(function(result){
+            var header=result;
+            header.ReprintCount+=1;
+            DB.update(DB_CONFIG.tableNames.bill.header,header, {columns:'DocNo=?', data: [DocNo]});
+      });
 
-        if(printer){
-          self.fetchData(DocNo).then(function (data) {
-            printData = data.printData;
+      if(PrintService.isConnected()){
+        try {
+          printer = PrintService.getPrinter();
 
-            if(data && data.header && data.footerData){
-              self.creatRecieptHeader();
+          if(printer){
+            self.fetchData(DocNo).then(function (data) {
+             
+              printData = data.printData;
 
-              self.creatRecieptBody(data, true);
+              if(data && data.header && data.footerData){
+                self.creatRecieptHeader();
+                
+                if(data.header.DocType=='VD') {                   
+                    PrintService.addTitle("Transaction Void");
+                    PrintService.addTitle(data.header.SalesDocNo);
+                  }
+                else if(data.header.DocType=='AV')
+                    PrintService.addTitle("Abort");
 
-              self.creatRecieptFooter(data.header, data.footerData);
+                self.creatRecieptBody(data, true);
 
-              printer.addCut(printer.CUT_FEED);
+                self.creatRecieptFooter(data.header, data.footerData);
 
-              printer.send();
-            } else {
-              console.log("bill not available");
-            }
-          });
+                printer.addCut(printer.CUT_FEED);
+
+                printer.send();
+              } else {
+                console.log("bill not available");
+              }
+            });
+          }
+
+        } catch(e){
+          console.log(e);
         }
-
-      } catch(e){
-        console.log(e);
+      } else {
+        Alert.success('printer not connected', 'Error');
       }
-    } else {
-      Alert.success('printer not connected', 'Error');
-    }
-
-
-
   }
 
   self.printVoid = function(DocNo){
@@ -222,6 +294,7 @@ angular.module('itouch.services')
           printer = PrintService.getPrinter();
 
           self.fetchData(DocNo).then(function (data) {
+            console.log(data.footerData.cashier.Code);
             printData = data.printData;
             if(data && data.header){
               self.creatRecieptHeader();
@@ -251,7 +324,8 @@ angular.module('itouch.services')
     return DB.query("SELECT v.*, s.DocNo  AS SalesDocNo  FROM " + DB_CONFIG.tableNames.bill.header + " AS v LEFT OUTER JOIN " + DB_CONFIG.tableNames.bill.header + " AS s ON v.DocNo = s.VoidDocNo WHERE v.DocNo = ?", [DocNo]).then(function (res) {
       var item = DB.fetch(res);
       item = ItemService.calculateTotal(item);
-      // item.SubTotal = item.SubTotal + item.Tax;
+      //item.SubTotal = item.SubTotal + item.Tax;
+      //console.log(item);
       return item;
     });
   }
@@ -291,7 +365,7 @@ angular.module('itouch.services')
   }
 
   self.getTenderDiscounts = function(DocNo){
-    var q = "SELECT SUM(bd.DiscountAmount) AS Amount, d.Description1 AS Description1 FROM BillDiscounts AS bd INNER JOIN Discounts AS d ON d.Id = bd.DiscountId INNER JOIN BillHeader AS bh ON bd.DocNo = bh.DocNo WHERE DiscountFrom = 'T' AND bh.DocNo = ? GROUP BY SeqNo";
+    var q = "SELECT SUM(bd.DiscountAmount) AS Amount, d.Description1 AS Description1 FROM BillDiscounts AS bd INNER JOIN Discounts AS d ON d.Id = bd.DiscountId INNER JOIN BillHeader AS bh ON bd.DocNo = bh.DocNo WHERE DiscountFrom = 'T' AND bh.DocNo = ?  GROUP BY DiscountId";
     return DB.query(q, [DocNo]).then(function(res){
       return DB.fetchAll(res);
     });
@@ -570,5 +644,93 @@ angular.module('itouch.services')
         return endBlock + '\n';
       }
     }
+
+    /*Yi Yi Po*/
+    self.fetchSuspendData = function(DocNo){    
+      return Restangular.one("GetSuspendBill").get({DocNo: DocNo}).then(function (res) {
+                try {
+                    var bills = JSON.parse(res);                      
+                    //var header = _.first(bills.DBSuspendBillHeader);
+                    var header=ItemService.calculateTotal( _.first(bills.DBSuspendBillHeader));
+                    var items=bills.DBSuspendBillDetail;
+                    _.forEach(items, function (item) {
+                         var itemdiscounts=[];
+                      _.forEach(bills.DBSuspendBillDiscounts, function (discount) {                           
+                            if(item.LineNumber==discount.LineNumber){
+                              var seqPromise=DiscountService.getDiscountById(discount.DiscountId);
+                              seqPromise.then(function(s){
+                                 discount.Description1=s.Description1;
+                                 discount.Description2=s.Description2;
+                                 itemdiscounts.push(discount);
+                              });
+                            }
+                        });
+                        item.discounts=itemdiscounts;
+                   });
+                    items=_.sortBy(items, 'LineNumber');
+                    if(header){                    
+                    return { 
+                     header:header,
+                     items:items                    
+                    }
+                  }
+                  else{
+                     return $q.reject("Unable to fetch suspended bills");
+                  }
+                } catch (e){
+                    return {};
+                }
+        }).then(function(data){         
+          return $q.all({    
+            printData: PrinterSettings.get(),        
+            shift: ShiftService.getById(data.header.ShiftId),
+            machine: SettingsService.getMachine(data.header.MachineId),
+            cashier: AuthService.getUserById(data.header.CashierId)
+          }).then(function (footerData) {
+            data.footerData = footerData;
+            return data;
+          });
+      }, function (ex) {
+        console.log(ex);
+    });
+    }
+    self.printSuspend = function(DocNo){
+        if(PrintService.isConnected()){
+          try {
+            printer = PrintService.getPrinter();
+
+            if(printer){
+              self.fetchSuspendData(DocNo).then(function (data) {
+                
+                printData =data.footerData.printData;
+
+                if(data && data.header && data.footerData){
+
+                  data.header.HeaderTitle="Suspend";
+
+                  self.creatRecieptHeader();
+
+                  self.creatRecieptBody(data, false);
+
+                  self.creatRecieptFooter(data.header, data.footerData);
+
+                  printer.addCut(printer.CUT_FEED);
+
+                  printer.send();
+                } else {
+                  console.log("bill not available");
+                }
+              });
+            }
+
+          } catch(e){
+            console.log(e);
+          }
+        }
+         else {
+          Alert.success('printer not connected', 'Error');
+      }
+  }
+  /*--*/
 
 }]);

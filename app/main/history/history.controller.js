@@ -6,7 +6,7 @@ angular.module('itouch.controllers')
     function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept, ControlService, $ionicScrollDelegate) {
       $scope.items = [];
       $scope.selectedItem = null;
-      $scope.search = { text: "" };
+      $scope.search = { text: "" };      
 
       $scope.$on("$ionicView.beforeEnter", function(event, data){
         $scope.search.text = "";
@@ -43,6 +43,7 @@ angular.module('itouch.controllers')
       $ionicModal.fromTemplateUrl('main/history/billModal.html', {
         id: 6,
         scope: $scope,
+        backdropClickToClose: false,
         animation: 'slide-in-up'
       }).then(function (modal) {
         $scope.modal = modal;
@@ -64,7 +65,6 @@ angular.module('itouch.controllers')
       }
 
       $scope.clearSearch = function(){
-        console.log('clear');
         $scope.search.text = "";
       }
 
@@ -72,4 +72,22 @@ angular.module('itouch.controllers')
         $scope.modal.hide();
       });
 
-    }]);
+    $scope.noMoreItemsAvailable = false;
+    $scope.bills = [];
+    var index=6;      
+    $scope.loadMore = function() { 
+      setTimeout(function() {
+          var startIndex=index-6;
+          for (var i =startIndex;i<index; i++) 
+          {
+            if($scope.bills.length!=$scope.items.length)
+                  $scope.bills.push($scope.items[i]);
+          }
+          if($scope.items.length>index)
+                index+=6;
+          $scope.$broadcast('scroll.infiniteScrollComplete');
+          $ionicScrollDelegate.resize();
+        }, 1000);        
+     };
+
+ }]);

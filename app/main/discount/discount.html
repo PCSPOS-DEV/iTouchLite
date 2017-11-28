@@ -20,7 +20,7 @@
         {{title}}
       </div>
 
-      <a class="item" ng-click="selectDiscount(discount)" ng-repeat="discount in discounts">
+      <a class="item" ng-click="selectDiscount(discount)" ng-repeat="discount in discounts" ng-dbliclick="return false;">
         {{print(discount, 'Description')}}
       </a>
 

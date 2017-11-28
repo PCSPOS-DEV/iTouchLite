@@ -248,7 +248,7 @@ angular.module('itouch', [
                   billData: ['$q', 'BillService', 'CartItemService', '$stateParams', 'ItemService', 'RoundingService', '$state', 'FunctionsService', 'TenderService',
                     function($q, BillService, CartItemService, $stateParams, ItemService, RoundingService, $state, FunctionsService, TenderService){
                     var docNo = $stateParams.DocNo;
-                    console.log(docNo);
+                    //console.log(docNo);
                     var def = $q.defer();
                     // def.resolve({});
                     $q.all({

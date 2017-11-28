@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept', 'LocationService', '$ionicScrollDelegate',
-    function ($scope, PrinterSettings, HistoryService, $q, Reciept, LocationService, $ionicScrollDelegate) {
+  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept', 'LocationService', '$ionicScrollDelegate','DB','DB_CONFIG','BillService',
+    function ($scope, PrinterSettings, HistoryService, $q, Reciept, LocationService, $ionicScrollDelegate,DB,DB_CONFIG,BillService) {
       $scope.settings = {};
       $scope.bill = {
         header: null,
@@ -58,7 +58,19 @@ angular.module('itouch.controllers')
             });
             data.subTotal = subTotal.roundTo(2);
             data.tenderDiscountTotal = tenderDiscountTotal.roundTo(2);
+
+            var sysDT=data.header.SysDateTime.split(" ");
+            if(sysDT.length==1)
+            {
+              sysDT=data.header.SysDateTime.split('T');
+            }
+            data.header.SysDate=sysDT[0];
+            data.header.SysTime=sysDT[1];
+            data.header.Sampm=sysDT[2];
+
             $scope.bill = data;
+           var curtSysDateTime=moment().format('DD-MM-YYYY hh:mm:ss a');
+           data.header.curtSysDateTime=curtSysDateTime;  
           }, function (ex) {
             console.log(ex);
           });
@@ -66,15 +78,15 @@ angular.module('itouch.controllers')
 
       };
 
-      $scope.printReciept = function(DocNo){
+ $scope.printReciept = function(DocNo){
         if(DocNo){
           Reciept.print(DocNo);
         }
       }
 
-      $scope.close = function(){
-        $scope.$emit('bill.modal.close');
-      }
+  $scope.close = function(){
+     $scope.$emit('bill.modal.close');
+  }
 
-
-    }]);
+  
+}]);

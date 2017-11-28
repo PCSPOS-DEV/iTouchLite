@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('TenderDiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert',
-    function ($scope, DiscountService, $ionicPopup, Alert) {
+  .controller('TenderDiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert','BillService',
+    function ($scope, DiscountService, $ionicPopup, Alert,BillService) {
       var discountsSet = {
         type1: [],
         type2: []
@@ -51,12 +51,11 @@ angular.module('itouch.controllers')
         $scope.title = titles[t];
       };
 
-      $scope.selectDiscount = function (discount) {
-        if(discount && submitted == false){
-          submitted = true;
+      $scope.selectDiscount = function (discount) {        
+        //if(discount && submitted == false){
+          if(discount){
           if(discount.DiscountType == 1 && discount.Amount == 0){
             $scope.data = {};
-
             // An elaborate, custom popup
             var myPopup = $ionicPopup.show({
               template: '<input type="tel" ng-model="data.amount">',
@@ -68,11 +67,12 @@ angular.module('itouch.controllers')
                 {
                   text: '<b>Save</b>',
                   type: 'button-positive',
-                  onTap: function (e) {
+                  onTap: function (e) {                   
                     if (!$scope.data.amount || _.isNaN($scope.data.amount) || $scope.data.amount == 0) {
                       //don't allow the user to close unless he enters wifi password
                       e.preventDefault();
                     } else {
+                      
                       return $scope.data.amount;
                     }
                   }
@@ -85,7 +85,7 @@ angular.module('itouch.controllers')
                 saveDiscount(discount, res);
               }
             }).finally(function () {
-                submitted = false;
+                //submitted = false;
             });
           } else {
             saveDiscount(discount, parseFloat(discount.Amount));
@@ -95,15 +95,28 @@ angular.module('itouch.controllers')
       }
 
       var saveDiscount = function (discount, amount) {
-        amount = parseFloat(amount);
-        DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy($scope.billItems), discount, amount).then(function () {
-
+        if(submitted == false){
+          submitted = true;
+          amount = parseFloat(amount);
+          BillService.getTempItems($scope.tenderHeader.DocNo).then(function(billItems){
+           DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy(billItems), discount, amount).then(function () {
+           
+            }, function(ex){
+              Alert.warning(ex);
+            }).finally(function () {
+                //submitted = false;
+                $scope.$emit("discountModel-close");
+            });
+          });
+        }
+        /*DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy($scope.billItems), discount, amount).then(function () {
+         
         }, function(ex){
           Alert.warning(ex);
         }).finally(function () {
             submitted = false;
             $scope.$emit("discountModel-close");
-        });
+        });*/
       }
 
       $scope.close = function () {

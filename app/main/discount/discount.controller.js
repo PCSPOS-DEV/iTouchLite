@@ -51,7 +51,7 @@ angular.module('itouch.controllers')
       };
 
       $scope.selectDiscount = function (discount) {
-        if(discount){
+        if(discount){          
           if(discount.DiscountType == 1 && discount.Amount == 0){
             $scope.data = {};
 
@@ -103,7 +103,7 @@ angular.module('itouch.controllers')
           }, function (err) {
             Alert.error(err);
           }).finally(function () {
-              submitted = false;
+              //submitted = false;
               $scope.$emit("discountModel-close");
           });
         }

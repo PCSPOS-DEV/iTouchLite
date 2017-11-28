@@ -36,13 +36,14 @@ angular.module('itouch.controllers')
       self.voidBill = function(){
         var bill = self.data.selectedItem;
         if(bill){
-          Alert.showConfirm('Are you sure?', 'Void bill', function(res){
+         Alert.showConfirm('Are you sure?', 'Void bill', function(res){
             if(res == 1){
               VoidBillService.voidBill(bill.DocNo).then(function(DocNo){
                 $scope.$emit('initBill');
                 $scope.$emit("refresh-cart");
                 $scope.$emit('voidBill.modal.close');
                 Reciept.printVoid(DocNo);
+                Reciept.openDrawer();
               }, function(ex){
                 console.log(ex);
               });
@@ -80,6 +81,7 @@ angular.module('itouch.controllers')
       $ionicModal.fromTemplateUrl('main/history/billModal.html', {
         id: 6,
         scope: $scope,
+        backdropClickToClose: false,
         animation: 'slide-in-up'
       }).then(function (modal) {
         self.modal = modal;

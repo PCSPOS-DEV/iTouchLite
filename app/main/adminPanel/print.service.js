@@ -153,7 +153,7 @@ angular.module('itouch.services')
       }
 
       self.addLine = function(startBlock, endBlock, qtyBlock){
-
+        // PrintService.addLine(text, " "+(sTotal.toFixed(2)), ""+row.Qty);
         if(startBlock && endBlock){
           var lengths  = {
             start: startBlock.length,
@@ -168,7 +168,7 @@ angular.module('itouch.services')
 
           if(startBlock.length > lengths.startBlockMaxLength){
             startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
-            startBlock += "...";
+            startBlock += "....";
             // console.log(startBlock);
           }
 
@@ -186,7 +186,7 @@ angular.module('itouch.services')
 
           if(lengths.end < 8){
             addSpaces(8 - lengths.end);
-          }
+          }        
 
           printer.addText(endBlock + '\n');
         }
@@ -220,7 +220,7 @@ angular.module('itouch.services')
 
           if (startBlock.length > lengths.startBlockMaxLength) {
             startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
-            startBlock += "...";
+            startBlock += "....";
           }
 
           if (length.spaces < 1) {
@@ -230,9 +230,11 @@ angular.module('itouch.services')
 
           printer.addText('\t' + startBlock);
           addSpaces(lengths.spaces);
+
           if (lengths.end < 8) {
             addSpaces(8 - lengths.end);
           }
+          
           printer.addText(endBlock + "\n");
         }
       }

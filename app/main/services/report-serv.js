@@ -93,7 +93,8 @@ angular.module('itouch.services')
     }
     printer.addTextAlign(printer.ALIGN_CENTER);
     printer.addText('\nBDate: '+bDate.format('DD/MM/YYYY')+' Shift: '+ shift.Description1 +' M/C: '+ machine.Code +'\n');
-    printer.addText(now+' User: '+ user.Id +'\n');
+    //printer.addText(now+' User: '+ user.Id +'\n');
+    printer.addText(now+' User: '+ user.Code +'\n');
   }
 
   self.print = function(DocNo){
@@ -255,8 +256,10 @@ angular.module('itouch.services')
       trans: TransactService.getTransDetails(shiftId, bDate.format('YYYY-MM-DD')),
       transactionAmounts: TransactService.getTransactionAmounts(bDate.format('YYYY-MM-DD'), shiftId),
       transactionBreakdown: TransactService.getTransactionBreakdown(bDate.format('YYYY-MM-DD'), shiftId),
+      voidtransactionBreakdown: TransactService.getVoidTransactionBreakdown(bDate.format('YYYY-MM-DD'), shiftId),
       gst: TransactService.getGst(bDate.format('YYYY-MM-DD'), shiftId),
       overTenderBreakdown: TransactService.getOverTenderBreakdown(bDate.format('YYYY-MM-DD'), shiftId),
+      voidoverTenderBreakdown: TransactService.getVoidOverTenderBreakdown(bDate.format('YYYY-MM-DD'), shiftId),
       recCount: TransactService.getReceiptCount(bDate.format('YYYY-MM-DD'), shiftId),
     }).then(function(data){
       // console.log(data);
@@ -266,18 +269,19 @@ angular.module('itouch.services')
       }
       var localTotal = (data.trans.cash ? data.trans.cash.Amount:0 );
       localTotal+= data.trans.nonCash ? data.trans.nonCash.Amount : 0;
-      localTotal -= data.trans.cash ? data.trans.cash.ChangeAmount : 0
+      //localTotal -= data.trans.cash ? data.trans.cash.ChangeAmount : 0
       var miscTotal = data.header.float ? data.header.float.Total : 0;
       miscTotal += data.header.payOut ? data.header.payOut.Total : 0;
       miscTotal += data.header.receiveIn ? data.header.receiveIn.Total : 0;
       miscTotal += data.trans.rounded? data.trans.rounded.Amount:0;
-      var cash = (data.trans.cash?data.trans.cash.Amount-data.trans.cash.ChangeAmount:0);
+      //var cash = (data.trans.cash?data.trans.cash.Amount-data.trans.cash.ChangeAmount:0);
+      var cash = (data.trans.cash?data.trans.cash.Amount:0);
       var diff = (data.header.cashDeclared ? data.header.cashDeclared.Total:0) - cash;
 
       _.forEach(data.overTenderBreakdown, function (row) {
         localTotal -= row.Amount;
       });
-
+      
       if(PrintService.isConnected()){
         try {
           printer = PrintService.getPrinter();
@@ -291,7 +295,8 @@ angular.module('itouch.services')
 
           PrintService.addLineBreak();
           PrintService.addTextLine('BUSINESS DATE : '+ bDate.format('DD/MM/YYYY'));
-          PrintService.addTextLine('TAKEN BY : '+ user.Id);
+          //PrintService.addTextLine('TAKEN BY : '+ user.Id);
+          PrintService.addTextLine('TAKEN BY : '+ user.Code);
 
           PrintService.addLineBreak();
 
@@ -305,35 +310,53 @@ angular.module('itouch.services')
           PrintService.addLineBreak();
 
           PrintService.addTextLine('SALES TRANSACTIONS');
-          PrintService.addReportLine('GROSS SALES', (data.header.sales ? (data.header.sales.SubTotal + data.header.sales.Tax5Amount): 0).toFixed(2), ""+(data.header.sales?data.header.sales.ItemCount: 0));
-          PrintService.addReportLine('DISCOUNT', (data.header.discounted? (data.header.discounted.DiscAmount+data.header.discounted.Tax5DiscAmount): 0).toFixed(2), ""+(data.header.discounted?data.header.discounted.ItemCount: 0));
+          /*PrintService.addReportLine('GROSS SALES', (data.header.sales ? (data.header.sales.SubTotal + data.header.sales.Tax5Amount): 0).toFixed(2), ""+(data.header.sales?data.header.sales.ItemCount: 0));          
+          PrintService.addReportLine('DISCOUNT', (data.header.discounted? (data.header.discounted.DiscAmount+data.header.discounted.Tax5DiscAmount): 0).toFixed(2), ""+(data.header.discounted?data.header.discounted.ItemCount: 0));*/
+          PrintService.addReportLine('GROSS SALES', (data.header.sales ? (data.header.sales.SubTotal + data.header.sales.Tax5Amount): 0).toFixed(2), ""+(data.header.sales.ItemCount-(data.header.void.ItemCount*2)));          
+          PrintService.addReportLine('DISCOUNT', (data.header.discounted? (data.header.discounted.DiscAmount+data.header.discounted.Tax5DiscAmount): 0).toFixed(2), ""+(data.header.discounted.ItemCount-(data.header.voiddiscounted.ItemCount * 2)));
           PrintService.addTabbedLine('SALES TOTAL',(data.header.sales? data.header.sales.Total: 0).toFixed(2));
           PrintService.addLineBreak();
           PrintService.addLineBreak();
 
           PrintService.addTextLine('MISCELLANEOUS TRANSACTIONS');
-          PrintService.addReportLine('ROUNDED', (data.trans.rounded? data.trans.rounded.Amount||0:0).toFixed(2), ""+(data.trans.rounded?data.trans.rounded.ItemCount: 0));
+          //PrintService.addReportLine('ROUNDED', (data.trans.rounded? data.trans.rounded.Amount||0:0).toFixed(2), ""+(data.trans.rounded?data.trans.rounded.ItemCount: 0));
+          var roundedCount=(data.trans.rounded.ItemCount||0);
+          var voidroundedCount=(data.trans.voidrounded[0].ItemCount||0); 
+          PrintService.addReportLine('ROUNDED', (data.trans.rounded? data.trans.rounded.Amount||0:0).toFixed(2), ""+(roundedCount-(voidroundedCount *2)));          
           PrintService.addReportLine('R.A(FLOAT)', (data.header.float? data.header.float.Total:0).toFixed(2), ""+(data.header.float?data.header.float.ItemCount: 0));
           PrintService.addReportLine('PAY OUT', (data.header.payOut ? data.header.payOut.Total:0).toFixed(2), ""+(data.header.payOut?data.header.payOut.ItemCount: 0));
           PrintService.addReportLine('RECEIVE IN', (data.header.receiveIn ? data.header.receiveIn.Total:0).toFixed(2), ""+(data.header.receiveIn?data.header.receiveIn.ItemCount: 0));
-          PrintService.addTabbedLine('MICS TOTAL', miscTotal.toFixed(2));
+          PrintService.addTabbedLine('MISC TOTAL', miscTotal.toFixed(2));
           PrintService.addReportLine('TRANSACTION TOTAL', ((data.header.sales? data.header.sales.Total: 0)+miscTotal).toFixed(2));
           PrintService.addLineBreak();
           PrintService.addLineBreak();
 
           PrintService.addTextLine('LOCAL COLLECTION');
           PrintService.addTextLine('  CASH COLLECTION (INCLUDING FLOAT)');
-          PrintService.addReportLine('CASH', cash.toFixed(2), ""+(data.trans.cash?data.trans.cash.ItemCount: 0));
+          //PrintService.addReportLine('CASH', cash.toFixed(2), ""+(data.trans.cash?data.trans.cash.ItemCount: 0));
+          PrintService.addReportLine('CASH', cash.toFixed(2), ""+(data.trans.cash.ItemCount-(data.header.void.ItemCount*2)));
           if(data.transactionBreakdown && data.transactionBreakdown.cash){
-            _.forEach(data.transactionBreakdown.cash, function (row) {
-              PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(row.Count||0) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
+            _.forEach(data.transactionBreakdown.cash, function (row) {                
+              //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(row.Count||0) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
+              //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(row.Count-voidCashCount) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
+              
+              //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(rowCount-voidCashCount) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
+              var voidCashCount=(data.voidtransactionBreakdown[row.Id] || 0);
+              var rowCount=(row.Count||0);
+              //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(rowCount-((voidCashCount?voidCashCount:0)*2)) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
+              PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(rowCount-((voidCashCount?voidCashCount:0)*2)) + "      " + ((row.Amount)||0).toFixed(2)+"*");
             });
           }
           if(data.transactionBreakdown && data.transactionBreakdown.nonCash){
             PrintService.addTextLine('NON-CASH COLLECTION');
             _.forEach(data.transactionBreakdown.nonCash, function (row) {
-              PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount)||0).toFixed(2), ""+(row.Count||0));
+              /*PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount)||0).toFixed(2), ""+(row.Count||0));*/              
               // localTotal += row.Amount;
+              //var voidRowCount=data.voidtransactionBreakdown[row.Id]?data.voidtransactionBreakdown[row.Id]:0;  
+              var voidRowCount=(data.voidtransactionBreakdown[row.Id]||0);  
+              var rowCount=(row.Count||0);
+              PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount)||0).toFixed(2), ""+(rowCount-(voidRowCount*2)));
+              //PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount)||0).toFixed(2), ""+(row.Count-voidRowCount));
             });
           }
 
@@ -348,7 +371,12 @@ angular.module('itouch.services')
                 default:
                   desc = 'Forfeited';
               }
-              PrintService.addReportLine(" "+desc, (row.Amount||0).toFixed(2), ""+(row.Count||0));
+               var  vdOvertransCount =(data.voidoverTenderBreakdown[row.OverTenderTypeId]||0);
+               var rowCount=(row.Count||0);
+               PrintService.addReportLine(" "+desc, (row.Amount||0).toFixed(2), ""+(rowCount - (vdOvertransCount *2)));
+
+              //PrintService.addReportLine(" "+desc, (row.Amount||0).toFixed(2), ""+(row.Count||0));
+              //PrintService.addReportLine(" "+desc, (row.Amount||0).toFixed(2), ""+(row.Count -vdOvertransCount));
             });
           }
           PrintService.addTabbedLine('LOCAL TOTAL', localTotal.toFixed(2));
@@ -356,13 +384,15 @@ angular.module('itouch.services')
           PrintService.addLineBreak();
 
           PrintService.addTextLine(location.Tax5Desc1);
-          PrintService.addReportLine('TAX TOTAL', (data.gst.Tax5Amount-data.gst.Tax5DiscAmount).roundTo(2).toFixed(2), ""+ (data.gst ? data.gst.ItemCount : 0));
+          //PrintService.addReportLine('TAX TOTAL', (data.gst.Tax5Amount-data.gst.Tax5DiscAmount).roundTo(2).toFixed(2), ""+ (data.gst ? data.gst.ItemCount : 0));
+          PrintService.addReportLine('TAX TOTAL', (data.gst.Tax5Amount-data.gst.Tax5DiscAmount).roundTo(2).toFixed(2), ""+ (data.gst.ItemCount-((data.header.void.ItemCount?data.header.void.ItemCount:0)*2)));
           PrintService.addLineBreak();
           PrintService.addLineBreak();
 
           PrintService.addReportLine('ITEM REVERSE', (data.header.reverse? (data.header.reverse.Total*-1):0).toFixed(2), ""+ (data.header.reverse ? data.header.reverse.ItemCount : 0));
           PrintService.addReportLine('ABORT', (data.header.abort? data.header.abort.Total:0).toFixed(2), ""+ (data.header.abort ? data.header.abort.ItemCount : 0));
-          PrintService.addReportLine('TRANS VD', (data.header.void? (data.header.void.Total*-1):0).toFixed(2), ""+ (data.header.void ? data.header.void.ItemCount : 0));
+          //PrintService.addReportLine('TRANS VD', (data.header.void? (data.header.void.Total*-1):0).toFixed(2), ""+ (data.header.void ? data.header.void.ItemCount : 0));
+          PrintService.addReportLine('TRANS VD', (data.header.void? (data.header.void.Total):0).toFixed(2), ""+ (data.header.void ? data.header.void.ItemCount : 0));
           PrintService.addReportLine('ITEM VD', (data.header.itemVoid? data.header.itemVoid.Total:0).toFixed(2), ""+ (data.header.itemVoid ? data.header.itemVoid.ItemCount : 0));
           PrintService.addLineBreak();
           // PrintService.addReportLine('DRAWER OPEN', (data.header.float? data.header.float.Total:0).toFixed(2));

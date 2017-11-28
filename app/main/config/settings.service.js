@@ -159,5 +159,20 @@ angular.module('itouch.services')
 
     }
 
+    self.setBusinessDate=function(bussinessdate){
+      settings.business_date=bussinessdate;
+      $localStorage.app_config.businessDate=bussinessdate;
+      DB.query("DELETE FROM "+DB_CONFIG.tableNames.bill.tempHeader);
+     }
+
+    self.getBusinessDate=function(){
+      if(settings.business_date){
+        return settings.business_date;
+      }
+      else{
+        return null;
+      }
+    }
+
     return self;
   }]);

@@ -51,16 +51,23 @@ angular.module('itouch.services')
         try {
             Restangular.one("GetItemBarcode").get({LocationId: SettingsService.getLocationId()}).then(function (res) {
                 try {
+                  if(!_.isUndefined(res)){
                     var barcodes = JSON.parse(res);
+                    if (barcodes) {
+                      self.saveBarcodes(barcodes);
+                      deferred.resolve();
+                    } 
+                    else {
+                      deferred.reject('Unknown machine');
+                    }
+                  }
+                  else{ 
+                    deferred.resolve();                   
+                  }
                 } catch(ex){
                     deferred.reject("No results");
                 }
-                if (barcodes) {
-                    self.saveBarcodes(barcodes);
-                    deferred.resolve();
-                } else {
-                    deferred.reject('Unknown machine');
-                }
+
             }, function (err) {
                 console.error(err);
                 deferred.reject('Unable to fetch data from the server');
@@ -85,7 +92,7 @@ angular.module('itouch.services')
       DB.addInsertToQueue(DB_CONFIG.tableNames.item.item, items);
     }
 
-    self.saveBarcodes = function (barcodes) {
+    self.saveBarcodes = function (barcodes) {     
         DB.addInsertToQueue(DB_CONFIG.tableNames.item.barcodes, barcodes);
     }
 
@@ -188,13 +195,30 @@ angular.module('itouch.services')
     self.calculateTotal = function (item) {
       if(item){
         item.Tax = (item.Tax1Amount || 0 + item.Tax2Amount || 0 + item.Tax3Amount || 0 + item.Tax4Amount || 0 + item.Tax5Amount || 0) - (item.Tax1DiscAmount + item.Tax2DiscAmount + item.Tax3DiscAmount+ item.Tax4DiscAmount + item.Tax5DiscAmount);
-        item.Tax = item.Tax.roundTo(2);
+        item.Tax = item.Tax.roundTo(2);            
         item.Discount = (item.DiscAmount||0).roundTo(2);
+        
+        item.Tax5DiscAmount=(item.Tax5DiscAmount||0).roundTo(2);
         item.Total = ((item.SubTotal + item.Tax) - item.Discount).roundTo(2);
         if (!item.Qty) {
           item.Qty = 0;
         }
       }
+      
+      return item;
+    }
+    self.calculateTotalWithNoDisc = function (item) {
+      if(item){
+        //item.Tax = (item.Tax1Amount || 0 + item.Tax2Amount || 0 + item.Tax3Amount || 0 + item.Tax4Amount || 0 + item.Tax5Amount || 0) - (item.Tax1DiscAmount + item.Tax2DiscAmount + item.Tax3DiscAmount+ item.Tax4DiscAmount + item.Tax5DiscAmount);
+        //item.Discount = (item.DiscAmount||0).roundTo(2);
+        item.Tax = (item.Tax1Amount || 0 + item.Tax2Amount || 0 + item.Tax3Amount || 0 + item.Tax4Amount || 0 + item.Tax5Amount || 0);
+        item.Tax = item.Tax.roundTo(2);                    
+        item.Tax5DiscAmount=(item.Tax5DiscAmount||0).roundTo(2);
+        item.Total = ((item.SubTotal + item.Tax)).roundTo(2);
+        if (!item.Qty) {
+          item.Qty = 0;
+        }
+      }      
       return item;
     }
 
@@ -251,7 +275,7 @@ angular.module('itouch.services')
             +"INNER JOIN SubPLU2 AS s2 ON i.SubPlu2Id = s2.Id "
             +"INNER JOIN SubPLU3 AS s3 ON i.SubPlu3Id = s3.Id "
             +"INNER JOIN PriceGroups AS p ON i.Plu = p.Plu AND i.PriceGroupId = p.PriceGroupId "
-            +"WHERE i.Plu = ? OR i.Description1 LIKE ? OR i.Description2 LIKE ? AND p.PriceLevelId = ? GROUP BY i.Id";
+            +"WHERE (i.Plu = ? OR i.Description1 LIKE ? OR i.Description2 LIKE ?) AND p.PriceLevelId = ? GROUP BY i.Id";
           DB.query(query, [text, "%"+text+"%", "%"+text+"%", location.PriceLevelId]).then(function (result) {
             var items = DB.fetchAll(result);
             items = _.map(items, function(item){

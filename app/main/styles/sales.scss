@@ -179,12 +179,14 @@
 .sales .row.table-body.selected ,
 .sales .row.table-body.sales-kit-item.selected,
 .sales .row.table-body.modifier-item.selected,
+.sales .row.table-body.nondisc.selected,
 //.sales .row.table-body.sales-kit.selected { background-color: rgba(250, 255, 229, 0.83); !important; }
 .sales .row.table-body.sales-kit.selected { background-color: rgba(250, 255, 229, 0.83); }
 
 .sales .row.table-body.take-away ,
 .sales .row.table-body.sales-kit-item.take-away,
 .sales .row.table-body.modifier-item.take-away,
+.sales .row.table-body.nondisc.take-away,
 //.sales .row.table-body.sales-kit.take-away { color: rgba(153,31,12,1); !important; }
 .sales .row.table-body.sales-kit.take-away { color: rgba(153,31,12,1); }
 
@@ -192,6 +194,7 @@
 .sales .row.table-body.sales-kit{ background-color: rgba(119, 121, 123, 0.83); }
 .sales .row.table-body.sales-kit-item { background-color: rgba(204, 208, 211, 0.83); }
 .sales .row.table-body.sales-kit-item :first-child { padding-left: 15px; }
+.sales .row.table-body.nondisc { background-color: rgb(255, 245, 230); }
 .sales .row.table-body.modifier-item { background-color: rgba(204, 208, 211, 0.83); }
 .sales .row.table-body.modifier-item :first-child { padding-left: 15px; }
 /*.sales .row.table-body.sales-kit-item{;}*/

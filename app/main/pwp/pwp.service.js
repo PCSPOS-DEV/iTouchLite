@@ -10,16 +10,22 @@ angular.module('itouch.services')
     var deferred = $q.defer();
       Restangular.one("GetItemsByPwp").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
         try {
-          var items = JSON.parse(res);
-        } catch(ex){
-          deferred.reject("No results");
-        }
-        if (items) {
-          self.saveItemsByPWP(items);
-          deferred.resolve();
-        } else {
-          deferred.reject('Unknown machine');
-        }
+            if(!_.isUndefined(res)){
+              var items = JSON.parse(res);
+              if (items) {
+              self.saveItemsByPWP(items);
+              deferred.resolve();
+              } 
+              else {
+                deferred.reject('Unknown machine');
+              }
+            }
+            else{
+               deferred.resolve();
+            }
+          } catch(ex){
+            deferred.reject("No results");
+          }        
       }, function (err) {
         console.error(err);
         deferred.reject('Unable to fetch data from the server');
@@ -32,20 +38,25 @@ angular.module('itouch.services')
     var deferred = $q.defer();
     Restangular.one("GetPwp").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
       try {
-        var items = JSON.parse(res);
-        items = _.map(items, function(item){
-          return _.omit(item, 'EntityId');
-        });
+        if(!_.isUndefined(res)){
+            var items = JSON.parse(res);
+            items = _.map(items, function(item){
+              return _.omit(item, 'EntityId');
+            });
+          if (items) {
+            self.savePWP(items);
+            deferred.resolve();
+            } else {
+              deferred.reject('Unknown machine');
+            }
+        }
+        else
+        {
+          deferred.resolve();
+        }
       } catch(ex){
-        deferred.reject("No results");
-      }
-      if (items) {
-        console.log(items);
-        self.savePWP(items);
-        deferred.resolve();
-      } else {
-        deferred.reject('Unknown machine');
-      }
+          deferred.reject("No results");
+      }      
     }, function (err) {
       console.error(err);
       deferred.reject('Unable to fetch data from the server');
@@ -93,7 +104,7 @@ angular.module('itouch.services')
         // pwp.TotalChildQty = pwp.MaxQuantity * applicableQty;
         pwp.QtyEntered = qty;
         pwp.Qty = 0;
-        console.log(pwp);
+        //console.log(pwp);
 
 
         pwp.items = _.map(resultSet, function(row){

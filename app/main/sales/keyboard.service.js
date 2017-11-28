@@ -48,27 +48,34 @@ angular.module('itouch.services')
         });
 
         Restangular.one("GetKeyboardPageInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
-          var pageInfo = JSON.parse(res);
-          if (pageInfo && pageInfo.length > 0) {
-            pageInfo = _.map(pageInfo, function (pageKey) {
-              if (pageKey && pageKey.ImageName) {
-                if (pageKey.ImageName == 'No file was uploaded.') {
-                  pageKey.ImageName = null;
-                } else {
-                  pageKey.ImageName = "img" + pageKey.ImageName.replace("~", "");
+          var pageInfo=null;
+          //var pageInfo = JSON.parse(res);
+          if(!_.isUndefined(res)){
+              pageInfo = JSON.parse(res);
+              if (pageInfo && pageInfo.length > 0) {
+              pageInfo = _.map(pageInfo, function (pageKey) {
+                if (pageKey && pageKey.ImageName) {
+                  if (pageKey.ImageName == 'No file was uploaded.') {
+                    pageKey.ImageName = null;
+                  } else {
+                    pageKey.ImageName = "img" + pageKey.ImageName.replace("~", "");
+                  }
                 }
-              }
 
-              if(pageKey && pageKey.Colour){
-                pageKey.Colour = argbToRGB(pageKey.Colour);
-              }
-              return pageKey;
-            });
-            self.savePageInfo(pageInfo);
-            deferred.resolve();
-          } else {
-            deferred.reject('Unknown machine');
-          }
+                if(pageKey && pageKey.Colour){
+                  pageKey.Colour = argbToRGB(pageKey.Colour);
+                }
+                return pageKey;
+              });
+              self.savePageInfo(pageInfo);
+              deferred.resolve();
+            } else {
+              deferred.reject('Unknown machine');
+            }
+         }
+         else{
+          deferred.resolve();
+         }
 
         }, function (err) {
           console.error(err);
@@ -85,29 +92,33 @@ angular.module('itouch.services')
     self.fetchKeys = function () {
       var deferred = $q.defer();
       try {
-        Restangular.one("GetKayboardKeyInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
-          keys = JSON.parse(res);
-          if (keys && keys.length > 0) {
-            keys = _.map(keys, function (key) {
-              if (key && key.ImageName) {
-                if (key.ImageName == 'No file was uploaded.') {
-                  key.ImageName = null;
-                } else {
-                  key.ImageName = "img" + key.ImageName.replace("~", "");
+        Restangular.one("GetKayboardKeyInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {          
+          if(!_.isUndefined(res)){
+            keys = JSON.parse(res);
+            if (keys && keys.length > 0) {
+              keys = _.map(keys, function (key) {
+                if (key && key.ImageName) {
+                  if (key.ImageName == 'No file was uploaded.') {
+                    key.ImageName = null;
+                  } else {
+                    key.ImageName = "img" + key.ImageName.replace("~", "");
+                  }
                 }
-              }
 
-              if(key && key.Color){
-                key.Color = argbToRGB(key.Color);
-              }
-              return key;
-            });
-            self.saveKeys(keys);
-            deferred.resolve(keys);
-          } else {
-            deferred.reject('Unable to fetch keys for this machine');
-          }
-
+                if(key && key.Color){
+                  key.Color = argbToRGB(key.Color);
+                }
+                return key;
+              });
+              self.saveKeys(keys);
+              deferred.resolve(keys);
+            } else {
+              deferred.reject('Unable to fetch keys for this machine');
+            }
+         }
+         else{
+           deferred.resolve();
+         }
         }, function (err) {
           console.error(err);
           deferred.reject('Unable to fetch data from the server');
@@ -179,6 +190,7 @@ angular.module('itouch.services')
       var deferred = $q.defer();
       DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.pages + " WHERE KeyboardLayoutMasterId = ?", [layoutId]).then(function (result) {
         pages = DB.fetchAll(result);
+        
         deferred.resolve(pages);
       }, function (err) {
         deferred.reject(err.message);

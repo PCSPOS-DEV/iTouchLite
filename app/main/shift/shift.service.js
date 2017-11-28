@@ -84,9 +84,8 @@ angular.module('itouch.services')
         });
       }
 
-      self.saveCurrent = function (shift) {
+      self.saveCurrent = function (shift) {   
         $localStorage.shift = shift;
-
         return DB.insert(DB_CONFIG.tableNames.auth.shiftStatus, {
           Id: shift.Id,
           ShiftName: shift.Description1,
@@ -108,7 +107,7 @@ angular.module('itouch.services')
         header.CashierId = shift.Id;
 
         var payTrans = initPayTrans(header.DocNo);
-        payTrans.Amount = amount
+        payTrans.Amount = amount;
 
         return $q.all({
           header: DB.insert(DB_CONFIG.tableNames.bill.header, header),
@@ -125,9 +124,9 @@ angular.module('itouch.services')
 
         if(shift || shiftId){
           DB.query("SELECT * FROM shiftstatus WHERE Id = ?", [shiftId || shift.Id]).then(function(res){
-            shift = DB.fetch(res);
+            shift = DB.fetch(res);           
             if(shift){
-              console.log(shift);
+              //console.log(shift);
               shift.CloseDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
               DB.update('ShiftStatus', _.omit(shift, 'Id'), { columns: 'Id= ?', data: [shift.Id]}).then(function(){
                 self.clearCurrent();
@@ -169,8 +168,7 @@ angular.module('itouch.services')
         if(shift || shiftId){
           return DB.query("SELECT * FROM shiftstatus WHERE Id = ?", [shiftId || shift.Id]).then(function(res){
             shift = DB.fetch(res);
-            if(shift){
-              console.log(shift);
+            if(shift){             
               shift.DeclareCashLater = 0;
               return $q.all({
                 'updateShift': DB.update('ShiftStatus', _.omit(shift, 'Id'), { columns: 'Id= ?', data: [shift.Id]}),
@@ -191,8 +189,7 @@ angular.module('itouch.services')
         if(shift || shiftId){
           return DB.query("SELECT * FROM shiftstatus WHERE Id = ?", [shiftId || shift.Id]).then(function(res){
             shift = DB.fetch(res);
-            if(shift){
-              console.log(shift);
+            if(shift){              
               shift.DeclareCashLater = 1;
               return DB.update('ShiftStatus', _.omit(shift, 'Id'), { columns: 'Id= ?', data: [shift.Id]});
               // deferred.resolve();
@@ -207,7 +204,8 @@ angular.module('itouch.services')
 
       var initBillHeader = function(){
         header = {};
-        header.DocNo = ControlService.getNextDocId();
+        //header.DocNo = ControlService.getNextDocId();
+        header.DocNo=ControlService.getDocId();
         header.DocType = null;
         header.LocationId = SettingsService.getLocationId();
         header.MachineId = SettingsService.getMachineId();
@@ -216,7 +214,8 @@ angular.module('itouch.services')
 
         header.AuthBy = 0;
         header.VipId = 0;
-        header.CashierId = null;
+        header.CashierId = null;        
+        header.StaffId=0;
         header.TableId = 0;
         header.DepAmount = 0;
         header.VoidDocNo = 0;
@@ -227,7 +226,7 @@ angular.module('itouch.services')
         header.Pax = 0;
 
         header.SubTotal = 0;
-        header.ShiftId = null;
+        header.ShiftId =0;
 
         header.DepAmount = 0;
         header.DiscAmount = 0;
@@ -252,7 +251,7 @@ angular.module('itouch.services')
         header.Tax4Perc = 0;
         header.Tax5Option = 0;
         header.Tax5Perc = 0;
-        header.IsExported = true;
+        header.IsExported = false;
         header.IsClosed = true;
         return header;
       }
@@ -270,7 +269,7 @@ angular.module('itouch.services')
           ChangeAmount: 0,
           ConvRate: 0,
           CurrencyId: 0,
-          IsExported: true
+          IsExported:false
         };
       }
 
@@ -281,9 +280,10 @@ angular.module('itouch.services')
         header.SubTotal = Amount;
         header.ShiftId = ShiftId;
         header.CashierId = ShiftId;
-
+       
         var payTrans = initPayTrans(header.DocNo);
-        payTrans.Amount = Amount
+        payTrans.Amount = Amount;
+
 
         return $q.all({
           header: DB.insert(DB_CONFIG.tableNames.bill.header, header),

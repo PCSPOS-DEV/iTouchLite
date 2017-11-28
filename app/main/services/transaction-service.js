@@ -23,21 +23,32 @@ angular.module('itouch.services')
       +"FROM BillHeader WHERE BusinessDate=? ";
     var data = [businessDate];
 
-    if(_.isUndefined(mode) || _.isNull(mode)){} else {
-      q += "AND DocType IN ("+mode+") ";
+    if(_.isUndefined(mode) || _.isNull(mode)){
+    } 
+    else {      
+      q += " AND DocType IN ("+mode+") ";
     }
 
     if(_.isUndefined(shiftId) || _.isNull(shiftId)){} else {
-      q += "AND ShiftId = ? ";
+      q += " AND ShiftId = ? ";
       data.push(shiftId);
     }
 
     if(_.isUndefined(discounted) || _.isNull(discounted)){} else {
-      q += "AND DiscAmount > 0 ";
+      q += " AND DiscAmount != 0 ";
+      if(_.isNull(mode))
+      {
+        q += " AND DocType !='AV' ";
+      }
+      /*q += "AND DiscAmount > 0 ";*/
     }
     // q += "GROUP BY ShiftId";
     return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
   }
+
+  /*Yi Yi Po*/
+  /*--*/
+
 
   var getItemDetails = function(type, shiftId, businessDate){
     var q = "SELECT "
@@ -57,7 +68,8 @@ angular.module('itouch.services')
       +"FROM BillDetail AS d INNER JOIN BillHeader AS h ON d.DocNo = h.DocNo WHERE  h.BusinessDate=? ";
     switch(type){
       case 'reverse':
-        q += "AND RefCode NOT NULL ";
+        //q += "AND RefCode NOT NULL ";
+        q+="AND Qty < 0 AND ReasonId!=0 AND h.VoidDocNo='' AND DocType!='AV' ";
         break;
     }
     var data = [businessDate];
@@ -109,27 +121,49 @@ angular.module('itouch.services')
       cashDeclared: getHeaderDetailsForMode(shiftId, "'CD'", null, businessDate),
       reverse: getItemDetails('reverse', shiftId, businessDate),
       itemVoid: getVoidItemDetails(shiftId, businessDate),
-      discounted: getHeaderDetailsForMode(shiftId, null, true, businessDate),
+      discounted: getHeaderDetailsForMode(shiftId, null, true, businessDate),      
+      voiddiscounted: getHeaderDetailsForMode(shiftId,"'VD'" , true, businessDate),
       recCount: getReceiptCount(businessDate)
     }).then(function(data){
       data.sales = ItemService.calculateTotal(_.first(data.sales));
       data.discounted = ItemService.calculateTotal(_.first(data.discounted));
+      data.voiddiscounted=ItemService.calculateTotal(_.first(data.voiddiscounted));
       data.refund = ItemService.calculateTotal(_.first(data.refund));
       data.float = ItemService.calculateTotal(_.first(data.float));
       data.payout = ItemService.calculateTotal(_.first(data.payout));
-      data.void = ItemService.calculateTotal(_.first(data.void));
-      data.abort = ItemService.calculateTotal(_.first(data.abort));
+      data.void = ItemService.calculateTotalWithNoDisc(_.first(data.void));
+      //data.void = ItemService.calculateTotal(_.first(data.void));
+      //data.abort = ItemService.calculateTotal(_.first(data.abort));
+      data.abort = ItemService.calculateTotalWithNoDisc(_.first(data.abort));
       data.receiveIn = ItemService.calculateTotal(_.first(data.receiveIn));
       data.cashDeclared = ItemService.calculateTotal(_.first(data.cashDeclared));
       data.reverse = ItemService.calculateTotal(_.first(data.reverse));
-      data.itemVoid = ItemService.calculateTotal(_.first(data.itemVoid));
+      //data.itemVoid = ItemService.calculateTotal(_.first(data.itemVoid));
+      data.itemVoid = ItemService.calculateTotalWithNoDisc(_.first(data.itemVoid));
 
       return data;
     });
   }
 
   var getTransDetailsForMode = function(shiftId, cash, rounded, bDate){
-    var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount) AS Amount, SUM(ChangeAmount) AS ChangeAmount FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE h.BusinessDate=? AND Cash = ? AND DocType != 'CD' ";
+    var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount) AS Amount, SUM(ChangeAmount) AS ChangeAmount FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE h.BusinessDate=? AND Cash = ? AND DocType != 'CD'";
+    var data = [bDate, cash];
+    // +"WHERE DocType = 'SA'  AND h.VoidDocNo='' "
+    if(_.isUndefined(shiftId) || _.isNull(shiftId)){ } else {
+      q += "AND ShiftId = ? ";
+      data.push(shiftId);
+    }
+    if(rounded){
+      q += "AND PayTypeId = -1 ";
+    } else {
+      q += "AND PayTypeId > 0 ";
+    }
+    // q += "GROUP BY ShiftId";
+    return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
+  }
+
+   var getVoidTransDetailsForMode = function(shiftId, cash, rounded, bDate){
+    var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount) AS Amount, SUM(ChangeAmount) AS ChangeAmount FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE h.BusinessDate=? AND Cash = ? AND DocType != 'CD' AND DocType = 'VD' ";
     var data = [bDate, cash];
     // +"WHERE DocType = 'SA' "
     if(_.isUndefined(shiftId) || _.isNull(shiftId)){ } else {
@@ -145,11 +179,13 @@ angular.module('itouch.services')
     return DB.query(q, data).then(function(res){ return DB.fetchAll(res); });
   }
 
+
   self.getTransDetails = function(shiftId, bDate){
     return $q.all({
       cash: getTransDetailsForMode(shiftId, 'true', null, bDate),
       nonCash: getTransDetailsForMode(shiftId, 'false', null, bDate),
-      rounded: getTransDetailsForMode(shiftId, 'false', true, bDate)
+      rounded: getTransDetailsForMode(shiftId, 'false', true, bDate),
+      voidrounded: getVoidTransDetailsForMode(shiftId, 'false', true, bDate)
     }).then(function(data){
       data.cash = _.first(data.cash);
       data.nonCash = _.first(data.nonCash);
@@ -160,7 +196,7 @@ angular.module('itouch.services')
   }
 
   self.getTransactionAmounts = function (bDate, shiftId) {
-    var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount), Cash FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE h.BusinessDate = ? AND DocType != 'CD' AND DocType != 'RA' ";
+    var q = "SELECT COUNT(*) AS ItemCount, SUM(Amount), Cash FROM PayTrans AS p INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo WHERE h.BusinessDate = ? AND DocType != 'CD' AND DocType != 'RA'";
     var data = [bDate];
     if(_.isUndefined(shiftId) || _.isNull(shiftId)){ } else {
       q += "AND ShiftId = ? ";
@@ -184,9 +220,9 @@ angular.module('itouch.services')
   }
 
   self.getTransactionBreakdown = function (bDate, shiftId) {
-    var q = "SELECT SUM(p.Amount) AS Amount, SUM(p.ChangeAmount) AS ChangeAmount, COUNT(*) AS Count, t.Description1, t.Description2, p.Cash FROM PayTrans AS p "
+    var q = "SELECT SUM(p.Amount) AS Amount, SUM(p.ChangeAmount) AS ChangeAmount, COUNT(*) AS Count, t.Description1, t.Description2, p.Cash,t.Id FROM PayTrans AS p "
     +"INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo "
-    +"INNER JOIN TenderTypes AS t on p.PayTypeId = t.Id " +"WHERE h.BusinessDate = ? AND DocType != 'CD' AND DocType != 'RA' ";
+    +"INNER JOIN TenderTypes AS t on p.PayTypeId = t.Id " +"WHERE h.BusinessDate = ? AND DocType != 'CD' AND DocType != 'RA'";
     var data = [bDate];
     if(_.isUndefined(shiftId) || _.isNull(shiftId)){ } else {
       q += "AND ShiftId = ? ";
@@ -212,8 +248,30 @@ angular.module('itouch.services')
     });
   }
 
+  self.getVoidTransactionBreakdown = function (bDate, shiftId) {
+    var q = "SELECT SUM(p.Amount) AS Amount, SUM(p.ChangeAmount) AS ChangeAmount, COUNT(*) AS Count, t.Description1, t.Description2, p.Cash,t.Id FROM PayTrans AS p "
+    +"INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo "
+    +"INNER JOIN TenderTypes AS t on p.PayTypeId = t.Id " +"WHERE h.BusinessDate = ? AND DocType = 'VD'";
+    var data = [bDate];
+    if(_.isUndefined(shiftId) || _.isNull(shiftId)){ } else {
+      q += "AND ShiftId = ? ";
+      data.push(shiftId);
+    }
+    q += "GROUP BY t.Id";
+    return DB.query(q, data).then(function(res){
+      var data = DB.fetchAll(res);
+      var transcount=[];     
+      _.forEach(data, function (row) {
+        if(row){
+          transcount[row.Id]=row.Count;          
+        }
+      });
+      return transcount;
+    });
+  }
+
   self.getGst = function (bDate, shiftId) {
-    var q = "SELECT SUM(Tax5Amount) AS Tax5Amount, SUM(Tax5DiscAmount) AS Tax5DiscAmount, COUNT(*) AS ItemCount FROM BillHeader WHERE BusinessDate = ? AND DocType != 'CD' AND DocType != 'RA'  ";
+    var q = "SELECT SUM(Tax5Amount) AS Tax5Amount, SUM(Tax5DiscAmount) AS Tax5DiscAmount, COUNT(*) AS ItemCount FROM BillHeader WHERE BusinessDate = ? AND DocType != 'CD' AND DocType != 'RA' AND DocType != 'AV' ";
     var data = [bDate];
     if(_.isUndefined(shiftId) || _.isNull(shiftId)){ } else {
       q += "AND ShiftId = ? ";
@@ -225,7 +283,7 @@ angular.module('itouch.services')
   }
 
   self.getOverTenderBreakdown = function (bDate, shiftId) {
-    var q = "SELECT OverTenderTypeId, SUM(Amount) AS Amount, COUNT(*) AS Count FROM PayTransOverTender AS p "
+    var q = "SELECT OverTenderTypeId, SUM(Amount) AS Amount, COUNT(*) AS Count,OverTenderTypeId FROM PayTransOverTender AS p "
       +"INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo "
       +"WHERE h.BusinessDate = ? AND OverTenderTypeId != 3 ";
     var data = [bDate];
@@ -238,7 +296,28 @@ angular.module('itouch.services')
       return DB.fetchAll(res);
     });
   }
-
+self.getVoidOverTenderBreakdown = function (bDate, shiftId) {
+    var q = "SELECT OverTenderTypeId, SUM(Amount) AS Amount, COUNT(*) AS Count,OverTenderTypeId FROM PayTransOverTender AS p "
+      +"INNER JOIN BillHeader AS h ON p.DocNo = h.DocNo "
+      +"WHERE h.BusinessDate = ? AND OverTenderTypeId != 3 AND h.DocType='VD'";
+    var data = [bDate];
+    if(_.isUndefined(shiftId) || _.isNull(shiftId)){ } else {
+      q += "AND ShiftId = ? ";
+      data.push(shiftId);
+    }
+    q += 'GROUP BY OverTenderTypeId'
+    return DB.query(q, data).then(function(res){
+      var data=DB.fetchAll(res);
+       var overtranscount=[];     
+      _.forEach(data, function (row) {
+        if(row){
+          overtranscount[row.OverTenderTypeId]=row.Count;          
+        }
+      });
+      return overtranscount;
+      //return DB.fetchAll(res);
+    });
+  }
 
   self.getReceiptCount = function (bDate, shiftId) {
     var data = [bDate];

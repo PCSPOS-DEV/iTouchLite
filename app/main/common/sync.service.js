@@ -44,10 +44,10 @@ angular.module('itouch.services')
               'Modifiers': ModifierService.fetch(),
               'Machines': SettingsService.fetchMachines(),
               // 'Images': ImageDownloadService.downloadImages()
+
             })
             // FunctionsService.fetch()
-              .then(function (values) {
-
+              .then(function (values) {                
                 return DB.executeQueue().then(function () {
                   DenominationsService.addDefault();
                   LocationService.get();

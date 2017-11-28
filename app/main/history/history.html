@@ -10,13 +10,14 @@
         </div>
       </div>
     </div>
-      <ion-scroll zooming="false" direction="y" style="height: 630px">
-          <div class="row">
-            <div class="col col-33" ng-repeat="bill in items | filter: search.text">
+      <ion-scroll zooming="false" direction="y" style="height: 630px" ng-if="search.text!=''">
+         <div class="row" >
+            <div class="col col-33" ng-repeat="bill in items | filter:search.text">
               <div class="card " ng-click="selectItem(bill)">
                 {{_.size(items)  }}
                 <div class="item">
-                  <h2>{{bill.DocNo}}</h2>
+                 <!--<h2>{{bill.DocNo}}</h2>-->
+                 <p style="font-weight: bold;font-size: 18px;color: black;">{{bill.DocNo}}</p>
                   <p>{{bill.BillType}}</p>
                 </div>
 
@@ -27,6 +28,8 @@
                       <div class="item" ng-repeat="item in bill.items">
                         <div class="row">
                           <div class="col-80">
+                           <span ng-if="item.ItemType == 'SKI' || item.ItemType == 'MOD'">
+                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>  
                             {{print(item, 'Desc')}}
                           </div>
                           <div class="align-right col-20">
@@ -38,12 +41,58 @@
                   </ion-scroll>
                 </div>
                 <div class="item item-divider">
-                  <div class="row">
+                  <div class="row total">
                     <div class="col-80">
                       Total
                     </div>
                     <div class="col-20 align-right">
-                      <p>{{bill.Total}}</p>
+                     <!--<p >{{bill.Total}}</p>-->
+                     <div class="total">{{bill.Total}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-scroll>
+        <ion-scroll zooming="false" direction="y" style="height: 630px" ng-if="search.text==''">
+          <ion-list>
+             <ion-item class="row">
+               <div class="col col-33" ng-repeat ="bill in bills | filter:search.text ">
+              <div class="card " ng-click="selectItem(bill)">
+                {{_.size(items)  }}
+                <div class="item">
+                  <!--<h3>{{bill.DocNo}}</h3>-->
+                  <p style="font-weight: bold;font-size: 18px;color: black;">{{bill.DocNo}}</p>
+                  <p>{{bill.BillType}}</p>
+                </div>
+
+                <div class="item item-body" style="padding: 0">
+                  <ion-scroll zooming="false" direction="y" style="height: 200px">
+                    <div class="list">
+
+                      <div class="item" ng-repeat="item in bill.items">
+                        <div class="row">
+                          <div class="col-80">
+                           <span ng-if="item.ItemType == 'SKI' || item.ItemType == 'MOD'">
+                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>  
+                            {{print(item, 'Desc')}}
+                          </div>
+                          <div class="align-right col-20">
+                            {{item.Qty}}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </ion-scroll>
+                </div>
+                <div class="item item-divider">
+                  <div class="row total">
+                    <div class="col-80">
+                      Total
+                    </div>
+                    <div class="col-20 align-right">
+                     <div class="total">{{bill.Total}}</div>
                     </div>
                   </div>
                 </div>
@@ -51,6 +100,11 @@
               </div>
             </div>
           </div>
+             </ion-item>
+          </ion-list>
+          <ion-infinite-scroll
+           ng-if = "!noMoreItemsAvailable" on-infinite = "loadMore()">             
+          </ion-infinite-scroll>
         </ion-scroll>
   </ion-content>
 </ion-view>

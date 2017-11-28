@@ -19,13 +19,13 @@
               </div>
               <ion-scroll class="cart" zooming="false" direction="y" style="height: 253px"  delegate-handle="cart">
                 <div class="row table-body" ng-repeat="item in cart.items | orderObjectBy :'LineNumber' track by $index"
-                     ng-class="{ selected: item.selected, 'sales-kit': item.ItemType == 'SKT', 'sales-kit-item': item.ParentItemLineNumber != 0, 'modifier-item': item.ItemType == 'MOD', 'take-away': item.TakeAway == 'true' }"
+                     ng-class="{ selected: item.selected, 'sales-kit': item.ItemType == 'SKT', 'sales-kit-item': item.ParentItemLineNumber != 0, 'modifier-item': item.ItemType == 'MOD', 'take-away': item.TakeAway == 'true','nondisc':item.NoDiscount=='true'}"
                      ng-click="selectItem(item)" id="{{item.LineNumber}}">
-                  <div class="col col-50">{{print(item, 'Desc')}}</div>
-                  <div class="col text-right padding-right">{{item.Qty}}</div>
-                  <div class="col text-right padding-right">{{item.OrgPrice.roundTo(2).toFixed(2)}}</div>
-                  <div class="col text-right padding-right">{{(item.DiscAmount + item.Tax5DiscAmount).roundTo(2).toFixed(2)}}</div>
-                  <div class="col text-right padding-right">{{item.Total.roundTo(2).toFixed(2)}}</div>
+                  <div class="col col-50" >{{print(item, 'Desc')}}</div>
+                  <div class="col text-right padding-right" >{{item.Qty}}</div>
+                  <div class="col text-right padding-right" >{{item.OrgPrice.roundTo(2).toFixed(2)}}</div>
+                  <div class="col text-right padding-right" >{{(item.DiscAmount + item.Tax5DiscAmount).roundTo(2).toFixed(2)}}</div>
+                  <div class="col text-right padding-right" >{{item.Total.roundTo(2).toFixed(2)}}</div>
                 </div>
               </ion-scroll>
             </div>
@@ -36,12 +36,15 @@
               <div class="clearfix">
                 <button class="btn" ng-repeat="key in keyboard.activeKeys"
                      ng-style="{'background-color': key.Colour }" on-tap="onKeyClick(key)">
-                  <div>
+                  <div style="font-weight: bold;">
                     <p class="desc1">{{ print(key, 'KeyDesc', 1) || print(key, 'PageDesc', 1) }}</p>
                     <p class="desc2">{{ print(key, 'KeyDesc', 2) || print(key, 'PageDesc', 2) }}</p>
                     <p class="desc3">{{ print(key, 'KeyDesc', 3) || print(key, 'PageDesc', 3) }}</p>
                   </div>
-                  <img class="item-image" width="80" ng-src="{{ imageUrl(key.ImageName) }}" alt=" ">
+                  <span  ng-if="key.ImageName!='' && key.ImageName!=null">
+                    <img class="item-image" width="80" ng-src="{{ imageUrl(key.ImageName) }}" alt="">
+                  </span>
+                  <!--<img class="item-image" width="80" ng-src="{{ imageUrl(key.ImageName) }}" alt=" ">-->
                 </button>
               </div>
             </div>
@@ -53,7 +56,7 @@
         <div class="info">
           <div class="row">
             <div class="col">Business Date</div>
-            <div class="col">: {{header.BusinessDate}}</div>
+            <div class="col">: {{header.BusinessDate | date:'dd-MM-yyyy' }}</div>
           </div>
           <div class="row">
             <div class="col">Staff</div>
@@ -76,7 +79,9 @@
           </div>
           <div class="row sblock">
             <div class="col label">Tax</div>
-            <div class="col value">{{(cart.summery.Tax + cart.summery.Tax5DiscAmount).roundTo(2).toFixed(2)}}</div>
+            <div class="col value">
+             {{(cart.summery.Tax + cart.summery.Tax5DiscAmount).roundTo(2).toFixed(2)}}
+            </div>
           </div>
           <div class="row sblock">
             <div class="col label">Discount</div>
@@ -123,7 +128,7 @@
               <ion-scroll zooming="false" direction="y" id="functions-bottom">
                   <a href="" class="button" ng-repeat="fn in functions" ng-click="invoke(fn)"
                      ng-class="{ 'button-balanced': (fn.Name == 'FullTakeaway' && TakeAway) || (fn.Name == 'PartialTakeaway' && cart.selectedItem.TakeAway == 'true') }"
-                  >{{ print(fn, 'Description')}}</a>
+                  style="font-weight: bold;">{{ print(fn, 'Description')}}</a>
               </ion-scroll>
             </div>
           </div>
@@ -144,7 +149,9 @@
           <div class="button-bar">
           <a class="button  button-positive" ng-click="changePage(page, $index)"
              ng-class="{'button-balanced': page.selected, 'button-positive': !page.selected}" ng-repeat="page in keyboard.pages">
-            <p class="desc1">{{ print(page, "Description", null, 14) }}</p>
+            <p class="desc1" style="font-weight: bold;">
+              {{ print(page, "Description", null, 14) }}
+            </p>
           </a>
             </div>
 
@@ -153,7 +160,7 @@
     </div>
     <div class="col">
       <a class="button button-full button-calm tender-button" ng-click="openTenderForm()" ng-disabled="tenderButtonClicked">
-        <p class="desc1">Tender</p>
+        <p class="desc1" style="font-weight: bold;">Tender</p>
       </a>
     </div>
   </div>

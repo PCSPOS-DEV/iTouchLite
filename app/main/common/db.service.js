@@ -249,7 +249,7 @@ angular.module('itouch.services')
      * @param tableName
      * @param bindings
      */
-    self.addUpdateToQueue = function (tableName, bindings, where) {
+    self.addUpdateToQueue = function (tableName, bindings, where) {      
      var q = prepareUpdateQuery(tableName, bindings, where);
       queue.push({query: q.query, data: q.values});
     }
@@ -281,7 +281,7 @@ angular.module('itouch.services')
      * Executes the query queue within a transaction & rollbacks if an error is thrown
      * @returns {Promise}
        */
-    self.executeQueue = function () {
+    self.executeQueue = function () {      
       var deferred = $q.defer();
       if (queue.length > 0) {
         var query, values;
@@ -331,6 +331,23 @@ angular.module('itouch.services')
       }
       if(order){
         q += " ORDER BY " + order;
+      }
+      if(limit){
+        q += " LIMIT " + limit;
+      }
+      return self.query(q, where ? where.data : []);
+    }
+
+    self.selectGroupBy = function (tableName, columns, where, groupby, limit) {
+      if(!columns){
+        columns = "*";
+      }
+      var q = "SELECT "+columns+" FROM "+tableName;
+      if(where){
+        q += " WHERE " + where.columns;
+      }
+      if(groupby){
+        q += " GROUP BY " + groupby;
       }
       if(limit){
         q += " LIMIT " + limit;

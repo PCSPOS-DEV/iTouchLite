@@ -21,6 +21,7 @@ angular.module('itouch.controllers')
           loc_id: SettingsService.getLocationId(),
           mac_id: SettingsService.getMachineId(),
           cash_id: SettingsService.getCashId(),
+          business_date:SettingsService.getBusinessDate(),
           url: AppConfig.getBaseUrl(),
           outletServerUrl: AppConfig.getOutletServerUrl(),
         };
@@ -35,6 +36,7 @@ angular.module('itouch.controllers')
     refresh();
 
     self.save = function () {
+
         if(!_.isUndefined(self.settings.url) && !_.isNull(self.settings.url) && !_.isEmpty(self.settings.url)){
             checkStatus(self.settings.url).then(function () {
                 Restangular.setBaseUrl(self.settings.url);
@@ -54,6 +56,7 @@ angular.module('itouch.controllers')
                 SettingsService.setLocationId(self.settings.loc_id);
                 SettingsService.setMachineId(self.settings.mac_id);
                 SettingsService.setCashId(self.settings.cash_id);
+                SettingsService.setBusinessDate(self.settings.business_date);
                 SettingsService.save();
 
                 SyncService.do().then(function () {
