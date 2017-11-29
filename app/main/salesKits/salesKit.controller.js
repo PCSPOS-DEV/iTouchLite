@@ -103,7 +103,7 @@ angular.module('itouch.controllers')
         if (update) {currentOrderQty = oldCustomQty;}
         if (totalComponetQty !== currentOrderQty) {currentOrderQty = totalComponetQty;}
 
-        if (currentTotalQty < currentOrderQty && validComponetQty !== 0)
+        if (currentTotalQty < currentOrderQty && validComponetQty != 0)
          {
           $scope.salesKits.component[kit.componetid].OrderQty = currentTotalQty + 1;
           kit.Qty += kit.QtyValid;
@@ -126,7 +126,7 @@ angular.module('itouch.controllers')
         }
         else
         {
-          Alert.warning('Child item quantity exceeded!');
+          Alert.warning('Child item quantity exceeded 1!');
         }
 
       };

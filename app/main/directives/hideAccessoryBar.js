@@ -3,7 +3,7 @@
  */
 function select () {
   var selectDirective = {
-    restrict: "E",
+    restrict: 'E',
     link: preLink
   };
   return selectDirective;
