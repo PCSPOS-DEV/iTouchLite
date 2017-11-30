@@ -2,7 +2,7 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory("SalesKitService", ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', 'ItemService', 'LocationService', 'AuthService', '$filter', 'ControlService', 'TenderService', 'BillService',
+  .factory('SalesKitService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', 'ItemService', 'LocationService', 'AuthService', '$filter', 'ControlService', 'TenderService', 'BillService',
     function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, ItemService, LocationService, AuthService, $filter, ControlService, TenderService, BillService) {
       var self = this;
 
@@ -19,13 +19,13 @@ angular.module('itouch.services')
 
       self.fetch = function () {
         return $q.all([self.fetchKitApplicablePeriod(), self.fetchKitByDays(), self.fetchKitItems(), self.fetchSalesKitSelections()]);
-      }
+      };
 
       self.fetchKitApplicablePeriod = function () {
         var deferred = $q.defer();
         try {
-          Restangular.one("GetSalesKitApplicablePeriod").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
-           if(!_.isUndefined(res)){
+          Restangular.one('GetSalesKitApplicablePeriod').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+            if (!_.isUndefined(res)) {
               var items = JSON.parse(res);
               if (items) {
                 self.saveKitApplicablePeriod(items);
@@ -33,8 +33,8 @@ angular.module('itouch.services')
               } else {
                 deferred.reject('Unable to fetch sales kits');
               }
-           }
-           else{
+            }
+            else {
               deferred.resolve();
             }
           }, function (err) {
@@ -46,28 +46,28 @@ angular.module('itouch.services')
         }
 
         return deferred.promise;
-      }
+      };
 
       self.saveKitApplicablePeriod = function (salesKits) {
         DB.addInsertToQueue(DB_CONFIG.tableNames.salesKit.salesKitApplicablePeriod, salesKits);
-      }
+      };
 
       self.fetchKitByDays = function () {
         var deferred = $q.defer();
         try {
-          Restangular.one("GetSalesKitByDays").get({EntityId: SettingsService.getEntityId()}).then(function (res) {            
-            if(!_.isUndefined(res)){
-            var items = JSON.parse(res);
-            if (items) {
-              self.saveKitByDays(items);
-              deferred.resolve();
-            } else {
-              deferred.reject('Unable to fetch sales kits');
+          Restangular.one('GetSalesKitByDays').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+            if (!_.isUndefined(res)) {
+              var items = JSON.parse(res);
+              if (items) {
+                self.saveKitByDays(items);
+                deferred.resolve();
+              } else {
+                deferred.reject('Unable to fetch sales kits');
+              }
             }
-           }
-           else{
+            else {
               deferred.resolve();
-           }
+            }
           }, function (err) {
             console.error(err);
             deferred.reject('Unable to fetch data from the server');
@@ -77,17 +77,17 @@ angular.module('itouch.services')
         }
 
         return deferred.promise;
-      }
+      };
 
       self.saveKitByDays = function (salesKits) {
         DB.addInsertToQueue(DB_CONFIG.tableNames.salesKit.salesKitByDays, salesKits);
-      }
+      };
 
       self.fetchKitItems = function () {
         var deferred = $q.defer();
         try {
-          Restangular.one("GetSalesKitItems").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
-            if(!_.isUndefined(res)){  
+          Restangular.one('GetSalesKitItems').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+            if (!_.isUndefined(res)) {
               var items = JSON.parse(res);
               if (items) {
                 self.saveKitItems(items);
@@ -95,10 +95,10 @@ angular.module('itouch.services')
               } else {
                 deferred.reject('Unable to fetch sales kits');
               }
-           }
-           else{
-            deferred.resolve();
-           }
+            }
+            else {
+              deferred.resolve();
+            }
           }, function (err) {
             console.error(err);
             deferred.reject('Unable to fetch data from the server');
@@ -108,28 +108,28 @@ angular.module('itouch.services')
         }
 
         return deferred.promise;
-      }
+      };
 
       self.saveKitItems = function (salesKits) {
         DB.addInsertToQueue(DB_CONFIG.tableNames.salesKit.salesKitItems, salesKits);
-      }
+      };
 
       self.fetchSalesKitSelections = function () {
         var deferred = $q.defer();
         try {
-          Restangular.one("GetSalesKitSelections").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
-            if(!_.isUndefined(res)){
-            var items = JSON.parse(res);
-            if (items) {              
-              self.saveSalesKitSelections(items);
-              deferred.resolve();
-            } else {
-              deferred.reject('Unable to fetch sales kits');
+          Restangular.one('GetSalesKitSelections').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+            if (!_.isUndefined(res)) {
+              var items = JSON.parse(res);
+              if (items) {
+                self.saveSalesKitSelections(items);
+                deferred.resolve();
+              } else {
+                deferred.reject('Unable to fetch sales kits');
+              }
             }
-           }
-           else{
-            deferred.resolve();
-           }
+            else {
+              deferred.resolve();
+            }
           }, function (err) {
             console.error(err);
             deferred.reject('Unable to fetch data from the server');
@@ -139,81 +139,81 @@ angular.module('itouch.services')
         }
 
         return deferred.promise;
-      }
+      };
 
       self.saveSalesKitSelections = function (salesKits) {
         DB.addInsertToQueue(DB_CONFIG.tableNames.salesKit.salesKitSelections, salesKits);
-      }
+      };
 
       self.getSalesKit = function (itemId, BusinessDate) {
         var salesKit;
-        var q = 'SELECT *, sk.Id AS SaleKitItemsId FROM '+DB_CONFIG.tableNames.salesKit.salesKitItems+' AS sk  INNER JOIN '+
-          DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sk.ItemId  WHERE sk.SalesKitId = ?';
+        var q = 'SELECT *, sk.Id AS SaleKitItemsId FROM ' + DB_CONFIG.tableNames.salesKit.salesKitItems + ' AS sk  INNER JOIN ' +
+          DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sk.ItemId  WHERE sk.SalesKitId = ?';
 
         return DB.query(q, [itemId]).then(function (res) {
           var salesKitItems = DB.fetchAll(res);
-         
+
           return ItemService.getById(itemId).then(function (sk) {
-              salesKit = sk;
-            if(salesKitItems.length > 0){
+            salesKit = sk;
+            if (salesKitItems.length > 0) {
               var promises = [];
-               salesKit.component={};               
-              /*Yi Yi Po*/ 
-                angular.forEach(salesKitItems, function (ski) {                   
-                   salesKit.selected = angular.copy(ski);
-                   ski.SalesKitId = itemId;
-                   salesKit.list = {}; 
-                   salesKit.selectedList = {};                    
-                   
-                   promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ? AND Quantity>?', data: [ski.SaleKitItemsId,0]})
-                    .then(function (res) {                                           
+              salesKit.component = {};
+              /*Yi Yi Po*/
+              angular.forEach(salesKitItems, function (ski) {
+                salesKit.selected = angular.copy(ski);
+                ski.SalesKitId = itemId;
+                salesKit.list = {};
+                salesKit.selectedList = {};
+
+                promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections + ' AS sks INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ? AND Quantity>?', data: [ski.SaleKitItemsId, 0]})
+                    .then(function (res) {
                       var selections = _.map(DB.fetchAll(res), function (row) {
-                      row.SalesKitId = itemId;
-                      row.Qty = 0;
-                      row.Default = false;
-                      row.Selectable = true;
-                      return row;
-                     });
-                     
-                     if(selections.length > 0)
-                     {
-                      ski.Selections = selections;
-                      ski.Selected = true;
-                      ski.Qty = 0;
-                      ski.Selectable = true;
-                      selections.unshift(ski);
-                      salesKit.selected.Selections = selections;
-                      salesKit.component[ski.ItemId] = ski;                      
-                     }
-                     else
-                     {
-                      ski.Qty = ski.Quantity;
-                      ski.Quantity = ski.Quantity;
-                      ski.Selected = true;
-                      ski.Default = true;
-                      ski.Selectable = false;
-                      salesKit.selectedList[ski.ItemId] = ski;
-                     }                    
-                  
-                    angular.forEach(selections, function (skisl) {
-                        salesKit.list[skisl.ItemId] = skisl;
-                        salesKit.list[skisl.ItemId].Qty=0;
-                        salesKit.list[skisl.ItemId].componetid=ski.ItemId;
-                        salesKit.list[skisl.ItemId].QtyValid=skisl.Quantity;
+                        row.SalesKitId = itemId;
+                        row.Qty = 0;
+                        row.Default = false;
+                        row.Selectable = true;
+                        return row;
                       });
 
-                     return selections;  
-                   })); 
+                      if (selections.length > 0)
+                     {
+                        ski.Selections = selections;
+                        ski.Selected = true;
+                        ski.Qty = 0;
+                        ski.Selectable = true;
+                        selections.unshift(ski);
+                        salesKit.selected.Selections = selections;
+                        salesKit.component[ski.ItemId] = ski;
+                      }
+                      else
+                     {
+                        ski.Qty = ski.Quantity;
+                        ski.Quantity = ski.Quantity;
+                        ski.Selected = true;
+                        ski.Default = true;
+                        ski.Selectable = false;
+                        salesKit.selectedList[ski.ItemId] = ski;
+                      }
 
-                }); 
-                
-              return $q.all(promises).then(function (sk) {                 
-                salesKit.isEmpty = _.isEmpty(salesKit.list) && _.isEmpty(salesKit.selectedList);
-                return salesKit;                
+                      angular.forEach(selections, function (skisl) {
+                        salesKit.list[skisl.ItemId] = skisl;
+                        salesKit.list[skisl.ItemId].Qty = 0;
+                        salesKit.list[skisl.ItemId].componetid = ski.ItemId;
+                        salesKit.list[skisl.ItemId].QtyValid = skisl.Quantity;
+                      });
+
+                      return selections;
+                    }));
+
               });
-                                     
+
+              return $q.all(promises).then(function (sk) {
+                salesKit.isEmpty = _.isEmpty(salesKit.list) && _.isEmpty(salesKit.selectedList);
+                return salesKit;
+              });
+
               /*--*/
-                           
+
               /*angular.forEach(salesKitItems, function (ski) {
                 salesKit.selected = angular.copy(ski);
                 //salesKit.list = {};
@@ -241,8 +241,8 @@ angular.module('itouch.services')
                        salesKit.list[skisl.ItemId] = skisl;
                        console.log(skisl);
                       });
-                       salesKit.component[ski.ItemId] = ski;                   
-                      
+                       salesKit.component[ski.ItemId] = ski;
+
                     } else {
                       ski.Qty = ski.Quantity;
                       ski.Quantity = ski.Quantity;
@@ -250,19 +250,19 @@ angular.module('itouch.services')
                       ski.Default = true;
                       ski.Selectable = false;
                       salesKit.selectedList[ski.ItemId] = ski;
-                    }  
+                    }
                     return selections;
                 }));
 
               });
-              return $q.all(promises).then(function (sk) { 
-                        
-                salesKit.isEmpty = _.isEmpty(salesKit.list) && _.isEmpty(salesKit.selectedList);
-                return salesKit;                
-              });
-              */             
+              return $q.all(promises).then(function (sk) {
 
-              
+                salesKit.isEmpty = _.isEmpty(salesKit.list) && _.isEmpty(salesKit.selectedList);
+                return salesKit;
+              });
+              */
+
+
             } else {
               return $q.resolve(false);
             }
@@ -270,21 +270,21 @@ angular.module('itouch.services')
         }, function (err) {
           return $q.reject(err.message);
         });
-      }
+      };
 
-      self.getSalesKitWithId= function (salesKitId) {
+      self.getSalesKitWithId = function (salesKitId) {
 
         var deferred = $q.defer();
         var salesKit;
-        var q = 'SELECT * FROM '+DB_CONFIG.tableNames.salesKit.salesKitItems+' AS sk'
-          +" INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sk.ItemId'
-          +" WHERE sk.SalesKitId = ?";
+        var q = 'SELECT * FROM ' + DB_CONFIG.tableNames.salesKit.salesKitItems + ' AS sk' +
+          ' INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sk.ItemId' +
+          ' WHERE sk.SalesKitId = ?';
 
         DB.query(q, [itemId]).then(function (res) {
           var salesKitItems = DB.fetchAll(res);
           ItemService.getById(itemId).then(function (sk) {
             salesKit = sk;
-            if(salesKitItems.length > 0){
+            if (salesKitItems.length > 0) {
               var promises = {};
               angular.forEach(salesKitItems, function (ski) {
                 salesKit.selected = angular.copy(ski);
@@ -294,22 +294,22 @@ angular.module('itouch.services')
                 // ItemService.getPrice(ski.Plu, ski.PriceGroupId).then(function (data) {
                 //   ski.Price = data.Price || 0;
 
-                promises[ski.ItemId] = DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]});
-                DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]}).then(function (res) {
+                promises[ski.ItemId] = DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections + ' AS sks INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]});
+                DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections + ' AS sks INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [ski.Id]}).then(function (res) {
                   var selections = _.map(DB.fetchAll(res), function (row) {
                     row.SalesKitId = itemId;
                     row.Qty = 0;
                     row.Default = false;
                     return row;
                   });
-                  if(selections.length > 0){
+                  if (selections.length > 0) {
                     ski.Selections = selections;
                     ski.Selected = true;
                     ski.Qty = 0;
                     selections.unshift(ski);
                     salesKit.selected.Selections = selections;
                     salesKit.list[ski.SalesKitId] = ski;
-                    
+
                   } else {
                     ski.Qty = ski.Quantity;
                     ski.Quantity = ski.Quantity;
@@ -347,21 +347,21 @@ angular.module('itouch.services')
           throw new Error(ex.message);
         });
         return deferred.promise;
-      }
+      };
 
       var fetchSelections = function (item, salesKitId, itemId) {
-        return DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections+" AS sks INNER JOIN "+DB_CONFIG.tableNames.item.item+' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [itemId]}).then(function (res) {
+        return DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections + ' AS sks INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ?', data: [itemId]}).then(function (res) {
           item.Selections = _.map(DB.fetchAll(res), function (row) {
             row.SalesKitId = salesKitId;
             row.Qty = 0;
             row.Default = false;
             return row;
           });
-          if(!_.isEmpty(item.Selections)){
+          if (!_.isEmpty(item.Selections)) {
             item.Selected = true;
           }
         });
-      }
+      };
 
       /**
        * Validates the bill object with property names in required array and returns an errors array
@@ -374,51 +374,51 @@ angular.module('itouch.services')
           'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'NoDiscount', 'MultiDiscount', 'PriceChanged', 'Taxable', 'BelowCost', 'Comm'];
 
 
-        if(skitem){
+        if (skitem) {
           var errors = [];
 
           angular.forEach(required, function (attribute) {
             if (_.isUndefined(skitem[attribute]) || skitem[attribute] == null) {
-              errors.push("Field " + attribute + " cannot be empty");
+              errors.push('Field ' + attribute + ' cannot be empty');
             }
           });
-          if(skitem.Selections){
+          if (skitem.Selections) {
             angular.forEach(skitem.Selections, function (item) {
               angular.forEach(required, function (attribute) {
                 if (_.isUndefined(item[attribute]) || item[attribute] == null) {
-                  errors.push("Field ["+skitem.LineNumber+"]" + attribute + " cannot be empty");
+                  errors.push('Field [' + skitem.LineNumber + ']' + attribute + ' cannot be empty');
                 }
               });
             });
           } else {
-            errors.push("Nothing selected");
+            errors.push('Nothing selected');
           }
         } else {
-          errors.push("Item not found");
+          errors.push('Item not found');
         }
 
         return errors;
-      }
+      };
 
       var prepareSalesKit = function (sk) {
         var deferred = $q.defer();
-        var loc = _.omit(location, ['Code', "Address1", 'Address2', 'Country', 'Description1', 'Description2', 'EntityId', 'LandSize', 'PostalCode', 'ShortName', 'Tax1Desc1',
+        var loc = _.omit(location, ['Code', 'Address1', 'Address2', 'Country', 'Description1', 'Description2', 'EntityId', 'LandSize', 'PostalCode', 'ShortName', 'Tax1Desc1',
           'Tax1DepApplicable', 'Tax5Desc1', 'Tax2Desc1', 'Tax3Desc1', 'Tax4Desc1', 'Tax2DepApplicable', 'Tax1Desc2', 'Tax2Desc2', 'Tax3Desc2', 'Tax4Desc2', 'Tax5Desc2', 'Tax3DepApplicable',
           'Tax4DepApplicable', 'Tax5DepApplicable']);
         var commonAttrs = {};
         sk = _.extend(sk, loc);
 
         commonAttrs.OrderedBy = AuthService.currentUser().Id;
-        commonAttrs.SuspendDepDocNo = "";
+        commonAttrs.SuspendDepDocNo = '';
         commonAttrs.TakeAway = false;
         commonAttrs.PromoPwpId = 0;
         commonAttrs.Comm = 0;
         commonAttrs.PriceChanged = false;
         commonAttrs.DepAmount = 0;
         commonAttrs.ByAmount = 0;
-        commonAttrs.KitType = "";
+        commonAttrs.KitType = '';
 
-        commonAttrs.BusinessDate = $filter('date')(ControlService.getBusinessDate(), "yyyy-MM-dd");
+        commonAttrs.BusinessDate = $filter('date')(ControlService.getBusinessDate(), 'yyyy-MM-dd');
         commonAttrs.MachineId = SettingsService.getMachineId();
         commonAttrs.DocNo = TenderService.generateReceiptId();
         sk = _.extend(sk, commonAttrs);
@@ -445,9 +445,7 @@ angular.module('itouch.services')
         });
 
         return deferred.promise;
-      }
-
-
+      };
 
 
       self.addSalesKit = function (sk) {
@@ -457,7 +455,7 @@ angular.module('itouch.services')
             DB.clearQueue();
             angular.forEach(sk.Selections, function (item) {
               DB.addInsertToQueue(DB_CONFIG.tableNames.bill.tempDetail, BillService.calculateTax(item));
-            })
+            });
             DB.addInsertToQueue(DB_CONFIG.tableNames.bill.tempDetail, BillService.calculateTax(_.omit(sk, 'Selections')));
             DB.executeQueue().then(function () {
               console.log('saved');
@@ -467,19 +465,19 @@ angular.module('itouch.services')
           } else {
             ErrorService.add(errors);
             console.log(errors);
-            throw new Error("Invalid item");
+            throw new Error('Invalid item');
           }
         }, function (err) {
           console.log(err);
         });
 
-      }
+      };
 
-      self.getCurrentChildItems = function(parentItemLineNumber){
-        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, 'Desc1, Desc2, Qty', { columns: 'ParentItemLineNumber=?', data: [parentItemLineNumber] }).then(function(res){
+      self.getCurrentChildItems = function (parentItemLineNumber) {
+        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, 'Desc1, Desc2, Qty', { columns: 'ParentItemLineNumber=?', data: [parentItemLineNumber] }).then(function (res) {
           return DB.fetchAll(res);
         });
-      }
+      };
 
       return self;
     }]);
