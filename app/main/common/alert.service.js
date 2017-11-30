@@ -20,7 +20,7 @@ angular.module('itouch.services')
 
     this.showAlert = function (title, message, cssClass) {
       $cordovaDialogs.alert(message, title || 'Alert');
-    }
+    };
 
     this.success = function (message, title) {
       return $ionicPopup.alert({
@@ -28,19 +28,19 @@ angular.module('itouch.services')
         title: title,
         template: message
       });
-    }
+    };
 
     this.error = function (message, title) {
       $cordovaDialogs.alert(message, title || 'Error');
-    }
+    };
 
     this.warning = function (message, title) {
       $cordovaDialogs.alert(message, title || 'Warning');
-    }
+    };
 
     this.success = function (message, title) {
       $cordovaDialogs.alert(message, title || 'Success');
-    }
+    };
 
 
     this.showConfirm = function (message, title, func, buttons) {
@@ -48,10 +48,10 @@ angular.module('itouch.services')
       //   title: title,
       //   template: message
       // });
-      if(!buttons){
+      if (!buttons) {
         buttons = ['Yes', 'No'];
       }
       navigator.notification.confirm(message, func, title, buttons);
 
-    }
+    };
   }]);

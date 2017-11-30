@@ -5,10 +5,10 @@ angular.module('itouch.services')
 .factory('FileService', ['$q', '$http', function ($q, $http) {
   var self = this;
 
-  var authHeaderValue = function(username, password) {
+  var authHeaderValue = function (username, password) {
     var tok = username + ':' + password;
     var hash = btoa(tok);
-    return "Basic " + hash;
+    return 'Basic ' + hash;
   };
   var options = {
     headers: authHeaderValue('ftpuser', 'PCSpos2012')
@@ -16,7 +16,7 @@ angular.module('itouch.services')
 
   self.fetch = function () {
 
-  }
+  };
 
   return self;
 }]);

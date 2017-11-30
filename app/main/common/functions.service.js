@@ -5,81 +5,81 @@ angular.module('itouch.services')
   .service('FunctionsService', ['DB', 'DB_CONFIG', '$q', function (DB, DB_CONFIG, $q) {
     var self = this;
 
-    self.fetch = function(){
+    self.fetch = function () {
       var deferred = $q.defer();
       DB.createTable(table);
-      DB.select(DB_CONFIG.tableNames.keyboard.functions, 'COUNT(*) AS count').then(function(res){
-          if(DB.fetch(res)['count'] == 0){
-              angular.forEach(functions, function(fn){
-                  DB.addQueryToQueue("INSERT INTO "+ DB_CONFIG.tableNames.keyboard.functions + " VALUES(?,?,?,?,?,?,?,?,?)", fn);
-              });
-          }
-          deferred.resolve(true);
+      DB.select(DB_CONFIG.tableNames.keyboard.functions, 'COUNT(*) AS count').then(function (res) {
+        if (DB.fetch(res)['count'] == 0) {
+          angular.forEach(functions, function (fn) {
+            DB.addQueryToQueue('INSERT INTO ' + DB_CONFIG.tableNames.keyboard.functions + ' VALUES(?,?,?,?,?,?,?,?,?)', fn);
+          });
+        }
+        deferred.resolve(true);
       });
       return deferred.promise;
     };
 
-    self.get = function(type){
+    self.get = function (type) {
       var deferred = $q.defer();
       var where = null;
-      if(type){
-        where = {columns: "Type = ? AND Inactive = ?", data: [type, false]}
+      if (type) {
+        where = {columns: 'Type = ? AND Inactive = ?', data: [type, false]};
       }
-      DB.select(DB_CONFIG.tableNames.keyboard.functions, "*", where, 'Code').then(function(result){
+      DB.select(DB_CONFIG.tableNames.keyboard.functions, '*', where, 'Code').then(function (result) {
         var functions = DB.fetchAll(result);
         deferred.resolve(functions);
-      }, function(err){
+      }, function (err) {
         deferred.reject(err.message);
       });
       return deferred.promise;
-    }
+    };
 
-    self.getSalesFunctions = function(){
+    self.getSalesFunctions = function () {
       return self.get('V');
-    }
+    };
 
-    self.getTenderFunctions = function(){
+    self.getTenderFunctions = function () {
       return self.get('T');
-    }
+    };
 
-    self.insert = function(data, toQueue){
-      if(toQueue){
+    self.insert = function (data, toQueue) {
+      if (toQueue) {
         DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.functions, data);
       } else {
         return DB.insert(DB_CONFIG.tableNames.keyboard.functions, data);
       }
-    }
+    };
 
-    self.update = function(data, where, toQueue){
-      if(toQueue){
+    self.update = function (data, where, toQueue) {
+      if (toQueue) {
         DB.addUpdateToQueue(DB_CONFIG.tableNames.keyboard.functions, data, where);
       } else {
         return DB.update(DB_CONFIG.tableNames.keyboard.functions, data, where);
       }
-    }
+    };
 
 
-    self.getNextCode = function(){
-      return DB.max(DB_CONFIG.tableNames.keyboard.functions, 'Code').then(function(code){
+    self.getNextCode = function () {
+      return DB.max(DB_CONFIG.tableNames.keyboard.functions, 'Code').then(function (code) {
         return ++code;
       });
 
-    }
+    };
 
     var table = {
       name: tableNames.keyboard.functions,
       columns: [
-        { name: "Code", type: "INT NOT NULL PRIMARY KEY" },
-        { name: "Description1", type: "TEXT" },
-        { name: "Description2", type: "TEXT" },
-        { name: "Name", type: "TEXT NOT NULL" },
-        { name: "Inactive", type: "BOOLEAN" },
-        { name: "Transact", type: "BOOLEAN" },
-        { name: "Type", type: "TEXT" },
-        { name: "AccessLevel", type: "INT" },
-        { name: "DisplayOnTop", type: "BOOLEAN" }
+        { name: 'Code', type: 'INT NOT NULL PRIMARY KEY' },
+        { name: 'Description1', type: 'TEXT' },
+        { name: 'Description2', type: 'TEXT' },
+        { name: 'Name', type: 'TEXT NOT NULL' },
+        { name: 'Inactive', type: 'BOOLEAN' },
+        { name: 'Transact', type: 'BOOLEAN' },
+        { name: 'Type', type: 'TEXT' },
+        { name: 'AccessLevel', type: 'INT' },
+        { name: 'DisplayOnTop', type: 'BOOLEAN' }
       ],
-        keep: true
+      keep: true
     };
     var functions = [
         // [1, 'Void Transaction', null, 'VoidFunction', true, false, 'V', 1, false],

@@ -10,7 +10,7 @@ angular.module('itouch.controllers')
 
       $rootScope.$on('viewOpen', function (event, data) {
 
-        if (data == 'printer') {
+        if (data === 'printer') {
           $scope.loadingHide();
           self.status = PrintService.isConnected();
           self.printerSettings = $localStorage.printeSettings;

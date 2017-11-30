@@ -33,25 +33,25 @@ angular.module('itouch.services')
       angular.forEach(DB_CONFIG.tables, function (table) {
         var columns = [];
 
-        var cols = "";
+        var cols = '';
         angular.forEach(table.columns, function (column) {
           columns.push(column.name + ' ' + column.type);
-          cols += column.name+ ",";
+          cols += column.name + ',';
         });
-        if(!table.keep){ //drop only keep == false tables
-          self.addQueryToQueue("DROP TABLE IF EXISTS " + table.name);
+        if (!table.keep) { //drop only keep == false tables
+          self.addQueryToQueue('DROP TABLE IF EXISTS ' + table.name);
         }
         var q = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',') ;
-        if(table.primaryKey){
-          q += ', PRIMARY KEY('+table.primaryKey+')';
+        if (table.primaryKey) {
+          q += ', PRIMARY KEY(' + table.primaryKey + ')';
         }
-        q += ')'
+        q += ')';
         self.addQueryToQueue(q);
 
       });
 
       angular.forEach(DB_VIEWS, function (view, name) {
-        self.addQueryToQueue("DROP VIEW IF EXISTS "+name);
+        self.addQueryToQueue('DROP VIEW IF EXISTS ' + name);
         self.addQueryToQueue(view);
       });
     };
@@ -60,13 +60,13 @@ angular.module('itouch.services')
       return self.db.transaction(function (transaction) {
         var columns = [];
 
-        var cols = "";
+        var cols = '';
         angular.forEach(table.columns, function (column) {
           columns.push(column.name + ' ' + column.type);
-          cols += column.name + ",";
+          cols += column.name + ',';
         });
         if (!table.keep) { //drop only keep == false tables
-          transaction.executeSql("DROP TABLE IF EXISTS " + table.name, []);
+          transaction.executeSql('DROP TABLE IF EXISTS ' + table.name, []);
         }
         var q = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',');
         if (table.primaryKey) {
@@ -80,19 +80,19 @@ angular.module('itouch.services')
     self.addCreateTableToQueue = function (table) {
       var columns = [];
 
-      var cols = "";
+      var cols = '';
       angular.forEach(table.columns, function (column) {
         columns.push(column.name + ' ' + column.type);
-        cols += column.name+ ",";
+        cols += column.name + ',';
       });
-      if(!table.keep){ //drop only keep == false tables
-        self.addQueryToQueue("DROP TABLE IF EXISTS " + table.name);
+      if (!table.keep) { //drop only keep == false tables
+        self.addQueryToQueue('DROP TABLE IF EXISTS ' + table.name);
       }
       var q = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',') ;
-      if(table.primaryKey){
-        q += ', PRIMARY KEY('+table.primaryKey+')';
+      if (table.primaryKey) {
+        q += ', PRIMARY KEY(' + table.primaryKey + ')';
       }
-      q += ')'
+      q += ')';
       self.addQueryToQueue(q);
     };
 
@@ -155,11 +155,11 @@ angular.module('itouch.services')
       self.db.transaction(function (transaction) {
         var columnNames = _.keys(bindings);
         var values = _.values(bindings);
-        var qs = "";
+        var qs = '';
         angular.forEach(values, function (value, index) {
-          qs += index != values.length - 1 ? "?," : "?";
+          qs += index != values.length - 1 ? '?,' : '?';
         });
-        transaction.executeSql("INSERT INTO " + tableName + "(" + columnNames.join(',') + ") VALUES(" + qs + ")", values, function (transaction, result) {
+        transaction.executeSql('INSERT INTO ' + tableName + '(' + columnNames.join(',') + ') VALUES(' + qs + ')', values, function (transaction, result) {
           deferred.resolve(result);
         }, function (transaction, error) {
           deferred.reject(error);
@@ -167,7 +167,7 @@ angular.module('itouch.services')
       });
 
       return deferred.promise;
-    }
+    };
 
     /**
      * Creates & executes an insert query with given table name & data
@@ -186,18 +186,18 @@ angular.module('itouch.services')
         var index = 0;
         angular.forEach(bindings, function (value, columnName) {
           values[index++] = value;
-          qs.push(columnName + " = ? ");
+          qs.push(columnName + ' = ? ');
         });
         values = values.concat(where.data);
-        transaction.executeSql("UPDATE " + tableName + " SET "+ qs.join(',') +  " WHERE " + where.columns , values, function (transaction, result) {
-           deferred.resolve(result);
+        transaction.executeSql('UPDATE ' + tableName + ' SET ' + qs.join(',') +  ' WHERE ' + where.columns, values, function (transaction, result) {
+          deferred.resolve(result);
         }, function (transaction, error) {
           deferred.reject(error);
         });
       });
 
       return deferred.promise;
-    }
+    };
 
     /**
      * Adds an insert statement to query queue
@@ -206,7 +206,7 @@ angular.module('itouch.services')
        */
     self.addInsertToQueue = function (tableName, bindings) {
       var data, qs, columnNames, query;
-      if(_.isArray(bindings)){
+      if (_.isArray(bindings)) {
         angular.forEach(bindings, function (row) {
           forEachRow(tableName, row);
         });
@@ -220,12 +220,12 @@ angular.module('itouch.services')
       qs = [];
       angular.forEach(row, function (value, col) {
         columnNames.push(col);
-        qs.push("?");
+        qs.push('?');
         data.push(value);
       });
-      query = "INSERT INTO " + tableName + " (" + columnNames.join(',') + ") VALUES(" + qs.join(',') + ")";
+      query = 'INSERT INTO ' + tableName + ' (' + columnNames.join(',') + ') VALUES(' + qs.join(',') + ')';
       queue.push({query: query, data: data});
-    }
+    };
 
     var prepareUpdateQuery = function (tableName, bindings, where) {
       var values = _.map(bindings, function (value) {
@@ -235,24 +235,24 @@ angular.module('itouch.services')
       var index = 0;
       angular.forEach(bindings, function (value, columnName) {
         values[index++] = value;
-        qs.push(columnName + " = ? ");
+        qs.push(columnName + ' = ? ');
       });
       values = values.concat(where.data);
       return {
-        query: "UPDATE " + tableName + " SET "+ qs.join(',') +  " WHERE " + where.columns,
+        query: 'UPDATE ' + tableName + ' SET ' + qs.join(',') +  ' WHERE ' + where.columns,
         values: values
-      }
-    }
+      };
+    };
 
     /**
      * Adds an update statement to query queue
      * @param tableName
      * @param bindings
      */
-    self.addUpdateToQueue = function (tableName, bindings, where) {      
-     var q = prepareUpdateQuery(tableName, bindings, where);
+    self.addUpdateToQueue = function (tableName, bindings, where) {
+      var q = prepareUpdateQuery(tableName, bindings, where);
       queue.push({query: q.query, data: q.values});
-    }
+    };
 
     /**
      * Adds an delete statement to query queue
@@ -260,14 +260,14 @@ angular.module('itouch.services')
      * @param bindings
      */
     self.addDeleteToQueue = function (tableName, where) {
-      var q = "DELETE FROM "+tableName;
+      var q = 'DELETE FROM ' + tableName;
       var data = [];
-      if(where){
-        q += " WHERE "+where.columns;
+      if (where) {
+        q += ' WHERE ' + where.columns;
         data = where.data;
       }
       queue.push({query: q, data: data});
-    }
+    };
 
     /**
      * Adds a query to queue
@@ -281,7 +281,7 @@ angular.module('itouch.services')
      * Executes the query queue within a transaction & rollbacks if an error is thrown
      * @returns {Promise}
        */
-    self.executeQueue = function () {      
+    self.executeQueue = function () {
       var deferred = $q.defer();
       if (queue.length > 0) {
         var query, values;
@@ -292,26 +292,26 @@ angular.module('itouch.services')
             values = dataSet.data;
             // console.log(query);
             // console.log(values);
-            tx.executeSql(dataSet.query, dataSet.data, function(transaction, result) {
+            tx.executeSql(dataSet.query, dataSet.data, function (transaction, result) {
               deferred.resolve(result);
-            }, function(transaction, error) {
-              $log.log(error.message + " in " + query + " (params : "+values.join(", ")+")");
+            }, function (transaction, error) {
+              $log.log(error.message + ' in ' + query + ' (params : ' + values.join(', ') + ')');
               // throw new Error(error.message + " in " + query + " (params : "+values.join(", ")+")");
-              deferred.reject(error.message + " in " + query + " (params : "+values.join(", ")+")");
+              deferred.reject(error.message + ' in ' + query + ' (params : ' + values.join(', ') + ')');
               // return false;
             });
           });
         });
       } else {
-        deferred.reject("Nothing to execute");
+        deferred.reject('Nothing to execute');
       }
 
       return deferred.promise;
-    }
+    };
 
     self.clearQueue = function () {
       queue = [];
-    }
+    };
 
     /**
      * Executes a select statement
@@ -322,56 +322,56 @@ angular.module('itouch.services')
        * @returns {Promise}
        */
     self.select = function (tableName, columns, where, order, limit) {
-      if(!columns){
-        columns = "*";
+      if (!columns) {
+        columns = '*';
       }
-      var q = "SELECT "+columns+" FROM "+tableName;
-      if(where){
-        q += " WHERE " + where.columns;
+      var q = 'SELECT ' + columns + ' FROM ' + tableName;
+      if (where) {
+        q += ' WHERE ' + where.columns;
       }
-      if(order){
-        q += " ORDER BY " + order;
+      if (order) {
+        q += ' ORDER BY ' + order;
       }
-      if(limit){
-        q += " LIMIT " + limit;
+      if (limit) {
+        q += ' LIMIT ' + limit;
       }
       return self.query(q, where ? where.data : []);
-    }
+    };
 
     self.selectGroupBy = function (tableName, columns, where, groupby, limit) {
-      if(!columns){
-        columns = "*";
+      if (!columns) {
+        columns = '*';
       }
-      var q = "SELECT "+columns+" FROM "+tableName;
-      if(where){
-        q += " WHERE " + where.columns;
+      var q = 'SELECT ' + columns + ' FROM ' + tableName;
+      if (where) {
+        q += ' WHERE ' + where.columns;
       }
-      if(groupby){
-        q += " GROUP BY " + groupby;
+      if (groupby) {
+        q += ' GROUP BY ' + groupby;
       }
-      if(limit){
-        q += " LIMIT " + limit;
+      if (limit) {
+        q += ' LIMIT ' + limit;
       }
       return self.query(q, where ? where.data : []);
-    }
+    };
 
     self.max = function (table, column, where) {
-      return self.select(table, "MAX("+column+") AS max ", where, '1').then(function (result) {
-        var ln = parseInt(self.fetch(result)["max"] || 0);
-        if(isNaN(ln)){
+      return self.select(table, 'MAX(' + column + ') AS max ', where, '1').then(function (result) {
+        var ln = parseInt(self.fetch(result)['max'] || 0);
+        if (isNaN(ln)) {
           ln = 0;
         }
         return ln;
       });
-    }
+    };
 
     self.delete = function (tableName, where) {
-      var q = "DELETE FROM "+tableName;
-      if(where){
-        q += " WHERE " + where.columns;
+      var q = 'DELETE FROM ' + tableName;
+      if (where) {
+        q += ' WHERE ' + where.columns;
       }
       return self.query(q, where ? where.data : []);
-    }
+    };
 
     return self;
   }]);

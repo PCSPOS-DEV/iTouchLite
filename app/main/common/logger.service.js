@@ -1,8 +1,8 @@
 /**
  * Created by shalitha on 30/5/16.
  */
-angular.module("itouch.logger", [])
-  .factory('Logger', [function(){
+angular.module('itouch.logger', [])
+  .factory('Logger', [function () {
     var debug = true;
     var db;
 
@@ -14,7 +14,7 @@ angular.module("itouch.logger", [])
           db = window.openDatabase('ITouchLite_debug', '1.0', 'database', -1);     //enables the websql for testing purposes
         }
         db.transaction(function (tx) {
-          tx.executeSql("CREATE TABLE IF NOT EXISTS error_log(id integer primary key, message text, name text, stack text, user text, cause text)");
+          tx.executeSql('CREATE TABLE IF NOT EXISTS error_log(id integer primary key, message text, name text, stack text, user text, cause text)');
         });
       },
       setDebug: function (isDebug) {
@@ -29,20 +29,20 @@ angular.module("itouch.logger", [])
           url: window.location.hash,
           localtime: Date.now()
         };
-        if(cause)               { data.cause    = cause;              }
-        if(exception){
-          if(exception.message) { data.message  = exception.message;  }
-          if(exception.name)    { data.name     = exception.name;     }
-          if(exception.stack)   { data.stack    = exception.stack;    }
+        if (cause)               { data.cause    = cause;              }
+        if (exception) {
+          if (exception.message) { data.message  = exception.message;  }
+          if (exception.name)    { data.name     = exception.name;     }
+          if (exception.stack)   { data.stack    = exception.stack;    }
         }
 
         var errorId = null;
-        if(db){
+        if (db) {
           db.transaction(function (tx) {
-            tx.executeSql("INSERT INTO error_log(message, name, stack, cause) VALUES(?, ?, ?, ?)", [data.message, data.name, data.stack, data.cause], function (tx, results) {
+            tx.executeSql('INSERT INTO error_log(message, name, stack, cause) VALUES(?, ?, ?, ?)', [data.message, data.name, data.stack, data.cause], function (tx, results) {
               errorId = results.insertId;
               output(debug, data, errorId);
-            }, function(tx, err) {
+            }, function (tx, err) {
               window.alert(err.message);
               return true;
             });
@@ -53,17 +53,17 @@ angular.module("itouch.logger", [])
 
 
       }
-    }
+    };
   }]);
 //outputs the errors according to environment
 var output = function (debug, data, errorId) {
-  if(debug){
+  if (debug) {
     console.log('exception', data);
-    window.alert('Error: '+data.message);
+    window.alert('Error: ' + data.message);
 
     // DB.insert(DB_CONFIG.tableNames.common.errorLog, data);
   } else {
     console.log('exception', data);
-    window.alert('Error Occurred: Please contact administrator. ' + errorId ? "Error ID : " + errorId : '');
+    window.alert('Error Occurred: Please contact administrator. ' + errorId ? 'Error ID : ' + errorId : '');
   }
-}
+};
