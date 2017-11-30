@@ -2,7 +2,7 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory("PrintService", ['ErrorService', '$q', '$localStorage',
+  .factory('PrintService', ['ErrorService', '$q', '$localStorage',
     function (ErrorService, $q, $localStorage) {
       var self = this;
 
@@ -35,7 +35,7 @@ angular.module('itouch.services')
               ePosDev.createDevice('local_printer', ePosDev.DEVICE_TYPE_PRINTER, options, function (deviceObj, errorCode) {
                 if (deviceObj === null) {
                   //Displays an error message if the system fails to retrieve the Printer object
-                  deferred.reject("connect error. code:" + errorCode);
+                  deferred.reject('connect error. code:' + errorCode);
                   return;
                 }
                 console.log('device created');
@@ -46,13 +46,13 @@ angular.module('itouch.services')
                 // printer.startMonitor();
                 printer.onpapernearend = onReceive;
 
-                printer.ondraweropen = function(){
+                printer.ondraweropen = function () {
                   self.drawerOpen = true;
-                }
+                };
 
-                printer.ondrawerclosed = function(){
+                printer.ondrawerclosed = function () {
                   self.drawerOpen = false;
-                }
+                };
 
                 deferred.resolve();
                 //Registers the print complete event
@@ -61,67 +61,67 @@ angular.module('itouch.services')
             else {
               //Displays error messages
               self.status = 'failed';
-              deferred.reject("connect error");
+              deferred.reject('connect error');
             }
-          }, {"eposprint" : true});
+          }, {'eposprint': true});
         } else {
           self.status = 'failed';
-          deferred.reject("Lib error");
+          deferred.reject('Lib error');
         }
         return deferred.promise;
-      }
+      };
 
-      self.onRecieve = function(func){
-        if(_.isFunction(func)){
+      self.onRecieve = function (func) {
+        if (_.isFunction(func)) {
           printer.onreceive = func;
         }
-      }
+      };
 
-      self.onReconnect = function(func){
-        if(_.isFunction(func)){
+      self.onReconnect = function (func) {
+        if (_.isFunction(func)) {
           printer.onreconnect = func;
         }
-      }
+      };
 
-      self.onReconnecting = function(func){
-        if(_.isFunction(func)){
+      self.onReconnecting = function (func) {
+        if (_.isFunction(func)) {
           printer.onreconnecting = func;
         }
-      }
+      };
 
-      self.onRecieve = function(func){
-        if(_.isFunction(func)){
+      self.onRecieve = function (func) {
+        if (_.isFunction(func)) {
           printer.onreceive = func;
         }
-      }
+      };
 
-      self.onOnline = function(func){
-        if(_.isFunction(func)){
+      self.onOnline = function (func) {
+        if (_.isFunction(func)) {
           printer.ononline = func;
         }
-      }
+      };
 
-      self.onOffline = function(func){
-        if(_.isFunction(func)){
+      self.onOffline = function (func) {
+        if (_.isFunction(func)) {
           printer.onpoweroff = func;
         }
-      }
+      };
 
-      self.onPaperNearEnd = function(func){
-        if(_.isFunction(func)){
+      self.onPaperNearEnd = function (func) {
+        if (_.isFunction(func)) {
           printer.onpapernearend = func;
         }
-      }
+      };
 
-      self.onPaperEnd = function(func){
-        if(_.isFunction(func)){
+      self.onPaperEnd = function (func) {
+        if (_.isFunction(func)) {
           printer.onpaperend = func;
         }
-      }
+      };
 
-      self.isDrawerOpen = function(){
+      self.isDrawerOpen = function () {
         return self.drawerOpen;
-      }
+      };
 
       self.disconnect = function () {
         var deferred = $q.defer();
@@ -130,31 +130,31 @@ angular.module('itouch.services')
           ePosDev.disconnect();
         });
         return deferred.promise;
-      }
+      };
 
       self.getPrinter = function () {
         return printer;
-      }
+      };
 
-      self.setIPAddress = function(ip){
-        if(ip){
+      self.setIPAddress = function (ip) {
+        if (ip) {
           $localStorage.printeSettings.ipAddress = ip;
         }
-      }
+      };
 
-      self.setPort = function(port){
-        if(port){
+      self.setPort = function (port) {
+        if (port) {
           $localStorage.printeSettings.port = port;
         }
-      }
+      };
 
-      self.isConnected = function(){
+      self.isConnected = function () {
         return printer != null;
-      }
+      };
 
-      self.addLine = function(startBlock, endBlock, qtyBlock){
+      self.addLine = function (startBlock, endBlock, qtyBlock) {
         // PrintService.addLine(text, " "+(sTotal.toFixed(2)), ""+row.Qty);
-        if(startBlock && endBlock){
+        if (startBlock && endBlock) {
           var lengths  = {
             start: startBlock.length,
             end: endBlock.length,
@@ -162,53 +162,53 @@ angular.module('itouch.services')
             spaces: 0,
             total: $localStorage.printeSettings.maxCharsPerLine,
             startBlockMaxLength: 0
-          }
+          };
 
           lengths.startBlockMaxLength = lengths.total - (4 + 8 + 2); // 4: qty, 8: price
 
-          if(startBlock.length > lengths.startBlockMaxLength){
+          if (startBlock.length > lengths.startBlockMaxLength) {
             startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
-            startBlock += "....";
+            startBlock += '....';
             // console.log(startBlock);
           }
 
           lengths.spaces = ((lengths.total - ((lengths.qty ? 4 : 0) + 8)) - lengths.start );
           lengths.spaces  = lengths.spaces < 1 ? 1 : lengths.spaces;
 
-          if(qtyBlock){
+          if (qtyBlock) {
             addSpaces(3 - lengths.qty);
-            printer.addText(qtyBlock + " ");
+            printer.addText(qtyBlock + ' ');
           }
 
           printer.addText(startBlock);
 
           addSpaces(lengths.spaces);
 
-          if(lengths.end < 8){
+          if (lengths.end < 8) {
             addSpaces(8 - lengths.end);
-          }        
+          }
 
           printer.addText(endBlock + '\n');
         }
-      }
+      };
 
-       var addSpaces = function(count){
-        var text = "";
-        for(var i = 1; i <= count; i++){
-          text += " ";
+      var addSpaces = function (count) {
+        var text = '';
+        for (var i = 1; i <= count; i++) {
+          text += ' ';
         }
         printer.addText(text);
-      }
+      };
 
-      self.addTabbedLine = function(startBlock, endBlock){
-        if(startBlock) {
+      self.addTabbedLine = function (startBlock, endBlock) {
+        if (startBlock) {
           var lengths = {
             start: startBlock.length,
             end: endBlock ? endBlock.length : 0,
             spaces: 0,
             total: $localStorage.printeSettings.maxCharsPerTabbedLine,
             startBlockMaxLength: 0
-          }
+          };
           if (endBlock) {
             lengths.startBlockMaxLength = lengths.total - 8;
 
@@ -220,7 +220,7 @@ angular.module('itouch.services')
 
           if (startBlock.length > lengths.startBlockMaxLength) {
             startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
-            startBlock += "....";
+            startBlock += '....';
           }
 
           if (length.spaces < 1) {
@@ -234,34 +234,34 @@ angular.module('itouch.services')
           if (lengths.end < 8) {
             addSpaces(8 - lengths.end);
           }
-          
-          printer.addText(endBlock + "\n");
-        }
-      }
 
-      self.addHLine = function(){
+          printer.addText(endBlock + '\n');
+        }
+      };
+
+      self.addHLine = function () {
         var text = ' ';
-        for(var i = 1; i <= ($localStorage.printeSettings.maxCharsPerLine-2); i++){
-          text += "-";
+        for (var i = 1; i <= ($localStorage.printeSettings.maxCharsPerLine - 2); i++) {
+          text += '-';
         }
         text += ' \n';
         printer.addText(text);
 
-      }
+      };
 
-      self.addTitle = function(text){
+      self.addTitle = function (text) {
         printer.addTextAlign(printer.ALIGN_CENTER);
         printer.addTextSize(2, 2);
         printer.addTextStyle(false, false, true);
-        printer.addText(text+"\n");
+        printer.addText(text + '\n');
         printer.addTextStyle(false, false, false);
         printer.addTextSize(1, 1);
         printer.addTextAlign(printer.ALIGN_LEFT);
-      }
+      };
 
-      self.addReportLine = function(startBlock, endBlock, qtyBlock){
+      self.addReportLine = function (startBlock, endBlock, qtyBlock) {
 
-        if(startBlock && endBlock){
+        if (startBlock && endBlock) {
           var lengths  = {
             start: startBlock.length,
             end: endBlock.length,
@@ -269,22 +269,22 @@ angular.module('itouch.services')
             spaces: 0,
             total: $localStorage.printeSettings.maxCharsPerLine,
             startBlockMaxLength: 22
-          }
+          };
 
-          if(startBlock.length > lengths.startBlockMaxLength){
+          if (startBlock.length > lengths.startBlockMaxLength) {
             startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
-            startBlock += "...";
+            startBlock += '...';
             // console.log(startBlock);
           }
 
           lengths.spaces = 22 - lengths.start;
           lengths.spaces  = lengths.spaces < 1 ? 1 : lengths.spaces;
 
-          printer.addText("  " +startBlock);
+          printer.addText('  ' + startBlock);
 
           addSpaces(lengths.spaces);
 
-          if(qtyBlock){
+          if (qtyBlock) {
             printer.addText(qtyBlock);
             addSpaces(4 - lengths.qty);
           } else {
@@ -292,35 +292,35 @@ angular.module('itouch.services')
           }
           addSpaces(12);
 
-          if(lengths.end < 8){
+          if (lengths.end < 8) {
             addSpaces(8 - lengths.end);
           }
 
           printer.addText(endBlock + '\n');
         }
-      }
+      };
 
-      self.addTextLine = function(text){
+      self.addTextLine = function (text) {
         printer.addText(text + '\n');
-      }
+      };
 
-      self.addLineBreak = function(){
+      self.addLineBreak = function () {
         printer.addText('\n');
-      }
+      };
 
-      self.alignCenter = function(){
+      self.alignCenter = function () {
         printer.addTextAlign(printer.ALIGN_CENTER);
-      }
+      };
 
-      self.alignLeft = function(){
+      self.alignLeft = function () {
         printer.addTextAlign(printer.ALIGN_LEFT);
-      }
+      };
 
-      self.alignRight = function(){
+      self.alignRight = function () {
         printer.addTextAlign(printer.ALIGN_RIGHT);
-      }
+      };
 
-      var onReceive = function(res){
+      var onReceive = function (res) {
         console.log(res);
           // Obtain the print result and error code
           // var msg = ' Print ' + (res.success ? ' Success ' : ' Failure ') + '\n Code:' + res.code + '\n Status:\n';
@@ -348,7 +348,7 @@ angular.module('itouch.services')
           // }
           // this.Success = res.success;
           // this.finish = true;
-      }
+      };
 
       self.addImage = function () {
         try {
@@ -361,7 +361,7 @@ angular.module('itouch.services')
         catch (e) {
           alert(e.message);
         }
-      }
+      };
 
       return self;
     }]);
