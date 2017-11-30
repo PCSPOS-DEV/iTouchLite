@@ -2,7 +2,7 @@
 angular.module('itouch')
   .provider('ionicInputClearableConfig', function () {
 
-    this.defaultDisplayType = "filled";
+    this.defaultDisplayType = 'filled';
 
     this.$get = function () {
       return this;
@@ -15,23 +15,23 @@ angular.module('itouch')
    - focused (the button appear when the field is focused and filled)
    - [default] filled (the button appear when the field is filled)
    */
-  .directive('ionicInputClearable', ["$compile", "$timeout", function ($compile, $timeout) {
+  .directive('ionicInputClearable', ['$compile', '$timeout', function ($compile, $timeout) {
     return {
       restrict: 'A',
       scope: {
         ngModel: '='
       },
-      controller: ["$scope", "$element", "$attrs", "ionicInputClearableConfig",
+      controller: ['$scope', '$element', '$attrs', 'ionicInputClearableConfig',
         function ($scope, $element, $attrs, ionicInputClearableConfig) {
 
           var displayType = ($attrs.ionicInputClearable.length > 0 ? $attrs.ionicInputClearable : ionicInputClearableConfig.defaultDisplayType);
           var element = $element[0];
 
           //Parent element should be position:relative to make clear button in correct positon
-          $element.parent().css("position", "relative");
+          $element.parent().css('position', 'relative');
 
           //Clear button icon class name
-          $scope.inputClearBtnClass = element.hasAttribute("data-input-clear-btn-class") ? element.getAttribute("data-input-clear-btn-class") : 'ion-close';
+          $scope.inputClearBtnClass = element.hasAttribute('data-input-clear-btn-class') ? element.getAttribute('data-input-clear-btn-class') : 'ion-close';
 
           //ng-hide class used to fix init flash problem
           $scope.clearBtn = angular.element('<a tabindex="-1" ng-cloak class="ng-hide input-clear-btn button button-icon icon ' + $scope.inputClearBtnClass + '" ng-click="clearInputField()" ng-hide="isInputFieldEmpty()"></a>');
@@ -41,7 +41,7 @@ angular.module('itouch')
           $scope.clearInputField = function () {
             $scope.ngModel = '';
 
-            function preventBluring() {
+            function preventBluring () {
               element.focus();
               $element.unbind('blur', preventBluring);
             }
@@ -50,7 +50,7 @@ angular.module('itouch')
             $element.bind('blur', preventBluring);
           };
 
-          function refresh() {
+          function refresh () {
             $timeout(function () {
               $scope.$digest();
             });
@@ -63,14 +63,14 @@ angular.module('itouch')
           $scope.isInputFieldEmpty = function () {
 
             switch (displayType) {
-              case "always"   :
+              case 'always'   :
                 return false;
-              case "focused"  :
+              case 'focused'  :
                 return (document.activeElement !== element || element.value == '' || element.value == null );
               default :
                 return (element.value == '' || element.value == null);
             }
-          }
+          };
         }]
-    }
+    };
   }]);

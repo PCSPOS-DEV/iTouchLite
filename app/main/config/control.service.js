@@ -2,9 +2,9 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory("ControlService", ['$localStorage', function ($localStorage) {
+  .factory('ControlService', ['$localStorage', function ($localStorage) {
     var self = this;
-    if(!$localStorage.app_config){
+    if (!$localStorage.app_config) {
       $localStorage.app_config = {};
     }
 
@@ -20,11 +20,11 @@ angular.module('itouch.services')
 
     self.setTakeAwayTaxPOS = function (taTax) {
       $localStorage.app_config.taTax = taTax;
-    }
+    };
 
     self.getTakeAwayTaxPOS = function () {
       return $localStorage.app_config.taTax;
-    }
+    };
 
     /**
      * Returns the parsed Business date
@@ -32,13 +32,13 @@ angular.module('itouch.services')
      * @returns {Date}
        */
     self.getBusinessDate = function (format) {
-      if(format){
-        return (_.isNumber($localStorage.app_config.businessDate)) ? moment($localStorage.app_config.businessDate).format("YYYY-MM-DD") : $localStorage.app_config.businessDate;
+      if (format) {
+        return (_.isNumber($localStorage.app_config.businessDate)) ? moment($localStorage.app_config.businessDate).format('YYYY-MM-DD') : $localStorage.app_config.businessDate;
       } else {
         return (_.isNumber($localStorage.app_config.businessDate)) ? moment($localStorage.app_config.businessDate) : $localStorage.app_config.businessDate;
       }
 
-    }
+    };
 
     /**
      * Returns the parsed day end date
@@ -47,15 +47,15 @@ angular.module('itouch.services')
      */
     self.getDayEndDate = function () {
       return (_.isNumber($localStorage.app_config.dayEndDate)) ? moment($localStorage.app_config.dayEndDate) : $localStorage.app_config.dayEndDate;
-    }
+    };
 
     /**
      * Saves the given date as business date
      * @param date
      */
     self.setBusinessDate = function (moment) {
-      $localStorage.app_config.businessDate = moment.valueOf()
-    }
+      $localStorage.app_config.businessDate = moment.valueOf();
+    };
 
     // /**
     //  * Returns the parsed day end date
@@ -72,7 +72,7 @@ angular.module('itouch.services')
        */
     self.setBusinessDate = function (moment) {
       $localStorage.app_config.businessDate = moment.valueOf();
-    }
+    };
 
     /**
      * Saves the given date as day end date
@@ -82,7 +82,7 @@ angular.module('itouch.services')
       $localStorage.app_config.dayEndDate = m.valueOf();
       self.setBusinessDate(moment([1950, 0, 1])); //setting business date to 1950-jan-01 (month is 0 based in js)
       // $localStorage.app_config.businessDate = moment().valueOf();
-    }
+    };
 
     /**
      * Returns the next business date
@@ -90,12 +90,12 @@ angular.module('itouch.services')
      * @returns {Date}
        */
     self.getNextBusinessDate = function () {
-      if(self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())){
+      if (self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())) {
         return self.getBusinessDate().add(1, 'days');
       } else {
         return (self.getDayEndDate() ? self.getDayEndDate().add(1, 'days') : moment());
       }
-    }
+    };
 
     /**
      * Returns the next business date
@@ -103,25 +103,25 @@ angular.module('itouch.services')
      * @returns {Date}
      */
     self.isNewBusinessDate = function () {
-      if(self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())){
+      if (self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())) {
         return false;
       } else {
         return true;
       }
-    }
+    };
 
     /**
      * Returns the next DocId
      * @returns {string}
        */
-    self.getNextDocId = function() {
-      if($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)){
+    self.getNextDocId = function () {
+      if ($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)) {
         var newId = parseInt($localStorage.app_config.currentDocId.substring(1, 6));
-        return 'R'+('00000' + ++newId).slice(-5);
-      } else{
+        return 'R' + ('00000' + ++newId).slice(-5);
+      } else {
         return 'R00001';
       }
-    }
+    };
 
     /**
      * Saves the current DocId
@@ -129,27 +129,27 @@ angular.module('itouch.services')
        */
     self.saveDocId = function (docId) {
       $localStorage.app_config.currentDocId = docId;
-    }
+    };
 
     self.getDocId = function () {
       return $localStorage.app_config.currentDocId;
-    }
+    };
 
     self.getTakeAwayTaxPOS = function () {
       return 2;
-    }
+    };
 
     self.getTakeAwayTax = function () {
       return 0;
-    }
+    };
 
-    self.counterDocId = function(DocNo){
+    self.counterDocId = function (DocNo) {
       self.saveDocId(DocNo);
       var nextId = self.getNextDocId();
       //console.log(self.getDocId());
       self.saveDocId(nextId);
       //console.log(nextId);
-    }
+    };
 
     return self;
   }]);

@@ -2,36 +2,36 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory("TempBillHeaderService", ['LocationService', 'ControlService', '$localStorage', 'ErrorService', 'DB', 'DB_CONFIG', 'TenderService', 'SettingsService', '$filter', 'AuthService', '$q', 'ShiftService',
+  .factory('TempBillHeaderService', ['LocationService', 'ControlService', '$localStorage', 'ErrorService', 'DB', 'DB_CONFIG', 'TenderService', 'SettingsService', '$filter', 'AuthService', '$q', 'ShiftService',
     function (LocationService, ControlService, $localStorage, ErrorService, DB, DB_CONFIG, TenderService, SettingsService, $filter, AuthService, $q, ShiftService) {
       var self = this;
       self.table = DB_CONFIG.tableNames.bill.tempHeader;
 
 
-      var columnList = ['BusinessDate','LocationId', 'MachineId', 'DocNo', 'DocType', 'SysDateTime', 'VoidDocNo', 'TableId',
+      var columnList = ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'DocType', 'SysDateTime', 'VoidDocNo', 'TableId',
         'SuspendDepDocNo', 'OrderedBy', 'SpecialOrderRemark', 'ServingTime', 'TakeAway', 'ItemType', 'ParentItemLineNumber', 'PromoPwpId',
         'Pax', 'ShiftId', 'VipId', 'CashierId', 'StaffId', 'AuthBy', 'SubTotal', 'DepAmount', 'DiscAmount', 'Tax1DiscAmount',
-        'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount', 'Tax1Amount','Tax2Amount','Tax3Amount','Tax4Amount','Tax5Amount','Tax1Option',
+        'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount', 'Tax1Amount', 'Tax2Amount', 'Tax3Amount', 'Tax4Amount', 'Tax5Amount', 'Tax1Option',
         'Tax2Option', 'Tax3Option', 'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'ReprintCount',
         'Remarks', 'OrderTag'];
 
       self.generateReceiptId = function () {
         return ControlService.getNextDocId();
-      }
+      };
 
       self.saveReceiptId = function (docNo) {
         ControlService.saveDocId(docNo);
-      }
+      };
 
       self.getCurrentReceiptId = function () {
         return ControlService.getDocId();
-      }
+      };
 
 
       self.init = function () {
         var locationPromise;
-        if(!item.LocationId || !item.PriceLevelId){
-          locationPromise = LocationService.get().then(function(loc){
+        if (!item.LocationId || !item.PriceLevelId) {
+          locationPromise = LocationService.get().then(function (loc) {
             item.LocationId = loc.LocationId;
             item.PriceLevelId = loc.PriceLevelId;
             return item;
@@ -39,7 +39,7 @@ angular.module('itouch.services')
         } else {
           locationPromise = $q.when(item);
         }
-        return locationPromise.then(function(item){
+        return locationPromise.then(function (item) {
           var header;
           header = {};
           header.DocNo = self.generateReceiptId();
@@ -56,8 +56,8 @@ angular.module('itouch.services')
           header.DepAmount = 0;
           header.VoidDocNo = null;
           header.ReprintCount = 0;
-          header.OrderTag = "";
-          header.Remarks = "";
+          header.OrderTag = '';
+          header.Remarks = '';
           header.IsClosed = false;
           header.Pax = 0;
 
@@ -90,7 +90,7 @@ angular.module('itouch.services')
             ControlService.saveDocId(header.DocNo);
           });
         });
-      }
+      };
 
       /**
        * Validates the bill object with property names in required array and returns an errors array
@@ -98,58 +98,58 @@ angular.module('itouch.services')
        * @returns {Array}
        */
       self.validate = function (item) {
-        var required = ['BusinessDate','LocationId', 'MachineId', 'DocNo', 'DocType', 'SysDateTime', 'VoidDocNo', 'TableId',
-            'SuspendDepDocNo', 'OrderedBy', 'SpecialOrderRemark', 'ServingTime', 'TakeAway', 'ItemType', 'ParentItemLineNumber', 'PromoPwpId',
-            'Pax', 'ShiftId', 'VipId', 'CashierId', 'StaffId', 'AuthBy', 'SubTotal', 'DepAmount', 'DiscAmount', 'Tax1DiscAmount',
-            'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount', 'Tax1Amount','Tax2Amount','Tax3Amount','Tax4Amount','Tax5Amount','Tax1Option',
-            'Tax2Option', 'Tax3Option', 'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'ReprintCount',
-            'Remarks', 'OrderTag'];
+        var required = ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'DocType', 'SysDateTime', 'VoidDocNo', 'TableId',
+          'SuspendDepDocNo', 'OrderedBy', 'SpecialOrderRemark', 'ServingTime', 'TakeAway', 'ItemType', 'ParentItemLineNumber', 'PromoPwpId',
+          'Pax', 'ShiftId', 'VipId', 'CashierId', 'StaffId', 'AuthBy', 'SubTotal', 'DepAmount', 'DiscAmount', 'Tax1DiscAmount',
+          'Tax2DiscAmount', 'Tax3DiscAmount', 'Tax4DiscAmount', 'Tax5DiscAmount', 'Tax1Amount', 'Tax2Amount', 'Tax3Amount', 'Tax4Amount', 'Tax5Amount', 'Tax1Option',
+          'Tax2Option', 'Tax3Option', 'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'ReprintCount',
+          'Remarks', 'OrderTag'];
         var errors = [];
-        if(item){
+        if (item) {
           angular.forEach(required, function (attribute) {
             if (_.isUndefined(item[attribute]) || item[attribute] == null) {
-              errors.push("Field " + attribute + " cannot be empty");
+              errors.push('Field ' + attribute + ' cannot be empty');
             }
           });
         } else {
-          errors.push("Header not found");
+          errors.push('Header not found');
         }
 
         return errors;
-      }
+      };
 
-      self.insert = function(DocNo, item, queue){
+      self.insert = function (DocNo, item, queue) {
         item = _.pick(item, columnList);
         var errors = [];
         // var errors = self.validate(item);
-        if(errors.length == 0){
-          if(queue){
-              DB.addInsertToQueue(self.table, item, { columns: 'DocNo=?', data: [DocNo] });
+        if (errors.length == 0) {
+          if (queue) {
+            DB.addInsertToQueue(self.table, item, { columns: 'DocNo=?', data: [DocNo] });
           }  else {
-              return DB.insert(self.table, item, { columns: 'DocNo=?', data: [DocNo] });
+            return DB.insert(self.table, item, { columns: 'DocNo=?', data: [DocNo] });
           }
         } else {
           return queue ? errors.join(', ') : $q.reject(errors.join(', '));
         }
-      }
+      };
 
-      self.update = function(DocNo, values, queue){
+      self.update = function (DocNo, values, queue) {
         values = _.pick(values, columnList);
-          if(queue){
-              DB.addUpdateToQueue(self.table, values, { columns: 'DocNo=?', data: [DocNo] });
-          }  else {
-              return DB.update(self.table, values, { columns: 'DocNo=?', data: [DocNo] });
-          }
-      }
+        if (queue) {
+          DB.addUpdateToQueue(self.table, values, { columns: 'DocNo=?', data: [DocNo] });
+        }  else {
+          return DB.update(self.table, values, { columns: 'DocNo=?', data: [DocNo] });
+        }
+      };
 
 
       self.delete = function (where) {
-        if(where && where.columns && where.data){
+        if (where && where.columns && where.data) {
           return $q.reject('Invalid where value');
         } else {
           return DB.delete(DB_CONFIG.tableNames.bill.tempDetail, where);
         }
-      }
+      };
 
       return self;
     }

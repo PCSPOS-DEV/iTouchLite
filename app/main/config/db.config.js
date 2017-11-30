@@ -2,7 +2,7 @@
  * Created by shalitha on 17/5/16.
  */
 
-
+'use strict';
 var tableNames = {
   keyboard: {
     layouts: 'KeyboardLayouts',
@@ -12,9 +12,9 @@ var tableNames = {
     functions: 'Functions'
   },
   auth: {
-    staff: "Staff",
-    shifts: "Shifts",
-    shiftStatus: "ShiftStatus"
+    staff: 'Staff',
+    shifts: 'Shifts',
+    shiftStatus: 'ShiftStatus'
   },
   item: {
     item: 'Item',
@@ -64,9 +64,9 @@ var tableNames = {
     printerSettings: 'PrinterSettings',
     machines: 'MachinesDetails',
   },
-  pwp:{
-    pwp: "Pwp",
-    itemsByPwp: "ItemsByPwp"
+  pwp: {
+    pwp: 'Pwp',
+    itemsByPwp: 'ItemsByPwp'
   }
 };
 
@@ -76,12 +76,12 @@ angular.module('itouch.config')
    * This contains DB table configuration. This is used by app/common/db.service.js
    */
   .constant('DB_CONFIG', {
-      tableNames: tableNames,
-      name: 'ITouchLite',
-      tables: [
-        {
-          name: tableNames.auth.staff, //table name
-          columns: [                      //column config
+    tableNames: tableNames,
+    name: 'ITouchLite',
+    tables: [
+      {
+        name: tableNames.auth.staff, //table name
+        columns: [                      //column config
             {name: 'Id', type: 'integer'},
             {name: 'Code', type: 'text'},
             {name: 'PersonalId', type: 'text'},
@@ -113,30 +113,30 @@ angular.module('itouch.config')
             {name: 'DescriptionLevel', type: 'integer'},
             {name: 'Position', type: 'text'},
             {name: 'Pager', type: 'text'}
-          ]
-        },
-        {
-          name: tableNames.keyboard.layouts,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.keyboard.layouts,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'LayoutId', type: 'integer'},
             {name: 'MachineId', type: 'integer'}
-          ]
-        },
-        {
-          name: tableNames.keyboard.pages,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.keyboard.pages,
+        columns: [
             {name: 'Id', type: 'INT'},
             {name: 'Code', type: 'text'},
             {name: 'Description1', type: 'text'},
             {name: 'Description2', type: 'text'},
             {name: 'Image', type: 'text'},
             {name: 'KeyboardLayoutMasterId', type: 'integer'}
-          ]
-        },
-        {
-          name: tableNames.keyboard.pageInfo,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.keyboard.pageInfo,
+        columns: [
             {name: 'Id', type: 'INT'},
             {name: 'Code', type: 'text'},
             {name: 'Colour', type: 'text'},
@@ -150,11 +150,11 @@ angular.module('itouch.config')
             {name: 'KeyboardPageId', type: 'integer'},
             {name: 'KeyNo', type: 'integer'},
             {name: 'ImageName', type: 'text'}
-          ]
-        },
-        {
-          name: tableNames.keyboard.keys,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.keyboard.keys,
+        columns: [
             {name: 'Id', type: 'INT'},
             {name: 'Color', type: 'text'},
             {name: 'KeyDesc11', type: 'text'},
@@ -174,11 +174,11 @@ angular.module('itouch.config')
             {name: 'SubPLU3Code', type: 'text'},
             {name: 'ValidFrom', type: 'date'},
             {name: 'ValidTo', type: 'date'}
-          ]
-        },
-        {
-          name: tableNames.item.item,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.item.item,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'Plu', type: 'text'},
             {name: 'PLU_Description1', type: 'text'},
@@ -201,50 +201,50 @@ angular.module('itouch.config')
             {name: 'MultiDiscount', type: 'BOOLEAN'},
             {name: 'NoDiscount', type: 'BOOLEAN'},
             {name: 'PopUpRemark', type: 'BIT'}
-          ]
-        },
-          {
-              name: tableNames.item.barcodes,
-              columns: [
-                  { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-                  { name: "ItemId", type: "INT NOT NULL" },
-                  { name: "Barcode", type: "TEXT NOT NULL" },
-                  { name: "Remarks", type: "TEXT NULL" },
-              ]
-          },
-        {
-          name: tableNames.item.subPLU1,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.item.barcodes,
+        columns: [
+                  { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+                  { name: 'ItemId', type: 'INT NOT NULL' },
+                  { name: 'Barcode', type: 'TEXT NOT NULL' },
+                  { name: 'Remarks', type: 'TEXT NULL' },
+        ]
+      },
+      {
+        name: tableNames.item.subPLU1,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'Code', type: 'text'},
             {name: 'EntityId', type: 'integer'},
             {name: 'Description1', type: 'text'},
             {name: 'Description2', type: 'text'}
-          ]
-        },
-        {
-          name: tableNames.item.subPLU2,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.item.subPLU2,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'Code', type: 'text'},
             {name: 'EntityId', type: 'integer'},
             {name: 'Description1', type: 'text'},
             {name: 'Description2', type: 'text'}
-          ]
-        },
-        {
-          name: tableNames.item.subPLU3,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.item.subPLU3,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'Code', type: 'text'},
             {name: 'EntityId', type: 'integer'},
             {name: 'Description1', type: 'text'},
             {name: 'Description2', type: 'text'}
-          ]
-        },
-        {
-          name: tableNames.item.priceGroups,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.item.priceGroups,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'Plu', type: 'text'},
             {name: 'Price', type: 'double'},
@@ -252,20 +252,20 @@ angular.module('itouch.config')
             {name: 'PriceLevelId', type: 'integer'},
             {name: 'Remarks', type: 'text'},
             {name: 'StdCost', type: 'double'}
-          ]
-        },
-        {
-          name: tableNames.item.modifiers,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.item.modifiers,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'PLU', type: 'text'},
             {name: 'KeyNo', type: 'integer'},
             {name: 'PageNo', type: 'integer'}
-          ]
-        },
-        {
-          name: tableNames.item.departments,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.item.departments,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'Code', type: 'text'},
             {name: 'Description1', type: 'text'},
@@ -274,11 +274,11 @@ angular.module('itouch.config')
             {name: 'CostingMethodId', type: 'integer'},
             {name: 'Modifier', type: 'integer'},
             {name: 'ModifierType', type: 'text'}
-          ]
-        },
-        {
-          name: tableNames.locations.locations,
-          columns: [
+        ]
+      },
+      {
+        name: tableNames.locations.locations,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'Code', type: 'text'},
             {name: 'Address1', type: 'text'},
@@ -317,148 +317,148 @@ angular.module('itouch.config')
             {name: 'Tax5Desc2', type: 'text'},
             {name: 'Tax5Option', type: 'integer'},
             {name: 'Tax5Perc', type: 'double'}
-          ]
-        },
+        ]
+      },
       //  temp bill details
-        {
-          name: tableNames.bill.tempDetail,
-          columns: [
-            { name: "BusinessDate", type: "date" },
-            { name: "LocationId", type: "int NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "DocNo", type: "text NOT NULL" },
-            { name: "PluType", type: "int NOT NULL" },
-            { name: "KitType", type: "int NOT NULL" },
-            { name: "ItemId", type: "int NOT NULL" },
-            { name: "LineNumber", type: "int NOT NULL" },
-            { name: "SuspendDepDocNo", type: "text NOT NULL" },
-            { name: "OrderedDateTime", type: "datetime NULL" },
-            { name: "OrderedBy", type: "text NOT NULL" },
-            { name: "SpecialOrderRemark", type: "text NULL" },
-            { name: "ServingTime", type: "datetime NULL" },
-            { name: "TakeAway", type: "int NOT NULL" },
-            { name: "ItemType", type: "text NOT NULL" },
-            { name: "ParentItemLineNumber", type: "int NOT NULL" },
-            { name: "PromoPwpId", type: "int NOT NULL" },
-            { name: "PriceLevelId", type: "int NOT NULL" },
-            { name: "StdCost", type: "double NOT NULL" },
-            { name: "OrgPrice", type: "double NOT NULL" },
-            { name: "AlteredPrice", type: "double NOT NULL" },
-            { name: "WaCost", type: "double NOT NULL" },
-            { name: "Price", type: "double NOT NULL" },
-            { name: "Qty", type: "double NOT NULL" },
-            { name: "SubTotal", type: "double NOT NULL" },
-            { name: "DiscAmount", type: "double NOT NULL" },
-            { name: "Tax1DiscAmount", type: "double NOT NULL" },
-            { name: "Tax2DiscAmount", type: "double NOT NULL" },
-            { name: "Tax3DiscAmount", type: "double NOT NULL" },
-            { name: "Tax4DiscAmount", type: "double NOT NULL" },
-            { name: "Tax5DiscAmount", type: "double NOT NULL" },
-            { name: "Tax1Amount", type: "double NOT NULL" },
-            { name: "Tax2Amount", type: "double NOT NULL" },
-            { name: "Tax3Amount", type: "double NOT NULL" },
-            { name: "Tax4Amount", type: "double NOT NULL" },
-            { name: "Tax5Amount", type: "double NOT NULL" },
-            { name: "DepAmount", type: "double NOT NULL" },
-            { name: "Tax1Option", type: "int NOT NULL" },
-            { name: "Tax2Option", type: "int NOT NULL" },
-            { name: "Tax3Option", type: "int NOT NULL" },
-            { name: "Tax4Option", type: "int NOT NULL" },
-            { name: "Tax5Option", type: "int NOT NULL" },
-            { name: "Tax1Perc", type: "double NOT NULL" },
-            { name: "Tax2Perc", type: "double NOT NULL" },
-            { name: "Tax3Perc", type: "double NOT NULL" },
-            { name: "Tax4Perc", type: "double NOT NULL" },
-            { name: "Tax5Perc", type: "double NOT NULL" },
-            { name: "ByAmount", type: "int NOT NULL" },
-            { name: "NoDiscount", type: "int NOT NULL" },
-            { name: "MultiDiscount", type: "int NOT NULL" },
-            { name: "PriceChanged", type: "int NOT NULL" },
-            { name: "Taxable", type: "int NOT NULL" },
-            { name: "BelowCost", type: "int NOT NULL" },
-            { name: "CurCode", type: "text NULL" },
-            { name: "BuyRate", type: "double NULL" },
-            { name: "ReasonId", type: "int NOT NULL" },
-            { name: "RefCode", type: "text NULL" },
-            { name: "Remark", type: "text NULL" },
-            { name: "Comm", type: "double NOT NULL" },
-            { name: "Desc1", type: "text NULL" },
-            { name: "Desc2", type: "text NULL" },
-            { name: "Selectable", type: "BOOLEAN NULL" }
-          ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber",
-          keep: true
-        },
-        {
-          name: tableNames.bill.tempHeader,
-          columns: [
-            { name: "BusinessDate", type: "date" },
-            { name: "LocationId", type: "int NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "DocNo", type: "text NOT NULL" },
-            { name: "DocType", type: "text NOT NULL" },
-            { name: "SysDateTime", type: "int NOT NULL" },
-            { name: "VoidDocNo", type: "text NULL" },
-            { name: "TableId", type: "int NOT NULL" },
-            { name: "Pax", type: "text NOT NULL" },
-            { name: "ShiftId", type: "int NULL" },
-            { name: "VipId", type: "int NOT NULL" },
-            { name: "CashierId", type: "int NULL" },
-            { name: "StaffId", type: "int NULL" },
-            { name: "AuthBy", type: "int NOT NULL" },
-            { name: "SubTotal", type: "double NOT NULL" },
-            { name: "DepAmount", type: "double NOT NULL" },
-            { name: "Tax1DiscAmount", type: "double NOT NULL" },
-            { name: "Tax2DiscAmount", type: "double NOT NULL" },
-            { name: "Tax3DiscAmount", type: "double NOT NULL" },
-            { name: "Tax4DiscAmount", type: "double NOT NULL" },
-            { name: "Tax5DiscAmount", type: "double NOT NULL" },
-            { name: "DiscAmount", type: "double NOT NULL" },
-            { name: "Tax1Option", type: "int NOT NULL" },
-            { name: "Tax1Perc", type: "double NOT NULL" },
-            { name: "Tax1Amount", type: "double NOT NULL" },
-            { name: "Tax2Amount", type: "double NOT NULL" },
-            { name: "Tax2Option", type: "int NOT NULL" },
-            { name: "Tax2Perc", type: "double NOT NULL" },
-            { name: "Tax3Amount", type: "double NOT NULL" },
-            { name: "Tax3Option", type: "int NOT NULL" },
-            { name: "Tax3Perc", type: "double NOT NULL" },
-            { name: "Tax4Amount", type: "double NOT NULL" },
-            { name: "Tax4Option", type: "int NOT NULL" },
-            { name: "Tax4Perc", type: "double NOT NULL" },
-            { name: "Tax5Amount", type: "double NOT NULL" },
-            { name: "Tax5Option", type: "int NOT NULL" },
-            { name: "Tax5Perc", type: "double NOT NULL" },
-            { name: "ReprintCount", type: "double NOT NULL" },
-            { name: "Remarks", type: "text NOT NULL" },
-            { name: "OrderTag", type: "text NOT NULL" },
-            { name: "IsClosed", type: "boolean boolean NULL" }
-          ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo",
-          keep: true
-        },
-        {
-          name: tableNames.bill.tempPayTrans,
-          columns: [
-            { name: "BusinessDate", type: "DATE" },
-            { name: "LocationId", type: "INT NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "DocNo", type: "TEXT NOT NULL" },
-            { name: "Cash", type: "BOOLEAN" },
-            { name: "SeqNo", type: "INT NOT NULL" },
-            { name: "PayTypeId", type: "INT NOT NULL" },
-            { name: "Amount", type: "DOUBLE" },
-            { name: "ChangeAmount", type: "DOUBLE" },
-            { name: "ConvRate", type: "DOUBLE" },
-            { name: "CurrencyId", type: "INT" },
-            { name: "Remarks", type: "TEXT" },
-            { name: "IsExported", type: "BOOLEAN NOT NULL" }
-          ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo"
-        },
-        {
-          name: tableNames.bill.tenderTypes,
-          columns: [
+      {
+        name: tableNames.bill.tempDetail,
+        columns: [
+            { name: 'BusinessDate', type: 'date' },
+            { name: 'LocationId', type: 'int NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'text NOT NULL' },
+            { name: 'PluType', type: 'int NOT NULL' },
+            { name: 'KitType', type: 'int NOT NULL' },
+            { name: 'ItemId', type: 'int NOT NULL' },
+            { name: 'LineNumber', type: 'int NOT NULL' },
+            { name: 'SuspendDepDocNo', type: 'text NOT NULL' },
+            { name: 'OrderedDateTime', type: 'datetime NULL' },
+            { name: 'OrderedBy', type: 'text NOT NULL' },
+            { name: 'SpecialOrderRemark', type: 'text NULL' },
+            { name: 'ServingTime', type: 'datetime NULL' },
+            { name: 'TakeAway', type: 'int NOT NULL' },
+            { name: 'ItemType', type: 'text NOT NULL' },
+            { name: 'ParentItemLineNumber', type: 'int NOT NULL' },
+            { name: 'PromoPwpId', type: 'int NOT NULL' },
+            { name: 'PriceLevelId', type: 'int NOT NULL' },
+            { name: 'StdCost', type: 'double NOT NULL' },
+            { name: 'OrgPrice', type: 'double NOT NULL' },
+            { name: 'AlteredPrice', type: 'double NOT NULL' },
+            { name: 'WaCost', type: 'double NOT NULL' },
+            { name: 'Price', type: 'double NOT NULL' },
+            { name: 'Qty', type: 'double NOT NULL' },
+            { name: 'SubTotal', type: 'double NOT NULL' },
+            { name: 'DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax1DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax2DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax3DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax4DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax5DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax1Amount', type: 'double NOT NULL' },
+            { name: 'Tax2Amount', type: 'double NOT NULL' },
+            { name: 'Tax3Amount', type: 'double NOT NULL' },
+            { name: 'Tax4Amount', type: 'double NOT NULL' },
+            { name: 'Tax5Amount', type: 'double NOT NULL' },
+            { name: 'DepAmount', type: 'double NOT NULL' },
+            { name: 'Tax1Option', type: 'int NOT NULL' },
+            { name: 'Tax2Option', type: 'int NOT NULL' },
+            { name: 'Tax3Option', type: 'int NOT NULL' },
+            { name: 'Tax4Option', type: 'int NOT NULL' },
+            { name: 'Tax5Option', type: 'int NOT NULL' },
+            { name: 'Tax1Perc', type: 'double NOT NULL' },
+            { name: 'Tax2Perc', type: 'double NOT NULL' },
+            { name: 'Tax3Perc', type: 'double NOT NULL' },
+            { name: 'Tax4Perc', type: 'double NOT NULL' },
+            { name: 'Tax5Perc', type: 'double NOT NULL' },
+            { name: 'ByAmount', type: 'int NOT NULL' },
+            { name: 'NoDiscount', type: 'int NOT NULL' },
+            { name: 'MultiDiscount', type: 'int NOT NULL' },
+            { name: 'PriceChanged', type: 'int NOT NULL' },
+            { name: 'Taxable', type: 'int NOT NULL' },
+            { name: 'BelowCost', type: 'int NOT NULL' },
+            { name: 'CurCode', type: 'text NULL' },
+            { name: 'BuyRate', type: 'double NULL' },
+            { name: 'ReasonId', type: 'int NOT NULL' },
+            { name: 'RefCode', type: 'text NULL' },
+            { name: 'Remark', type: 'text NULL' },
+            { name: 'Comm', type: 'double NOT NULL' },
+            { name: 'Desc1', type: 'text NULL' },
+            { name: 'Desc2', type: 'text NULL' },
+            { name: 'Selectable', type: 'BOOLEAN NULL' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber',
+        keep: true
+      },
+      {
+        name: tableNames.bill.tempHeader,
+        columns: [
+            { name: 'BusinessDate', type: 'date' },
+            { name: 'LocationId', type: 'int NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'text NOT NULL' },
+            { name: 'DocType', type: 'text NOT NULL' },
+            { name: 'SysDateTime', type: 'int NOT NULL' },
+            { name: 'VoidDocNo', type: 'text NULL' },
+            { name: 'TableId', type: 'int NOT NULL' },
+            { name: 'Pax', type: 'text NOT NULL' },
+            { name: 'ShiftId', type: 'int NULL' },
+            { name: 'VipId', type: 'int NOT NULL' },
+            { name: 'CashierId', type: 'int NULL' },
+            { name: 'StaffId', type: 'int NULL' },
+            { name: 'AuthBy', type: 'int NOT NULL' },
+            { name: 'SubTotal', type: 'double NOT NULL' },
+            { name: 'DepAmount', type: 'double NOT NULL' },
+            { name: 'Tax1DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax2DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax3DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax4DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax5DiscAmount', type: 'double NOT NULL' },
+            { name: 'DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax1Option', type: 'int NOT NULL' },
+            { name: 'Tax1Perc', type: 'double NOT NULL' },
+            { name: 'Tax1Amount', type: 'double NOT NULL' },
+            { name: 'Tax2Amount', type: 'double NOT NULL' },
+            { name: 'Tax2Option', type: 'int NOT NULL' },
+            { name: 'Tax2Perc', type: 'double NOT NULL' },
+            { name: 'Tax3Amount', type: 'double NOT NULL' },
+            { name: 'Tax3Option', type: 'int NOT NULL' },
+            { name: 'Tax3Perc', type: 'double NOT NULL' },
+            { name: 'Tax4Amount', type: 'double NOT NULL' },
+            { name: 'Tax4Option', type: 'int NOT NULL' },
+            { name: 'Tax4Perc', type: 'double NOT NULL' },
+            { name: 'Tax5Amount', type: 'double NOT NULL' },
+            { name: 'Tax5Option', type: 'int NOT NULL' },
+            { name: 'Tax5Perc', type: 'double NOT NULL' },
+            { name: 'ReprintCount', type: 'double NOT NULL' },
+            { name: 'Remarks', type: 'text NOT NULL' },
+            { name: 'OrderTag', type: 'text NOT NULL' },
+            { name: 'IsClosed', type: 'boolean boolean NULL' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo',
+        keep: true
+      },
+      {
+        name: tableNames.bill.tempPayTrans,
+        columns: [
+            { name: 'BusinessDate', type: 'DATE' },
+            { name: 'LocationId', type: 'INT NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'TEXT NOT NULL' },
+            { name: 'Cash', type: 'BOOLEAN' },
+            { name: 'SeqNo', type: 'INT NOT NULL' },
+            { name: 'PayTypeId', type: 'INT NOT NULL' },
+            { name: 'Amount', type: 'DOUBLE' },
+            { name: 'ChangeAmount', type: 'DOUBLE' },
+            { name: 'ConvRate', type: 'DOUBLE' },
+            { name: 'CurrencyId', type: 'INT' },
+            { name: 'Remarks', type: 'TEXT' },
+            { name: 'IsExported', type: 'BOOLEAN NOT NULL' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo'
+      },
+      {
+        name: tableNames.bill.tenderTypes,
+        columns: [
             {name: 'Id', type: 'integer'},
             {name: 'Code', type: 'text'},
             {name: 'Color', type: 'text'},
@@ -477,424 +477,424 @@ angular.module('itouch.config')
             {name: 'TenderTypeId', type: 'integer'},
             {name: 'TotalPrintReceipt', type: 'text'},
             {name: 'PayOrder', type: 'integer'}
-          ]
-        },
-        {
-          name: tableNames.bill.detail,
-          columns: [
-            { name: "BusinessDate", type: "date" },
-            { name: "LocationId", type: "int NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "DocNo", type: "text NOT NULL" },
-            { name: "PluType", type: "int NOT NULL" },
-            { name: "KitType", type: "int NOT NULL" },
-            { name: "ItemId", type: "int NOT NULL" },
-            { name: "LineNumber", type: "int NOT NULL" },
-            { name: "SuspendDepDocNo", type: "text NOT NULL" },
-            { name: "OrderedDateTime", type: "datetime NULL" },
-            { name: "OrderedBy", type: "text NOT NULL" },
-            { name: "SpecialOrderRemark", type: "text NULL" },
-            { name: "ServingTime", type: "datetime NULL" },
-            { name: "TakeAway", type: "int NOT NULL" },
-            { name: "ItemType", type: "text NOT NULL" },
-            { name: "ParentItemLineNumber", type: "int NOT NULL" },
-            { name: "PromoPwpId", type: "int NOT NULL" },
-            { name: "PriceLevelId", type: "int NOT NULL" },
-            { name: "StdCost", type: "double NOT NULL" },
-            { name: "OrgPrice", type: "double NOT NULL" },
-            { name: "AlteredPrice", type: "double NOT NULL" },
-            { name: "WaCost", type: "double NOT NULL" },
-            { name: "Price", type: "double NOT NULL" },
-            { name: "Qty", type: "double NOT NULL" },
-            { name: "SubTotal", type: "double NOT NULL" },
-            { name: "DiscAmount", type: "double NOT NULL" },
-            { name: "Tax1DiscAmount", type: "double NOT NULL" },
-            { name: "Tax2DiscAmount", type: "double NOT NULL" },
-            { name: "Tax3DiscAmount", type: "double NOT NULL" },
-            { name: "Tax4DiscAmount", type: "double NOT NULL" },
-            { name: "Tax5DiscAmount", type: "double NOT NULL" },
-            { name: "DepAmount", type: "double NOT NULL" },
-            { name: "Tax1Option", type: "int NOT NULL" },
-            { name: "Tax2Option", type: "int NOT NULL" },
-            { name: "Tax3Option", type: "int NOT NULL" },
-            { name: "Tax4Option", type: "int NOT NULL" },
-            { name: "Tax5Option", type: "int NOT NULL" },
-            { name: "Tax1Perc", type: "double NOT NULL" },
-            { name: "Tax2Perc", type: "double NOT NULL" },
-            { name: "Tax3Perc", type: "double NOT NULL" },
-            { name: "Tax4Perc", type: "double NOT NULL" },
-            { name: "Tax5Perc", type: "double NOT NULL" },
-            { name: "Tax1Amount", type: "double NOT NULL" },
-            { name: "Tax2Amount", type: "double NOT NULL" },
-            { name: "Tax3Amount", type: "double NOT NULL" },
-            { name: "Tax4Amount", type: "double NOT NULL" },
-            { name: "Tax5Amount", type: "double NOT NULL" },
-            { name: "ByAmount", type: "int NOT NULL" },
-            { name: "NoDiscount", type: "int NOT NULL" },
-            { name: "MultiDiscount", type: "int NOT NULL" },
-            { name: "PriceChanged", type: "int NOT NULL" },
-            { name: "Taxable", type: "int NOT NULL" },
-            { name: "BelowCost", type: "int NOT NULL" },
-            { name: "CurCode", type: "text NULL" },
-            { name: "BuyRate", type: "double NULL" },
-            { name: "ReasonId", type: "int NULL" },
-            { name: "RefCode", type: "text NULL" },
-            { name: "Remark", type: "text NULL" },
-            { name: "Comm", type: "double NOT NULL" },
-            { name: "Desc1", type: "text NULL" },
-            { name: "Desc2", type: "text NULL" },
-            { name: "IsExported", type: "int NULL" }
-          ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber",
-          keep: true
-        },
-        {
-          name: tableNames.bill.header,
-          columns: [
-            { name: "BusinessDate", type: "date" },
-            { name: "LocationId", type: "int NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "DocNo", type: "text NOT NULL" },
-            { name: "DocType", type: "text NOT NULL" },
-            { name: "SysDateTime", type: "int NOT NULL" },
-            { name: "VoidDocNo", type: "text NULL" },
-            { name: "TableId", type: "int NOT NULL" },
-            { name: "Pax", type: "text NOT NULL" },
-            { name: "ShiftId", type: "int NULL" },
-            { name: "VipId", type: "int NOT NULL" },
-            { name: "CashierId", type: "int NULL" },
-            { name: "StaffId", type: "int NULL" },
-            { name: "AuthBy", type: "int NOT NULL" },
-            { name: "SubTotal", type: "double NOT NULL" },
-            { name: "DepAmount", type: "double NOT NULL" },
-            { name: "Tax1DiscAmount", type: "double NOT NULL" },
-            { name: "Tax2DiscAmount", type: "double NOT NULL" },
-            { name: "Tax3DiscAmount", type: "double NOT NULL" },
-            { name: "Tax4DiscAmount", type: "double NOT NULL" },
-            { name: "Tax5DiscAmount", type: "double NOT NULL" },
-            { name: "DiscAmount", type: "double NOT NULL" },
-            { name: "Tax1Option", type: "int NOT NULL" },
-            { name: "Tax1Perc", type: "double NOT NULL" },
-            { name: "Tax1Amount", type: "double NOT NULL" },
-            { name: "Tax2Amount", type: "double NOT NULL" },
-            { name: "Tax2Option", type: "int NOT NULL" },
-            { name: "Tax2Perc", type: "double NOT NULL" },
-            { name: "Tax3Amount", type: "double NOT NULL" },
-            { name: "Tax3Option", type: "int NOT NULL" },
-            { name: "Tax3Perc", type: "double NOT NULL" },
-            { name: "Tax4Amount", type: "double NOT NULL" },
-            { name: "Tax4Option", type: "int NOT NULL" },
-            { name: "Tax4Perc", type: "double NOT NULL" },
-            { name: "Tax5Amount", type: "double NOT NULL" },
-            { name: "Tax5Option", type: "int NOT NULL" },
-            { name: "Tax5Perc", type: "double NOT NULL" },
-            { name: "ReprintCount", type: "double NOT NULL" },
-            { name: "Remarks", type: "text NOT NULL" },
-            { name: "OrderTag", type: "text NOT NULL" },
-            { name: "IsExported", type: "boolean NOT NULL" },
-            { name: "IsClosed", type: "boolean boolean NULL" }
-          ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo",
-          keep: true
-        },
-        {
-          name: tableNames.bill.stockTransactions,
-          columns: [
-            { name: "BusinessDate", type: "date" },
-            { name: "LocationId", type: "int NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "LineNumber", type: "int NOT NULL" },
-            { name: "DocNo", type: "text NOT NULL" },
-            { name: "ItemId", type: "int NOT NULL" },
-            { name: "SeqNo", type: "int NOT NULL" },
-            { name: "DocType", type: "text NOT NULL" },
-            { name: "Qty", type: "int NOT NULL" },
-            { name: "StdCost", type: "double NOT NULL" },
-            { name: "BaseUOMId", type: "int NULL" },
-            { name: "IsExported", type: "boolean NOT NULL" }
-          ],
-          primaryKey: "BusinessDate,MachineId,LocationId, LineNumber, DocNo, ItemId, SeqNo",
-          keep: true
-        },
-        {
-          name: tableNames.bill.payTransactions,
-          columns: [
-            { name: "BusinessDate", type: "DATE" },
-            { name: "LocationId", type: "INT NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "DocNo", type: "TEXT NOT NULL" },
-            { name: "Cash", type: "BOOLEAN" },
-            { name: "SeqNo", type: "INT NOT NULL" },
-            { name: "PayTypeId", type: "INT NOT NULL" },
-            { name: "Amount", type: "DOUBLE" },
-            { name: "ChangeAmount", type: "DOUBLE" },
-            { name: "ConvRate", type: "DOUBLE" },
-            { name: "CurrencyId", type: "INT" },
-            { name: "Remarks", type: "TEXT" },
-            { name: "IsExported", type: "BOOLEAN NOT NULL" }
-          ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo",
-          keep: true
-        },
-        {
-          name: tableNames.bill.payTransactionsOverTender,
-          columns: [
-            { name: "BusinessDate", type: "DATE" },
-            { name: "LocationId", type: "INT NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "DocNo", type: "TEXT NOT NULL" },
-            { name: "SeqNo", type: "INT NOT NULL" },
-            { name: "PayTypeId", type: "INT NOT NULL" },
-            { name: "OverTenderTypeId", type: "INT NOT NULL" },
-            { name: "Amount", type: "DOUBLE" },
-            { name: "ChangeAmount", type: "DOUBLE" },
-            { name: "IsExported", type: "BOOLEAN NOT NULL" }
-          ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo, OverTenderTypeId",
-          keep: true
-        },
-        {
-          name: tableNames.auth.shifts,
-          columns: [
-            { name: "Id", type: "INT PRIMARY KEY" },
-            { name: "Code", type: "TEXT NOT NULL" },
-            { name: "LocationId", type: "INT NOT NULL" },
-            { name: "Description1", type: "TEXT NOT NULL" },
-            { name: "Description2", type: "TEXT NOT NULL" },
-            { name: "StartTime", type: "TIME NOT NULL" },
-            { name: "EndTime", type: "TIME NOT NULL" },
-            { name: "RA", type: "DOUBLE NOT NULL" },
-            { name: "RANoAdj", type: "text NOT NULL" }
-          ]
-        },
-        {
-          name: tableNames.salesKit.salesKitApplicablePeriod,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "SalesKitItemsId", type: "INT NOT NULL" },
-            { name: "Fromtime", type: "TIME" },
-            { name: "ToTime", type: "TIME" },
-            { name: "FromDate", type: "DATE" },
-            { name: "Todate", type: "DATE" },
-            { name: "Status", type: "INT" }
-          ]
-        },
-        {
-          name: tableNames.salesKit.salesKitByDays,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "SalesKitItemsId", type: "INT NOT NULL" },
-            { name: "SalesKitDaysId", type: "INT NOT NULL" }
-          ]
-        },
-        {
-          name: tableNames.salesKit.salesKitItems,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "SalesKitId", type: "INT NOT NULL" },
-            { name: "ItemId", type: "INT NOT NULL" },
-            { name: "Quantity", type: "DOUBLE" },
-            { name: "Priority", type: "INT NOT NULL" }
-          ]
-        },
-        {
-          name: tableNames.salesKit.salesKitSelections,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "SalesKitItemsId", type: "INT NOT NULL" },
-            { name: "SelectionId", type: "INT NOT NULL" },
-            { name: "Quantity", type: "DOUBLE" },
-            { name: "AdditionalPrice", type: "DOUBLE NOT NULL" },
-            { name: "AdditionalCost", type: "DOUBLE NOT NULL" },
-            { name: "Sequence", type: "INT NOT NULL" }
-          ]
-        },
-        {
-          name: tableNames.promo.days,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "Code", type: "TEXT NOT NULL" },
-            { name: "Description", type: "TEXT" }
-          ]
-        },
-        {
-          name: tableNames.auth.shiftStatus,
-          columns: [
-            { name: "Id", type: "INTEGER PRIMARY KEY" },
-            { name: "ShiftName", type: "TEXT NOT NULL" },
-            { name: "OpenDateTime", type: "DATETIME" },
-            { name: "OpenUser", type: "TEXT" },
-            { name: "CloseDateTime", type: "DATETIME" },
-            { name: "CloseUser", type: "TEXT" },
-            { name: "RA", type: "DOUBLE" },
-            { name: "RANoAdj", type: "BOOLEAN" },
-            { name: "DeclareCashLater", type: "BOOLEAN" }
-          ],
-          keep: true
-        },
-        {
-          name: tableNames.discounts.discounts,
-          columns: [
-            { name: "Id", type: "INT" },
-            { name: "Code", type: "TEXT NOT NULL" },
-            { name: "DiscountFor", type: "INT" },
-            { name: "DiscountType", type: "INT" },
-            { name: "Amount", type: "DOUBLE" },
-            { name: "Percentage", type: "FLOAT" },
-            { name: "MaxDiscountedValue", type: "DOUBLE" },
-            { name: "MinBillAmount", type: "DOUBLE" },
-            { name: "MultiDiscount", type: "BOOLEAN" },
-            { name: "FrontendDiscountHidden", type: "BOOLEAN" },
-            { name: "Description1", type: "TEXT NOT NULL" },
-            { name: "Description2", type: "TEXT" },
-          ]
-        },
-        {
-          name: tableNames.discounts.discountsFor,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "Code", type: "TEXT NOT NULL" },
-            { name: "Description", type: "TEXT NOT NULL" }
-          ]
-        },
-        {
-          name: tableNames.discounts.billDiscounts,
-          columns: [
-            { name: "BusinessDate", type: "DATE NOT NULL" },
-            { name: "LocationId", type: "INT NOT NULL" },
-            { name: "MachineId", type: "INT NOT NULL" },
-            { name: "DocNo", type: "TEXT NOT NULL" },
-            { name: "ItemId", type: "INT NOT NULL" },
-            { name: "LineNumber", type: "INT NOT NULL" },
-            { name: "SeqNo", type: "INT NOT NULL" },
-            { name: "DiscountFrom", type: "TEXT" },
-            { name: "DiscountId", type: "INT" },
-            { name: "DiscountCode", type: "TEXT" },
-            { name: "DiscountFor", type: "INT" },
-            { name: "DiscountType", type: "TEXT" },
-            { name: "DiscountAmount", type: "DOUBLE" },
-            { name: "DiscountPercentage", type: "DOUBLE" },
-            { name: "IsExported", type: "BOOLEAN" }
-          ],
-          primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo',
-          keep: true
-        },
-        {
-          name: tableNames.discounts.tempBillDiscounts,
-          columns: [
-            { name: "BusinessDate", type: "DATE NOT NULL" },
-            { name: "LocationId", type: "INT NOT NULL" },
-            { name: "MachineId", type: "INT NOT NULL" },
-            { name: "DocNo", type: "TEXT NOT NULL" },
-            { name: "ItemId", type: "INT NOT NULL" },
-            { name: "LineNumber", type: "INT NOT NULL" },
-            { name: "SeqNo", type: "INT NOT NULL" },
-            { name: "DiscountFrom", type: "TEXT" },
-            { name: "DiscountId", type: "INT" },
-            { name: "DiscountCode", type: "TEXT" },
-            { name: "DiscountFor", type: "INT" },
-            { name: "DiscountType", type: "TEXT" },
-            { name: "DiscountAmount", type: "DOUBLE" },
-            { name: "DiscountPercentage", type: "DOUBLE" }
-          ],
-          primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo',
-          keep: true
-        },
-        {
-          name: tableNames.bill.voidItems,
-          columns: [
-            { name: "BusinessDate", type: "date" },
-            { name: "LocationId", type: "int NOT NULL" },
-            { name: "MachineId", type: "int NOT NULL" },
-            { name: "DocNo", type: "text NOT NULL" },
-            { name: "SysDateTime", type: "DATETIME NOT NULL" },
-            { name: "ItemId", type: "int NOT NULL" },
-            { name: "LineNumber", type: "int NOT NULL" },
-            { name: "ItemType", type: "text NOT NULL" },
-            { name: "ParentItemId", type: "int NOT NULL" },
-            { name: "ShiftId", type: "int NOT NULL" },
-            { name: "CashierId", type: "int NOT NULL" },
-            { name: "StaffId", type: "int NOT NULL" },
-            { name: "OrgPrice", type: "double NOT NULL" },
-            { name: "AlteredPrice", type: "double NOT NULL" },
-            { name: "Price", type: "double NOT NULL" },
-            { name: "Qty", type: "double NOT NULL" },
-            { name: "SubTotal", type: "double NOT NULL" },
-            { name: "DiscAmount", type: "double NOT NULL" },
-            { name: "IsExported", type: "boolean NOT NULL" },
-            { name: "SeqNo", type: "int NOT NULL" },
-          ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo"
-        },
-        {
-          name: tableNames.bill.denominations,
-          columns: [
-            { name: "Id", type: "INTEGER PRIMARY KEY AUTOINCREMENT" },
-            { name: "Desc", type: "TEXT NOT NULL" },
-            { name: "Value", type: "DOUBLE NOT NULL" }
-          ],
+        ]
+      },
+      {
+        name: tableNames.bill.detail,
+        columns: [
+            { name: 'BusinessDate', type: 'date' },
+            { name: 'LocationId', type: 'int NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'text NOT NULL' },
+            { name: 'PluType', type: 'int NOT NULL' },
+            { name: 'KitType', type: 'int NOT NULL' },
+            { name: 'ItemId', type: 'int NOT NULL' },
+            { name: 'LineNumber', type: 'int NOT NULL' },
+            { name: 'SuspendDepDocNo', type: 'text NOT NULL' },
+            { name: 'OrderedDateTime', type: 'datetime NULL' },
+            { name: 'OrderedBy', type: 'text NOT NULL' },
+            { name: 'SpecialOrderRemark', type: 'text NULL' },
+            { name: 'ServingTime', type: 'datetime NULL' },
+            { name: 'TakeAway', type: 'int NOT NULL' },
+            { name: 'ItemType', type: 'text NOT NULL' },
+            { name: 'ParentItemLineNumber', type: 'int NOT NULL' },
+            { name: 'PromoPwpId', type: 'int NOT NULL' },
+            { name: 'PriceLevelId', type: 'int NOT NULL' },
+            { name: 'StdCost', type: 'double NOT NULL' },
+            { name: 'OrgPrice', type: 'double NOT NULL' },
+            { name: 'AlteredPrice', type: 'double NOT NULL' },
+            { name: 'WaCost', type: 'double NOT NULL' },
+            { name: 'Price', type: 'double NOT NULL' },
+            { name: 'Qty', type: 'double NOT NULL' },
+            { name: 'SubTotal', type: 'double NOT NULL' },
+            { name: 'DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax1DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax2DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax3DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax4DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax5DiscAmount', type: 'double NOT NULL' },
+            { name: 'DepAmount', type: 'double NOT NULL' },
+            { name: 'Tax1Option', type: 'int NOT NULL' },
+            { name: 'Tax2Option', type: 'int NOT NULL' },
+            { name: 'Tax3Option', type: 'int NOT NULL' },
+            { name: 'Tax4Option', type: 'int NOT NULL' },
+            { name: 'Tax5Option', type: 'int NOT NULL' },
+            { name: 'Tax1Perc', type: 'double NOT NULL' },
+            { name: 'Tax2Perc', type: 'double NOT NULL' },
+            { name: 'Tax3Perc', type: 'double NOT NULL' },
+            { name: 'Tax4Perc', type: 'double NOT NULL' },
+            { name: 'Tax5Perc', type: 'double NOT NULL' },
+            { name: 'Tax1Amount', type: 'double NOT NULL' },
+            { name: 'Tax2Amount', type: 'double NOT NULL' },
+            { name: 'Tax3Amount', type: 'double NOT NULL' },
+            { name: 'Tax4Amount', type: 'double NOT NULL' },
+            { name: 'Tax5Amount', type: 'double NOT NULL' },
+            { name: 'ByAmount', type: 'int NOT NULL' },
+            { name: 'NoDiscount', type: 'int NOT NULL' },
+            { name: 'MultiDiscount', type: 'int NOT NULL' },
+            { name: 'PriceChanged', type: 'int NOT NULL' },
+            { name: 'Taxable', type: 'int NOT NULL' },
+            { name: 'BelowCost', type: 'int NOT NULL' },
+            { name: 'CurCode', type: 'text NULL' },
+            { name: 'BuyRate', type: 'double NULL' },
+            { name: 'ReasonId', type: 'int NULL' },
+            { name: 'RefCode', type: 'text NULL' },
+            { name: 'Remark', type: 'text NULL' },
+            { name: 'Comm', type: 'double NOT NULL' },
+            { name: 'Desc1', type: 'text NULL' },
+            { name: 'Desc2', type: 'text NULL' },
+            { name: 'IsExported', type: 'int NULL' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber',
+        keep: true
+      },
+      {
+        name: tableNames.bill.header,
+        columns: [
+            { name: 'BusinessDate', type: 'date' },
+            { name: 'LocationId', type: 'int NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'text NOT NULL' },
+            { name: 'DocType', type: 'text NOT NULL' },
+            { name: 'SysDateTime', type: 'int NOT NULL' },
+            { name: 'VoidDocNo', type: 'text NULL' },
+            { name: 'TableId', type: 'int NOT NULL' },
+            { name: 'Pax', type: 'text NOT NULL' },
+            { name: 'ShiftId', type: 'int NULL' },
+            { name: 'VipId', type: 'int NOT NULL' },
+            { name: 'CashierId', type: 'int NULL' },
+            { name: 'StaffId', type: 'int NULL' },
+            { name: 'AuthBy', type: 'int NOT NULL' },
+            { name: 'SubTotal', type: 'double NOT NULL' },
+            { name: 'DepAmount', type: 'double NOT NULL' },
+            { name: 'Tax1DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax2DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax3DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax4DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax5DiscAmount', type: 'double NOT NULL' },
+            { name: 'DiscAmount', type: 'double NOT NULL' },
+            { name: 'Tax1Option', type: 'int NOT NULL' },
+            { name: 'Tax1Perc', type: 'double NOT NULL' },
+            { name: 'Tax1Amount', type: 'double NOT NULL' },
+            { name: 'Tax2Amount', type: 'double NOT NULL' },
+            { name: 'Tax2Option', type: 'int NOT NULL' },
+            { name: 'Tax2Perc', type: 'double NOT NULL' },
+            { name: 'Tax3Amount', type: 'double NOT NULL' },
+            { name: 'Tax3Option', type: 'int NOT NULL' },
+            { name: 'Tax3Perc', type: 'double NOT NULL' },
+            { name: 'Tax4Amount', type: 'double NOT NULL' },
+            { name: 'Tax4Option', type: 'int NOT NULL' },
+            { name: 'Tax4Perc', type: 'double NOT NULL' },
+            { name: 'Tax5Amount', type: 'double NOT NULL' },
+            { name: 'Tax5Option', type: 'int NOT NULL' },
+            { name: 'Tax5Perc', type: 'double NOT NULL' },
+            { name: 'ReprintCount', type: 'double NOT NULL' },
+            { name: 'Remarks', type: 'text NOT NULL' },
+            { name: 'OrderTag', type: 'text NOT NULL' },
+            { name: 'IsExported', type: 'boolean NOT NULL' },
+            { name: 'IsClosed', type: 'boolean boolean NULL' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo',
+        keep: true
+      },
+      {
+        name: tableNames.bill.stockTransactions,
+        columns: [
+            { name: 'BusinessDate', type: 'date' },
+            { name: 'LocationId', type: 'int NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'LineNumber', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'text NOT NULL' },
+            { name: 'ItemId', type: 'int NOT NULL' },
+            { name: 'SeqNo', type: 'int NOT NULL' },
+            { name: 'DocType', type: 'text NOT NULL' },
+            { name: 'Qty', type: 'int NOT NULL' },
+            { name: 'StdCost', type: 'double NOT NULL' },
+            { name: 'BaseUOMId', type: 'int NULL' },
+            { name: 'IsExported', type: 'boolean NOT NULL' }
+        ],
+        primaryKey: 'BusinessDate,MachineId,LocationId, LineNumber, DocNo, ItemId, SeqNo',
+        keep: true
+      },
+      {
+        name: tableNames.bill.payTransactions,
+        columns: [
+            { name: 'BusinessDate', type: 'DATE' },
+            { name: 'LocationId', type: 'INT NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'TEXT NOT NULL' },
+            { name: 'Cash', type: 'BOOLEAN' },
+            { name: 'SeqNo', type: 'INT NOT NULL' },
+            { name: 'PayTypeId', type: 'INT NOT NULL' },
+            { name: 'Amount', type: 'DOUBLE' },
+            { name: 'ChangeAmount', type: 'DOUBLE' },
+            { name: 'ConvRate', type: 'DOUBLE' },
+            { name: 'CurrencyId', type: 'INT' },
+            { name: 'Remarks', type: 'TEXT' },
+            { name: 'IsExported', type: 'BOOLEAN NOT NULL' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo',
+        keep: true
+      },
+      {
+        name: tableNames.bill.payTransactionsOverTender,
+        columns: [
+            { name: 'BusinessDate', type: 'DATE' },
+            { name: 'LocationId', type: 'INT NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'TEXT NOT NULL' },
+            { name: 'SeqNo', type: 'INT NOT NULL' },
+            { name: 'PayTypeId', type: 'INT NOT NULL' },
+            { name: 'OverTenderTypeId', type: 'INT NOT NULL' },
+            { name: 'Amount', type: 'DOUBLE' },
+            { name: 'ChangeAmount', type: 'DOUBLE' },
+            { name: 'IsExported', type: 'BOOLEAN NOT NULL' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo, OverTenderTypeId',
+        keep: true
+      },
+      {
+        name: tableNames.auth.shifts,
+        columns: [
+            { name: 'Id', type: 'INT PRIMARY KEY' },
+            { name: 'Code', type: 'TEXT NOT NULL' },
+            { name: 'LocationId', type: 'INT NOT NULL' },
+            { name: 'Description1', type: 'TEXT NOT NULL' },
+            { name: 'Description2', type: 'TEXT NOT NULL' },
+            { name: 'StartTime', type: 'TIME NOT NULL' },
+            { name: 'EndTime', type: 'TIME NOT NULL' },
+            { name: 'RA', type: 'DOUBLE NOT NULL' },
+            { name: 'RANoAdj', type: 'text NOT NULL' }
+        ]
+      },
+      {
+        name: tableNames.salesKit.salesKitApplicablePeriod,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'SalesKitItemsId', type: 'INT NOT NULL' },
+            { name: 'Fromtime', type: 'TIME' },
+            { name: 'ToTime', type: 'TIME' },
+            { name: 'FromDate', type: 'DATE' },
+            { name: 'Todate', type: 'DATE' },
+            { name: 'Status', type: 'INT' }
+        ]
+      },
+      {
+        name: tableNames.salesKit.salesKitByDays,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'SalesKitItemsId', type: 'INT NOT NULL' },
+            { name: 'SalesKitDaysId', type: 'INT NOT NULL' }
+        ]
+      },
+      {
+        name: tableNames.salesKit.salesKitItems,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'SalesKitId', type: 'INT NOT NULL' },
+            { name: 'ItemId', type: 'INT NOT NULL' },
+            { name: 'Quantity', type: 'DOUBLE' },
+            { name: 'Priority', type: 'INT NOT NULL' }
+        ]
+      },
+      {
+        name: tableNames.salesKit.salesKitSelections,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'SalesKitItemsId', type: 'INT NOT NULL' },
+            { name: 'SelectionId', type: 'INT NOT NULL' },
+            { name: 'Quantity', type: 'DOUBLE' },
+            { name: 'AdditionalPrice', type: 'DOUBLE NOT NULL' },
+            { name: 'AdditionalCost', type: 'DOUBLE NOT NULL' },
+            { name: 'Sequence', type: 'INT NOT NULL' }
+        ]
+      },
+      {
+        name: tableNames.promo.days,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'Code', type: 'TEXT NOT NULL' },
+            { name: 'Description', type: 'TEXT' }
+        ]
+      },
+      {
+        name: tableNames.auth.shiftStatus,
+        columns: [
+            { name: 'Id', type: 'INTEGER PRIMARY KEY' },
+            { name: 'ShiftName', type: 'TEXT NOT NULL' },
+            { name: 'OpenDateTime', type: 'DATETIME' },
+            { name: 'OpenUser', type: 'TEXT' },
+            { name: 'CloseDateTime', type: 'DATETIME' },
+            { name: 'CloseUser', type: 'TEXT' },
+            { name: 'RA', type: 'DOUBLE' },
+            { name: 'RANoAdj', type: 'BOOLEAN' },
+            { name: 'DeclareCashLater', type: 'BOOLEAN' }
+        ],
+        keep: true
+      },
+      {
+        name: tableNames.discounts.discounts,
+        columns: [
+            { name: 'Id', type: 'INT' },
+            { name: 'Code', type: 'TEXT NOT NULL' },
+            { name: 'DiscountFor', type: 'INT' },
+            { name: 'DiscountType', type: 'INT' },
+            { name: 'Amount', type: 'DOUBLE' },
+            { name: 'Percentage', type: 'FLOAT' },
+            { name: 'MaxDiscountedValue', type: 'DOUBLE' },
+            { name: 'MinBillAmount', type: 'DOUBLE' },
+            { name: 'MultiDiscount', type: 'BOOLEAN' },
+            { name: 'FrontendDiscountHidden', type: 'BOOLEAN' },
+            { name: 'Description1', type: 'TEXT NOT NULL' },
+            { name: 'Description2', type: 'TEXT' },
+        ]
+      },
+      {
+        name: tableNames.discounts.discountsFor,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'Code', type: 'TEXT NOT NULL' },
+            { name: 'Description', type: 'TEXT NOT NULL' }
+        ]
+      },
+      {
+        name: tableNames.discounts.billDiscounts,
+        columns: [
+            { name: 'BusinessDate', type: 'DATE NOT NULL' },
+            { name: 'LocationId', type: 'INT NOT NULL' },
+            { name: 'MachineId', type: 'INT NOT NULL' },
+            { name: 'DocNo', type: 'TEXT NOT NULL' },
+            { name: 'ItemId', type: 'INT NOT NULL' },
+            { name: 'LineNumber', type: 'INT NOT NULL' },
+            { name: 'SeqNo', type: 'INT NOT NULL' },
+            { name: 'DiscountFrom', type: 'TEXT' },
+            { name: 'DiscountId', type: 'INT' },
+            { name: 'DiscountCode', type: 'TEXT' },
+            { name: 'DiscountFor', type: 'INT' },
+            { name: 'DiscountType', type: 'TEXT' },
+            { name: 'DiscountAmount', type: 'DOUBLE' },
+            { name: 'DiscountPercentage', type: 'DOUBLE' },
+            { name: 'IsExported', type: 'BOOLEAN' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo',
+        keep: true
+      },
+      {
+        name: tableNames.discounts.tempBillDiscounts,
+        columns: [
+            { name: 'BusinessDate', type: 'DATE NOT NULL' },
+            { name: 'LocationId', type: 'INT NOT NULL' },
+            { name: 'MachineId', type: 'INT NOT NULL' },
+            { name: 'DocNo', type: 'TEXT NOT NULL' },
+            { name: 'ItemId', type: 'INT NOT NULL' },
+            { name: 'LineNumber', type: 'INT NOT NULL' },
+            { name: 'SeqNo', type: 'INT NOT NULL' },
+            { name: 'DiscountFrom', type: 'TEXT' },
+            { name: 'DiscountId', type: 'INT' },
+            { name: 'DiscountCode', type: 'TEXT' },
+            { name: 'DiscountFor', type: 'INT' },
+            { name: 'DiscountType', type: 'TEXT' },
+            { name: 'DiscountAmount', type: 'DOUBLE' },
+            { name: 'DiscountPercentage', type: 'DOUBLE' }
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo',
+        keep: true
+      },
+      {
+        name: tableNames.bill.voidItems,
+        columns: [
+            { name: 'BusinessDate', type: 'date' },
+            { name: 'LocationId', type: 'int NOT NULL' },
+            { name: 'MachineId', type: 'int NOT NULL' },
+            { name: 'DocNo', type: 'text NOT NULL' },
+            { name: 'SysDateTime', type: 'DATETIME NOT NULL' },
+            { name: 'ItemId', type: 'int NOT NULL' },
+            { name: 'LineNumber', type: 'int NOT NULL' },
+            { name: 'ItemType', type: 'text NOT NULL' },
+            { name: 'ParentItemId', type: 'int NOT NULL' },
+            { name: 'ShiftId', type: 'int NOT NULL' },
+            { name: 'CashierId', type: 'int NOT NULL' },
+            { name: 'StaffId', type: 'int NOT NULL' },
+            { name: 'OrgPrice', type: 'double NOT NULL' },
+            { name: 'AlteredPrice', type: 'double NOT NULL' },
+            { name: 'Price', type: 'double NOT NULL' },
+            { name: 'Qty', type: 'double NOT NULL' },
+            { name: 'SubTotal', type: 'double NOT NULL' },
+            { name: 'DiscAmount', type: 'double NOT NULL' },
+            { name: 'IsExported', type: 'boolean NOT NULL' },
+            { name: 'SeqNo', type: 'int NOT NULL' },
+        ],
+        primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo'
+      },
+      {
+        name: tableNames.bill.denominations,
+        columns: [
+            { name: 'Id', type: 'INTEGER PRIMARY KEY AUTOINCREMENT' },
+            { name: 'Desc', type: 'TEXT NOT NULL' },
+            { name: 'Value', type: 'DOUBLE NOT NULL' }
+        ],
           // keep: true
-        },
-        {
-          name: tableNames.refunds.reasons,
-          columns: [
-            { name: "Id", type: "INTEGER PRIMARY KEY" },
-            { name: "Code", type: "TEXT NOT NULL" },
-            { name: "Description1", type: "TEXT NOT NULL" },
-            { name: "Description2", type: "TEXT NULL" },
-            { name: "Type", type: "CHAR" }
-          ]
-        },
-        {
-          name: tableNames.config.printerSettings,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "Type", type: "TEXT NOT NULL" },
-            { name: "Sequence", type: "INT NOT NULL" },
-            { name: "Text", type: "TEXT NULL" },
-            { name: "IsBold", type: "BOOL" }
-          ]
-        },
-        {
-          name: tableNames.config.machines,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "Code", type: "TEXT NOT NULL" },
-            { name: "Description1", type: "TEXT NOT NULL" },
-            { name: "Description2", type: "TEXT NULL" },
-            { name: "LocationId", type: "INT" }
-          ]
-        },
-        {
-          name: tableNames.pwp.itemsByPwp,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "PwpId", type: "INT NOT NULL" },
-            { name: "ItemId", type: "INT NOT NULL" },
-            { name: "MaxQuantity", type: "INT NOT NULL" },
-            { name: "DiscountId", type: "INT" },
-            { name: "Price", type: "DOUBLE NOT NULL" },
-            { name: "IsDefault", type: "BOOL" },
-          ]
-        },
-        {
-          name: tableNames.pwp.pwp,
-          columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
-            { name: "Code", type: "TEXT NOT NULL" },
-            { name: "Description1", type: "TEXT NOT NULL" },
-            { name: "Description2", type: "TEXT NULL" },
-            { name: "PriceLevelId", type: "INT NOT NULL" },
-            { name: "FromDate", type: "DATETIME NOT NULL" },
-            { name: "ToDate", type: "DATETIME NOT NULL" },
-            { name: "ItemId", type: "INT NOT NULL" },
-            { name: "Quantity", type: "INT" },
-            { name: "MaxQuantity", type: "INT" },
-            { name: "MaxNoOfItems", type: "INT" },
-            { name: "MaxNoOfItemsPerReceipt", type: "INT" },
-            { name: "MaxPrice", type: "DOUBLE" },
-            { name: "IsMultiItemPromotion", type: "BOOL" },
-          ]
-        }
-      ]
-    });
+      },
+      {
+        name: tableNames.refunds.reasons,
+        columns: [
+            { name: 'Id', type: 'INTEGER PRIMARY KEY' },
+            { name: 'Code', type: 'TEXT NOT NULL' },
+            { name: 'Description1', type: 'TEXT NOT NULL' },
+            { name: 'Description2', type: 'TEXT NULL' },
+            { name: 'Type', type: 'CHAR' }
+        ]
+      },
+      {
+        name: tableNames.config.printerSettings,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'Type', type: 'TEXT NOT NULL' },
+            { name: 'Sequence', type: 'INT NOT NULL' },
+            { name: 'Text', type: 'TEXT NULL' },
+            { name: 'IsBold', type: 'BOOL' }
+        ]
+      },
+      {
+        name: tableNames.config.machines,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'Code', type: 'TEXT NOT NULL' },
+            { name: 'Description1', type: 'TEXT NOT NULL' },
+            { name: 'Description2', type: 'TEXT NULL' },
+            { name: 'LocationId', type: 'INT' }
+        ]
+      },
+      {
+        name: tableNames.pwp.itemsByPwp,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'PwpId', type: 'INT NOT NULL' },
+            { name: 'ItemId', type: 'INT NOT NULL' },
+            { name: 'MaxQuantity', type: 'INT NOT NULL' },
+            { name: 'DiscountId', type: 'INT' },
+            { name: 'Price', type: 'DOUBLE NOT NULL' },
+            { name: 'IsDefault', type: 'BOOL' },
+        ]
+      },
+      {
+        name: tableNames.pwp.pwp,
+        columns: [
+            { name: 'Id', type: 'INT NOT NULL PRIMARY KEY' },
+            { name: 'Code', type: 'TEXT NOT NULL' },
+            { name: 'Description1', type: 'TEXT NOT NULL' },
+            { name: 'Description2', type: 'TEXT NULL' },
+            { name: 'PriceLevelId', type: 'INT NOT NULL' },
+            { name: 'FromDate', type: 'DATETIME NOT NULL' },
+            { name: 'ToDate', type: 'DATETIME NOT NULL' },
+            { name: 'ItemId', type: 'INT NOT NULL' },
+            { name: 'Quantity', type: 'INT' },
+            { name: 'MaxQuantity', type: 'INT' },
+            { name: 'MaxNoOfItems', type: 'INT' },
+            { name: 'MaxNoOfItemsPerReceipt', type: 'INT' },
+            { name: 'MaxPrice', type: 'DOUBLE' },
+            { name: 'IsMultiItemPromotion', type: 'BOOL' },
+        ]
+      }
+    ]
+  });
