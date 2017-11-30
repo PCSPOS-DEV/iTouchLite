@@ -21,6 +21,19 @@ $ionicons-font-path: "../assets/fonts" !default;
 // Include all of Ionic
 @import "../../bower_components/ionic/scss/ionic";
 
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lato Regular'), local('Lato-Regular'), url(../assets/fonts/lato-regular.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+*{
+  font-family: Lato;
+  font-size: 14px;
+}
+
 .spinner svg {
   width: 28px;
   height: 28px;
@@ -52,17 +65,150 @@ $ionicons-font-path: "../assets/fonts" !default;
   text-align: center;
 }
 
+.text-right{
+  text-align: right;
+}
+
+padding-right{
+  padding-right: 15px;
+}
+
+.text-left{
+  text-align: left;
+}
+
 .modal {
   background-color: rgba(7, 50, 82, 1);
   color: white;
 }
 
 .modal .bar{
-  background-color: rgba(7, 50, 82, 1);
+  //background-color: rgba(7, 50, 82, 1);
 }
 
 .modal .bar {
+  //background-color: rgba(7, 50, 82, 1);
+
   .title, .button{
     color: white;
   }
 }
+
+
+//clearable input field
+/* ================================================
+Input field
+================================================ */
+.item-input input[ionic-input-clearable]{
+  padding-right: 32px;
+}
+
+
+/* ================================================
+Clear button
+================================================ */
+.input-clear-btn.button{
+  position: absolute;
+  right: 0;
+  bottom: 11px;
+  min-height: inherit;
+  -webkit-transition: 0.1s linear all;
+  transition: 0.1s linear all;
+  opacity: 1;
+}
+.input-clear-btn.button.ng-hide {
+  opacity: 0;
+}
+
+.input-clear-btn.button,
+.item-stacked-label .icon.input-clear-btn{
+  padding-right: 10px;
+}
+
+.input-clear-btn.button,
+.input-clear-btn.button .icon:before,
+.input-clear-btn.button.icon:before,
+.input-clear-btn.button.icon-left:before,
+.input-clear-btn.button.icon-right:before{
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.item-input-inset .input-clear-btn.button{
+  bottom: 4px;
+}
+
+ion-modal-view ion-header-bar.bar.bar-header {
+  background-color: #073252;
+}
+
+.popup-container.popup-showing {
+  top: -30%;
+}
+
+.no-data {
+  text-align: center;
+
+  i: {
+    font-size: 90px;
+  }
+}
+
+.row.header, .item.item-divider.header{
+  background-color: steelblue;
+}
+
+.no-padding-top { padding-top: 0; }
+
+.bold, .table-header .col { font-weight: bolder; }
+
+//for custom keyboard
+custom-keyboard-container > custom-keyboard > custom-keyboard-keys > custom-keyboard-key {
+  width: 10%;
+}
+
+custom-keyboard-container > custom-keyboard.fullKeyboard > custom-keyboard-keys > custom-keyboard-key:nth-child(10), custom-keyboard-container > custom-keyboard.fullKeyboard > custom-keyboard-keys > custom-keyboard-key:nth-child(12) {
+  background-color: #fff;
+}
+
+input[disabled], select[disabled], textarea[disabled], input[readonly]:not(.cloned-text-input), textarea[readonly]:not(.cloned-text-input), select[readonly] {
+  background-color: #fff;
+}
+
+.col-70 {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 70%;
+  -moz-box-flex: 0;
+  -moz-flex: 0 0 70%;
+  -ms-flex: 0 0 70%;
+  flex: 0 0 70%;
+  max-width: 70%;
+}
+
+
+
+ion-scroll.ionic-scroll.scroll-view {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  margin-left: 0;
+  border: none;
+}
+
+img.logo {
+  width: 100px;
+  height: 100px;
+}
+
+.image-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+div.loading-pane {
+  position: absolute;
+  left: 48%;
+  padding-top: 50%;
+}
+

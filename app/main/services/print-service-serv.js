@@ -1,4 +1,4 @@
-
+'use strict';
 angular.module('itouch.services')
 .service('PrintService', function ($log, $q, $localStorage) {
   var self = this;

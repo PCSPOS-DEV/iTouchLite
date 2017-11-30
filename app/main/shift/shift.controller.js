@@ -2,15 +2,14 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state',
-    function ($scope, ShiftService, $ionicPopup, $state) {
+  .controller('ShiftCtrl', ['$scope', 'ShiftService', '$ionicPopup', '$state', 'Report', '$q', '$ionicHistory', '$timeout', 'Alert', 'Reciept', 'CartItemService','ControlService','SuspendService',
+    function ($scope, ShiftService, $ionicPopup, $state, Report, $q, $ionicHistory, $timeout, Alert, Reciept, CartItemService,ControlService,SuspendService) {
       $scope.shifts = [];
       $scope.shiftSelectionShown = true;
       $scope.shift = {};
       $scope.title = '';
 
-      console.log('shift');
-      $scope.$on('modal.shown', function(event, modal) {
+      $scope.$on('modal.shown', function(event, modal) {       
         $scope.shiftSelectionShown = true;
         if(modal.id == 3){
           var promise = null;
@@ -40,21 +39,43 @@ angular.module('itouch.controllers')
       });
 
 
-      $scope.selectShift = function (shift) {
+      $scope.selectShift = function (shift) {        
         $scope.shift = shift;
         switch($scope.shiftListType){
-          case 'open':
-            $scope.shiftSelectionShown = false;
+          case 'open':            
+            if(shift.OpenDateTime){
+              ShiftService.saveCurrent(shift);
+              $scope.$emit('shift-changed');
+              $scope.$emit("shift-modal-close");
+              $timeout(function(){
+                $ionicHistory.nextViewOptions({
+                  disableAnimate: false,
+                  disableBack: true
+                });
+                $state.go('app.sales');
+              }, 1000);
+            } else {
+              $scope.shiftSelectionShown = false;
+            }
+
             break;
           case 'close':
             closeShift($scope.shift);
             break;
           case 'declareCash':
-            $scope.$emit("shift-modal-close");
-            $scope.$emit("declare-cash", shift);
+            $scope.close();
+            $timeout(function(){
+              $scope.$emit("declare-cash", shift);
+            }, 500);
+
             break;
           default:
-            // $scope.$emit("shift-modal-close");
+            $ionicHistory.nextViewOptions({
+              disableAnimate: false,
+              disableBack: true
+            });
+            ShiftService.clearCurrent();
+            $scope.$emit("shift-modal-close");
             $scope.$emit("shift-exit", shift);
             break;
         }
@@ -69,9 +90,24 @@ angular.module('itouch.controllers')
       }
 
       $scope.save = function () {
-        ShiftService.saveCurrent($scope.shift).then(function(){
-          $scope.$emit("shift-modal-close");
+        $q.all({
+          save: ShiftService.saveCurrent($scope.shift),
+          addFloat: ShiftService.addFloat($scope.shift, $scope.shift.RA)
+        }).then(function(){
+          Reciept.openDrawer();
+
           $scope.$emit('shift-changed');
+          Report.printAddFloat($scope.shift.RA);
+          $scope.$emit("shift-modal-close");
+
+          $timeout(function(){
+            $ionicHistory.nextViewOptions({
+              disableAnimate: false,
+              disableBack: true
+            });
+            $state.go('app.sales');
+          }, 1000);
+
         }, function(err){
           console.log(err);
         });
@@ -79,21 +115,46 @@ angular.module('itouch.controllers')
       }
 
       var closeShift = function(shift){
-        var confirmPopup = $ionicPopup.confirm({
-          title: 'Close Shift?',
-          template: 'Are you sure you want to close this shift ('+shift.Id+')?'
-        });
+        CartItemService.isEmpty().then(function (isEmpty) {
+          if(isEmpty){
+            /*Alert.showConfirm('Are you sure you want to close this shift ('+shift.Id+')?', 'Close Shift?', function(res){
+              if(res == 1){  
+              SuspendService.fetchSuspendedBills().then(function(data){  
+                console.log("SuspendService");                 
+               console.log(data);                 
+                if(data.length!=0){
+                  Alert.warning('Shift cannot be closed since the system detects the suspend bills.');
+                }
+                else{
+                ShiftService.closeShift(shift.Id || null).then(function(success){
+                  //var businessDate = angular.copy(ControlService.getBusinessDate());
+                  //Report.printShiftClosingReport(shift.Id, businessDate);                   
+                  $scope.$emit("shift-close", shift);
+                }, function(err){
+                  console.log(err);
+                });
+               }
+               });
 
-        confirmPopup.then(function(res) {
-          if(res) {
-            ShiftService.closeShift(shift.Id || null).then(function(success){
-              $scope.$emit("shift-close", shift);
-              console.log(success);
-            }, function(err){
-              console.log(err);
-            });
+              }
+            });*/
+            Alert.showConfirm('Are you sure you want to close this shift ('+shift.Id+')?', 'Close Shift?', function(res){
+              if(res == 1){ 
+             ShiftService.closeShift(shift.Id || null).then(function(success){
+                  //var businessDate = angular.copy(ControlService.getBusinessDate());
+                  //Report.printShiftClosingReport(shift.Id, businessDate);                   
+                  $scope.$emit("shift-close", shift);
+                }, function(err){
+                  console.log(err);
+                });
+               }
+             });
+          } else {
+            Alert.warning('Unsaved items should be saved before closing the shift');
           }
         });
+
+
       }
 
     }]);

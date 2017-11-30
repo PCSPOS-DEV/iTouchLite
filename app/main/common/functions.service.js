@@ -8,19 +8,27 @@ angular.module('itouch.services')
     self.fetch = function(){
       var deferred = $q.defer();
       DB.createTable(table);
-      angular.forEach(functions, function(fn){
-        DB.addQueryToQueue("INSERT INTO "+ DB_CONFIG.tableNames.keyboard.functions + " VALUES(?,?,?,?,?,?,?,?,?)", fn);
+      DB.select(DB_CONFIG.tableNames.keyboard.functions, 'COUNT(*) AS count').then(function(res){
+          if(DB.fetch(res)['count'] == 0){
+              angular.forEach(functions, function(fn){
+                  DB.addQueryToQueue("INSERT INTO "+ DB_CONFIG.tableNames.keyboard.functions + " VALUES(?,?,?,?,?,?,?,?,?)", fn);
+              });
+          }
+          deferred.resolve(true);
       });
-      deferred.resolve(true);
       return deferred.promise;
     };
 
     self.get = function(type){
       var deferred = $q.defer();
-      DB.select(DB_CONFIG.tableNames.keyboard.functions, "*", {columns: "Type = ? AND Inactive = ?", data: [type, false]}, 'Code').then(function(result){
-        deferred.resolve(DB.fetchAll(result));
+      var where = null;
+      if(type){
+        where = {columns: "Type = ? AND Inactive = ?", data: [type, false]}
+      }
+      DB.select(DB_CONFIG.tableNames.keyboard.functions, "*", where, 'Code').then(function(result){
+        var functions = DB.fetchAll(result);
+        deferred.resolve(functions);
       }, function(err){
-        throw new Error(err.message);
         deferred.reject(err.message);
       });
       return deferred.promise;
@@ -32,6 +40,30 @@ angular.module('itouch.services')
 
     self.getTenderFunctions = function(){
       return self.get('T');
+    }
+
+    self.insert = function(data, toQueue){
+      if(toQueue){
+        DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.functions, data);
+      } else {
+        return DB.insert(DB_CONFIG.tableNames.keyboard.functions, data);
+      }
+    }
+
+    self.update = function(data, where, toQueue){
+      if(toQueue){
+        DB.addUpdateToQueue(DB_CONFIG.tableNames.keyboard.functions, data, where);
+      } else {
+        return DB.update(DB_CONFIG.tableNames.keyboard.functions, data, where);
+      }
+    }
+
+
+    self.getNextCode = function(){
+      return DB.max(DB_CONFIG.tableNames.keyboard.functions, 'Code').then(function(code){
+        return ++code;
+      });
+
     }
 
     var table = {
@@ -46,17 +78,18 @@ angular.module('itouch.services')
         { name: "Type", type: "TEXT" },
         { name: "AccessLevel", type: "INT" },
         { name: "DisplayOnTop", type: "BOOLEAN" }
-      ]
+      ],
+        keep: true
     };
     var functions = [
-        [1, 'Void Transaction', null, 'VoidFunction', true, false, 'V', 1, false],
+        // [1, 'Void Transaction', null, 'VoidFunction', true, false, 'V', 1, false],
         [3, 'Suspend', null, 'CallSuspendBill', false, true, 'V', 1, false],
         [4, 'Refund', null, 'ReFundDeposit', true, false, 'F', 1, false],
-        [6, 'Shift Exit', null, 'shiftexit', true, false, 'F', 1, false],
-        [7, 'Open Shift', null, 'openshift', true, false, 'V', 1, false],
-        [8, 'Void Item,', null, 'VoidItem', true, true, 'V', 1, false],
-        [9, 'Declare Cash Later', null, 'dcl', true, false, 'F', 1, false],
-        [10, 'Close Shift', null, 'closeshift', true, false, 'F', 1, false],
+        // [6, 'Shift Exit', null, 'shiftexit', true, false, 'F', 1, false],
+        // [7, 'Open Shift', null, 'openshift', true, false, 'V', 1, false],
+        // [8, 'Void Item,', null, 'VoidItem', true, true, 'V', 1, false],
+        // [9, 'Declare Cash Later', null, 'dcl', true, false, 'F', 1, false],
+        // [10, 'Close Shift', null, 'closeshift', true, false, 'F', 1, false],
         // [11, 'Search', null, 'Search', true, false, 'F', 1, false],
         // [12, 'Search Receipt', null, 'SearchReceipt', true, false, 'V', 1, false],
         // [21, 'Activate Pump', null, 'ActivatePump', true, true, 'V', 1, false],
@@ -64,7 +97,7 @@ angular.module('itouch.services')
         // [23, 'Force Conclude (Y)', null, 'ForceConclusion', true, true, 'V', 1, false],
         // [24, 'Mifare Topup', null, 'MiFareTopUp', false, false, 'V', 8, false],
         // [26, 'Open Drawer', null, 'OpenDrawer', true, false, 'V', 1, false],
-        [27, 'Print Receipt', null, 'RePrintReceipt', true, false, 'V', 1, false],
+        // [27, 'Print Receipt', null, 'RePrintReceipt', true, false, 'V', 1, false],
         // [30, 'VIP', null, 'VipPricelvl', false, true, 'V', 1, false],
         // [31, 'Mifare Refund', null, 'MiFareRefund', false, false, 'V', 1, false],
         // [32, 'Price Level', null, 'PriceLevel', true, false, 'V', 1, false],
@@ -87,8 +120,8 @@ angular.module('itouch.services')
         // [52, 'Suspend Void Item', null, 'VoidSuspendItem', true, true, 'V', 1, false],
         // [53, 'Cancel Order', null, 'CancelOrder', true, false, 'V', 1, false],
         // [54, 'Change Table', null, 'ChangeTable', true, true, 'V', 1, false],
-        [55, 'Special Order', null, 'SpecialOrder', true, true, 'V', 1, false],
-        [56, 'Item Remark', null, 'TransactionRemark', true, true, 'V', 1, false],
+        // [55, 'Special Order', null, 'SpecialOrder', true, true, 'V', 1, false],
+        // [56, 'Item Remark', null, 'TransactionRemark', true, true, 'V', 1, false],
         // [81, 'Foreign Exchange', null, 'callforex', true, true, 'T', 1, false],
         // [82, 'Toggle Tax', null, 'toggletax', true, true, 'T', 1, false],
         // [83, 'Redeem', null, 'Redemption', false, true, 'T', 1, false],
@@ -97,7 +130,8 @@ angular.module('itouch.services')
         // [86, 'Tender Remark', null, 'TenderRemarks', true, false, 'T', 1, false],
         [87, 'Payment Made', null, 'PaymentMade', false, true, 'T', 1, false],
         // [88, 'VIPs', null, 'vipdiscount', false, true, 'T', 1, false],
-        [89, 'Staff Usage', null, 'TenderStaff', false, true, 'T', 1, false],
+        // [89, 'Staff Usage', null, 'TenderStaff', false, true, 'T', 1, false],
+        [89, '', null, 'TenderStaff', false, true, 'T', 1, false],
         [90, 'Discount', null, 'Discount', false, true, 'T', 1, false],
         // [91, 'Deposit', null, 'TenderDeposit', true, true, 'T', 1, false],
         // [92, 'Force Conclude (R)', null, 'ForceConclusionRed', true, false, 'V', 1, false],
@@ -108,13 +142,13 @@ angular.module('itouch.services')
         // [98, 'Search Barcode', null, 'BarcodeSearch', true, false, 'V', 1, false],
         // [99, 'Reprint TopUp', null, 'RePrintTopUpReceipt', true, false, 'V', 1, false],
         [101, 'Abort', null, 'AbortFunction', false, true, 'V', 1, true],
-        [102, 'Void', null, 'VoidTop', false, true, 'V', 1, true],
-        [103, 'History', null, 'ReceiptHistory', false, true, 'V', 1, true],
+        [102, 'Void', null, 'VoidTop', false, false, 'V', 1, true],
+        [103, 'History', null, 'ReceiptHistory', false, false, 'V', 1, true],
         // [104, 'Suspend', null, 'SuspendTop', false, true, 'V', 1, false],
         // [106, 'Clear', null, 'ClearTop', true, true, 'V', 1, true],
-        [200, 'Add Float', null, 'AddFloat', true, false, 'V', 1, false],
-        [201, 'Change Price', null, 'ChangeItemPrice', true, true, 'V', 3, false],
-        [202, 'Day End Closing', null, 'DayEndClosing', true, false, 'V', 1, false],
+        // [200, 'Add Float', null, 'AddFloat', true, false, 'V', 1, false],
+        // [201, 'Change Price', null, 'ChangeItemPrice', true, true, 'V', 3, false],
+        // [202, 'Day End Closing', null, 'DayEndClosing', true, false, 'V', 1, false],
         // [205, 'Combine Bills', null, 'CombineBills', true, true, 'V', 1, false],
         // [206, 'Split Bills', null, 'SplitBills', true, true, 'V', 1, false],
         // [207, 'Present Bill', null, 'PresentBill', true, true, 'V', 1, false],
@@ -130,14 +164,16 @@ angular.module('itouch.services')
         [1001, 'Drink Modifiers', null, 'BeveragesModifiers', false, true, 'V', 1, true],
         [1002, 'Full T/A', null, 'FullTakeaway', false, true, 'V', 1, true],
         [1003, 'Partial T/A', null, 'PartialTakeaway', false, true, 'V', 1, true],
-        // [1005, 'Tag', null, 'OrderTag', false, true, 'V', 1, true],
+        [1005, 'Tag', null, 'OrderTag', false, true, 'V', 1, true],
         [1006, 'Discount', null, 'Discount', false, true, 'V', 1, false],
         [1008, 'Refund Item', null, 'ItemReverse', false, true, 'V', 1, false],
         // [1009, 'Reports', null, 'winreportc40', false, true, 'V', 1, false],
         [1010, 'Shift Option', null, 'Shiftoption', false, false, 'V', 1, false],
         // [2000, 'KeyBoard', null, 'KeyBoardTop', false, true, 'V', 1, false],
+        // [2001, '', null, 'ItemDetailTop', false, true, 'V', 1, false],
+        // [2001, '', null, 'ItemDetailTop', false, true, 'V', 1, false],
         [2001, 'Item Detail', null, 'ItemDetailTop', false, true, 'V', 1, false],
-        // [2002, 'Search', null, 'SearchTop', false, true, 'V', 1, false],
+        [2002, 'Search', null, 'SearchTop', false, true, 'V', 1, false],
         // [10000, 'Lock Machine', null, 'LockMachineTop', true, false, 'V', 1, true]
     ];
   }]);

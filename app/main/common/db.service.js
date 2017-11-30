@@ -13,12 +13,13 @@ angular.module('itouch.services')
      * @type {Array}
        */
     var queue = [];
+    var sqlLiteOff = false;
 
     /**
      * Initialize the database connection
      */
     self.init = function () {
-      if (window.sqlitePlugin) {
+      if (window.sqlitePlugin && sqlLiteOff == false) {
         self.db = window.sqlitePlugin.openDatabase({name: DB_CONFIG.name, location: 'default'});    //enables the sqllite plugin for development
       } else {
         self.db = window.openDatabase(DB_CONFIG.name, '1.0', 'database', -1);     //enables the websql for testing purposes
@@ -94,7 +95,6 @@ angular.module('itouch.services')
       q += ')'
       self.addQueryToQueue(q);
     };
-
 
 
     /**
@@ -249,7 +249,7 @@ angular.module('itouch.services')
      * @param tableName
      * @param bindings
      */
-    self.addUpdateToQueue = function (tableName, bindings, where) {
+    self.addUpdateToQueue = function (tableName, bindings, where) {      
      var q = prepareUpdateQuery(tableName, bindings, where);
       queue.push({query: q.query, data: q.values});
     }
@@ -281,7 +281,7 @@ angular.module('itouch.services')
      * Executes the query queue within a transaction & rollbacks if an error is thrown
      * @returns {Promise}
        */
-    self.executeQueue = function () {
+    self.executeQueue = function () {      
       var deferred = $q.defer();
       if (queue.length > 0) {
         var query, values;
@@ -296,9 +296,9 @@ angular.module('itouch.services')
               deferred.resolve(result);
             }, function(transaction, error) {
               $log.log(error.message + " in " + query + " (params : "+values.join(", ")+")");
+              // throw new Error(error.message + " in " + query + " (params : "+values.join(", ")+")");
               deferred.reject(error.message + " in " + query + " (params : "+values.join(", ")+")");
-              throw new Error(error.message);
-              return false;
+              // return false;
             });
           });
         });
@@ -322,6 +322,9 @@ angular.module('itouch.services')
        * @returns {Promise}
        */
     self.select = function (tableName, columns, where, order, limit) {
+      if(!columns){
+        columns = "*";
+      }
       var q = "SELECT "+columns+" FROM "+tableName;
       if(where){
         q += " WHERE " + where.columns;
@@ -335,9 +338,26 @@ angular.module('itouch.services')
       return self.query(q, where ? where.data : []);
     }
 
+    self.selectGroupBy = function (tableName, columns, where, groupby, limit) {
+      if(!columns){
+        columns = "*";
+      }
+      var q = "SELECT "+columns+" FROM "+tableName;
+      if(where){
+        q += " WHERE " + where.columns;
+      }
+      if(groupby){
+        q += " GROUP BY " + groupby;
+      }
+      if(limit){
+        q += " LIMIT " + limit;
+      }
+      return self.query(q, where ? where.data : []);
+    }
+
     self.max = function (table, column, where) {
-      return self.select(table, "MAX("+column+") ", where, '1').then(function (result) {
-        var ln = parseInt(self.fetch(result)["MAX("+column+")"] || 0);
+      return self.select(table, "MAX("+column+") AS max ", where, '1').then(function (result) {
+        var ln = parseInt(self.fetch(result)["max"] || 0);
         if(isNaN(ln)){
           ln = 0;
         }

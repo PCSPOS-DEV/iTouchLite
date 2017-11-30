@@ -71,8 +71,6 @@ angular.module('itouch.services')
      * @param date
        */
     self.setBusinessDate = function (moment) {
-      console.log("bd set");
-      console.log(moment);
       $localStorage.app_config.businessDate = moment.valueOf();
     }
 
@@ -82,7 +80,7 @@ angular.module('itouch.services')
      */
     self.setDayEndDate = function (m) {
       $localStorage.app_config.dayEndDate = m.valueOf();
-      self.setBusinessDate(moment([1950, 1, 1])); //setting business date to 1950-jan-01 (month is 0 based in js)
+      self.setBusinessDate(moment([1950, 0, 1])); //setting business date to 1950-jan-01 (month is 0 based in js)
       // $localStorage.app_config.businessDate = moment().valueOf();
     }
 
@@ -92,7 +90,7 @@ angular.module('itouch.services')
      * @returns {Date}
        */
     self.getNextBusinessDate = function () {
-      if(self.getBusinessDate() && moment([1950, 1, 1]).diff(self.getBusinessDate())){
+      if(self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())){
         return self.getBusinessDate().add(1, 'days');
       } else {
         return (self.getDayEndDate() ? self.getDayEndDate().add(1, 'days') : moment());
@@ -117,8 +115,12 @@ angular.module('itouch.services')
      * @returns {string}
        */
     self.getNextDocId = function() {
-      var newId = parseInt($localStorage.app_config.currentDocId.substring(1, 6));
-      return 'R'+('00000' + ++newId).slice(-5);
+      if($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)){
+        var newId = parseInt($localStorage.app_config.currentDocId.substring(1, 6));
+        return 'R'+('00000' + ++newId).slice(-5);
+      } else{
+        return 'R00001';
+      }
     }
 
     /**
@@ -139,6 +141,14 @@ angular.module('itouch.services')
 
     self.getTakeAwayTax = function () {
       return 0;
+    }
+
+    self.counterDocId = function(DocNo){
+      self.saveDocId(DocNo);
+      var nextId = self.getNextDocId();
+      //console.log(self.getDocId());
+      self.saveDocId(nextId);
+      //console.log(nextId);
     }
 
     return self;

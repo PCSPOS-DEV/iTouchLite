@@ -11,6 +11,9 @@ Number.prototype.roundTo = function(decimalPoints, step) {
   step || (step = 1.0);
   var inv = 1.0 / step;
   var val = +(Math.round(this.valueOf() + "e+"+decimalPoints)  + "e-"+decimalPoints);
+  if(_.isNaN(val)){
+    val = 0;
+  }
   return (val * inv) / inv;
 };
 

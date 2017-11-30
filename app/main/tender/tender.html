@@ -1,143 +1,159 @@
-<ion-modal-view class="tender" ng-controller="TenderCtrl">
-  <ion-header-bar>
-    <h1 class="title">{{title}}</h1>
-    <button class="button button-clear" ng-click="close()"> <i class="ion-close-round"></i></button>
-  </ion-header-bar>
+<ion-view view-title="iTouch NX Lite" class="tender" can-swipe-back="false">
   <ion-content scroll="false">
-    <div class="row summary">
-      <div class="col col-50">
-        <div class="row">
-          <div class="col col-50">
-            <div class="row">
-              <div class="col">Receipt No</div>
-              <div class="col">{{ tenderHeader.DocNo }}</div>
+    <div class="wrapper">
+      <div class="row summary">
+        <div class="col col-50">
+          <div class="row">
+            <div class="col col-50 underlined">
+              <div class="row">
+                <div class="col">Receipt No</div>
+                <div class="col">{{ tenderHeader.DocNo }}</div>
+              </div>
+            </div>
+            <div class="col col-40 underlined">
+              <div class="row">
+                <div class="col">NA</div>
+                <div class="col">{{ tenderHeader.Tax3Amount.toFixed(2) }}</div>
+              </div>
             </div>
           </div>
-          <div class="col col-50">
-            <div class="row">
-              <div class="col">NA</div>
-              <div class="col">{{ tenderHeader.Tax3Amount.toFixed(2) }}</div>
+          <div class="row">
+            <div class="col col-50 underlined">
+              <div class="row">
+                <div class="col">Discount</div>
+                <div class="col">{{ (tenderHeader.Discount+tenderHeader.Tax5DiscAmount).toFixed(2) }}</div>
+              </div>
+            </div>
+            <div class="col col-40 underlined">
+              <div class="row">
+                <div class="col">NA</div>
+                <div class="col">{{ tenderHeader.Tax4Amount.toFixed(2) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-50 underlined">
+              <div class="row">
+                <div class="col">NA</div>
+                <div class="col">{{ tenderHeader.Tax1Amount.toFixed(2)}}</div>
+              </div>
+            </div>
+            <div class="col col-40 underlined">
+              <div class="row">
+                <div class="col">GST 7%</div>
+                <div class="col">{{ (tenderHeader.Tax5Amount - tenderHeader.Tax5DiscAmount||0).toFixed(2) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-50 underlined">
+              <div class="row">
+                <div class="col">NA</div>
+                <div class="col">{{ tenderHeader.Tax2Amount.toFixed(2) }}</div>
+              </div>
+            </div>
+            <div class="col col-40 underlined">
+              <div class="row">
+                <div class="col">&nbsp;</div>
+                <div class="col">&nbsp;</div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col col-50">
-            <div class="row">
-              <div class="col">Discount</div>
-              <div class="col">{{ tenderHeader.Discount.toFixed(2) }}</div>
+
+
+        <div class="col col-50 totals">
+          <div class="row">
+            <div class="col col-60">Sub Total</div>
+            <div class="col col-40">
+              <div class="total">
+                <input class="total bold" type="text" ng-value="tenderHeader.UpdatedTenderTotal||tenderHeader.TenderTotal" ng-readonly="true" />
+              </div>
             </div>
           </div>
-          <div class="col col-50">
-            <div class="row">
-              <div class="col">NA</div>
-              <div class="col">{{ tenderHeader.Tax4Amount.toFixed(2) }}</div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-50">
-            <div class="row">
-              <div class="col">NA</div>
-              <div class="col">{{ tenderHeader.Tax1Amount.toFixed(2)}}</div>
-            </div>
-          </div>
-          <div class="col col-50">
-            <div class="row">
-              <div class="col">GST 7%</div>
-              <div class="col">{{ tenderHeader.Tax5Amount.toFixed(2) }}</div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-50">
-            <div class="row">
-              <div class="col">NA</div>
-              <div class="col">{{ tenderHeader.Tax2Amount.toFixed(2) }}</div>
-            </div>
-          </div>
-          <div class="col col-50">
-            <div class="row">
-              <div class="col">&nbsp;</div>
-              <div class="col">&nbsp;</div>
-            </div>
+          <div class="row">
+            <div class="col col-60">Rounded Sub Total</div>
+            <div class="col col-40"><input class="total bold" type="text" ng-value="tenderHeader.TotalRounded" ng-readonly="true" /></div>
           </div>
         </div>
       </div>
 
-
-      <div class="col col-50 totals">
-        <div class="row">
-          <div class="col col-67">Sub Total</div>
-          <div class="col col-33">
-            <input class="total" type="text" ng-value="tenderHeader.UpdatedTenderTotal||tenderHeader.TenderTotal" ng-readonly="true" />
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-67">Rounded Sub Total</div>
-          <div class="col col-33"><input class="total" type="text" ng-value="tenderHeader.UpdatedTenderTotal||tenderHeader.TotalRounded" ng-readonly="true" /></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col col-75 list">
-        <ion-scroll zooming="false" direction="y" id="tender-types">
-        <a ng-repeat="tenderType in tenderTypes" href="" class="button button-calm tender-item"
-           ng-click="selectTenderType(tenderType)">
+      <div class="row">
+        <div class="col col-80 list">
+          <div class="scroll-wrapper">
+            <ion-scroll zooming="false" direction="y" id="tender-types">
+              <a ng-repeat="tenderType in tenderTypes" href="" class="button button-calm tender-item"
+                 ng-click="selectTenderType(tenderType)">
           <span class="buttontext">
           {{ print(tenderType, 'Description')}}
-            {{tenderType.Round == 'true' ? ' ( $' + (tenderHeader.UpdatedTenderTotal || tenderHeader.TotalRounded) +' )' : ''}}</span>
-        </a>
-          </ion-scroll>
-      </div>
-      <div class="col col-25">
-
-
-        <div class="row">
-          <div class="col">
-            <div class="button-row">
-              <a href="" ng-click="numpadClick('7')" class="button">7</a>
-              <a href="" ng-click="numpadClick('8')" class="button">8</a>
-              <a href="" ng-click="numpadClick('9')" class="button">9</a>
-            </div>
-            <div class="button-row">
-              <a href="" ng-click="numpadClick('4')" class="button">4</a>
-              <a href="" ng-click="numpadClick('5')" class="button">5</a>
-              <a href="" ng-click="numpadClick('6')" class="button">6</a>
-            </div>
-            <div class="button-row">
-              <a href="" ng-click="numpadClick('1')" class="button">1</a>
-              <a href="" ng-click="numpadClick('2')" class="button">2</a>
-              <a href="" ng-click="numpadClick('3')" class="button">3</a>
-            </div>
-            <div class="button-row">
-              <a href="" ng-click="numpadClick('0')" class="button">0</a>
-              <a href="" ng-click="numpadDotClick()" class="button">.</a>
-              <a href="" ng-click="numpadClear()" class="button">C</a>
-            </div>
+            {{tenderType.Round == 'true' ? ' ( $' + (tenderHeader.TotalRounded || tenderHeader.TenderTotal) +' )' : ''}}</span>
+              </a>
+            </ion-scroll>
           </div>
         </div>
-        <div class="functions">
-          <div class="row">
-            <div class="col">
-              <!-- AppCtrl.print() -->
-              <a href="" class="button" ng-repeat="fn in functions.top">{{print(fn, 'Description')}}</a>
+        <div class="col col-20">
+
+
+          <div class="row no-padding-top">
+            <div class="col no-padding-top">
+              <div class="num-pad">
+                <div class="button-row">
+                  <a href="" ng-click="numpadClick('7')" class="button">7</a>
+                  <a href="" ng-click="numpadClick('8')" class="button">8</a>
+                  <a href="" ng-click="numpadClick('9')" class="button">9</a>
+                </div>
+                <div class="button-row">
+                  <a href="" ng-click="numpadClick('4')" class="button">4</a>
+                  <a href="" ng-click="numpadClick('5')" class="button">5</a>
+                  <a href="" ng-click="numpadClick('6')" class="button">6</a>
+                </div>
+                <div class="button-row">
+                  <a href="" ng-click="numpadClick('1')" class="button">1</a>
+                  <a href="" ng-click="numpadClick('2')" class="button">2</a>
+                  <a href="" ng-click="numpadClick('3')" class="button">3</a>
+                </div>
+                <div class="button-row">
+                  <a href="" ng-click="numpadClick('0')" class="button">0</a>
+                  <a href="" ng-click="numpadDotClick()" class="button">.</a>
+                  <a href="" ng-click="numpadClear()" class="button">C</a>
+                </div>
+              </div>
+
             </div>
           </div>
-          <div class="row">
-            <div class="col">
-              <a href="" class="button" ng-repeat="fn in functions.bottom" ng-click="invoke(fn.Name)">{{print(fn, 'Description')}}</a>
+          <div class="functions">
+            <div class="row">
+              <div class="col">
+                <!-- AppCtrl.print() -->
+                <a href="" class="button" ng-repeat="fn in functions.top">{{print(fn, 'Description')}}</a>
+              </div>
             </div>
-          </div>
+            <div class="functions">
+              <a href="" class="button button-full" ng-repeat="fn in functions.bottom" ng-click="invoke(fn)">{{print(fn, 'Description')}}</a>
+            </div>
+            </div>
+
         </div>
       </div>
     </div>
   </ion-content>
-  <!--<ion-footer-bar class="bar-stable">-->
-    <!--<div class="h1 title"></div>-->
-    <!--<div class="buttons">-->
-      <!--<button class="button button-primary button-outline" ng-click="save()">Save</button>-->
-      <!--<button class="button button-energized button-outline" ng-click="modalClose()">Cancel</button>-->
-    <!--</div>-->
-  <!--</ion-footer-bar>-->
-</ion-modal-view>
+  <div class="bar bar-footer">
+    <div class="col page-bar row pages">
+      <div class="wrapper">
+        <ion-scroll direction="x">
+          <div class="button-bar">
+            <a class="button  button-positive" ng-repeat="denomination in denominations" ng-click="addDenomination(denomination.Value)">
+              <p class="desc1">{{ denomination.Desc }}</p>
+            </a>
+          </div>
+
+        </ion-scroll>
+      </div>
+    </div>
+    <div class="col">
+      <div class="cancel-button">
+        <button ng-click="close()" class="button button-assertive button-full">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ion-view>

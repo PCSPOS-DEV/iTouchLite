@@ -1,3 +1,61 @@
+.tender {
+  .functions{
+    height: 282px;
+  }
+
+  .functions {
+    width: 167px;
+    margin-left: 5px;
+  }
+
+  .num-pad .button {
+    min-width: 54px;
+    min-height: 50px;
+  }
+
+  div.total {
+    background-color: #f8f8f8;
+    cursor: not-allowed;
+  }
+  .scroll-wrapper {
+    max-width: 760px;
+    overflow: hidden;
+  }
+
+  .bar-footer{
+    margin: 0;
+    padding: 0;
+
+    .pages {
+      margin: 0;
+      padding: 0;
+
+      .wrapper {
+        margin: 1px 0 0 0;
+        padding: 0;
+        width: 800px;
+
+        .button {
+          border-radius: 0;
+          padding-top: 7px;
+          border-left: 1px solid white;
+        }
+      }
+    }
+
+    .cancel-button {
+
+      .button {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        padding-bottom: 10px;
+        padding-top: 5px;
+      }
+    }
+  }
+
+}
+
 .tender, .tender .bar{
   background-color: rgba(7, 50, 82, 1);
   color: white;
@@ -10,6 +68,12 @@
 
 
 .tender .btn { min-width: 19%; padding-top: 15px; padding-bottom: 15px; height: auto; }
+
+.tender .wrapper {
+  width: 96%;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 .tender.modal {
     top: 10%;
@@ -36,7 +100,7 @@
   max-width: 30%;
   margin: 5px;
   height: auto;
-  font-size: 12px;
+  font-size: 14px;
   background-color: rgba(32, 114, 112, 1);
 }
 
@@ -52,22 +116,41 @@
   max-width: 100%;
   margin: 2px;
   height: auto;
-  font-size: 12px;
 }
 
 .tender input.total {
-  margin-right: 3px;
-  width: 131px;
+  margin-right: 5px;
+  width: 89%;
   margin-bottom: 2px;
   padding-bottom: 0px;
   text-align: right;
+  float: right;
+  font-size: 20px;
 }
 
 .tender #tender-types {
-  height: 400px;
+  height: 530px;
+  width: 815px;
 }
 
 .tender .scroll-view.scroll-y {
   overflow-x: hidden;
   overflow-y: hidden;
+}
+
+.tender .num-pad {
+  float: right;
+  margin-right: -4px;
+}
+
+.tender .underlined {
+  border-bottom: 1px solid white;
+}
+
+.bar-footer .bar-footer .pages .scroll:last-child{
+  border-left: none;
+}
+
+.payment-made .item-note {
+  color:#444;
 }

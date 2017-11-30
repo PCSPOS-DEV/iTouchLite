@@ -1,0 +1,20 @@
+<ion-modal-view class="payment-made">
+  <ion-header-bar>
+    <h1 class="title">Payments Made</h1>
+    <button class="button button-clear" ng-click="closePaymentsModal()"> <i class="ion-close-round"></i></button>
+  </ion-header-bar>
+  <ion-content class="padding">
+    <ion-list>
+      <ion-item ng-repeat="item in payTransactions">
+        {{print(item, 'Desc')}}
+        <span class="item-note">${{item.Amount.toFixed(2)}}</span>
+      </ion-item>
+    </ion-list>
+    <div class="no-data" ng-if="payTransactions.length == 0">
+      <!--<p>-->
+        <i class="icon ion-android-warning"></i>
+      <!--</p>-->
+      <p>No records found</p>
+    </div>
+  </ion-content>
+</ion-modal-view>

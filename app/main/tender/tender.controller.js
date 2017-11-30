@@ -2,62 +2,70 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService', 'DiscountService', '$ionicModal', 'RoundingService',
-    function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService) {
-      $scope.tenderTypes = [];
+  .controller('TenderCtrl', ['$scope', 'TenderService', 'BillService', 'AuthService', 'SettingsService', '$filter', 'FunctionsService', 'ControlService', '$ionicPopup', 'CartItemService',
+    'DiscountService', '$ionicModal', 'RoundingService', 'Reciept', 'billData', '$state', '$rootScope', '$ionicHistory', '$stateParams', '$q', 'ItemService', 'denominations', '$ionicScrollDelegate', 'Alert', 'Restangular', 'AppConfig','$timeout',
+    function ($scope, TenderService, BillService, AuthService, SettingsService, $filter, FunctionsService, ControlService, $ionicPopup, CartItemService, DiscountService, $ionicModal, RoundingService,
+              Reciept, billData, $state, $rootScope, $ionicHistory, $stateParams, $q, ItemService, denominations,$ionicScrollDelegate,Alert, Restangular, AppConfig,$timeout) {
+    $scope.tenderTypes = [];
       $scope.title = "Tender";
-      $scope.tenderHeader = {
-        DiscAmount: 0,
-        DocNo: "",
-        Pax: 0,
-        SubTotal: 0,
-        Tax1Amount: 0,
-        Tax1DiscAmount: 0,
-        Tax2Amount: 0,
-        Tax2DiscAmount: 0,
-        Tax3Amount: 0,
-        Tax3DiscAmount: 0,
-        Tax4Amount: 0,
-        Tax4DiscAmount: 0,
-        Tax5Amount: 0,
-        Tax5DiscAmount: 0,
-        TaxAmount: 0,
-        Total: 0,
-        TotalRounded: 0,
-        Disocunt: 0
-      };
+      $scope.tenderHeader = billData.header;
+      $scope.billItems = billData.items;
       var payTransactions = [];
-      var businessDate = $filter('date')(ControlService.getBusinessDate(), "yyyy-MM-dd");
+      $scope.payTransactions = [];
+      var businessDate = ControlService.getBusinessDate(true);
       var tenderDiscount = {
         header: null,
         discount: null
       };
+      $scope.tenderTypes = billData.tenderTypes;
+      $scope.functions = billData.functions;
+      $scope.denominations = denominations;
 
       $scope.updatedRoundedTotal = 0;
+      var submitted = false;
+      $scope.modals = {
+        loginModal: null
+      };
 
-      TenderService.getTenderTypes().then(function (types) {
-        $scope.tenderTypes = types;
+      $scope.$on("$ionicView.beforeEnter", function(event, data){        
+        submitted = false;        
+        DiscountService.clearTempTenderDiscounts();
+        initBill();
       });
 
-      FunctionsService.getTenderFunctions().then(function (fns) {
-        $scope.functions = {
-          top: _.where(fns, {DisplayOnTop: "true"}),
-          bottom: _.where(fns, {DisplayOnTop: "false"})
-        }
-      });
+      var initBill = function(){
+        //console.log($stateParams.DocNo);
+        payTransactions = [];
+        $scope.payTransactions = [];
+        DiscountService.clearTenderDiscounts();
+        $q.all({
+          header: BillService.getTempHeader($stateParams.DocNo),
+          items: CartItemService.getItems($stateParams.DocNo)
+        }).then(function(data){
+          if(data.header){
+            /*Yi Yi Po (25-07-2017)*/     
+            //data.header.DiscAmount=data.header.DiscAmount-(data.header.Tax1DiscAmount + data.header.Tax2DiscAmount + data.header.Tax3DiscAmount+ data.header.Tax4DiscAmount + data.header.Tax5DiscAmount);
+            /*---*/
+            
+            $scope.header = ItemService.calculateTotal(data.header);
+            $scope.header.CashierId=AuthService.currentUser().Id;
+            $scope.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
+            $scope.header.UpdatedTenderTotal = data.header.Total.toFixed(2) || 0 ;
+            $scope.header.TenderTotal = data.header.Total.toFixed(2) || 0 ;
+            $scope.header.UpdatedRoundedTotal = RoundingService.round(data.header.Total).toFixed(2);
+            $scope.tenderHeader = $scope.header;
+            $scope.billItems = _.map(data.items, function (item) {
+              if(item.SuspendDepDocNo){
+                  $scope.header.isSuspended = true;
+                  $scope.header.SuspendDocNo = item.SuspendDepDocNo;
+              }
+              return item;
+            });
+          }
+        }).then(function(){
+        });
 
-      /**
-       * Executes when modal is shown. Data initializations should be done inside this
-       */
-      $scope.$on("modal.shown", function () {
-        if($scope.shownModal == 'tender'){
-
-          BillService.getHeader().then(function(header){
-            $scope.tenderHeader = header;
-            refreshData();
-          });
-        }
-      });
+      }
 
       $scope.$on("refresh-cart", function () {
         if($scope.shownModal == 'tender'){
@@ -71,11 +79,12 @@ angular.module('itouch.controllers')
         dotClicked = false;
 
         CartItemService.fetchItemsFromDb().then(function(bill) {
+
           $scope.billItems = bill;
           // BillService.getBillSummary(bill).then(function (summary) {
           // originalHeader = angular.copy(CartItemService.getSummery());
           // originalHeader.DocNo = TenderService.generateReceiptId();
-          $scope.tenderHeader = CartItemService.getSummery($scope.tenderHeader);
+          $scope.tenderHeader = CartItemService.getSummery($scope.tenderHeader);          
           // $scope.tenderHeader = angular.copy(originalHeader);
           $scope.tenderHeader.TenderTotal = $scope.tenderHeader.Total.toFixed(2);
           // $scope.tenderHeader.TotalRounded = $scope.tenderHeader.Total.roundTo(2, .25).toFixed(2);
@@ -90,204 +99,262 @@ angular.module('itouch.controllers')
       }
 
       /**
-       * Tells the sales controller to close the tender modal
-       */
-      $scope.modalClose = function () {
-        $scope.$emit("tenderModel-close");
-      }
-
-      /**
        * Handles the tenderType click event
        * @param tenderType
        */
       var seq = 0;
-      $scope.selectTenderType = function (tenderType) {
-        var overTender = false;
-        var bill = _.map($scope.billItems, function (item) {
-          item.IsExported = true;
-          item.DocNo = $scope.tenderHeader.DocNo;
-          item.StdCost = item.StdCost.roundTo(2);
-          item.AlteredPrice = item.AlteredPrice.roundTo(2);
-          item.SubTotal = item.SubTotal.roundTo(2);
-          return item;
-        });
-        var item = _.first(bill);
-        var total = $scope.tenderHeader.Total;
-        var amount = (tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.TenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
-        var changeAmount = 0;
-        if (amount > total) {
-          changeAmount = (amount - total).roundTo(2);
-        }
-        var diff = (($scope.tenderHeader.Total - parseFloat($scope.tenderHeader.TotalRounded))* -1).roundTo(2);
-        // console.log(diff);
-        if(diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
-          payTransactions.push({
-            BusinessDate: businessDate,
-            LocationId: SettingsService.getLocationId(),
-            MachineId: SettingsService.getMachineId(),
-            DocNo: $scope.tenderHeader.DocNo,
-            Cash: tenderType.Cash == 'false',
-            SeqNo: seq++,
-            PayTypeId: -1,
-            Amount: diff,
-            ChangeAmount: 0,
-            ConvRate: 0,
-            CurrencyId: 0,
-            IsExported: true
+      $scope.selectTenderType = function (tenderType, value) {
+        if(!submitted){
+          var overTender = false;
+         
+          var bill = _.map($scope.billItems, function (item) {
+            item.IsExported = true;
+            item.DocNo = $scope.tenderHeader.DocNo;
+            item.StdCost = item.StdCost.roundTo(2);
+            item.AlteredPrice = item.AlteredPrice.roundTo(2);
+            item.SubTotal = item.SubTotal.roundTo(2);
+            return item;
           });
-        }
-
-        if(item){
-          var transAmount = 0;
-          // console.log(tenderType);
-          if(tenderType.Round == 'true'){
-            transAmount = total + diff;
-          } else {
-            transAmount = amount;
+          var item = _.first(bill);
+          var total = $scope.tenderHeader.Total;
+          var roundedTotal = parseFloat($scope.tenderHeader.TotalRounded);
+          // var total = $scope.tenderHeader.TotalRounded;
+          
+          var amount = null;
+          if(!$scope.tenderHeader.UpdatedTenderTotal){
+            $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total;
           }
-          payTransactions.push({
-            BusinessDate: businessDate,
-            LocationId: SettingsService.getLocationId(),
-            MachineId: SettingsService.getMachineId(),
-            DocNo: $scope.tenderHeader.DocNo,
-            Cash: tenderType.Cash == 'true',
-            SeqNo: seq,
-            PayTypeId: tenderType.Id,
-            Amount: transAmount,
-            ChangeAmount: changeAmount,
-            ConvRate: 0,
-            CurrencyId: 0,
-            IsExported: true
-          });
+          if(value){
+            amount = parseFloat(value).roundTo(2);
+          } else if( (setValueManually && tenderType.TenderAmount == '0')){
+            // if(){
+            amount = parseFloat($scope.tenderHeader.UpdatedTenderTotal).roundTo(2);
+            // } else {
+            //   amount = parseFloat(tenderType.TenderAmount).roundTo(2)
+            // }
+          } else {
+            amount = parseFloat(tenderType.TenderAmount != '0' ? tenderType.TenderAmount : total ).roundTo(2);
+          }
+          // var amount = ($scope.tenderHeader.UpdatedTenderTotal || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
+          // var amount = ($scope.tenderHeader.UpdatedTenderTotal || tenderType.Cash == 'true' || setValueManually ? parseFloat($scope.tenderHeader.UpdatedTenderTotal) : parseFloat(tenderType.TenderAmount)).roundTo(2);
+          var diff = 0;
 
-          if (total <= amount) {
+          if(tenderType.Round == 'true'){
+            diff = ((total - roundedTotal)* -1).roundTo(2);
+          }
+          var changeAmount = 0;
 
-            var stockTransactions = [];
-            angular.forEach(bill, function (item, key) {
-              stockTransactions.push({
-                BusinessDate: businessDate,
-                LocationId: item.LocationId,
-                LineNumber: item.LineNumber,
-                DocNo: $scope.tenderHeader.DocNo,
-                ItemId: item.ItemId,
-                SeqNo: 0,
-                DocType: "SA",
-                StdCost: item.StdCost,
-                Qty: item.Qty,
-                BaseUOMId: 1,
-                IsExported: true
 
+
+          if(item){
+            var transAmount = 0;
+            // console.log(tenderType);
+            if(value || (setValueManually && tenderType.TenderAmount == 0)){
+              transAmount = parseFloat(value || $scope.tenderHeader.UpdatedTenderTotal);
+            } else if(tenderType.Round == 'true'){
+              transAmount = total + diff;
+            } else {
+              transAmount = amount;
+            }
+            transAmount = transAmount.roundTo(2);
+
+
+              if (transAmount > roundedTotal) {
+                  changeAmount = (transAmount- (total+diff)).roundTo(2);
+              }
+
+            var currentTenderTotal=(total - amount).roundTo(2);
+            //if (roundedTotal <= transAmount || (roundedTotal < 0 &&  roundedTotal >= transAmount) ) 
+            if (currentTenderTotal==0 || roundedTotal <= transAmount || (roundedTotal < 0 &&  roundedTotal >= transAmount) ) 
+            {
+                submitted = true;
+              // console.log(diff);
+              if(tenderType.Round == 'true' && diff != 0 && !_.findWhere(payTransactions, {PayTypeId: -1})){
+                payTransactions.push({
+                  BusinessDate: businessDate,
+                  LocationId: SettingsService.getLocationId(),
+                  MachineId: SettingsService.getMachineId(),
+                  DocNo: $scope.tenderHeader.DocNo,
+                  Cash: tenderType.Cash == 'false',
+                  SeqNo: seq++,
+                  PayTypeId: -1,
+                  Amount: diff,
+                  ChangeAmount: 0,
+                  ConvRate: 0,
+                  CurrencyId: 0,
+                  IsExported: false
+                });
+              }
+
+              var stockTransactions = [];
+              angular.forEach(bill, function (item, key) {
+                stockTransactions.push({
+                  BusinessDate: businessDate,
+                  LocationId: item.LocationId,
+                  MachineId:item.MachineId,
+                  LineNumber: item.LineNumber,
+                  DocNo: $scope.tenderHeader.DocNo,
+                  ItemId: item.ItemId,
+                  SeqNo: 1,
+                  DocType: "SA",
+                  StdCost: item.StdCost,
+                  Qty: item.Qty,
+                  BaseUOMId: 1,
+                  IsExported: false
+
+                });
               });
-            });
-            var header = _.omit($scope.tenderHeader, ["TaxAmount", "Total", "TenderTotal", "TotalRounded"]);
-            // header.DocType = TenderService.getDocType();
-            // header.LocationId = SettingsService.getLocationId();
-            // header.MachineId = SettingsService.getMachineId();
-            // header.BusinessDate = businessDate;
-            // header.SysDateTime = $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss');
-            // header.ShiftId = AuthService.getShift().Id;
-            // header.AuthBy = 0;
-            // header.VipId = 0;
-            // header.CashierId = AuthService.currentUser().Id;
-            // header.TableId = 0;
-            // header.DepAmount = 0;
-            // header.VoidDocNo = 0;
-            // header.ReprintCount = 0;
-            // header.OrderTag = "";
-            // header.Remarks = "";
-            // header.IsExported = true;
-            // header.IsClosed = true;
-            //
-            // header.Tax1Option = item.Tax1Option;
-            // header.Tax1Perc = item.Tax1Perc;
-            // header.Tax2Option = item.Tax2Option;
-            // header.Tax2Perc = item.Tax2Perc;
-            // header.Tax3Option = item.Tax3Option;
-            // header.Tax3Perc = item.Tax3Perc;
-            // header.Tax4Option = item.Tax4Option;
-            // header.Tax4Perc = item.Tax4Perc;
-            // header.Tax5Option = item.Tax5Option;
-            // header.Tax5Perc = item.Tax5Perc;
+              var header = _.omit($scope.tenderHeader, ["TaxAmount", "Total", "TenderTotal", "TotalRounded"]);
+
+              // var total = 0;
+              // angular.forEach(payTransactions, function (tx) {
+              //   total += parseFloat(tx.Amount);
+              // });
+               
+              if (transAmount > roundedTotal && tenderType.OverTender == 'true') {
+                var OverTenderAmount=OverTenderAmount=(transAmount - roundedTotal).roundTo(2);
+                if(SettingsService.getCashId()!=tenderType.Id){
+                    OverTenderAmount=(transAmount-$scope.tenderHeader.UpdatedTenderTotal).roundTo(2); 
+                 }
+                if(OverTenderAmount!=0){
+                  var payOverTenderAmount=OverTenderAmount;
+                  var payOverChangeAmount=0;
+                  if(tenderType.OverTenderTypeId==3){
+                    payOverTenderAmount=roundedTotal;
+                    payOverChangeAmount=OverTenderAmount;
+                  }
+                  overTender = {
+                    BusinessDate: businessDate,
+                    LocationId: SettingsService.getLocationId(),
+                    MachineId: SettingsService.getMachineId(),
+                    DocNo: $scope.tenderHeader.DocNo,
+                    PayTypeId: tenderType.Id,
+                    OverTenderTypeId: tenderType.OverTenderTypeId,
+                    SeqNo: 1,
+                    Amount:payOverTenderAmount,
+                    ChangeAmount:payOverChangeAmount,
+                    //Amount:OverTenderAmount,
+                    //ChangeAmount: 0,
+                    IsExported: false
+                  };
+                 
+                 
+                }
+              }
+
+              if($scope.header.isSuspended){
+                var outletUrl = AppConfig.getOutletServerUrl();
+              //  $scope.header.SuspendDocNo
+                 if(outletUrl){
+                     Restangular.oneUrl("DeleteSuspendBill", outletUrl + "DeleteSuspendBill").get({ SuspendDocNo: $scope.header.SuspendDocNo }).then(function (res) {
+                         if(res == 'success'){
+                             return true;
+                         } else {
+                             return $q.reject('Invalid service');
+                         }
+                     });
+                 }
+
+              }
+              DiscountService.saveTenderDiscount($scope.tenderHeader.DocNo).then(function(){
+                BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
+                  ControlService.counterDocId($scope.tenderHeader.DocNo);
+                  BillService.initHeader();
+                  payTransactions = [];
+                  overTender = [];
+
+                  numpadValue = "";
+                  setValueManually = false;
+                  if(tenderType.OpenDrawer == 'true'){
+                    Reciept.openDrawer();
+                  }
+                  Reciept.print(header.DocNo);
 
 
-            var total = 0;
-            angular.forEach(payTransactions, function (tx) {
-              total += parseFloat(tx.Amount);
-            });
+                  if(changeAmount > 0 && tenderType.Cash == 'true'){
+                    $ionicPopup.alert({
+                      title: 'Change',
+                      template: '<p style="font-size: 18px; text-align: center;">$'+ changeAmount.toFixed(2)+'</p>'
+                    });
+                  }
+                  $ionicHistory.nextViewOptions({
+                    disableAnimate: false,
+                    disableBack: true
+                  });
 
-            if (total > $scope.tenderHeader.Total && tenderType.OverTender == 'true') {
-              overTender = {
-                BusinessDate: businessDate,
-                LocationId: SettingsService.getLocationId(),
-                MachineId: SettingsService.getMachineId(),
-                DocNo: $scope.tenderHeader.DocNo,
-                PayTypeId: tenderType.Id,
-                OverTenderTypeId: tenderType.OverTenderTypeId,
-                SeqNo: 0,
-                Amount: amount,
-                ChangeAmount: changeAmount,
-                IsExported: true
-              };
+                  $rootScope.$emit("initBill");
+                  $rootScope.$emit("refresh-cart");
+                  $state.go('app.sales', {}, {reload: true});
+
+                }, function (err) {
+                  console.log(err);
+                });
+              });
+            }
+             else {
+              $scope.tenderHeader.Total = (total - amount).roundTo(2);
+              $scope.tenderHeader.TenderTotal = $scope.tenderHeader.Total.toFixed(2);
+              $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.Total.toFixed(2);
+              $scope.tenderHeader.TotalRounded = RoundingService.round($scope.tenderHeader.Total).toFixed(2);
+            }           
+           
+            var payTransAmount=transAmount;
+            if(tenderType.OverTenderTypeId==3){             
+              if(tenderType.Round=='true'){
+                if(setValueManually==false){             
+                  payTransAmount=roundedTotal;       
+                }
+                else{
+                  if(transAmount>roundedTotal){
+                    payTransAmount=roundedTotal;
+                  }
+                }
+               }
+             }
+            if(value)
+            {
+              if(value>payTransAmount)
+                 payTransAmount=payTransAmount;
+               else
+                 payTransAmount=value;
             }
 
-            DiscountService.saveTenderDiscount().then(function(){
-              BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
-                BillService.saveReceiptId($scope.tenderHeader.DocNo);
-                BillService.initHeader().then(function(header){
-
-                });
-                payTransactions = [];
-                overTender = [];
-                $scope.$emit("tenderModel-close");
-                $scope.$emit("refresh-cart");
-                $ionicPopup.alert({
-                  title: 'Balance',
-                  template: '<p>Balance: $'+ changeAmount.toFixed(2) + '</p><p>Rounded Balance: $'+ changeAmount.roundTo(2, .25).toFixed(2) +'</p>'
-                }).then(function () {
-                });
-                numpadValue = "";
-                setValueManually = false;
-              }, function (err) {
-                console.log(err);
-              });
+            payTransactions.push({
+              BusinessDate: businessDate,
+              LocationId: SettingsService.getLocationId(),
+              MachineId: SettingsService.getMachineId(),
+              DocNo: $scope.tenderHeader.DocNo,
+              Cash: tenderType.Cash == 'true',
+              SeqNo: seq,
+              PayTypeId: tenderType.Id,
+              //Amount: transAmount,
+              Amount: payTransAmount,
+              ChangeAmount: tenderType.Cash == 'true' ? changeAmount || 0 : 0,
+              ConvRate: 0,
+              CurrencyId: 0,
+              IsExported: false
             });
-          } else {
-            $scope.tenderHeader.Total = (total - amount).roundTo(2);
-            $scope.tenderHeader.TenderTotal = $scope.tenderHeader.Total.toFixed(2);
-            $scope.updatedRoundedTotal = RoundingService.round($scope.tenderHeader.Total).toFixed(2);
+            $scope.payTransactions.push({
+              Desc1: tenderType.Description1,
+              Desc2: tenderType.Description2,
+              Amount: transAmount
+            });
           }
+          seq++;
+          $scope.numpadClear();
         }
-        seq++;
+        
       }
-
-      /**
-       * Initiating discount modal dialog
-       */
-      $ionicModal.fromTemplateUrl('main/tender.discount/discount.html', {
-        scope: $scope,
-        backdropClickToClose: false,
-        animation: 'slide-in-up'
-      }).then(function (modal) {
-        $scope.discountModal = modal;
-      });
-
-      /**
-       * Biding an event to catch modal close call
-       */
-      $scope.$on('discountModel-close', function () {
-        $scope.discountModal.hide();
-      });
 
       /**
        * Invokes the given named function from $scope.tenderFunctions
        * @param name
        */
-      $scope.invoke = function (name) {
-        console.log(name);
-        if (!_.isUndefined($scope.tenderFunctions[name])) {
-          $scope.tenderFunctions[name]();
+      $scope.invoke = function (fn) {
+        if (!_.isUndefined($scope.tenderFunctions[fn.Name])) {
+          $scope.tenderFunctions[fn.Name](fn);
         } else {
-          throw new Error("Function " + name + " is not available.");
+          throw new Error("Function " + fn.Name + " is not available.");
         }
       };
 
@@ -300,7 +367,23 @@ angular.module('itouch.controllers')
           console.log("Redemption");
         },
         Discount: function (fn) {
-          $scope.discountModal.show();
+          if (authorityCheck(fn)) {
+             /*Yi Yi Po(24/07/2017)*/
+            $ionicScrollDelegate.scrollTop();
+            /*--*/
+            if (payTransactions.length == 0) {
+              $scope.shownModal = 'tenderDiscounts';
+              $scope.discountModal.show();
+            }
+          }
+
+        },
+        PaymentMade: function(fn){
+          if (authorityCheck(fn)) {
+            $scope.paymentsMadeModal.show();
+          }
+        },
+        TenderStaff: function(){
 
         }
       };
@@ -380,6 +463,7 @@ angular.module('itouch.controllers')
        * @param Function fn
        * @returns {boolean}
        */
+      var modalOpen = false;
       var authorityCheck = function (fn) {
         var authorized = false;
         var tempUser = AuthService.getTempUser();
@@ -387,12 +471,21 @@ angular.module('itouch.controllers')
           if(AuthService.isAuthorized(fn.AccessLevel, tempUser)){
             authorized = true;
           }
+          else {
+              Alert.warning('Access denied!');
+          }
         } else {
           if(AuthService.isAuthorized(fn.AccessLevel, AuthService.currentUser())){
             authorized = true;
           } else {
-            $scope.LoginlModal.show();
+            if (!modalOpen) {
+              $timeout(function () {
+                $scope.modals.loginlModal.show();
+                modalOpen = true;
+              }, 500);
+              //$scope.modals.loginlModal.show();
             onGoingFunction = fn;
+          }
           }
         }
 
@@ -402,16 +495,94 @@ angular.module('itouch.controllers')
       }
 
       $scope.close = function () {
-        $scope.$emit("tenderModel-close");
+        /*Yi Yi Po(25-07-2017)*/
+        DiscountService.clearTempTenderDiscounts();
+        /*---*/
+        $state.go('app.sales', {}, {reload: true});
+      }
+
+      $scope.closePaymentsModal = function () {
+        $scope.paymentsMadeModal.hide();
       }
 
       $scope.$on('discountModel-close', function () {
-        console.log($scope.tenderHeader);
-        // $scope.updatedRoundedTotal = $scope.tenderHeader.updatedRoundedTotal;
-        // tenderDiscount.header = angular.copy($scope.tenderHeader);
+        // console.log($scope.tenderHeader);
+        $scope.updatedRoundedTotal = $scope.tenderHeader.UpdatedRoundedTotal;
+        tenderDiscount.header = angular.copy($scope.tenderHeader);
         // originalHeader.Total = tenderDiscount.header.Total
         //TODO comeup with a plan to capture selected discount
         // tenderDiscount.discount = angular.copy($scope.tenderHeader);
       });
+
+      $scope.addDenomination = function(value){
+        var cashId = SettingsService.getCashId();
+        // console.log(cashId);
+        TenderService.getTenderTypeById(cashId).then(function (tenderType) {
+          if(tenderType){
+            $scope.selectTenderType(tenderType, value);
+          } else {
+            Alert.error('Incorrect Cash ID configured. Please contact administrator');
+          }
+        });
+      }
+
+      /* Modals */
+
+        /**
+         * Initiating shift modal dialog
+         */
+        $ionicModal.fromTemplateUrl('main/login/loginModal.html', {
+            id: 12,
+            scope: $scope,
+            backdropClickToClose: false,
+            animation: 'slide-in-up'
+        }).then(function (modal) {
+            $scope.modals.loginlModal = modal;
+
+        });
+
+        /**
+         * Biding an event to catch modal close call
+         */
+        $scope.$on('loginlModal-close', function (modal, close) {
+            $scope.modals.loginlModal.hide();
+            modalOpen = false;
+            if (close) {
+                onGoingFunction = false;
+            }
+            // console.log(AuthService.getTempUser());
+            if (onGoingFunction) {
+                $scope.invoke(onGoingFunction);
+            }
+        });
+
+        /**
+         * Initiating discount modal dialog
+         */
+        $ionicModal.fromTemplateUrl('main/tenderDiscount/discount.html', {
+            scope: $scope,
+            backdropClickToClose: false,
+            animation: 'slide-in-up'
+        }).then(function (modal) {
+            $scope.discountModal = modal;
+        });
+
+        /**
+         * Initiating discount modal dialog
+         */
+        $ionicModal.fromTemplateUrl('main/tender/paymentsMade.html', {
+            scope: $scope,
+            backdropClickToClose: false,
+            animation: 'slide-in-up'
+        }).then(function (modal) {
+            $scope.paymentsMadeModal = modal;
+        });
+
+        /**
+         * Biding an event to catch modal close call
+         */
+        $scope.$on('discountModel-close', function () {
+            $scope.discountModal.hide();
+        });
 
     }]);

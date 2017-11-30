@@ -37,6 +37,12 @@ angular.module('itouch.services')
     return deferred.promise;
   }
 
+  self.getTenderTypeById = function (Id) {
+    return DB.select(DB_CONFIG.tableNames.bill.tenderTypes, '*', { columns: 'Id = ?', data: [Id] }).then(function (result) {
+      return DB.fetch(result);
+    });
+  }
+
   self.save = function (items) {
     DB.addInsertToQueue(DB_CONFIG.tableNames.bill.tenderTypes, items);
   }

@@ -2,20 +2,43 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService',
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService) {
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService','$timeout', 'Reciept', 'UploadService',
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService) {
       var self = this;
       var dayEnd = false;
 
       $scope.shiftListType = null;
+      self.shiftData = shiftData;
 
-      $scope.$on('modal.shown', function(event, modal) {
-        $ionicHistory.nextViewOptions({
-          disableAnimate: false,
-          disableBack: true
-        });
+      var checkBDate = function(){
+        if(ControlService.isNewBusinessDate()){
+          self.openDatePicker(ControlService.getDayEndDate());
+          return false;
+        } else {
+          return true;
+        }
+      }
 
+      $scope.$on("$ionicView.enter", function(event, data){
+        checkBDate();
       });
+
+      $scope.$on('shift-changed', function(){
+        refreshData();
+      });
+
+      var refreshData = function(){
+        $q.all({
+          opened: ShiftService.getOpened(),
+          unOpened: ShiftService.getUnOpened(),
+          toBeDeclared: ShiftService.getDeclareCashShifts(),
+          dayEndPossible: ShiftService.dayEndPossible()
+        }).then(function(data){          
+          self.shiftData = data;
+        }, function(ex){
+          console.log(ex);
+        });
+      }
 
 
       /**
@@ -31,8 +54,12 @@ angular.module('itouch.controllers')
       });
 
       self.openShiftOpenModal = function(){
-        $scope.shiftListType = 'open';
-        self.shiftModal.show();
+        if(checkBDate()){
+          $scope.shiftListType = 'open';
+          self.shiftModal.show();
+        } else {
+          Alert.warning('Choose business date first!');
+        }
       }
 
       self.openShiftCloseModal = function(){
@@ -41,8 +68,13 @@ angular.module('itouch.controllers')
       }
 
       self.openShiftExitModal = function(){
-        $scope.shiftListType = 'exit';
-        self.shiftModal.show();
+        Alert.showConfirm('Are you sure?', 'Exit current shift', function(val){
+          if(val == 1){
+            dayEnd=false;
+            ShiftService.clearCurrent();
+            showReopenModal();
+          }
+        });
       }
 
       self.openDeclareCash = function(){
@@ -50,18 +82,35 @@ angular.module('itouch.controllers')
         self.shiftModal.show();
       }
 
+      var showReopenModal = function(){
+        if(!dayEnd){
+          ShiftService.getOpened().then(function(data){           
+            if(data.length == 0){
+              // Alert.warning('No shifts available');
+            } else {
+              $timeout(function(){
+                self.openShiftOpenModal();
+              }, 1000);
+            }
+          });
+        } else {
+          self.openDayEnd();
+        }
+      }
+
       var openCashPopUp = function(shift, dayEnd){
+        Reciept.openDrawer();
         $scope.data = {};
         var buttons = [
           {
             text: '<b>Ok</b>',
             type: 'button-positive',
             onTap: function(e) {
-              if (!$scope.data.cash) {
-                //don't allow the user to close unless he enters wifi password
-                e.preventDefault();
-              } else {
+              if($scope.data.cash && !_.isNaN($scope.data.cash)){
                 return $scope.data.cash;
+              } else {
+                e.preventDefault();
+                Alert.warning('Entered value is invalid!');
               }
             }
           }
@@ -71,16 +120,10 @@ angular.module('itouch.controllers')
           buttons.push({
             text: 'Later',
             onTap: function(e) {
-              // if (!$scope.data.cash) {
-              //   //don't allow the user to close unless he enters wifi password
-              //   e.preventDefault();
-              // } else {
               return 'later';
-              // }
             }
           });
         }
-        console.log(buttons);
 
         // An elaborate, custom popup
         var myPopup = $ionicPopup.show({
@@ -92,21 +135,34 @@ angular.module('itouch.controllers')
         });
 
         myPopup.then(function(cash) {
-          console.log(shift);
           var promise = null;
           if(cash == 'later'){
-            promise = ShiftService.declareCashLater(shift.Id);
-          } else {
-            promise = ShiftService.declareCash(cash, shift.Id);
-          }
 
-          promise.then(function(){
-            self.shiftModal.hide();
-            $scope.closeShiftOptionsModal();
-            $scope.$emit('shift-changed');
-          }, function(err){
-            console.log(err);
-          });
+            ShiftService.declareCashLater(shift.Id).then(function(){
+              refreshData();
+              self.shiftModal.hide();
+              showReopenModal();
+            }, function(err){
+              console.log(err);
+            });
+          } else {
+            ShiftService.declareCash(cash, shift.Id).then(function(DocNo){
+              // if(cash && !_.isNaN(cash)){
+                self.shiftModal.hide();
+                Report.printDeclareCash(shift, cash);
+                refreshData();
+
+                Report.printShiftClosingReport(shift.Id);
+
+                showReopenModal();
+              // } else {
+              //   Alert.warning('Entered value is invalid!');
+              // }
+
+            }, function(err){
+              console.log(err);
+            });
+          }
           // console.log('Tapped!', res);
         });
       }
@@ -118,30 +174,17 @@ angular.module('itouch.controllers')
         self.shiftModal.hide();
       };
 
-      $scope.$on('shift-exit', function(evt, shift){
-        self.openShiftOpenModal();
-      });
-
       $scope.$on('declare-cash', function(evt, shift){
-        console.log(dayEnd);
         openCashPopUp(shift, dayEnd);
       });
 
-      $scope.$on('shift-exit', function(evt, shift){
-        // openCashPopUp()
-      });
-
       $scope.$on('shift-close', function(evt, shift){
-        openCashPopUp(shift);
+        openCashPopUp(shift, dayEnd);
       });
 
       $scope.$on('shift-modal-close', function(evt, success){
-        // console.log($scope.shiftListType);
-        // success(){
+        // if(!dayEnd){
           self.closeShiftModal();
-        // }
-        // if($scope.shiftListType = type){
-        //   self.closeShiftModal();
         // }
       });
 
@@ -152,41 +195,94 @@ angular.module('itouch.controllers')
           cartEmpty: CartItemService.isEmpty()
         }).then(function (data) {
           if (!data.cartEmpty) {
-            // dayEnd = true;
-            Alert.showAlert('Warning!', 'Unsaved items should be saved before day end');
+            // if(!dayEnd) {
+              dayEnd = true;
+              Alert.warning('Unsaved items should be saved before day end');
+            // }
             return true;
           }
 
           if (data.declare.length > 0) {
-            // dayEnd = true;
-            Alert.showAlert('Warning!', 'Declare Cash before day end');
-            return true;
-          }
+            // if(!dayEnd){
+              dayEnd = true;
+              Alert.warning('Declare Cash before day end');
+            // }
 
-          console.log(data.cart);
-          if (data.cart) {
-            // dayEnd = true;
-            Alert.showAlert('Warning!', 'Save order' +
-              ' before day end');
+            // self.openDeclareCash();
             return true;
           }
 
           if (data.opened.length > 0) {
-            // dayEnd = true;
-            Alert.showAlert('Warning!', 'Close shifts before day end');
+            // if(!dayEnd){
+              Alert.warning('Close shifts before day end');
+              dayEnd = true;
+            // }
+
+            // self.openShiftCloseModal();
             return true;
           }
 
-          ShiftService.dayEnd().then(function () {
-            $scope.closeShiftOptionsModal();
-            $scope.$emit('shift-changed');
-            Alert.showAlert('Success!', 'Day end completed').then(function(){
+          var businessDate = angular.copy(ControlService.getBusinessDate());
+          Report.printShiftClosingReport(null, businessDate);
+          $timeout(function () {
+            ShiftService.dayEnd().then(function () {
+              dayEnd = false;
+              $scope.$emit('shift-changed');
+              Alert.success('Day end completed')
+              $ionicHistory.nextViewOptions({
+                disableAnimate: false,
+                disableBack: true
+              });
+              UploadService.upload().finally(function () {
+                $state.go('app.home');
+              });
 
-            })
-          }, function (err) {
-            console.log(err);
-            dayEnd = false;
-          });
+            }, function (err) {
+              dayEnd = false;
+              console.log(err);
+            });
+          }, 500);
         });
       }
+
+      /**
+       * Opens the Business Date picker
+       */
+      self.openDatePicker = function (currentDate) {
+        var datePickerOptions = {
+          callback: function (val) {
+            setBusinessDate(new Date(val));
+          },
+          inputDate: ControlService.getNextBusinessDate().isValid() ? ControlService.getNextBusinessDate().toDate() : new Date(),
+          setLabel: 'Set Bu. Date',
+          showTodayButton: true,
+          from: currentDate && currentDate.isValid()? currentDate.add(1, 'days').toDate(): moment().toDate(),
+          showTodayButton: false
+        };
+
+        ionicDatePicker.openDatePicker(datePickerOptions);
+      };
+
+
+
+
+      /**
+       * Saves the Business Date set by the user
+       * @param date
+       */
+      var setBusinessDate = function (date) {
+        if(moment(date).isValid()){
+          ControlService.setBusinessDate(moment(date));
+        } else {
+          $log.log('date is not valid');
+        }
+
+      }
+
+      self.test = function () {
+        var bdate = ControlService.getNextBusinessDate();
+        bdate.subtract(1, 'days');
+        Report.printShiftClosingReport(null, bdate);
+      }
+
     }]);
