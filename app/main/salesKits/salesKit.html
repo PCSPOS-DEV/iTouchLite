@@ -15,9 +15,9 @@
           <!--ng-repeat="skit in salesKits.list" -->
             <button class="button button-energized" ng-repeat="skit in salesKits.component"
                ng-click=" selectComponent(skit)" style="margin-right: 5px;" ng-if="skit.Quantity!=0">
-               Component  {{$index+1}}               
+               Component  {{$index+1}}
               <span class="badge badge-assertive">{{skit.Quantity - skit.OrderQty}}</span>
-            </button>            
+            </button>
           </div>
         </div>
         </ion-scroll>

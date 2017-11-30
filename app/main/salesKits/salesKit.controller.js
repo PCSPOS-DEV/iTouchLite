@@ -15,7 +15,7 @@ angular.module('itouch.controllers')
       var oldCustomQty = 0;
 
       $scope.$on('modal.shown', function (event, modal) {
-        if (modal.id == 1) {
+        if (modal.id === 1) {
           $scope.selectedRow = null;
           submitted = false;
           $ionicScrollDelegate.$getByHandle('salesKit').scrollTop();
