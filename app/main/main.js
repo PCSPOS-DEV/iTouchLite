@@ -1,18 +1,18 @@
 
 angular.module('itouch', [
-    'ionic',
-    'ngCordova',
-    'ui.router',
-    'ngStorage',
-    'restangular',
-    'ngOrderObjectBy',
-    'ionic-datepicker',
-    'angularMoment',
-    'ionic-numberpicker',
-    'itouch.logger',
-    'itouch.config',
-    'itouch.controllers',
-    'itouch.services'
+  'ionic',
+  'ngCordova',
+  'ui.router',
+  'ngStorage',
+  'restangular',
+  'ngOrderObjectBy',
+  'ionic-datepicker',
+  'angularMoment',
+  'ionic-numberpicker',
+  'itouch.logger',
+  'itouch.config',
+  'itouch.controllers',
+  'itouch.services'
     // TODO: load other modules selected during generation
 ])
     .run(['$ionicPlatform', 'DB', 'PrintService', 'Alert', 'UploadService', function ($ionicPlatform, DB, PrintService, Alert, UploadService) {
@@ -38,27 +38,27 @@ angular.module('itouch', [
       // }, function(err){
       //   // Alert.success(err, 'Error');
       // });
-        $ionicPlatform.ready(function () {
-            DB.init();
+      $ionicPlatform.ready(function () {
+        DB.init();
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
             // for form inputs)
-            if (window.cordova && window.cordova.plugins.Keyboard) {
-                cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-                cordova.plugins.Keyboard.disableScroll(true);
+        if (window.cordova && window.cordova.plugins.Keyboard) {
+          cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+          cordova.plugins.Keyboard.disableScroll(true);
 
-            }
-            if (window.StatusBar) {
+        }
+        if (window.StatusBar) {
                 // org.apache.cordova.statusbar required
-                StatusBar.styleDefault();
-            }
+          StatusBar.styleDefault();
+        }
 
-            UploadService.startAutoUpload();
+        UploadService.startAutoUpload();
 
-        });
+      });
     }])
 
     .config(['$stateProvider', '$urlRouterProvider', 'RestangularProvider', '$provide', 'ionicDatePickerProvider', '$localStorageProvider',
-        function ($stateProvider, $urlRouterProvider, RestangularProvider, $provide, ionicDatePickerProvider, $localStorageProvider) {
+      function ($stateProvider, $urlRouterProvider, RestangularProvider, $provide, ionicDatePickerProvider, $localStorageProvider) {
 
           // RollbarProvider.init({
           //   accessToken: 'c141337316fb46668bcbb9575b9cd911',
@@ -74,132 +74,132 @@ angular.module('itouch', [
           //   version: '0.1',
           //   debug: true
           // });
-          var appConfig = $localStorageProvider.get('itouchConfig');
-          if(appConfig){
-            RestangularProvider.setBaseUrl(appConfig.baseUrl);
-          }
+        var appConfig = $localStorageProvider.get('itouchConfig');
+        if (appConfig) {
+          RestangularProvider.setBaseUrl(appConfig.baseUrl);
+        }
 
-            $stateProvider
+        $stateProvider
                 .state('login', {
-                    url: '/login',
-                    templateUrl: 'main/login/login.html',
-                    controller: 'LoginCtrl as ctrl'
+                  url: '/login',
+                  templateUrl: 'main/login/login.html',
+                  controller: 'LoginCtrl as ctrl'
                 })
 
                 .state('settings', {
-                    url: '/settings',
-                    templateUrl: 'main/settings/settings.html',
-                    controller: 'SettingsCtrl'
+                  url: '/settings',
+                  templateUrl: 'main/settings/settings.html',
+                  controller: 'SettingsCtrl'
                 })
 
                 .state('app', {
-                    url: '/app',
-                    abstract: true,
-                    templateUrl: 'main/menu.html',
-                    controller: 'AppCtrl'
+                  url: '/app',
+                  abstract: true,
+                  templateUrl: 'main/menu.html',
+                  controller: 'AppCtrl'
                 })
 
                 .state('app.home', {
-                    url: '/home',
-                    views: {
-                        'menuContent': {
-                            templateUrl: 'main/home/home.html',
-                            controller: 'HomeCtrl as ctrl'
-                        }
-                    },
-                    resolve: {
-                      printer: ['PrintService', '$q', 'Alert', function(PrintService, $q, Alert){
-                        if(PrintService.isConnected()){
-                          return $q.when(true);
-                        } else {
-                          PrintService.connect().then(function(){
-                            PrintService.onPaperEnd(function(){
-                              Alert.warning('Paper roll depleted');
-                            });
+                  url: '/home',
+                  views: {
+                    'menuContent': {
+                      templateUrl: 'main/home/home.html',
+                      controller: 'HomeCtrl as ctrl'
+                    }
+                  },
+                  resolve: {
+                    printer: ['PrintService', '$q', 'Alert', function (PrintService, $q, Alert) {
+                      if (PrintService.isConnected()) {
+                        return $q.when(true);
+                      } else {
+                        PrintService.connect().then(function () {
+                          PrintService.onPaperEnd(function () {
+                            Alert.warning('Paper roll depleted');
+                          });
 
-                            PrintService.onPaperNearEnd(function(){
-                              Alert.warning('Paper roll is about to be depleted');
-                            });
-                            console.log('printer connected');
-                            return true;
-                          }, function(ex){
-                            console.log('Cant connect to printer', ex);
+                          PrintService.onPaperNearEnd(function () {
+                            Alert.warning('Paper roll is about to be depleted');
+                          });
+                          console.log('printer connected');
+                          return true;
+                        }, function (ex) {
+                          console.log('Cant connect to printer', ex);
                             // Alert.error("Unable to connect to the printer");
                             // return $q.resolve();
-                          });
-                        }
-                        return $q.when(true);
+                        });
+                      }
+                      return $q.when(true);
 
-                      }]
-                    }
+                    }]
+                  }
                 })
                 .state('app.sales', {
-                    url: '/sales',
-                    views: {
-                        'menuContent': {
-                            templateUrl: 'main/sales/sales.html',
-                            controller: 'SalesCtrl',
-                            controllerAs: 'SalesCtrl'
-                        }
-                    },
-                    resolve: {
-                      header: ['BillService', 'PrintService', function(BillService, PrintService){
-                        var rec_id = BillService.getCurrentReceiptId();
-                        return BillService.getTempHeader(rec_id).then(function(header){
-                          if(!header){
-                            return BillService.initHeader().then(function(header){
-                              return header;
-                            }, function(ex){
-                              console.log(ex);
-                            });
-                          } else{
-                            return header;
-                          }
-                        }, function(ex){
-                          console.log(ex);
-                        });
-                      }],
-                      user: ['AuthService', '$q', function(AuthService, $q){
-                        return AuthService.currentUser();
-                      }],
-                      shift: ['ShiftService', '$q', '$state', 'Alert', '$ionicLoading', function(ShiftService, $q, $state, Alert, $ionicLoading){
-
-                        var def = $q.defer();
-                        // $timeout(function() {
-                          var shift = ShiftService.getCurrent();
-                          if (shift) {
-                            def.resolve(shift);
-                          } else {
-                            Alert.warning('shift not set');
-                            def.reject({redirectTo: 'app.shift'});
-                            // def.reject();
-                          }
-                        // });
-                        return def.promise.catch(function () { $state.go('app.shift'); $ionicLoading.hide(); });;
-                      }],
-                      businessDate: ['ControlService', '$q', function(ControlService, $q){
-                        var def = $q.defer();
-                        var bd = ControlService.getBusinessDate(true);
-                        if(bd){
-                          def.resolve(bd);
-                        } else {
-                          console.log('business date not set');
-                          return false;
-                        }
-                        return def.promise;
-                      }],
-
+                  url: '/sales',
+                  views: {
+                    'menuContent': {
+                      templateUrl: 'main/sales/sales.html',
+                      controller: 'SalesCtrl',
+                      controllerAs: 'SalesCtrl'
                     }
+                  },
+                  resolve: {
+                    header: ['BillService', 'PrintService', function (BillService, PrintService) {
+                      var rec_id = BillService.getCurrentReceiptId();
+                      return BillService.getTempHeader(rec_id).then(function (header) {
+                        if (!header) {
+                          return BillService.initHeader().then(function (header) {
+                            return header;
+                          }, function (ex) {
+                            console.log(ex);
+                          });
+                        } else {
+                          return header;
+                        }
+                      }, function (ex) {
+                        console.log(ex);
+                      });
+                    }],
+                    user: ['AuthService', '$q', function (AuthService, $q) {
+                      return AuthService.currentUser();
+                    }],
+                    shift: ['ShiftService', '$q', '$state', 'Alert', '$ionicLoading', function (ShiftService, $q, $state, Alert, $ionicLoading) {
+
+                      var def = $q.defer();
+                        // $timeout(function() {
+                      var shift = ShiftService.getCurrent();
+                      if (shift) {
+                        def.resolve(shift);
+                      } else {
+                        Alert.warning('shift not set');
+                        def.reject({redirectTo: 'app.shift'});
+                            // def.reject();
+                      }
+                        // });
+                      return def.promise.catch(function () { $state.go('app.shift'); $ionicLoading.hide(); });
+                    }],
+                    businessDate: ['ControlService', '$q', function (ControlService, $q) {
+                      var def = $q.defer();
+                      var bd = ControlService.getBusinessDate(true);
+                      if (bd) {
+                        def.resolve(bd);
+                      } else {
+                        console.log('business date not set');
+                        return false;
+                      }
+                      return def.promise;
+                    }],
+
+                  }
                 })
 
                 .state('app.history', {
-                    url: '/history',
-                    views: {
-                        'menuContent': {
-                            templateUrl: 'main/history/history.html',
-                            controller: 'HistoryCtrl'
-                        }
+                  url: '/history',
+                  views: {
+                    'menuContent': {
+                      templateUrl: 'main/history/history.html',
+                      controller: 'HistoryCtrl'
                     }
+                  }
                 })
                 // .state('app.printerSetup', {
                 //     url: '/printer-setup',
@@ -219,18 +219,18 @@ angular.module('itouch', [
                   }
                 },
                 resolve: {
-                  shiftData: ['$q', 'ShiftService', function($q, ShiftService){
+                  shiftData: ['$q', 'ShiftService', function ($q, ShiftService) {
                     var def = $q.defer();
                     $q.all({
                       opened: ShiftService.getOpened(),
                       unOpened: ShiftService.getUnOpened(),
                       toBeDeclared: ShiftService.getDeclareCashShifts(),
                       dayEndPossible: ShiftService.dayEndPossible()
-                    }).then(function(data){
+                    }).then(function (data) {
                       def.resolve(data);
-                    }, function(ex){
+                    }, function (ex) {
                       console.log(ex);
-                      def.reject("error");
+                      def.reject('error');
                     });
                     return def.promise;
                   }]
@@ -246,41 +246,41 @@ angular.module('itouch', [
                 },
                 resolve: {
                   billData: ['$q', 'BillService', 'CartItemService', '$stateParams', 'ItemService', 'RoundingService', '$state', 'FunctionsService', 'TenderService',
-                    function($q, BillService, CartItemService, $stateParams, ItemService, RoundingService, $state, FunctionsService, TenderService){
-                    var docNo = $stateParams.DocNo;
+                    function ($q, BillService, CartItemService, $stateParams, ItemService, RoundingService, $state, FunctionsService, TenderService) {
+                      var docNo = $stateParams.DocNo;
                     //console.log(docNo);
-                    var def = $q.defer();
+                      var def = $q.defer();
                     // def.resolve({});
-                    $q.all({
-                      header: BillService.getTempHeader(docNo),
-                      items: CartItemService.fetchItemsFromDb(docNo),
-                      functions: FunctionsService.getTenderFunctions().then(function (fns) {
-                        return {
-                          top: _.where(fns, {DisplayOnTop: "true"}),
-                          bottom: _.where(fns, {DisplayOnTop: "false"})
+                      $q.all({
+                        header: BillService.getTempHeader(docNo),
+                        items: CartItemService.fetchItemsFromDb(docNo),
+                        functions: FunctionsService.getTenderFunctions().then(function (fns) {
+                          return {
+                            top: _.where(fns, {DisplayOnTop: 'true'}),
+                            bottom: _.where(fns, {DisplayOnTop: 'false'})
+                          };
+                        }),
+                        tenderTypes: TenderService.getTenderTypes()
+                      }).then(function (data) {
+                        if (data && data.header) {
+                          data.header = ItemService.calculateTotal(data.header);
+                          data.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
+                          data.header.UpdatedTenderTotal = data.header.Total.toFixed(2) || 0 ;
+                          data.header.UpdatedRoundedTotal = RoundingService.round(data.header.Total).toFixed(2);
+                          def.resolve(data);
+                        } else {
+                          def.reject('Bill not initialized');
                         }
-                      }),
-                      tenderTypes: TenderService.getTenderTypes()
-                    }).then(function(data){
-                      if(data && data.header){
-                        data.header = ItemService.calculateTotal(data.header);
-                        data.header.TotalRounded = RoundingService.round(data.header.Total).toFixed(2) || 0 ;
-                        data.header.UpdatedTenderTotal = data.header.Total.toFixed(2) || 0 ;
-                        data.header.UpdatedRoundedTotal = RoundingService.round(data.header.Total).toFixed(2);
-                        def.resolve(data);
-                      } else {
-                        def.reject("Bill not initialized");
-                      }
 
-                    }, function(ex){
-                      console.log(ex);
-                      def.reject("error");
-                    });
-                    return def.promise.catch(function(ex){
-                      console.log(ex);
-                      $state.go('app.sales');
-                    });
-                  }],
+                      }, function (ex) {
+                        console.log(ex);
+                        def.reject('error');
+                      });
+                      return def.promise.catch(function (ex) {
+                        console.log(ex);
+                        $state.go('app.sales');
+                      });
+                    }],
                   denominations: ['DenominationsService', function (DenominationsService) {
                     return DenominationsService.getAll();
                   }]
@@ -295,7 +295,7 @@ angular.module('itouch', [
                     controller: 'AdminPanelCtrl as ctrl'
                   }
                 }
-              })
+              });
 
 
             // .state('app.single', {
@@ -308,73 +308,73 @@ angular.module('itouch', [
             //   }
             // });
             // if none of the above states are matched, use this as the fallback
-            $urlRouterProvider.otherwise('/login');
+        $urlRouterProvider.otherwise('/login');
 
             // catch exceptions in angular
-            $provide.decorator('$exceptionHandler', ['$delegate', 'Logger', function ($delegate, Logger) {
-                return function (exception, cause) {
-                    $delegate(exception, cause);
+        $provide.decorator('$exceptionHandler', ['$delegate', 'Logger', function ($delegate, Logger) {
+          return function (exception, cause) {
+            $delegate(exception, cause);
 
-                    console.log("e");
-                    Logger.error(exception, cause);
-                };
-            }]);
+            console.log('e');
+            Logger.error(exception, cause);
+          };
+        }]);
 // catch exceptions out of angular
-            window.onerror = function (message, url, line, col, error) {
-                var stopPropagation = appConfig.debug ? false : true;
-                var data = {
-                    type: 'javascript',
-                    url: window.location.hash,
-                    localtime: Date.now()
-                };
-                if (message) {
-                    data.message = message;
-                }
-                if (url) {
-                    data.fileName = url;
-                }
-                if (line) {
-                    data.lineNumber = line;
-                }
-                if (col) {
-                    data.columnNumber = col;
-                }
-                if (error) {
-                    if (error.name) {
-                        data.name = error.name;
-                    }
-                    if (error.stack) {
-                        data.stack = error.stack;
-                    }
-                }
+        window.onerror = function (message, url, line, col, error) {
+          var stopPropagation = appConfig.debug ? false : true;
+          var data = {
+            type: 'javascript',
+            url: window.location.hash,
+            localtime: Date.now()
+          };
+          if (message) {
+            data.message = message;
+          }
+          if (url) {
+            data.fileName = url;
+          }
+          if (line) {
+            data.lineNumber = line;
+          }
+          if (col) {
+            data.columnNumber = col;
+          }
+          if (error) {
+            if (error.name) {
+              data.name = error.name;
+            }
+            if (error.stack) {
+              data.stack = error.stack;
+            }
+          }
 
-                if (appConfig.debug) {
-                    console.log('exception', data);
-                    window.alert('Error: ' + data.message);
-                } else {
-                    track('exception', data);
-                }
-                return stopPropagation;
-            };
+          if (appConfig.debug) {
+            console.log('exception', data);
+            window.alert('Error: ' + data.message);
+          } else {
+            track('exception', data);
+          }
+          return stopPropagation;
+        };
 
             //datepicker configuration
-            var datePickerObj = {
-                inputDate: new Date(),
-                setLabel: 'Set',
-                todayLabel: 'Today',
-                closeLabel: 'Close',
-                mondayFirst: false,
-                weeksList: ["S", "M", "T", "W", "T", "F", "S"],
-                monthsList: ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"],
-                templateType: 'popup',
-                from: new Date(2012, 8, 1),
-                to: new Date(2018, 8, 1),
-                showTodayButton: true,
-                dateFormat: 'dd MMMM yyyy',
-                closeOnSelect: false,
-                disableWeekdays: [6]
-            };
-            ionicDatePickerProvider.configDatePicker(datePickerObj);
+        var datePickerObj = {
+          inputDate: new Date(),
+          setLabel: 'Set',
+          todayLabel: 'Today',
+          closeLabel: 'Close',
+          mondayFirst: false,
+          weeksList: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+          monthsList: ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
+          templateType: 'popup',
+          from: new Date(2012, 8, 1),
+          to: new Date(2018, 8, 1),
+          showTodayButton: true,
+          dateFormat: 'dd MMMM yyyy',
+          closeOnSelect: false,
+          disableWeekdays: [6]
+        };
+        ionicDatePickerProvider.configDatePicker(datePickerObj);
 
           // $peanuthubCustomKeyboardProvider.addCustomKeyboard('CUSTOM_SKU', {
           //   keys: [
@@ -434,8 +434,8 @@ angular.module('itouch', [
           //     { type: "CHAR_KEY", value: "." },
           //     { type: "DELETE_KEY", icon: "ion-backspace-outline", label: 'DEL' }
           //   ]})
-        }]);
-angular.module("itouch.controllers", []);
-angular.module("itouch.services", []);
+      }]);
+angular.module('itouch.controllers', []);
+angular.module('itouch.services', []);
 angular.module('itouch.config', []);
 angular.module('itouch.contants', []);

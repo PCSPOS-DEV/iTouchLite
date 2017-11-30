@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('TenderDiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert','BillService',
-    function ($scope, DiscountService, $ionicPopup, Alert,BillService) {
+  .controller('TenderDiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert', 'BillService',
+    function ($scope, DiscountService, $ionicPopup, Alert, BillService) {
       var discountsSet = {
         type1: [],
         type2: []
@@ -17,8 +17,8 @@ angular.module('itouch.controllers')
       $scope.title = '';
       var submitted = false;
 
-      $scope.$on('modal.shown', function(event, data){
-        if($scope.shownModal == 'tenderDiscounts'){
+      $scope.$on('modal.shown', function (event, data) {
+        if ($scope.shownModal == 'tenderDiscounts') {
           $scope.type = 2;
           submitted = false;
           refresh();
@@ -26,12 +26,12 @@ angular.module('itouch.controllers')
       });
 
 
-      var refresh = function(){
+      var refresh = function () {
         discountsSet.type1 = [];
         discountsSet.type2 = [];
-        DiscountService.get().then(function(dis) {
+        DiscountService.get().then(function (dis) {
           angular.forEach(dis, function (item) {
-            if(item.DiscountType == '1'){
+            if (item.DiscountType == '1') {
               discountsSet.type1.push(item);
             } else {
               discountsSet.type2.push(item);
@@ -42,19 +42,19 @@ angular.module('itouch.controllers')
         }, function (er) {
           console.log(er);
         });
-      }
+      };
 
 
       $scope.setType = function (t) {
         $scope.type = t;
-        $scope.discounts = discountsSet['type'+t];
+        $scope.discounts = discountsSet['type' + t];
         $scope.title = titles[t];
       };
 
-      $scope.selectDiscount = function (discount) {        
+      $scope.selectDiscount = function (discount) {
         //if(discount && submitted == false){
-          if(discount){
-          if(discount.DiscountType == 1 && discount.Amount == 0){
+        if (discount) {
+          if (discount.DiscountType == 1 && discount.Amount == 0) {
             $scope.data = {};
             // An elaborate, custom popup
             var myPopup = $ionicPopup.show({
@@ -67,12 +67,12 @@ angular.module('itouch.controllers')
                 {
                   text: '<b>Save</b>',
                   type: 'button-positive',
-                  onTap: function (e) {                   
+                  onTap: function (e) {
                     if (!$scope.data.amount || _.isNaN($scope.data.amount) || $scope.data.amount == 0) {
                       //don't allow the user to close unless he enters wifi password
                       e.preventDefault();
                     } else {
-                      
+
                       return $scope.data.amount;
                     }
                   }
@@ -81,7 +81,7 @@ angular.module('itouch.controllers')
             });
 
             myPopup.then(function (res) {
-              if(res){
+              if (res) {
                 saveDiscount(discount, res);
               }
             }).finally(function () {
@@ -92,37 +92,36 @@ angular.module('itouch.controllers')
           }
         }
 
-      }
+      };
 
       var saveDiscount = function (discount, amount) {
-        if(submitted == false){
+        if (submitted == false) {
           submitted = true;
           amount = parseFloat(amount);
-          BillService.getTempItems($scope.tenderHeader.DocNo).then(function(billItems){
-           DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy(billItems), discount, amount).then(function () {
-           
-            }, function(ex){
+          BillService.getTempItems($scope.tenderHeader.DocNo).then(function (billItems) {
+            DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy(billItems), discount, amount).then(function () {
+
+            }, function (ex) {
               Alert.warning(ex);
             }).finally(function () {
                 //submitted = false;
-                $scope.$emit("discountModel-close");
+              $scope.$emit('discountModel-close');
             });
           });
         }
         /*DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy($scope.billItems), discount, amount).then(function () {
-         
+
         }, function(ex){
           Alert.warning(ex);
         }).finally(function () {
             submitted = false;
             $scope.$emit("discountModel-close");
         });*/
-      }
+      };
 
       $scope.close = function () {
         $scope.$emit('discountModel-close');
-      }
-
+      };
 
 
     }]);

@@ -2,7 +2,7 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService','$timeout', 'Reciept', 'UploadService',
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService', '$timeout', 'Reciept', 'UploadService',
     function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService) {
       var self = this;
       var dayEnd = false;
@@ -10,37 +10,36 @@ angular.module('itouch.controllers')
       $scope.shiftListType = null;
       self.shiftData = shiftData;
 
-      var checkBDate = function(){
-        if(ControlService.isNewBusinessDate()){
+      var checkBDate = function () {
+        if (ControlService.isNewBusinessDate()) {
           self.openDatePicker(ControlService.getDayEndDate());
           return false;
         } else {
           return true;
         }
-      }
+      };
 
-      $scope.$on("$ionicView.enter", function(event, data){
+      $scope.$on('$ionicView.enter', function (event, data) {
         checkBDate();
       });
 
-      $scope.$on('shift-changed', function(){
-        refreshData();
-      });
 
-      var refreshData = function(){
+      var refreshData = function () {
         $q.all({
           opened: ShiftService.getOpened(),
           unOpened: ShiftService.getUnOpened(),
           toBeDeclared: ShiftService.getDeclareCashShifts(),
           dayEndPossible: ShiftService.dayEndPossible()
-        }).then(function(data){          
+        }).then(function (data) {
           self.shiftData = data;
-        }, function(ex){
+        }, function (ex) {
           console.log(ex);
         });
-      }
+      };
 
-
+      $scope.$on('shift-changed', function () {
+        refreshData();
+      });
       /**
        * Initiating shift modal dialog
        */
@@ -53,42 +52,42 @@ angular.module('itouch.controllers')
         self.shiftModal = modal;
       });
 
-      self.openShiftOpenModal = function(){
-        if(checkBDate()){
+      self.openShiftOpenModal = function () {
+        if (checkBDate()) {
           $scope.shiftListType = 'open';
           self.shiftModal.show();
         } else {
           Alert.warning('Choose business date first!');
         }
-      }
+      };
 
-      self.openShiftCloseModal = function(){
+      self.openShiftCloseModal = function () {
         $scope.shiftListType = 'close';
         self.shiftModal.show();
-      }
+      };
 
-      self.openShiftExitModal = function(){
-        Alert.showConfirm('Are you sure?', 'Exit current shift', function(val){
-          if(val == 1){
-            dayEnd=false;
+      self.openShiftExitModal = function () {
+        Alert.showConfirm('Are you sure?', 'Exit current shift', function (val) {
+          if (val == 1) {
+            dayEnd = false;
             ShiftService.clearCurrent();
             showReopenModal();
           }
         });
-      }
+      };
 
-      self.openDeclareCash = function(){
+      self.openDeclareCash = function () {
         $scope.shiftListType = 'declareCash';
         self.shiftModal.show();
-      }
+      };
 
-      var showReopenModal = function(){
-        if(!dayEnd){
-          ShiftService.getOpened().then(function(data){           
-            if(data.length == 0){
+      var showReopenModal = function () {
+        if (!dayEnd) {
+          ShiftService.getOpened().then(function (data) {
+            if (data.length == 0) {
               // Alert.warning('No shifts available');
             } else {
-              $timeout(function(){
+              $timeout(function () {
                 self.openShiftOpenModal();
               }, 1000);
             }
@@ -96,17 +95,17 @@ angular.module('itouch.controllers')
         } else {
           self.openDayEnd();
         }
-      }
+      };
 
-      var openCashPopUp = function(shift, dayEnd){
+      var openCashPopUp = function (shift, dayEnd) {
         Reciept.openDrawer();
         $scope.data = {};
         var buttons = [
           {
             text: '<b>Ok</b>',
             type: 'button-positive',
-            onTap: function(e) {
-              if($scope.data.cash && !_.isNaN($scope.data.cash)){
+            onTap: function (e) {
+              if ($scope.data.cash && !_.isNaN($scope.data.cash)) {
                 return $scope.data.cash;
               } else {
                 e.preventDefault();
@@ -116,10 +115,10 @@ angular.module('itouch.controllers')
           }
         ];
 
-        if(!dayEnd){
+        if (!dayEnd) {
           buttons.push({
             text: 'Later',
-            onTap: function(e) {
+            onTap: function (e) {
               return 'later';
             }
           });
@@ -134,38 +133,38 @@ angular.module('itouch.controllers')
           buttons: buttons
         });
 
-        myPopup.then(function(cash) {
+        myPopup.then(function (cash) {
           var promise = null;
-          if(cash == 'later'){
+          if (cash == 'later') {
 
-            ShiftService.declareCashLater(shift.Id).then(function(){
+            ShiftService.declareCashLater(shift.Id).then(function () {
               refreshData();
               self.shiftModal.hide();
               showReopenModal();
-            }, function(err){
+            }, function (err) {
               console.log(err);
             });
           } else {
-            ShiftService.declareCash(cash, shift.Id).then(function(DocNo){
+            ShiftService.declareCash(cash, shift.Id).then(function (DocNo) {
               // if(cash && !_.isNaN(cash)){
-                self.shiftModal.hide();
-                Report.printDeclareCash(shift, cash);
-                refreshData();
+              self.shiftModal.hide();
+              Report.printDeclareCash(shift, cash);
+              refreshData();
 
-                Report.printShiftClosingReport(shift.Id);
+              Report.printShiftClosingReport(shift.Id);
 
-                showReopenModal();
+              showReopenModal();
               // } else {
               //   Alert.warning('Entered value is invalid!');
               // }
 
-            }, function(err){
+            }, function (err) {
               console.log(err);
             });
           }
           // console.log('Tapped!', res);
         });
-      }
+      };
 
       /**
        * Biding an event to catch modal close call
@@ -174,21 +173,21 @@ angular.module('itouch.controllers')
         self.shiftModal.hide();
       };
 
-      $scope.$on('declare-cash', function(evt, shift){
+      $scope.$on('declare-cash', function (evt, shift) {
         openCashPopUp(shift, dayEnd);
       });
 
-      $scope.$on('shift-close', function(evt, shift){
+      $scope.$on('shift-close', function (evt, shift) {
         openCashPopUp(shift, dayEnd);
       });
 
-      $scope.$on('shift-modal-close', function(evt, success){
+      $scope.$on('shift-modal-close', function (evt, success) {
         // if(!dayEnd){
-          self.closeShiftModal();
+        self.closeShiftModal();
         // }
       });
 
-      self.openDayEnd = function() {
+      self.openDayEnd = function () {
         $q.all({
           declare: ShiftService.getDeclareCashShifts(),
           opened: ShiftService.getOpened(),
@@ -196,16 +195,16 @@ angular.module('itouch.controllers')
         }).then(function (data) {
           if (!data.cartEmpty) {
             // if(!dayEnd) {
-              dayEnd = true;
-              Alert.warning('Unsaved items should be saved before day end');
+            dayEnd = true;
+            Alert.warning('Unsaved items should be saved before day end');
             // }
             return true;
           }
 
           if (data.declare.length > 0) {
             // if(!dayEnd){
-              dayEnd = true;
-              Alert.warning('Declare Cash before day end');
+            dayEnd = true;
+            Alert.warning('Declare Cash before day end');
             // }
 
             // self.openDeclareCash();
@@ -214,8 +213,8 @@ angular.module('itouch.controllers')
 
           if (data.opened.length > 0) {
             // if(!dayEnd){
-              Alert.warning('Close shifts before day end');
-              dayEnd = true;
+            Alert.warning('Close shifts before day end');
+            dayEnd = true;
             // }
 
             // self.openShiftCloseModal();
@@ -228,7 +227,7 @@ angular.module('itouch.controllers')
             ShiftService.dayEnd().then(function () {
               dayEnd = false;
               $scope.$emit('shift-changed');
-              Alert.success('Day end completed')
+              Alert.success('Day end completed');
               $ionicHistory.nextViewOptions({
                 disableAnimate: false,
                 disableBack: true
@@ -243,7 +242,7 @@ angular.module('itouch.controllers')
             });
           }, 500);
         });
-      }
+      };
 
       /**
        * Opens the Business Date picker
@@ -256,7 +255,7 @@ angular.module('itouch.controllers')
           inputDate: ControlService.getNextBusinessDate().isValid() ? ControlService.getNextBusinessDate().toDate() : new Date(),
           setLabel: 'Set Bu. Date',
           showTodayButton: true,
-          from: currentDate && currentDate.isValid()? currentDate.add(1, 'days').toDate(): moment().toDate(),
+          from: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
           showTodayButton: false
         };
 
@@ -264,25 +263,23 @@ angular.module('itouch.controllers')
       };
 
 
-
-
       /**
        * Saves the Business Date set by the user
        * @param date
        */
       var setBusinessDate = function (date) {
-        if(moment(date).isValid()){
+        if (moment(date).isValid()) {
           ControlService.setBusinessDate(moment(date));
         } else {
           $log.log('date is not valid');
         }
 
-      }
+      };
 
       self.test = function () {
         var bdate = ControlService.getNextBusinessDate();
         bdate.subtract(1, 'days');
         Report.printShiftClosingReport(null, bdate);
-      }
+      };
 
     }]);

@@ -11,8 +11,8 @@ angular.module('itouch.controllers')
       };
       self.loading = true;
 
-      $scope.$on('modal.shown', function(event, data){
-        if(data.id == 5){
+      $scope.$on('modal.shown', function (event, data) {
+        if (data.id == 5) {
           refresh();
         }
       });
@@ -20,31 +20,31 @@ angular.module('itouch.controllers')
       var refresh = function () {
 
         self.loading = true;
-        VoidBillService.getBillList(ControlService.getBusinessDate(true)).then(function(data){
+        VoidBillService.getBillList(ControlService.getBusinessDate(true)).then(function (data) {
           self.data.bills = data;
         }).finally(function () {
-            $timeout(function () {
-                self.loading = false;
-            }, 500);
+          $timeout(function () {
+            self.loading = false;
+          }, 500);
         });
-      }
+      };
 
       self.close = function () {
         $scope.$emit('voidBill.modal.close');
-      }
+      };
 
-      self.voidBill = function(){
+      self.voidBill = function () {
         var bill = self.data.selectedItem;
-        if(bill){
-         Alert.showConfirm('Are you sure?', 'Void bill', function(res){
-            if(res == 1){
-              VoidBillService.voidBill(bill.DocNo).then(function(DocNo){
+        if (bill) {
+          Alert.showConfirm('Are you sure?', 'Void bill', function (res) {
+            if (res == 1) {
+              VoidBillService.voidBill(bill.DocNo).then(function (DocNo) {
                 $scope.$emit('initBill');
-                $scope.$emit("refresh-cart");
+                $scope.$emit('refresh-cart');
                 $scope.$emit('voidBill.modal.close');
                 Reciept.printVoid(DocNo);
                 Reciept.openDrawer();
-              }, function(ex){
+              }, function (ex) {
                 console.log(ex);
               });
             }
@@ -53,11 +53,11 @@ angular.module('itouch.controllers')
           Alert.warning('Please select an item to void');
         }
 
-      }
+      };
 
       self.onItemTap = function (bill) {
-        if(bill){
-          self.data.bills = _.map(self.data.bills, function(item){
+        if (bill) {
+          self.data.bills = _.map(self.data.bills, function (item) {
             item.active = false;
             return item;
           });
@@ -65,15 +65,15 @@ angular.module('itouch.controllers')
           self.data.selectedItem = bill;
         }
 
-      }
+      };
 
-      self.view = function(){
+      self.view = function () {
         $scope.selectedItem = angular.copy(self.data.selectedItem);
-        if($scope.selectedItem){
+        if ($scope.selectedItem) {
           self.modal.show();
           // self.data.selectedItem = null;
         }
-      }
+      };
 
       /**
        * Initiating Sub PLU modal dialog
@@ -93,12 +93,11 @@ angular.module('itouch.controllers')
       $scope.modalClose = function () {
         self.modal.hide();
         $scope.$emit('voidBill.modal.open');
-      }
+      };
 
       $scope.$on('bill.modal.close', function () {
         self.modal.hide();
       });
-
 
 
     }]);
