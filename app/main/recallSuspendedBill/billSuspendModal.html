@@ -1,0 +1,71 @@
+<ion-modal-view class="billView" ng-controller="BillSuspendViewCtrl">
+  <ion-header-bar>
+  <button class="button button-icon ion-printer" ng-if="!shiftSelectionShown" ng-click="printSuspendReciept(bill.header.DocNo)"></button>
+  <h1 class="title">
+  {{bill.header.DocNo}}
+   
+  </h1>
+    <button class="button button-icon ion-close-round button-small" ng-click="close()"></button>
+  </ion-header-bar>
+  <ion-content>
+    <div class="row header">
+      <div class="col">
+        <img ng-src="{{images.logo}}" alt="" class="logo" width="100">
+      </div>
+      </div>
+    <div class="row header">
+      <div class="col ">
+        <p class="text-center" ng-repeat="item in settings.Header">{{item.Text}}</p>
+      </div>
+    </div>
+    <div class="row body">
+      <div class="col title">
+        {{bill.header.Title}}
+        
+      </div>
+    </div>
+    <div class="row body" ng-if="bill.header.OrderTag">
+      <div class="col">
+        Order Tag     : {{bill.header.OrderTag}}
+      </div>
+    </div>
+    <div class="row body">
+      <div class="col">
+        <div ng-repeat="item in bill.items">
+          <div class="row" ng-if="item.ItemId != '0'">
+            <div class="col-10">{{item.Qty}}</div>
+          <div class="col-80">
+            <span ng-if="item.ItemType == 'SKI' || item.ItemType == 'MOD'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>  
+              {{print(item,'Desc')}}
+            <span ng-if="item.ItemType == 'MOD'">**</span>
+            <span ng-if="item.ItemType != 'MOD' && item.TakeAway == 'true'">*</span>
+          </div>
+          <div class="col-10 text-right"> {{(item.SubTotal + item.Tax5Amount).toFixed(2)}}</div>
+          </div>
+          <div class="row" ng-repeat="discount in item.discounts">
+            <div class="col-60 col-offset-20">{{print(discount,'Description')}}</div>
+            <div class="col-20 text-right"> {{(discount.DiscountAmount*-1).toFixed(2)}}</div>
+          </div>
+          <div class="row" ng-if="item.ReasonId">
+            <div class="col" style="padding-left: 90px">
+              Reason : {{item.ReasonDesc1}}<br/>
+             Reference : {{item.RefCode}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row footer">
+      <div class="col">
+        <p class="text-center" ng-repeat="item in settings.Footer">{{item.Text}}</p>
+      </div>
+    </div>
+    <div class="row footer">
+      <div class="col">
+        <p class="text-center">BDate: {{bill.header.BusinessDate}} Shift: {{bill.footerData.shift.Description1}} M/C: {{bill.footerData.machine.Code}}</p>
+        <p class="text-center">{{bill.header.SysDateTime}} User: {{bill.footerData.cashier.Code}} &nbsp;{{bill.header.DocNo}}</p>
+      </div>
+    </div>
+  </ion-content>
+</ion-modal-view>
