@@ -1,0 +1,42 @@
+<div class="row" ng-controller="PrinterSetupCtrl as ctrl">
+    <div class="col col-50 col-offset-25">
+      <div class="card">
+        <div class="item item-text-wrap">
+          <div class="list">
+            <label class="item item-input item-stacked-label">
+              <span class="input-label">IP Address</span>
+              <input type="text" ng-model="ctrl.printerSettings.ipAddress">
+            </label>
+            <label class="item item-input item-stacked-label">
+              <span class="input-label">Port</span>
+              <input type="text" ng-model="ctrl.printerSettings.port">
+            </label>
+            <label class="item item-input item-stacked-label">
+              <span class="input-label">Max Characters per line</span>
+              <input type="text" ng-model="ctrl.printerSettings.maxCharsPerLine">
+            </label>
+            <label class="item item-input item-stacked-label">
+              <span class="input-label">Max Characters per tabbed line</span>
+              <input type="text" ng-model="ctrl.printerSettings.maxCharsPerTabbedLine">
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="padding">
+            <button class="button button-block button-positive" ng-click="ctrl.save(settings.ipAddress, settings.port)" ng-disabled="ctrl.status">
+              Connect
+            </button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="padding">
+            <button class="button button-block button-secondary" ng-click="ctrl.save(settings.ipAddress, settings.port)" ng-disabled="!ctrl.status">
+              Reconnect
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -19,9 +19,13 @@
 
       <div class="col-20 cart">
         <h3>Details</h3>
+        <div class="row" ng-repeat="item in ctrl.selectedCart">
+          <div class="col"> {{ print(item, 'Desc')}}</div>
+        </div>
+
         <div class="row" ng-repeat="item in ctrl.cart">
-          <div class="col">
-            {{ item.SubPluDesc1 && item.SubPluDesc1 != 'N/A' ? print(item, 'SubPluDesc') : ""}} {{print(item, 'Description')}}</div>
+          <div class="col" ng-if="item.SubPluDesc1">{{ item.SubPluDesc1 && item.SubPluDesc1 != 'N/A' ? print(item, 'SubPluDesc') : ""}} {{print(item, 'Description')}}</div>
+          <div class="col" ng-if="item.Desc1"> {{ print(item, 'Desc')}}</div>
         </div>
       </div>
 

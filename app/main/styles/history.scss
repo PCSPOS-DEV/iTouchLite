@@ -1,5 +1,27 @@
-.history .card .col, .history .card .row { padding: 0;}
+.history {
+  .col, .history .card .row { padding: 0;}
+  .align-right { text-align: right; }
+  .item { padding: 10px; }
 
-.history .align-right { text-align: right; }
+  .row{
+    flex-wrap: wrap;
+  }
+}
 
-.history .item { padding: 10px; }
+ion-modal-view.billView {
+  top: 15%;
+  right: 30%;
+  bottom: 20%;
+  left: 30%;
+  min-height: 240px;
+  width: 40%;
+}
+
+ion-modal-view.billView .row.header {
+  background-color: white;
+}
+
+.total
+{
+ color:orange;  
+}

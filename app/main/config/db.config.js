@@ -23,7 +23,8 @@ var tableNames = {
     subPLU3: 'SubPLU3',
     priceGroups: 'PriceGroups',
     modifiers: 'ModifiersKeyInfo',
-    departments: 'Departments'
+    departments: 'Departments',
+    barcodes: 'ItemBarcodes'
   },
   locations: {
     locations: 'Locations'
@@ -38,7 +39,8 @@ var tableNames = {
     stockTransactions: 'StockTransactions',
     payTransactions: 'PayTrans',
     payTransactionsOverTender: 'PayTransOverTender',
-    voidItems: 'VoidItems'
+    voidItems: 'VoidItems',
+    denominations: 'Denominations'
   },
   salesKit: {
     salesKitApplicablePeriod: 'SalesKitApplicablePeriod',
@@ -59,7 +61,8 @@ var tableNames = {
     reasons: 'Reason'
   },
   config: {
-    printerSettings: 'PrinterSettings'
+    printerSettings: 'PrinterSettings',
+    machines: 'MachinesDetails',
   },
   pwp:{
     pwp: "Pwp",
@@ -200,6 +203,15 @@ angular.module('itouch.config')
             {name: 'PopUpRemark', type: 'BIT'}
           ]
         },
+          {
+              name: tableNames.item.barcodes,
+              columns: [
+                  { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
+                  { name: "ItemId", type: "INT NOT NULL" },
+                  { name: "Barcode", type: "TEXT NOT NULL" },
+                  { name: "Remarks", type: "TEXT NULL" },
+              ]
+          },
         {
           name: tableNames.item.subPLU1,
           columns: [
@@ -366,7 +378,7 @@ angular.module('itouch.config')
             { name: "BelowCost", type: "int NOT NULL" },
             { name: "CurCode", type: "text NULL" },
             { name: "BuyRate", type: "double NULL" },
-            { name: "ReasonId", type: "text NULL" },
+            { name: "ReasonId", type: "int NOT NULL" },
             { name: "RefCode", type: "text NULL" },
             { name: "Remark", type: "text NULL" },
             { name: "Comm", type: "double NOT NULL" },
@@ -374,7 +386,8 @@ angular.module('itouch.config')
             { name: "Desc2", type: "text NULL" },
             { name: "Selectable", type: "BOOLEAN NULL" }
           ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber"
+          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber",
+          keep: true
         },
         {
           name: tableNames.bill.tempHeader,
@@ -385,7 +398,7 @@ angular.module('itouch.config')
             { name: "DocNo", type: "text NOT NULL" },
             { name: "DocType", type: "text NOT NULL" },
             { name: "SysDateTime", type: "int NOT NULL" },
-            { name: "VoidDocNo", type: "text NOT NULL" },
+            { name: "VoidDocNo", type: "text NULL" },
             { name: "TableId", type: "int NOT NULL" },
             { name: "Pax", type: "text NOT NULL" },
             { name: "ShiftId", type: "int NULL" },
@@ -421,7 +434,8 @@ angular.module('itouch.config')
             { name: "OrderTag", type: "text NOT NULL" },
             { name: "IsClosed", type: "boolean boolean NULL" }
           ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo"
+          primaryKey: "BusinessDate, LocationId, MachineId, DocNo",
+          keep: true
         },
         {
           name: tableNames.bill.tempPayTrans,
@@ -523,7 +537,7 @@ angular.module('itouch.config')
             { name: "BelowCost", type: "int NOT NULL" },
             { name: "CurCode", type: "text NULL" },
             { name: "BuyRate", type: "double NULL" },
-            { name: "ReasonId", type: "text NULL" },
+            { name: "ReasonId", type: "int NULL" },
             { name: "RefCode", type: "text NULL" },
             { name: "Remark", type: "text NULL" },
             { name: "Comm", type: "double NOT NULL" },
@@ -531,7 +545,8 @@ angular.module('itouch.config')
             { name: "Desc2", type: "text NULL" },
             { name: "IsExported", type: "int NULL" }
           ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber"
+          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber",
+          keep: true
         },
         {
           name: tableNames.bill.header,
@@ -542,7 +557,7 @@ angular.module('itouch.config')
             { name: "DocNo", type: "text NOT NULL" },
             { name: "DocType", type: "text NOT NULL" },
             { name: "SysDateTime", type: "int NOT NULL" },
-            { name: "VoidDocNo", type: "text NOT NULL" },
+            { name: "VoidDocNo", type: "text NULL" },
             { name: "TableId", type: "int NOT NULL" },
             { name: "Pax", type: "text NOT NULL" },
             { name: "ShiftId", type: "int NULL" },
@@ -579,13 +594,15 @@ angular.module('itouch.config')
             { name: "IsExported", type: "boolean NOT NULL" },
             { name: "IsClosed", type: "boolean boolean NULL" }
           ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo"
+          primaryKey: "BusinessDate, LocationId, MachineId, DocNo",
+          keep: true
         },
         {
           name: tableNames.bill.stockTransactions,
           columns: [
             { name: "BusinessDate", type: "date" },
             { name: "LocationId", type: "int NOT NULL" },
+            { name: "MachineId", type: "int NOT NULL" },
             { name: "LineNumber", type: "int NOT NULL" },
             { name: "DocNo", type: "text NOT NULL" },
             { name: "ItemId", type: "int NOT NULL" },
@@ -596,7 +613,8 @@ angular.module('itouch.config')
             { name: "BaseUOMId", type: "int NULL" },
             { name: "IsExported", type: "boolean NOT NULL" }
           ],
-          primaryKey: "BusinessDate, LocationId, LineNumber, DocNo, ItemId, SeqNo"
+          primaryKey: "BusinessDate,MachineId,LocationId, LineNumber, DocNo, ItemId, SeqNo",
+          keep: true
         },
         {
           name: tableNames.bill.payTransactions,
@@ -615,7 +633,8 @@ angular.module('itouch.config')
             { name: "Remarks", type: "TEXT" },
             { name: "IsExported", type: "BOOLEAN NOT NULL" }
           ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo"
+          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo",
+          keep: true
         },
         {
           name: tableNames.bill.payTransactionsOverTender,
@@ -631,7 +650,8 @@ angular.module('itouch.config')
             { name: "ChangeAmount", type: "DOUBLE" },
             { name: "IsExported", type: "BOOLEAN NOT NULL" }
           ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo, OverTenderTypeId"
+          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, PayTypeId, SeqNo, OverTenderTypeId",
+          keep: true
         },
         {
           name: tableNames.auth.shifts,
@@ -647,20 +667,6 @@ angular.module('itouch.config')
             { name: "RANoAdj", type: "text NOT NULL" }
           ]
         },
-        // {
-        //   name: tableNames.keyboard.functions,
-        //   columns: [
-        //     { name: "Code", type: "INT NOT NULL PRIMARY KEY" },
-        //     { name: "Description1", type: "TEXT" },
-        //     { name: "Description2", type: "TEXT" },
-        //     { name: "Name", type: "TEXT NOT NULL" },
-        //     { name: "Inactive", type: "BOOLEAN" },
-        //     { name: "Transact", type: "BOOLEAN" },
-        //     { name: "Type", type: "TEXT" },
-        //     { name: "AccessLevel", type: "INT" },
-        //     { name: "DisplayOnTop", type: "BOOLEAN" }
-        //   ]
-        // },
         {
           name: tableNames.salesKit.salesKitApplicablePeriod,
           columns: [
@@ -723,7 +729,8 @@ angular.module('itouch.config')
             { name: "RA", type: "DOUBLE" },
             { name: "RANoAdj", type: "BOOLEAN" },
             { name: "DeclareCashLater", type: "BOOLEAN" }
-          ]
+          ],
+          keep: true
         },
         {
           name: tableNames.discounts.discounts,
@@ -760,16 +767,17 @@ angular.module('itouch.config')
             { name: "ItemId", type: "INT NOT NULL" },
             { name: "LineNumber", type: "INT NOT NULL" },
             { name: "SeqNo", type: "INT NOT NULL" },
-            { name: "DiscountFrom", type: "CHAR" },
+            { name: "DiscountFrom", type: "TEXT" },
             { name: "DiscountId", type: "INT" },
             { name: "DiscountCode", type: "TEXT" },
             { name: "DiscountFor", type: "INT" },
-            { name: "DiscountType", type: "CHAR" },
+            { name: "DiscountType", type: "TEXT" },
             { name: "DiscountAmount", type: "DOUBLE" },
             { name: "DiscountPercentage", type: "DOUBLE" },
             { name: "IsExported", type: "BOOLEAN" }
           ],
-          primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo'
+          primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo',
+          keep: true
         },
         {
           name: tableNames.discounts.tempBillDiscounts,
@@ -781,15 +789,16 @@ angular.module('itouch.config')
             { name: "ItemId", type: "INT NOT NULL" },
             { name: "LineNumber", type: "INT NOT NULL" },
             { name: "SeqNo", type: "INT NOT NULL" },
-            { name: "DiscountFrom", type: "CHAR" },
+            { name: "DiscountFrom", type: "TEXT" },
             { name: "DiscountId", type: "INT" },
             { name: "DiscountCode", type: "TEXT" },
             { name: "DiscountFor", type: "INT" },
-            { name: "DiscountType", type: "CHAR" },
+            { name: "DiscountType", type: "TEXT" },
             { name: "DiscountAmount", type: "DOUBLE" },
             { name: "DiscountPercentage", type: "DOUBLE" }
           ],
-          primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo'
+          primaryKey: 'BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo',
+          keep: true
         },
         {
           name: tableNames.bill.voidItems,
@@ -813,13 +822,23 @@ angular.module('itouch.config')
             { name: "SubTotal", type: "double NOT NULL" },
             { name: "DiscAmount", type: "double NOT NULL" },
             { name: "IsExported", type: "boolean NOT NULL" },
+            { name: "SeqNo", type: "int NOT NULL" },
           ],
-          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber"
+          primaryKey: "BusinessDate, LocationId, MachineId, DocNo, ItemId, LineNumber, SeqNo"
+        },
+        {
+          name: tableNames.bill.denominations,
+          columns: [
+            { name: "Id", type: "INTEGER PRIMARY KEY AUTOINCREMENT" },
+            { name: "Desc", type: "TEXT NOT NULL" },
+            { name: "Value", type: "DOUBLE NOT NULL" }
+          ],
+          // keep: true
         },
         {
           name: tableNames.refunds.reasons,
           columns: [
-            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
+            { name: "Id", type: "INTEGER PRIMARY KEY" },
             { name: "Code", type: "TEXT NOT NULL" },
             { name: "Description1", type: "TEXT NOT NULL" },
             { name: "Description2", type: "TEXT NULL" },
@@ -834,6 +853,16 @@ angular.module('itouch.config')
             { name: "Sequence", type: "INT NOT NULL" },
             { name: "Text", type: "TEXT NULL" },
             { name: "IsBold", type: "BOOL" }
+          ]
+        },
+        {
+          name: tableNames.config.machines,
+          columns: [
+            { name: "Id", type: "INT NOT NULL PRIMARY KEY" },
+            { name: "Code", type: "TEXT NOT NULL" },
+            { name: "Description1", type: "TEXT NOT NULL" },
+            { name: "Description2", type: "TEXT NULL" },
+            { name: "LocationId", type: "INT" }
           ]
         },
         {

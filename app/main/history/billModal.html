@@ -1,13 +1,13 @@
 <ion-modal-view class="billView" ng-controller="BillViewCtrl">
   <ion-header-bar>
-  <!--<button class="button button-icon ion-arrow-left-c" ng-if="!shiftSelectionShown" ng-click="goBack()"></button>-->
+  <button class="button button-icon ion-printer" ng-if="!shiftSelectionShown" ng-click="printReciept(bill.header.DocNo)"></button>
   <h1 class="title">{{bill.header.DocNo}}</h1>
     <button class="button button-icon ion-close-round button-small" ng-click="close()"></button>
   </ion-header-bar>
   <ion-content>
     <div class="row header">
       <div class="col">
-        <img src="img/dummy.png" alt="" class="logo" width="100">
+        <img ng-src="{{images.logo}}" alt="" class="logo" width="100">
       </div>
       </div>
     <div class="row header">
@@ -16,35 +16,110 @@
       </div>
     </div>
     <div class="row body">
+      <div class="col title">
+        {{bill.header.Title}}
+      </div>
+    </div>
+    <div class="row body" ng-if="bill.header.ReprintCount">
+       <div class="col">
+         [RE-PRINTED {{bill.header.ReprintCount}}x]<br/>
+         <!--[Tansacted at {{bill.header.SysDate+'T'+bill.header.SysTime | date:'hh:mma'}}]-->
+         [Transacted at {{bill.header.SysTime}}{{bill.header.Sampm}}]
+       </div>
+    </div>
+    <div class="row body" ng-if="bill.header.OrderTag">
       <div class="col">
-        <div class="row" ng-repeat="item in bill.items">
-          <civ class="col-10">{{item.Qty}}</civ>
-          <civ class="col-80">{{print(item,'Desc')}}</civ>
-          <civ class="col-10 text-right">$ {{item.Total.toFixed(2)}}</civ>
-        </div>
+        Order Tag     : {{bill.header.OrderTag}}
       </div>
     </div>
     <div class="row body">
       <div class="col">
+        <div ng-repeat="item in bill.items">
+          <div class="row">
+            <div class="col-10">{{item.Qty}}</div>
+          <div class="col-70">
+            <span ng-if="item.ItemType == 'SKI' || item.ItemType == 'MOD'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>  
+              {{print(item,'Desc')}}
+            <!--<span ng-if="item.ItemType == 'MOD'">**</span>-->
+            <span ng-if="item.NoDiscount =='true'">**</span>
+            <span ng-if="item.ItemType != 'MOD' && item.TakeAway == 'true'">*</span>
+          </div>
+          <div class="col-20 text-right"> {{(item.SubTotal + item.Tax5Amount).toFixed(2)}}</div>
+          </div>
+          <div class="row" ng-repeat="discount in item.discounts" ng-if="discount.Description1">
+            <div class="col-60 col-offset-20">{{print(discount,'Description')}}</div>
+            <div class="col-20 text-right" > {{(discount.DiscountAmount*-1).toFixed(2)}}</div>
+          </div>
+          <div class="row" ng-if="item.ReasonId">
+            <div class="col" style="padding-left: 90px">
+              Reason : {{item.ReasonDesc1}}<br/>
+             Reference : {{item.RefCode}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row body" ng-if="bill.header.DocType != 'AV'">
+      <div class="col">
         <div class="row">
           <div class="col-80">SUBTOTAL</div>
-          <div class="col-20 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
+          <div class="col-20 text-right">$ {{bill.subTotal.toFixed(2)}}</div>
+        </div>
+        <div class="row body" ng-repeat="discount in bill.tenderDiscounts">
+          <!--{{item.PayTypeId}}-->
+          <div class="col-80">{{print(discount, 'Description')}}</div>
+          <div class="col-20 text-right">$ {{ (discount.Amount * -1).toFixed(2)}}</div>
+        </div>
+        <div class="row body" ng-if="bill.tenderDiscounts && bill.tenderDiscounts.length > 0">
+          <!--{{item.PayTypeId}}-->
+          <div class="col-80">Sub Total After Discount</div>
+          <div class="col-20 text-right">$ {{ (bill.subTotal - bill.tenderDiscountTotal).toFixed(2) }}</div>
         </div>
         <div class="row">
           <div class="col-80">TOTAL</div>
           <div class="col-20 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
         </div>
-        <div class="row" ng-repeat="item in bill.transactions">
+          <div class="row" ng-repeat="item in bill.transactions">
+            <!--{{item.PayTypeId}}-->
+            <div class="col-80">{{print(item, 'Description').toUpperCase() || 'ROUNDED'}}</div>
+            <div class="col-20 text-right">$ {{(item.Amount+item.ChangeAmount).toFixed(2)}}</div>
+          </div>
+          <div class="row">
+            <div class="col">
+            &nbsp;
+            </div>
+          </div>
+        <div class="row body" ng-if="bill.transactionOT">
           <!--{{item.PayTypeId}}-->
-          <div class="col-80">{{print(item, 'Description').toUpperCase() || 'ROUNDED'}}</div>
-          <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
-          <div class="col-20 text-right">$ {{item.Amount.toFixed(2)}}</div>
+          <div class="col">{{ bill.transactionOT.OverTenderTypeId == 3 ? 'Change Due' : 'Forfeited' }}: $ {{ bill.transactionOT.OverTenderTypeId == 3 ? bill.transactionOT.ChangeAmount.toFixed(2) : bill.transactionOT.Amount.toFixed(2)}}</div>
+        </div>
+        <!--<div class="row body" ng-if="item.ChangeAmount > 0 && item.Cash == 'false'">-->
+          <!--&lt;!&ndash;{{item.PayTypeId}}&ndash;&gt;-->
+          <!--<div class="col">Forfeited: $ {{item.ChangeAmount.toFixed(2)}}</div>-->
+        <!--</div>-->
+
+        <div class="row" ng-if="location.Tax5Option == 3">
+          <div class="col">
+            {{'Inc of  '+location.Tax5Desc1 +  ' $'+ bill.header.Tax.toFixed(2)}}
+          </div>
         </div>
       </div>
+
     </div>
     <div class="row footer">
       <div class="col">
         <p class="text-center" ng-repeat="item in settings.Footer">{{item.Text}}</p>
+      </div>
+    </div>
+    <div class="row footer">
+      <div class="col">
+        <p class="text-center">BDate: {{bill.header.BusinessDate | date:'dd-MM-yyyy'}} Shift: {{bill.footerData.shift.Description1}} M/C: {{bill.footerData.machine.Code}}</p>
+        <p class="text-center">
+          {{bill.header.curtSysDateTime | date:'DD-MM-YYYY hh:mm:ss A'}}      
+        User: {{bill.footerData.cashier.Code}} 
+        &nbsp;{{bill.header.DocNo}}
+        </p>
       </div>
     </div>
   </ion-content>

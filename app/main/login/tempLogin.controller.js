@@ -8,6 +8,15 @@ angular.module('itouch.controllers')
       password: null
     };
 
+    $scope.$on("modal.shown", function(event, modal){
+      if(modal.id == 11 || modal.id == 12){
+        $scope.credentials = {
+          username: null,
+          password: null
+        };
+      }
+    });
+
     $scope.doLogin = function () {
       if($scope.credentials.username && $scope.credentials.password){
         AuthService.attempt($scope.credentials.username, $scope.credentials.password, true).then(function (user) {
@@ -15,7 +24,8 @@ angular.module('itouch.controllers')
           AuthService.setTempUser(user);
           $scope.$emit("loginlModal-close");
         }, function (err) {
-          Alert.showAlert('Login Failed', err, 'warning-alert');
+          Alert.warning('Login Failed');
+          $scope.$emit('loginlModal-close', true);
           console.log(err);
         });
       }
@@ -26,6 +36,6 @@ angular.module('itouch.controllers')
     }
 
     $scope.close = function () {
-      $scope.$emit('loginlModal-close');
+      $scope.$emit('loginlModal-close', true);
     }
   }]);

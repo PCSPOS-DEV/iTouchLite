@@ -6,12 +6,12 @@ angular.module('itouch.services')
     function (DB, DB_CONFIG, $q, ItemService) {
       var self = this;
 
-      self.getAll = function () {
+      self.getAll = function (bDate) {
         return DB.query("SELECT " +
           "h.DocNo, h.DocType, h.SubTotal, h.DiscAmount, h.Tax1Amount, h.Tax2Amount, h.Tax3Amount, h.Tax4Amount, h.Tax5Amount, " +
           "h.Tax1DiscAmount, h.Tax2DiscAmount, h.Tax3DiscAmount, h.Tax4DiscAmount, h.Tax5DiscAmount, " +
-          "d.LineNumber, d.Desc1, d.Desc2, d.Qty  " +
-          "FROM " + DB_CONFIG.tableNames.bill.header + " h INNER JOIN " + DB_CONFIG.tableNames.bill.detail + " d ON h.DocNo = d.DocNo ORDER BY h.DocNo DESC").then(function (res) {
+          "d.LineNumber, d.Desc1, d.Desc2, d.Qty,d.ItemType  " +
+          "FROM " + DB_CONFIG.tableNames.bill.header + " h INNER JOIN " + DB_CONFIG.tableNames.bill.detail + " d ON h.DocNo = d.DocNo WHERE h.BusinessDate = ? AND d.ItemId!=0 ORDER BY h.DocNo DESC,d.LineNumber ASC", [bDate]).then(function (res) {
           var items = DB.fetchAll(res);
           var bills = {};
           var total = 0;
@@ -40,7 +40,7 @@ angular.module('itouch.services')
               };
               bills[item.DocNo] = ItemService.calculateTotal(bills[item.DocNo]);
             }
-            bills[item.DocNo].items.push(_.pick(item, ['Desc1', 'Desc2', 'Qty']));
+            bills[item.DocNo].items.push(_.pick(item, ['Desc1', 'Desc2', 'Qty','ItemType']));
             // item = ItemService.calculateTotal(item);
             // bills[item.DocNo].items.push(item);
           });
@@ -49,7 +49,7 @@ angular.module('itouch.services')
         });
       }
 
-      self.getHeader = function (DocNo) {
+      self.getTempHeader = function (DocNo) {
         return DB.query("SELECT *  FROM " + DB_CONFIG.tableNames.bill.header + " WHERE DocNo = ?", [DocNo]).then(function (res) {
           var item = DB.fetch(res);
           item = ItemService.calculateTotal(item);

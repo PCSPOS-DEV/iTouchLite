@@ -10,13 +10,17 @@ angular.module('itouch.services')
         var deferred = $q.defer();
         try {
           Restangular.one("GetReason").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
-            var items = JSON.parse(res);
-            if (items) {
-              items = _.map(items, function (item) {
-                return _.omit(item, 'EntityId');
-              });
-              self.save(items);
-              deferred.resolve();
+            if(res && res != ""){
+              var items = JSON.parse(res);
+              if (items) {
+                items = _.map(items, function (item) {
+                  return _.omit(item, 'EntityId');
+                });
+                self.save(items);
+                deferred.resolve();
+              } else {
+                deferred.reject('Unable to fetch Shifts');
+              }
             } else {
               deferred.reject('Unable to fetch Shifts');
             }

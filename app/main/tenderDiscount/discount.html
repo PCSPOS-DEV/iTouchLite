@@ -6,21 +6,21 @@
   <ion-content>
     <ion-item class="menu-tabs tabs tabs-secondary tabs-icon-top">
       <a class="tab-item" ng-click="setType(1)" ng-class="{'active': discounts === 'bookmarks'}">
-        <i class="icon" ng-class="type === 2 ? 'ion-calculator' : 'ion-calculator'">
+        <i class="icon" ng-class="type === 2 ? 'ion-ios-calculator-outline' : 'ion-ios-calculator'">
         </i> Amounts
       </a>
       <a class="tab-item" ng-click="setType(2)" ng-class="{'active': discounts === 'friends'}">
-        <i class="icon" ng-class="type === 1 ? 'ion-steam' : 'ion-steam'">
+        <i class="icon" ng-class="type === 1 ? 'ion-ios-pie-outline' : 'ion-ios-pie'">
         </i> Percentages
       </a>
     </ion-item>
     <div class="list">
 
-      <div class="item item-divider">
+      <div class="item item-divider header">
         {{title}}
       </div>
 
-      <a class="item" ng-click="selectDiscount(discount)" ng-repeat="discount in discounts">
+      <a class="item" ng-click="selectDiscount(discount)" ng-repeat="discount in discounts" ng-dbliclick="return false;">
         {{print(discount, 'Description')}}
       </a>
 

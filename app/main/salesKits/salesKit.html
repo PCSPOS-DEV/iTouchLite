@@ -1,4 +1,4 @@
-<ion-modal-view class="sk" ng-controller="SalesKitCtrl">
+<ion-modal-view class="sk" ng-controller="SalesKitCtrl" no-scroll="true">
   <ion-header-bar>
     <h1 class="title">{{print(salesKits, 'Description')}}</h1>
     <button class="button button-clear" ng-click="close()"> <i class="ion-close-round"></i></button>
@@ -9,12 +9,19 @@
         <div class="row">
           <div class="col"></div>
         </div>
-        <div class="row components">
+         <ion-scroll zooming="false" direction="y" delegate-handle="salesKit">
+        <div class="row components" style="height: 100px;">
           <div class="col">
-            <button class="button button-energized" ng-repeat="skit in salesKits.list" ng-click="selectComponent(skit)">Component {{$index+1}} <span class="badge badge-assertive">{{skit.Quantity - skit.Qty}}</span></button>
+          <!--ng-repeat="skit in salesKits.list" -->
+            <button class="button button-energized" ng-repeat="skit in salesKits.component"
+               ng-click=" selectComponent(skit)" style="margin-right: 5px;" ng-if="skit.Quantity!=0">
+               Component  {{$index+1}}               
+              <span class="badge badge-assertive">{{skit.Quantity - skit.OrderQty}}</span>
+            </button>            
           </div>
         </div>
-        <ion-scroll zooming="false" direction="y" style="width: 620px; height: 470px;">
+        </ion-scroll>
+        <ion-scroll zooming="false" direction="y" style="height: 470px;" delegate-handle="salesKit">
           <div class="row wrapper">
             <div class="col">
               <button class="button sk-item button-calm" ng-repeat="item in salesKits.selected.Selections" ng-click="selectItem(item)">{{item.Description1}}</button>
@@ -23,12 +30,18 @@
         </ion-scroll>
       </div>
       <div class="col col-25">
+        <div class="row table-header">
+          <div class="col col-50" style="padding-right: 0;">Description</div>
+          <div class="col text-right">Qty</div>
+        </div>
+        <ion-scroll zooming="false" direction="y" style="width: 200px; height: 300px;" delegate-handle="salesKitSelectedItems">
         <div class="selected-items">
-          <div ng-repeat="item in salesKits.selectedList | orderObjectBy :'AddedAt'" class="row" ng-class="{selected: item.selected == true}" ng-click="selectRow(item)">
-            <div class="col col-75">{{print(item, 'Description')}}</div>
-            <div class="col col-25">{{item.Qty}}</div>
+          <div ng-repeat="item in salesKits.selectedList | orderObjectBy :'AddedAt' : false" class="row" ng-class="{selected: item.selected == true}" ng-click="selectRow(item)">
+            <div class="col col-75">{{print(item, 'Description') || print(item, 'Desc')}}</div>
+            <div class="col col-25 text-right padding-right" style="padding-right: 15px;">{{item.Qty}}</div>
           </div>
         </div>
+        </ion-scroll>
         <div class="operations">
           <div class="row">
             <div class="col">

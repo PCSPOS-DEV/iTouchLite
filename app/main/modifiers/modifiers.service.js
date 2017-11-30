@@ -2,7 +2,7 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory("ModifierService", ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
+  .factory("ModifierService", ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'CartItemService', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, CartItemService) {
     var self = this;
 
     self.TYPE_FOOD = 'F';
@@ -13,15 +13,21 @@ angular.module('itouch.services')
       try {
         Restangular.one("GetModifiersKeyInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
           try {
-            var items = JSON.parse(res);
+            if(!_.isUndefined(res)){
+              var items = JSON.parse(res);
+              if (items) {
+              self.save(items);
+              deferred.resolve(items);
+              }
+              else {
+               deferred.reject('Unknown machine');
+              }
+            }
+            else{
+               deferred.resolve();
+            }
           } catch(ex){
             deferred.reject("No results");
-          }
-          if (items) {
-            self.save(items);
-            deferred.resolve(items);
-          } else {
-            deferred.reject('Unknown machine');
           }
         }, function (err) {
           console.error(err);
@@ -68,6 +74,35 @@ angular.module('itouch.services')
 
     self.save = function (items) {
       DB.addInsertToQueue(DB_CONFIG.tableNames.item.modifiers, items);
+    }
+
+    self.getItemModifiers = function(parentLineNumber){
+      return DB.select(DB_CONFIG.tableNames.bill.tempDetail+" AS d INNER JOIN Item AS i ON d.ItemId = i.Id", 'd.*, i.Plu', { columns: "ParentItemLineNumber = ? AND ItemType = 'MOD'", data: [parentLineNumber] }).then(function(res){
+        return DB.fetchAll(res);
+      });
+    }
+
+    self.add = function(DocNo, prentItemLineNumber, cart){
+      var promises = [DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: "ParentItemLineNumber=? AND ItemType = 'MOD'", data:[prentItemLineNumber] })];
+
+      angular.forEach(cart, function(item){
+        if(item.SubPluDesc1 && item.Description2 && item.SubPluDesc1 != "N/A"){
+          item.Description1 = item.SubPluDesc1  + " " + item.Description1;
+          item.Description2 = item.SubPluDesc1 + " " + item.Description2;
+        }
+        item.LineNumber = ++prentItemLineNumber;
+
+        promises.push(CartItemService.addItemToCart(DocNo, item));
+      });
+      return $q.all(promises);
+    }
+
+    var remove = function(item){
+      if(item.LineNumber && item.ItemId){
+        return
+      } else {
+        return $q.reject("invalid item");
+      }
     }
 
 

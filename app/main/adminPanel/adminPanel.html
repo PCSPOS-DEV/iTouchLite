@@ -1,0 +1,25 @@
+<ion-view view-title="iTouch NX Lite" can-swipe-back="false">
+  <ion-nav-bar class="bar-dark">
+    <ion-nav-buttons side="primary">
+    <button class="button icon button-clear ion-chevron-left" ng-click="ctrl.goBack()">
+
+    </button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+  <ion-content class="padding admin-panel">
+    <div class="wrapper" ng-include="ctrl.page.template"></div>
+  </ion-content>
+  <div class="bar bar-footer admin-panel">
+    <div class="col page-bar row pages">
+        <ion-scroll direction="x">
+          <div class="button-bar">
+            <a class="button  button-positive" ng-click="ctrl.changePage(page)" ng-repeat="page in ctrl.pages"
+               ng-class="{'active': page.active}">
+              <p class="desc1">{{page.text}}</p>
+            </a>
+          </div>
+
+        </ion-scroll>
+    </div>
+  </div>
+</ion-view>

@@ -1,11 +1,12 @@
 *, p, a, li, div {
   //font-size: 12px; !important;
-  font-size: 12px;
+  //font-size: 12px;
 }
 
 .btn p {
-  margin: 20px 0;
-  line-height: 16px;
+  //margin: 20px 0;
+  margin: 0;
+  line-height: 20px;
   word-wrap: break-word;
 }
 .btn p.desc1 { margin-top: 16px; }
@@ -96,8 +97,8 @@
 
 .sales .bar-footer { height: 45px; padding: 0; }
 .sales .bar-footer .page-bar, .bar-footer .col { padding: 0;}
-.sales .bar-footer .col {
-  /*width: 65%;*/
+.sales .bar-footer .row.pages {
+  margin-top: 1px;
 }
 .sales .bar-footer .page-bar{
   max-width: 72%;
@@ -106,7 +107,9 @@
 .sales .bar-footer.page-bar ion-scroll:last-child {
   margin-right:0;
 }
-.sales .bar-footer .page-bar .button-bar>.button { border-radius: 0; }
+.sales .bar-footer .page-bar .button-bar>.button { border-radius: 0;
+  min-width: 120px;
+  border-left: 1px solid white; }
 .sales .bar-footer .page-bar .button p { margin: 8px 0;}
 
 
@@ -117,8 +120,12 @@
   margin: 0;
 }
 
+.sales .tender-button.button.disabled, .sales .tender-button.button[disabled] {
+  opacity: 1;
+}
 
-.sales .table { height: 286px; width: 100%; overflow: hidden; }
+
+.sales .table { height: 300px; width: 100%; overflow: hidden; }
 
 /*cart*/
 
@@ -133,7 +140,7 @@
   border-right: 1px solid rgba(144, 153, 159, 0.83);
   border-bottom: 1px solid rgba(144, 153, 159, 0.83);
   padding: 0;
-  width: 721px;
+  width: 718px;
   margin-left: 3px;
 }
 
@@ -172,12 +179,14 @@
 .sales .row.table-body.selected ,
 .sales .row.table-body.sales-kit-item.selected,
 .sales .row.table-body.modifier-item.selected,
+.sales .row.table-body.nondisc.selected,
 //.sales .row.table-body.sales-kit.selected { background-color: rgba(250, 255, 229, 0.83); !important; }
 .sales .row.table-body.sales-kit.selected { background-color: rgba(250, 255, 229, 0.83); }
 
 .sales .row.table-body.take-away ,
 .sales .row.table-body.sales-kit-item.take-away,
 .sales .row.table-body.modifier-item.take-away,
+.sales .row.table-body.nondisc.take-away,
 //.sales .row.table-body.sales-kit.take-away { color: rgba(153,31,12,1); !important; }
 .sales .row.table-body.sales-kit.take-away { color: rgba(153,31,12,1); }
 
@@ -185,6 +194,7 @@
 .sales .row.table-body.sales-kit{ background-color: rgba(119, 121, 123, 0.83); }
 .sales .row.table-body.sales-kit-item { background-color: rgba(204, 208, 211, 0.83); }
 .sales .row.table-body.sales-kit-item :first-child { padding-left: 15px; }
+.sales .row.table-body.nondisc { background-color: rgb(255, 245, 230); }
 .sales .row.table-body.modifier-item { background-color: rgba(204, 208, 211, 0.83); }
 .sales .row.table-body.modifier-item :first-child { padding-left: 15px; }
 /*.sales .row.table-body.sales-kit-item{;}*/
@@ -194,19 +204,100 @@
 .subplu .list .button { margin-left: 5px; min-width: 80px; }
 .subplu .list:first-child { margin-left: 0; }
 
-.sales .functions { padding-left: 10px; margin-top: 74px; }
-.sales .functions .button {
-  width: 48%;
-  font-size: 12px;
-  height: 46px;
-  margin-bottom: 3px;
-  margin-right: 3px;
-}
-.sales #functions-bottom{
-  height: 368px;
+.sales {
+  .scroll-bar-indicator {
+    display: none;
+  }
+
+  .button-area {
+    .summery {
+      margin-bottom: 10px;
+    }
+
+    .functions {
+      padding-left: 10px;
+      margin-top: 0px;
+    }
+
+    #functions-bottom{
+      height: 330px;
+    }
+
+    .functions .button {
+      width: 48%;
+      font-size: 12px;
+      height: 47px;
+      margin-bottom: 3px;
+      margin-right: 3px;
+    }
+
+    .quantity{
+      margin: 0 13px 0 14px;
+
+      .list.list-inset {
+        margin: 0 0 0 5px;
+        padding: 0;
+      }
+
+    }
+
+    div.info {
+      margin: 0 auto 8px auto;
+      max-width: 290px;
+      padding: 0;
+      font-weight: bold;
+      color: rgba(251,181,12,0.54);
+
+      .row {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+
+
+
+    .qty-bc.row {
+      padding-bottom: 0;
+      margin-bottom: 3px;
+
+      .col { padding-left: 0; padding-right: 0; padding-bottom: 0; }
+
+      .barcode-toggle {
+        margin-top: 0px;
+        border-radius: 3px;
+        padding: 13px 5px 13px 7px;
+        margin-left: 2px;
+        margin-right: 6px;
+
+        .toggle {
+          right: 5px;
+        }
+      }
+
+      .quantity {
+        margin-left: 5px;
+        margin-right: 1px;
+      }
+    }
+
+
+  }
+  .item-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    border: none;
+  }
+
+  img.cart-background {
+    width: 716px;
+    height: 300px;
+  }
 }
 
-.sales .scroll-view.scroll-y {
-  overflow-x: hidden;
-  overflow-y: hidden;
+#barcodeText {
+  position: absolute;
+  left: -400px;
 }

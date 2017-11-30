@@ -1,0 +1,74 @@
+<div class="functions" ng-controller="FunctionsCtrl as ctrl">
+  <div class="row">
+    <div class="col-50">
+      <div class="row">
+        <h2 class="col-80 title">Functions</h2>
+        <button class="col-20 button button-positive icon ion-plus-round" ng-click="ctrl.createNewButtonClick()"></button>
+      </div>
+
+      <ion-scroll style="height: 600px; overflow-y: hidden;">
+        <ion-list>
+          <ion-item ng-repeat="function in ctrl.data.functions" ng-click="ctrl.selectFunction(function)" ng-class="{ active: function.active, undefined: function.undefined }">
+            {{print(function, 'Description') || 'undefined'}}
+          </ion-item>
+        </ion-list>
+      </ion-scroll>
+    </div>
+    <div class="col-50">
+      <h2 class="title">Edit Function</h2>
+      <div class="selected-function">
+
+        <div class="list">
+          <label class="item item-input">
+            <input type="text" placeholder="Description 1" ng-model="ctrl.selectedFunction.Description1">
+          </label>
+          <label class="item item-input">
+            <input type="text" placeholder="Description 2" ng-model="ctrl.selectedFunction.Description2">
+          </label>
+          <label class="item item-input">
+            <input type="text" placeholder="Name" ng-model="ctrl.selectedFunction.Name" ng-disabled="!ctrl.insert">
+          </label>
+          <li class="item item-toggle">
+            Inactive
+            <label class="toggle toggle-assertive">
+              <input type="checkbox" ng-model="ctrl.selectedFunction.Inactive">
+              <div class="track">
+                <div class="handle"></div>
+              </div>
+            </label>
+          </li>
+          <li class="item item-toggle">
+            Transact
+            <label class="toggle toggle-assertive">
+              <input type="checkbox" ng-model="ctrl.selectedFunction.Transact">
+              <div class="track">
+                <div class="handle"></div>
+              </div>
+            </label>
+          </li>
+          <label class="item item-input item-select">
+            <div class="input-label">
+              Type
+            </div>
+            <select ng-options="type.id as type.id for type in ctrl.types" ng-model="ctrl.selectedFunction.Type">
+            </select>
+          </label>
+          <label class="item item-input item-select">
+            <div class="input-label">
+              Access Level
+            </div>
+            <select ng-options="level for level in ctrl.accessLevels" ng-model="ctrl.selectedFunction.AccessLevel">
+
+            </select>
+          </label>
+        </div>
+        <button class="button button-positive" ng-click="ctrl.saveFunction()">
+          Save
+        </button>
+        <button class="button" ng-click="ctrl.cancelFunction()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

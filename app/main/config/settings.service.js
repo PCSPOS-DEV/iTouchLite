@@ -2,7 +2,7 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory("SettingsService", ['$localStorage', function ($localStorage) {
+  .factory("SettingsService", ['$localStorage', '$q', 'Restangular', 'DB', 'DB_CONFIG', function ($localStorage, $q, Restangular, DB, DB_CONFIG) {
     var self = this;
     var settings = $localStorage.settings || {};
 
@@ -30,6 +30,17 @@ angular.module('itouch.services')
 
     self.setLocationId = function (loc_id) {
       settings.loc_id = loc_id;
+      if(loc_id){
+        self.getLocation(loc_id).then(function(location){
+          if(location){
+            console.log(location);
+            settings.location = location;
+            self.save();
+          }
+        }, function(err){
+          console.log(err);
+        });
+      }
     }
 
     self.getLocationId = function () {
@@ -42,6 +53,17 @@ angular.module('itouch.services')
 
     self.setMachineId = function (mac_id) {
       settings.mac_id = mac_id;
+      if(mac_id){
+        self.getMachine(mac_id).then(function(machine){
+          if(machine){
+            console.log(machine);
+            settings.machine = machine;
+            self.save();
+          }
+        }, function(err){
+          console.log(err);
+        });
+      }
     }
 
     self.getMachineId = function () {
@@ -81,6 +103,75 @@ angular.module('itouch.services')
 
     self.save = function () {
       $localStorage.settings = settings;
+    }
+
+
+
+    self.fetchMachines = function () {
+      var deferred = $q.defer();
+      var entityId = self.getEntityId();
+      if(entityId){
+        Restangular.one("GetMachineDetails").get({EntityId: entityId}).then(function (res) {
+          console.log('machines fetch done');
+          machines = JSON.parse(res);
+          DB.addInsertToQueue(DB_CONFIG.tableNames.config.machines, machines);
+          deferred.resolve();
+        }, function (err) {
+          deferred.reject('Could fetch data from the server');
+          console.error(err);
+        });
+      } else {
+        deferred.reject('Entity ID is not available');
+      }
+      return deferred.promise;
+    }
+
+    self.getMachine = function(id){
+      return DB.select(DB_CONFIG.tableNames.config.machines, '*', { columns: 'Id=?', data: [id] }).then(function(res){
+        return DB.fetch(res);
+      });
+    }
+
+    self.getLocation = function(id){
+      return DB.select(DB_CONFIG.tableNames.locations.locations, '*', { columns: 'Id=?', data: [id] }).then(function(res){
+        return DB.fetch(res);
+      });
+    }
+
+    self.getCurrentMachine = function(){
+      if(settings.machine){
+        return settings.machine;
+      } else {
+        return null;
+      }
+    }
+
+    self.setCashId = function (cash_id) {
+      settings.cash_id = cash_id;
+    }
+
+    self.getCashId = function () {
+      if(settings.cash_id){
+        return parseInt(settings.cash_id);
+      } else {
+        return null;
+      }
+
+    }
+
+    self.setBusinessDate=function(bussinessdate){
+      settings.business_date=bussinessdate;
+      $localStorage.app_config.businessDate=bussinessdate;
+      DB.query("DELETE FROM "+DB_CONFIG.tableNames.bill.tempHeader);
+     }
+
+    self.getBusinessDate=function(){
+      if(settings.business_date){
+        return settings.business_date;
+      }
+      else{
+        return null;
+      }
     }
 
     return self;
