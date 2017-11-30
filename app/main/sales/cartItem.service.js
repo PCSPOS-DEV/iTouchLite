@@ -2,7 +2,7 @@
  * Created by shalitha on 27/5/16.
  */
 angular.module('itouch.services')
-  .factory('CartItemService', ['Restangular', 'AuthService', 'TaxService', 'BillService', 'SalesKitService', '$q', 'ItemService', 'DB', 'DB_CONFIG',
+  .factory("CartItemService", ['Restangular', 'AuthService', 'TaxService', 'BillService', 'SalesKitService', '$q', 'ItemService', 'DB', 'DB_CONFIG',
     function (Restangular, AuthService, TaxService, BillService, SalesKitService, $q, ItemService, DB, DB_CONFIG) {
       var self = this;
       var cart = {
@@ -12,7 +12,7 @@ angular.module('itouch.services')
 
 
       self.refreshCartSummery = function (header) {
-        if (header) {
+        if(header){
           cart.summery = header;
         }
         cart.summery.SubTotal = 0;
@@ -31,7 +31,7 @@ angular.module('itouch.services')
         cart.summery.Tax3DiscAmount = 0;
         cart.summery.Tax4DiscAmount = 0;
         cart.summery.Tax5DiscAmount = 0;
-        var TotalForTaxItem = 0;
+        var TotalForTaxItem=0;
         if (!_.isEmpty(cart.items)) {
           angular.forEach(cart.items, function (item) {
             cart.summery.SubTotal += item.SubTotal;
@@ -47,12 +47,12 @@ angular.module('itouch.services')
             cart.summery.Tax3DiscAmount += item.Tax3DiscAmount || 0;
             cart.summery.Tax4DiscAmount += item.Tax4DiscAmount || 0;
             cart.summery.Tax5DiscAmount += item.Tax5DiscAmount || 0;
-            cart.summery.Tax += item.Tax || 0;
+            cart.summery.Tax += item.Tax || 0;           
             cart.summery.Total += item.Total || 0;
             cart.summery.Discount += item.Discount || 0;
-            cart.summery.Tax5Perc = item.Tax5Perc;
-            if (item.Taxable == 'true') {
-              TotalForTaxItem += item.Total || 0;
+            cart.summery.Tax5Perc=item.Tax5Perc;
+            if(item.Taxable=='true'){
+             TotalForTaxItem+= item.Total || 0;
             }
           });
           cart.summery.SubTotal = cart.summery.SubTotal.roundTo(2);
@@ -68,21 +68,21 @@ angular.module('itouch.services')
           cart.summery.Tax3DiscAmount = cart.summery.Tax3DiscAmount.roundTo(2);
           cart.summery.Tax4DiscAmount = cart.summery.Tax4DiscAmount.roundTo(2);
           cart.summery.Tax5DiscAmount = cart.summery.Tax5DiscAmount.roundTo(2);
-          //cart.summery.Tax = (cart.summery.Tax - cart.summery.Tax5DiscAmount).roundTo(2);
+          //cart.summery.Tax = (cart.summery.Tax - cart.summery.Tax5DiscAmount).roundTo(2);          
           cart.summery.Total = cart.summery.Total.roundTo(2);
           cart.summery.Discount = cart.summery.Discount.roundTo(2);
           /*Yi Yi Po*/
-          var TotalTax = ((TotalForTaxItem / (100 + cart.summery.Tax5Perc)) * cart.summery.Tax5Perc).roundTo(2);
-          cart.summery.Tax = (TotalTax - cart.summery.Tax5DiscAmount).roundTo(2);
+          var TotalTax=((TotalForTaxItem/(100+cart.summery.Tax5Perc)) * cart.summery.Tax5Perc).roundTo(2);          
+          cart.summery.Tax=(TotalTax-cart.summery.Tax5DiscAmount).roundTo(2);
           /*--*/
-
+          
         }
       };
 
       self.refreshCart = function () {
         self.refreshCartSummery();
         // self.getItems();
-      };
+      }
       self.refreshCart();
 
       self.getItems = function () {
@@ -93,7 +93,7 @@ angular.module('itouch.services')
           return self.fetchItemsFromDb();
         }
         return def.promise;
-      };
+      }
 
       self.fetchItemsFromDb = function (docNo) {
         return BillService.getItems(docNo).then(function (items) {
@@ -105,7 +105,7 @@ angular.module('itouch.services')
                 self.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
               } else {
                 // if(item.ReasonId){
-                self.setItem(item.ItemId, item.ItemType, item, item.LineNumber, item.ReasonId != null, item.ParentItemLineNumber);
+                  self.setItem(item.ItemId, item.ItemType, item, item.LineNumber, item.ReasonId != null, item.ParentItemLineNumber);
                 // } else {
 
                 // }
@@ -118,15 +118,15 @@ angular.module('itouch.services')
         }, function (ex) {
           console.log(ex);
         });
-      };
+      }
 
       self.getSummery = function (header) {
         self.refreshCartSummery(header);
         return cart.summery;
-      };
+      }
 
       self.addItemToCart = function (DocNo, item, salesKit) {
-
+     
         item = angular.copy(item);
         var cartItem = null;
         // if(item){
@@ -134,33 +134,33 @@ angular.module('itouch.services')
         // }
 
         return BillService.findItems(item.ItemId, DocNo, item.ItemType, item.ParentItemLineNumber).then(function (items) {
-
+         
           var ndItem = getItem(items);
-          if (item.OpenKey) {
-            if (item.customQuantity) {
+          if(item.OpenKey){
+            if(item.customQuantity){
               item.Qty = item.customQuantity;
             }
-            if (!item.Qty) {
+            if(!item.Qty){
               item.Qty = 1;
-            }
+            }            
             return BillService.addItem(item);
 
           } else if (ndItem && !salesKit && ndItem.TakeAway == 'false' && ndItem.ChildCount == 0) {
-            if (item.customQuantity) {
+            if(item.customQuantity){
               ndItem.Qty += item.customQuantity;
             } else {
               ndItem.Qty++;
             }
             return BillService.updateItem(ndItem);
           } else {
-            if (item.customQuantity) {
+            if(item.customQuantity){
               item.Qty = item.customQuantity;
             }
-            if (!item.Qty) {
+            if(!item.Qty){
               item.Qty = 1;
             }
 
-            if (ndItem && salesKit) {
+            if(ndItem && salesKit){
               item.LineNumber = ndItem.LineNumber + 10;
             }
             return BillService.addItem(item);
@@ -168,10 +168,10 @@ angular.module('itouch.services')
         });
 
 
-      };
+      }
 
-      self.addSalesKitItemToCart = function (item) {
-
+      self.addSalesKitItemToCart = function(item){
+        
         var item = angular.copy(item);
 
         return BillService.addSalesKitItem(item).then(function () {
@@ -180,7 +180,7 @@ angular.module('itouch.services')
         }).catch(function (ex) {
           console.log(ex);
         });
-      };
+      }
 
       self.updateSalesKitItem = function (item, itemId) {
 
@@ -199,7 +199,7 @@ angular.module('itouch.services')
         });
 
 
-      };
+      }
 
       var getItem = function (items) {
         var nDI = false;
@@ -210,15 +210,15 @@ angular.module('itouch.services')
         });
 
         return nDI;
-      };
+      }
 
-      self.addPWP = function (DocNo, parentItem, items) {
-        return BillService.loadLineNewNumber().then(function (lineNumber) {
+      self.addPWP = function(DocNo, parentItem, items){
+        return BillService.loadLineNewNumber().then(function(lineNumber){
 
           var promises = [];
           parentItem.LineNumber = lineNumber;
           promises.push(self.addItemToCart(DocNo, parentItem));
-          items = _.map(items, function (item) {
+          items = _.map(items, function(item){
             item.ParentItemLineNumber = parentItem.LineNumber;
             lineNumber += 100;
             item.LineNumber = lineNumber;
@@ -227,7 +227,7 @@ angular.module('itouch.services')
           });
           return $q.all(promises);
         });
-      };
+      }
 
       self.clearCart = function () {
         cart = {
@@ -235,7 +235,7 @@ angular.module('itouch.services')
           items: {}
         };
         self.refreshCartSummery();
-      };
+      }
 
       self.findItem = function (id, type, lineNumber, parentItemLineNumber) {
         if (id && type && type == 'NOR') {
@@ -244,27 +244,27 @@ angular.module('itouch.services')
           if (lineNumber) {
             label += lineNumber;
           }
-          if (parentItemLineNumber) {
+          if(parentItemLineNumber){
             label += parentItemLineNumber;
           }
           var item = cart.items[label];
-          if (!item || item.ParentItemLineNumber != 0) {
+          if(!item || item.ParentItemLineNumber != 0){
             return null;
           }
           return item;
         } else {
           return null;
         }
-      };
+      }
       var counter = 1;
       self.setItem = function (id, type, item, lineNumber, refunded, parentItemLineNumber) {
         if (id && type && item) {
-          var label = '';
-          if (refunded) {
-            label += 'REFUND-';
+          var label = "";
+          if(refunded){
+            label += "REFUND-";
           }
 
-          if (item.TakeAway == 'true') {
+          if(item.TakeAway == 'true'){
             label += 'TA-';
             label += counter++;
           }
@@ -274,19 +274,19 @@ angular.module('itouch.services')
           if (lineNumber) {
             label += lineNumber;
           }
-          if (parentItemLineNumber) {
+          if(parentItemLineNumber){
             label += parentItemLineNumber;
           }
-          if (type == 'PWP' || type == 'PWI') {
+          if(type == 'PWP' || type == 'PWI'){
             label += counter++;
           }
-          if (item.OpenKey) {
-            label += 'OK' + (counter++);
+          if(item.OpenKey){
+            label += 'OK'+(counter++);
           }
           cart.items[label] = item;
         }
 
-      };
+      }
 
       self.setDiscountedItem = function (id, type, item, lineNumber) {
         if (id && type && item && lineNumber) {
@@ -298,38 +298,38 @@ angular.module('itouch.services')
           // }
           cart.items[label] = item;
         }
-      };
+      }
 
       self.findSalesKitParent = function (parentId) {
         return self.fetchItemsFromDb().then(function (items) {
           var sk = _.findWhere(items, {LineNumber: parentId});
-          if (sk) {
+          if(sk){
             return sk;
           } else {
-            return $q.reject('not found');
+            return $q.reject("not found");
           }
-        });
-      };
+        })
+      }
 
-      self.isEmpty = function (DocNo) {
-        if (!DocNo) {
-          DocNo = BillService.getCurrentReceiptId();
+      self.isEmpty = function(DocNo){
+        if(!DocNo){
+            DocNo = BillService.getCurrentReceiptId();
         }
-        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, 'COUNT(*) AS c', { columns: 'DocNo=? AND ItemType !=? ', data: [DocNo, 'RND'] }).then(function (res) {
-          var count = DB.fetch(res).c;
-          if (count == 0) {
+        return DB.select(DB_CONFIG.tableNames.bill.tempDetail, "COUNT(*) AS c", { columns: 'DocNo=? AND ItemType !=? ', data:[DocNo,'RND'] }).then(function(res){
+          var count = DB.fetch(res).c;                    
+          if(count == 0){
             return true;
           } else {
             return false;
           }
         });
-      };
+      }
 
-      self.getChildItems = function (parentItemLineNumber) {
-        return DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.bill.tempDetail + ' WHERE ParentItemLineNumber = ?', [parentItemLineNumber]).then(function (res) {
+      self.getChildItems = function(parentItemLineNumber){
+        return DB.query("SELECT * FROM "+DB_CONFIG.tableNames.bill.tempDetail +" WHERE ParentItemLineNumber = ?", [parentItemLineNumber]).then(function(res){
           return DB.fetchAll(res);
         });
-      };
+      }
 
 
       return self;

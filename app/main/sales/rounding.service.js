@@ -2,16 +2,16 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-.factory('RoundingService', ['SettingsService', function (SettingsService) {
+.factory("RoundingService", ['SettingsService', function (SettingsService) {
   var roundFor = SettingsService.getRoundFor();
   var roundDelta = SettingsService.getRoundDelta();
 
   var self = this;
 
   self.round = function (amount) {
-    if (roundFor == 'M' || roundFor == 'C')//Mathematical rounding
+    if (roundFor == "M" || roundFor == "C")//Mathematical rounding
     {
-      if (roundFor == 'M')//Mathematical rounding
+      if (roundFor == "M")//Mathematical rounding
       {
         return roundNear(amount);
       }
@@ -19,7 +19,7 @@ angular.module('itouch.services')
       var TmpDelta = 0;
       var Temp = 0;
 
-      if (roundFor == 'C')//Consumer rounding
+      if (roundFor == "C")//Consumer rounding
       {
         TmpDelta = -(roundDelta);
 
@@ -47,11 +47,11 @@ angular.module('itouch.services')
     }
     else
     {
-      throw new Exception('Invalid rounding configuration.');
+      throw new Exception("Invalid rounding configuration.");
     }
-  };
-  self.roundNumber = function (num, decimalPlaces) {
-    var d = decimalPlaces || 0;
+  }
+ self.roundNumber =function (num,decimalPlaces) {
+   var d = decimalPlaces || 0;
     var m = Math.pow(10, d);
     var n = +(d ? num * m : num).toFixed(8); // Avoid rounding errors
     var i = Math.floor(n), f = n - i;
@@ -59,19 +59,19 @@ angular.module('itouch.services')
     var r = (f > 0.5 - e && f < 0.5 + e) ?
                 ((i % 2 == 0) ? i : i + 1) : Math.round(n);
     return d ? r / m : r;
-  };
+}
 
 
   var roundNear = function (amount) {
-    var Desc = 0;
+    var desc = 0;
     var varX = 0;
     var intX = 0;
 
     //varX = amount / roundDelta;
-    varX = self.roundNumber((amount / roundDelta), 2);
+    varX = self.roundNumber((amount / roundDelta),2);
     intX = parseInt(varX);
     Desc = parseFloat(varX) - intX;
-
+    
     if (Desc >= 0.5)
     {
       return roundDelta * (intX + 1);
@@ -80,7 +80,7 @@ angular.module('itouch.services')
     {
       return roundDelta * intX;
     }
-  };
+  }
 
   return self;
 }]);

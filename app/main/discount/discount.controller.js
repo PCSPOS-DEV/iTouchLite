@@ -16,8 +16,8 @@ angular.module('itouch.controllers')
       $scope.title = '';
       var submitted = false;
 
-      $scope.$on('modal.shown', function (event, data) {
-        if ($scope.shownModal == 'itemDiscounts') {
+      $scope.$on('modal.shown', function(event, data){
+        if($scope.shownModal == 'itemDiscounts'){
           $scope.type = 2;
           submitted = false;
           refresh();
@@ -25,12 +25,12 @@ angular.module('itouch.controllers')
       });
 
 
-      var refresh = function () {
+      var refresh = function(){
         discountsSet.type1 = [];
         discountsSet.type2 = [];
-        DiscountService.get().then(function (dis) {
+        DiscountService.get().then(function(dis) {
           angular.forEach(dis, function (item) {
-            if (item.DiscountType == '1') {
+            if(item.DiscountType == '1'){
               discountsSet.type1.push(item);
             } else {
               discountsSet.type2.push(item);
@@ -41,18 +41,18 @@ angular.module('itouch.controllers')
         }, function (er) {
           console.log(er);
         });
-      };
+      }
 
 
       $scope.setType = function (t) {
         $scope.type = t;
-        $scope.discounts = discountsSet['type' + t];
+        $scope.discounts = discountsSet['type'+t];
         $scope.title = titles[t];
       };
 
       $scope.selectDiscount = function (discount) {
-        if (discount) {
-          if (discount.DiscountType == 1 && discount.Amount == 0) {
+        if(discount){          
+          if(discount.DiscountType == 1 && discount.Amount == 0){
             $scope.data = {};
 
             // An elaborate, custom popup
@@ -79,7 +79,7 @@ angular.module('itouch.controllers')
             });
 
             myPopup.then(function (res) {
-              if (res) {
+              if(res){
                 saveDiscount(angular.copy(discount), res);
               }
             });
@@ -87,31 +87,31 @@ angular.module('itouch.controllers')
             saveDiscount(angular.copy(discount));
           }
         }
-      };
+      }
 
       var saveDiscount = function (discount, amount) {
-        if (submitted == false) {
+        if(submitted == false){
           submitted = true;
-          if (amount) {
+          if(amount){
             discount.Amount = parseFloat(amount);
           }
           DiscountService.saveTempDiscountItem(angular.copy($scope.cart.selectedItem), angular.copy(discount)).then(function (item) {
             // $scope.cart.selectedItem.discounted = true;
             // console.log(item);
             // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
-            $scope.$emit('refresh-cart');
+            $scope.$emit("refresh-cart");
           }, function (err) {
             Alert.error(err);
           }).finally(function () {
               //submitted = false;
-            $scope.$emit('discountModel-close');
+              $scope.$emit("discountModel-close");
           });
         }
-      };
+      }
 
       $scope.close = function () {
-        $scope.$emit('discountModel-close');
-      };
+        $scope.$emit("discountModel-close");
+      }
 
     }]);
 

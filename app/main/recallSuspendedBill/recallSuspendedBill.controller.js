@@ -12,45 +12,45 @@ angular.module('itouch.controllers')
       self.loading = true;
 
       $scope.$on('modal.shown', function(event, data){
-        if ( data.id === 14) {
+        if(data.id == 14){
           refresh();
         }
       });
 
       var refresh = function () {
-        self.loading = true;
-        SuspendService.fetchSuspendedBills().then(function (data) {
+          self.loading = true;
+        SuspendService.fetchSuspendedBills().then(function(data){
           self.data.bills = data;
         }).finally(function () {
-          $timeout(function () {
+            $timeout(function () {
                 self.loading = false;
-          }, 500);
+            }, 500);
 
         });
-      };
+      }
 
       self.close = function () {
         $scope.$emit('recallSuspendBill.modal.close');
-      };
+      }
 
-      self.recallBill = function() {
+      self.recallBill = function(){
         var bill = self.data.selectedItem;
-        if(bill) {
-         /* Alert.showConfirm('Are you sure?', 'Recall Suspended bill', function(res){
-            if(res == 1){*/
+        if(bill){
+          Alert.showConfirm('Are you sure?', 'Recall Suspended bill', function(res){
+            if(res == 1){
                 SuspendService.recallBill(bill.DocNo).then(function(DocNo){
                 $scope.$emit('initBill');
-                $scope.$emit('refresh-cart');
+                $scope.$emit("refresh-cart");
                 $scope.$emit('recallSuspendBill.modal.close');
                 // Reciept.printVoid(DocNo);
               }, function(ex){
-                  console.log(ex);
+                console.log(ex);
               });
-            /*}
-        });*/
+            }
+        });
         } else {
           //Alert.warning('Please select an item to void');
-          Alert.warning('Please select an item to suspend', 'ItouchLite');
+          Alert.warning('Please select an item to suspend','ItouchLite');
         }
 
       }
@@ -68,7 +68,7 @@ angular.module('itouch.controllers')
       }
 
       self.view = function(){
-        $scope.selectedItem = angular.copy(self.data.selectedItem);
+        $scope.selectedItem = angular.copy(self.data.selectedItem);        
         if($scope.selectedItem){
           self.modal.show();
           // self.data.selectedItem = null;

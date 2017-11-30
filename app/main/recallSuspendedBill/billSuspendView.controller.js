@@ -13,24 +13,24 @@ angular.module('itouch.controllers')
       };
       $scope.location = LocationService.currentLocation;
 
-      $scope.$on('modal.shown', function (event, modal) {
-        if (modal.id === 6) {
+      $scope.$on("modal.shown", function(event, modal){
+        if(modal.id == 6){
           refresh();
           $ionicScrollDelegate.scrollTop();
         }
       });
 
       var refresh = function () {
-        if ($scope.selectedItem) {
+        if($scope.selectedItem){
           PrinterSettings.get().then(function (data) {
             $scope.settings = data;
           });
 
           Reciept.fetchSuspendData($scope.selectedItem.DocNo).then(function (data) {
-            data.header.Title = 'Suspend';
-            data.header.BusinessDate = moment(data.header.BusinessDate).format('YYYY-MM-D');
-            data.header.SysDateTime = moment(data.header.SysDateTime).format('YYYY-MM-D h:mm:ss');
-            $scope.bill = data;
+           data.header.Title = 'Suspend';
+           data.header.BusinessDate=moment(data.header.BusinessDate).format('YYYY-MM-D');
+           data.header.SysDateTime=moment(data.header.SysDateTime).format('YYYY-MM-D h:mm:ss');           
+           $scope.bill = data;
           }, function (ex) {
             console.log(ex);
           });
@@ -38,7 +38,7 @@ angular.module('itouch.controllers')
 
       };
 
-      $scope.printSuspendReciept = function (DocNo){
+      $scope.printSuspendReciept = function(DocNo){
         if(DocNo){
           Reciept.printSuspend(DocNo);
         }

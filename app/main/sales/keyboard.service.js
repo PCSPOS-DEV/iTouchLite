@@ -2,19 +2,15 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory('KeyBoardService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
+  .factory("KeyBoardService", ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
     var self = this;
     var pages;
     var keys;
 
-    var argbToRGB = function (color) {
-      return color ? '#' + ('000000' + (color & 0xFFFFFF).toString(16)).slice(-6) : '';
-    };
-
     self.fetchLayout = function () {
       var deferred = $q.defer();
       try {
-        Restangular.one('GetKeyboardLayoutsByMachines').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+        Restangular.one("GetKeyboardLayoutsByMachines").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
           var kBLayouts = JSON.parse(res);
           if (kBLayouts) {
             self.saveLayout(kBLayouts);
@@ -32,12 +28,12 @@ angular.module('itouch.services')
       }
 
       return deferred.promise;
-    };
+    }
 
     self.fetchPages = function () {
       var deferred = $q.defer();
       try {
-        Restangular.one('GetKeyboardPages').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+        Restangular.one("GetKeyboardPages").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
           var pageSet = JSON.parse(res);
           if (pageSet && pageSet.length > 0) {
             self.savePages(pageSet);
@@ -51,22 +47,22 @@ angular.module('itouch.services')
           deferred.reject('Unable to fetch data from the server');
         });
 
-        Restangular.one('GetKeyboardPageInfo').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
-          var pageInfo = null;
+        Restangular.one("GetKeyboardPageInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+          var pageInfo=null;
           //var pageInfo = JSON.parse(res);
-          if (!_.isUndefined(res)) {
-            pageInfo = JSON.parse(res);
-            if (pageInfo && pageInfo.length > 0) {
+          if(!_.isUndefined(res)){
+              pageInfo = JSON.parse(res);
+              if (pageInfo && pageInfo.length > 0) {
               pageInfo = _.map(pageInfo, function (pageKey) {
                 if (pageKey && pageKey.ImageName) {
                   if (pageKey.ImageName == 'No file was uploaded.') {
                     pageKey.ImageName = null;
                   } else {
-                    pageKey.ImageName = 'img' + pageKey.ImageName.replace('~', '');
+                    pageKey.ImageName = "img" + pageKey.ImageName.replace("~", "");
                   }
                 }
 
-                if (pageKey && pageKey.Colour) {
+                if(pageKey && pageKey.Colour){
                   pageKey.Colour = argbToRGB(pageKey.Colour);
                 }
                 return pageKey;
@@ -76,10 +72,10 @@ angular.module('itouch.services')
             } else {
               deferred.reject('Unknown machine');
             }
-          }
-          else {
-            deferred.resolve();
-          }
+         }
+         else{
+          deferred.resolve();
+         }
 
         }, function (err) {
           console.error(err);
@@ -91,13 +87,13 @@ angular.module('itouch.services')
 
 
       return deferred.promise;
-    };
+    }
 
     self.fetchKeys = function () {
       var deferred = $q.defer();
       try {
-        Restangular.one('GetKayboardKeyInfo').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
-          if (!_.isUndefined(res)) {
+        Restangular.one("GetKayboardKeyInfo").get({EntityId: SettingsService.getEntityId()}).then(function (res) {          
+          if(!_.isUndefined(res)){
             keys = JSON.parse(res);
             if (keys && keys.length > 0) {
               keys = _.map(keys, function (key) {
@@ -105,11 +101,11 @@ angular.module('itouch.services')
                   if (key.ImageName == 'No file was uploaded.') {
                     key.ImageName = null;
                   } else {
-                    key.ImageName = 'img' + key.ImageName.replace('~', '');
+                    key.ImageName = "img" + key.ImageName.replace("~", "");
                   }
                 }
 
-                if (key && key.Color) {
+                if(key && key.Color){
                   key.Color = argbToRGB(key.Color);
                 }
                 return key;
@@ -119,10 +115,10 @@ angular.module('itouch.services')
             } else {
               deferred.reject('Unable to fetch keys for this machine');
             }
-          }
-          else {
-            deferred.resolve();
-          }
+         }
+         else{
+           deferred.resolve();
+         }
         }, function (err) {
           console.error(err);
           deferred.reject('Unable to fetch data from the server');
@@ -132,42 +128,42 @@ angular.module('itouch.services')
       }
 
       return deferred.promise;
-    };
+    }
 
     self.getLayout = function () {
       var deferred = $q.defer();
-      DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.keyboard.layouts + ' WHERE MachineId = ?', [SettingsService.getMachineId()]).then(function (result) {
+      DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.layouts + " WHERE MachineId = ?", [SettingsService.getMachineId()]).then(function (result) {
         deferred.resolve(DB.fetch(result));
       }, function (err) {
         deferred.reject(err.message);
       });
       return deferred.promise;
-    };
+    }
 
     self.getKeys = function (layoutId) {
       return $q.all({
-        keys: DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.keyboard.keys + ' WHERE KeyboardLayoutId = ? AND PageKeyNo IS NOT NULL ORDER BY PageKeyNo, KeyNo', [layoutId]).then(function (result) {
+        keys: DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.keys + " WHERE KeyboardLayoutId = ? AND PageKeyNo IS NOT NULL ORDER BY PageKeyNo, KeyNo", [layoutId]).then(function (result) {
           return DB.fetchAll(result);
         }),
-        keyboard: DB.query('SELECT * FROM view_keyboard WHERE KeyboardLayoutMasterId = ? ORDER BY MainPageId, KeyNo', [layoutId]).then(function (result) {
+        keyboard: DB.query("SELECT * FROM view_keyboard WHERE KeyboardLayoutMasterId = ? ORDER BY MainPageId, KeyNo", [layoutId]).then(function (result) {
           return DB.fetchAll(result);
         })
       }).then(function (data) {
         var keys = data.keys.concat(data.keyboard);
-        if (keys.length > 0) {
+        if(keys.length > 0){
           var keyObject = {};
           _.each(data.keyboard, function (key) {
 
-            if (!keyObject[key.MainPageId]) {
+            if(!keyObject[key.MainPageId]){
               keyObject[key.MainPageId] = [];
             }
-            keyObject[key.MainPageId][key.KeyNo % 32] = key;
+            keyObject[key.MainPageId][key.KeyNo%32] = key;
 
 
           });
           _.each(data.keys, function (key) {
 
-            if (!keyObject[key.PageKeyNo]) {
+            if(!keyObject[key.PageKeyNo]){
               keyObject[key.PageKeyNo] = [];
             }
             keyObject[key.PageKeyNo][key.KeyNo % 32] = key;
@@ -184,7 +180,7 @@ angular.module('itouch.services')
       //   deferred.resolve(keys);
       // });
       // return deferred.promise;
-    };
+    }
 
     self.getKeysForPage = function (pageId) {
       return _.where(keys, {KeyboardPageId: pageId});
@@ -192,31 +188,36 @@ angular.module('itouch.services')
 
     self.getPages = function (layoutId) {
       var deferred = $q.defer();
-      DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.keyboard.pages + ' WHERE KeyboardLayoutMasterId = ?', [layoutId]).then(function (result) {
+      DB.query("SELECT * FROM " + DB_CONFIG.tableNames.keyboard.pages + " WHERE KeyboardLayoutMasterId = ?", [layoutId]).then(function (result) {
         pages = DB.fetchAll(result);
-
+        
         deferred.resolve(pages);
       }, function (err) {
         deferred.reject(err.message);
       });
       return deferred.promise;
-    };
+    }
 
     self.saveLayout = function (layouts) {
       DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.layouts, layouts);
-    };
+    }
 
     self.savePages = function (pages) {
       DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.pages, pages);
-    };
+    }
 
     self.savePageInfo = function (pageInfo) {
       DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.pageInfo, pageInfo);
-    };
+    }
 
     self.saveKeys = function (keys) {
       DB.addInsertToQueue(DB_CONFIG.tableNames.keyboard.keys, keys);
-    };
+    }
+
+    var argbToRGB = function (color) {
+      return color ? '#' + ('000000' + (color & 0xFFFFFF).toString(16)).slice(-6) : "";
+    }
+
 
     return self;
   }]);

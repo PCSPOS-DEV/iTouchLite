@@ -6,20 +6,20 @@ angular.module('itouch.controllers')
     function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept, ControlService, $ionicScrollDelegate) {
       $scope.items = [];
       $scope.selectedItem = null;
-      $scope.search = { text: '' };
+      $scope.search = { text: "" };      
 
-      $scope.$on('$ionicView.beforeEnter', function (event, data) {
-        $scope.search.text = '';
+      $scope.$on("$ionicView.beforeEnter", function(event, data){
+        $scope.search.text = "";
         refresh();
         $ionicScrollDelegate.scrollTop();
       });
 
       var refresh = function () {
         var bDate = ControlService.getBusinessDate(true);
-        HistoryService.getAll(bDate).then(function (items) {
+        HistoryService.getAll(bDate).then(function(items) {
           $scope.items = _.values(items);
-          $scope.items = _.map(items, function (item) {
-            switch (item.DocType) {
+          $scope.items = _.map(items, function(item){
+            switch(item.DocType){
               case 'VD':
                 item.BillType = 'Void';
                 break;
@@ -54,40 +54,40 @@ angular.module('itouch.controllers')
        */
       $scope.modalClose = function () {
         $scope.modal.hide();
-      };
+      }
 
       $scope.selectItem = function (item) {
-        if ($scope.modal) {
+        if($scope.modal){
           $scope.shownModal = 'billView';
           $scope.selectedItem = item;
           $scope.modal.show();
         }
-      };
+      }
 
-      $scope.clearSearch = function () {
-        $scope.search.text = '';
-      };
+      $scope.clearSearch = function(){
+        $scope.search.text = "";
+      }
 
-      $scope.$on('bill.modal.close', function () {
+      $scope.$on('bill.modal.close', function(){
         $scope.modal.hide();
       });
 
-      $scope.noMoreItemsAvailable = false;
-      $scope.bills = [];
-      var index = 6;
-      $scope.loadMore = function () {
-        setTimeout(function () {
-          var startIndex = index - 6;
-          for (var i = startIndex;i < index; i++)
+    $scope.noMoreItemsAvailable = false;
+    $scope.bills = [];
+    var index=6;      
+    $scope.loadMore = function() { 
+      setTimeout(function() {
+          var startIndex=index-6;
+          for (var i =startIndex;i<index; i++) 
           {
-            if ($scope.bills.length != $scope.items.length)
-              {$scope.bills.push($scope.items[i]);}
+            if($scope.bills.length!=$scope.items.length)
+                  $scope.bills.push($scope.items[i]);
           }
-          if ($scope.items.length > index)
-            {index += 6;}
+          if($scope.items.length>index)
+                index+=6;
           $scope.$broadcast('scroll.infiniteScrollComplete');
           $ionicScrollDelegate.resize();
-        }, 1000);
-      };
+        }, 1000);        
+     };
 
-    }]);
+ }]);
