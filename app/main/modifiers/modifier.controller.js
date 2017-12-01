@@ -13,17 +13,17 @@ angular.module('itouch.controllers')
       self.selectedCart = [];
       self.removeList = [];
 
-      $scope.$on('modal.shown', function(event, data){
-        if($scope.shownModal == 'mod'){
+      $scope.$on('modal.shown', function (event, data) {
+        if ($scope.shownModal == 'mod') {
           // handle event
           self.view = 1;
           self.cart = [];
           refresh();
           var item = $scope.cart.selectedItem;
-          if(item){
-            ModifierService.getItemModifiers(item.LineNumber).then(function(data){
-              if(data.length > 0){
-                self.cart = _.map(data, function(item){
+          if (item) {
+            ModifierService.getItemModifiers(item.LineNumber).then(function (data) {
+              if (data.length > 0) {
+                self.cart = _.map(data, function (item) {
                   item.existing = true;
                   return item;
                 });
@@ -34,14 +34,14 @@ angular.module('itouch.controllers')
       });
 
       var refresh = function () {
-        if($scope.type){
+        if ($scope.type) {
           self.title = $scope.type == 'F' ? 'Food Modifiers' : 'Drink Modifiers';
-          ModifierService.get($scope.type == 'F' ? 'F' : 'B').then(function(modifiers) {
-            angular.forEach(modifiers, function(row){
-              if(!self.pages[row.PageNo]){
+          ModifierService.get($scope.type == 'F' ? 'F' : 'B').then(function (modifiers) {
+            angular.forEach(modifiers, function (row) {
+              if (!self.pages[row.PageNo]) {
                 self.pages[row.PageNo] = {};
               }
-              for(var i = 1; i <= 32; i++){
+              for (var i = 1; i <= 32; i++) {
                 var key = _.findWhere(modifiers, { PageNo: row.PageNo, KeyNo: i });
                 // console.log(key, i);
                 // if(key){
@@ -50,36 +50,36 @@ angular.module('itouch.controllers')
               }
             });
             self.selectPage(self.pages[_.first(_.keys(self.pages))]);
-          }, function(err){
+          }, function (err) {
             console.log(err);
           });
         }
-      }
+      };
 
-      var fetchExistingModifiers = function(){
+      var fetchExistingModifiers = function () {
 
-      }
+      };
 
       self.close = function () {
         $scope.$emit('modifier.modal.close');
-      }
+      };
 
-      self.selectPage = function(page){
-        _.map(self.pages, function(p){
+      self.selectPage = function (page) {
+        _.map(self.pages, function (p) {
           p.selected = false;
           return p;
         });
         page.selected = true;
         self.selectedPage = page;
-      }
+      };
 
-      self.selectItem = function(item){
-        if(item){
+      self.selectItem = function (item) {
+        if (item) {
           var exItem = _.findWhere(self.cart, { Plu: item.Plu });
-          if(!exItem){
-            ModifierService.getSubPlu(item.Plu, item.PageNo, item.KeyNo).then(function(modifiers) {
-              if(_.isArray(modifiers)){
-                if(modifiers.length > 1){
+          if (!exItem) {
+            ModifierService.getSubPlu(item.Plu, item.PageNo, item.KeyNo).then(function (modifiers) {
+              if (_.isArray(modifiers)) {
+                if (modifiers.length > 1) {
                   self.subPlus = modifiers;
                   self.view = 2;
                 } else {
@@ -90,8 +90,8 @@ angular.module('itouch.controllers')
               console.log(err);
             });
           } else {
-            angular.forEach(self.cart, function(it, key){
-              if(item.Plu == it.Plu){
+            angular.forEach(self.cart, function (it, key) {
+              if (item.Plu == it.Plu) {
                 self.removeList.push(it);
                 self.cart.splice(key, 1);
               }
@@ -99,15 +99,15 @@ angular.module('itouch.controllers')
           }
 
         }
-      }
+      };
 
-      self.selectSubPlu = function(spItem){
-        if(spItem){
-          ItemService.getById(spItem.ItemId).then(function(item) {
-            if(item && !_.find(self.selectedCart, { ItemId: item.Id })){
+      self.selectSubPlu = function (spItem) {
+        if (spItem) {
+          ItemService.getById(spItem.ItemId).then(function (item) {
+            if (item && !_.find(self.selectedCart, { ItemId: item.Id })) {
               item.SubPluDesc1 = spItem.Description1;
               item.SubPluDesc2 = spItem.Description2;
-              renameProperty(item, 'Id', "ItemId");
+              renameProperty(item, 'Id', 'ItemId');
               item.ItemType = 'MOD';
               item.ParentItemLineNumber = $scope.cart.selectedItem.LineNumber;
               item.Qty = $scope.cart.selectedItem.Qty;
@@ -119,23 +119,23 @@ angular.module('itouch.controllers')
             console.log(err);
           });
         }
-      }
+      };
 
 
       self.save = function () {
         var parentItem = $scope.cart.selectedItem;
-        if(parentItem && self.cart.length > 0){
-          ModifierService.add(parentItem.DocNo, parentItem.LineNumber, angular.copy(self.cart)).then(function(res){
+        if (parentItem && self.cart.length > 0) {
+          ModifierService.add(parentItem.DocNo, parentItem.LineNumber, angular.copy(self.cart)).then(function (res) {
             $scope.$emit('refresh-cart');
             $scope.$emit('modifier.modal.close');
           }, function (err) {
             console.log(err);
           });
         }
-      }
+      };
 
-      self.goBack = function(){
+      self.goBack = function () {
         self.view = 1;
-      }
+      };
 
     }]);

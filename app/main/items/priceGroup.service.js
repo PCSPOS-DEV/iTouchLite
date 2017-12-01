@@ -2,7 +2,7 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory("PriceGroupService", ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'LocationService', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, LocationService) {
+  .factory('PriceGroupService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'LocationService', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, LocationService) {
     var self = this;
 
     var location = LocationService.currentLocation;
@@ -19,11 +19,11 @@ angular.module('itouch.services')
     self.fetch = function () {
       var deferred = $q.defer();
       try {
-        Restangular.one("GetItemPriceByPriceGroupLevel").get({EntityId: SettingsService.getEntityId()}).then(function (res) {
+        Restangular.one('GetItemPriceByPriceGroupLevel').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
           try {
             var items = JSON.parse(res);
-          } catch(ex){
-            deferred.reject("No results");
+          } catch (ex) {
+            deferred.reject('No results');
           }
           if (items) {
             self.save(items);
@@ -40,21 +40,21 @@ angular.module('itouch.services')
       }
 
       return deferred.promise;
-    }
+    };
 
     self.get = function (plu, priceGroupId, priceLevel, taxable) {
       location = LocationService.currentLocation;
-      return DB.query("SELECT * FROM " + DB_CONFIG.tableNames.item.priceGroups + " WHERE  PLU = ? AND PriceGroupId = ? AND PriceLevelId = ?", [plu, priceGroupId, priceLevel]).then(function (result) {
+      return DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.item.priceGroups + ' WHERE  PLU = ? AND PriceGroupId = ? AND PriceLevelId = ?', [plu, priceGroupId, priceLevel]).then(function (result) {
         var data = DB.fetch(result);
-        if(data){
+        if (data) {
           // console.log(data);
           data.OrgPrice = data.OrgPrice || data.Price;
           data.AlteredPrice = data.AlteredPrice || data.Price;
           data.StdCost = data.StdCost;
           data.Price = data.Price;
-          if(taxable){
-            if(location && location.Tax5Option == 3){
-              data.Price =((data.Price / (100 + location.Tax5Perc)) * 100).roundTo(2);
+          if (taxable) {
+            if (location && location.Tax5Option == 3) {
+              data.Price = ((data.Price / (100 + location.Tax5Perc)) * 100).roundTo(2);
             }
           }
           return data;
@@ -64,16 +64,15 @@ angular.module('itouch.services')
             OrgPrice: 0,
             AlteredPrice: 0,
             PriceLevelId: priceLevel
-          }
+          };
         }
       });
-    }
-
+    };
 
 
     self.save = function (priceGroups) {
       DB.addInsertToQueue(DB_CONFIG.tableNames.item.priceGroups, priceGroups);
-    }
+    };
 
 
     return self;
