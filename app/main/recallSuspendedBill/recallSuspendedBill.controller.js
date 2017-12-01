@@ -11,53 +11,53 @@ angular.module('itouch.controllers')
       };
       self.loading = true;
 
-      $scope.$on('modal.shown', function(event, data){
-        if(data.id == 14){
+      $scope.$on('modal.shown', function (event, data) {
+        if (data.id == 14) {
           refresh();
         }
       });
 
       var refresh = function () {
-          self.loading = true;
-        SuspendService.fetchSuspendedBills().then(function(data){
+        self.loading = true;
+        SuspendService.fetchSuspendedBills().then(function (data) {
           self.data.bills = data;
         }).finally(function () {
-            $timeout(function () {
-                self.loading = false;
-            }, 500);
+          $timeout(function () {
+            self.loading = false;
+          }, 500);
 
         });
-      }
+      };
 
       self.close = function () {
         $scope.$emit('recallSuspendBill.modal.close');
-      }
+      };
 
-      self.recallBill = function(){
+      self.recallBill = function () {
         var bill = self.data.selectedItem;
-        if(bill){
-          Alert.showConfirm('Are you sure?', 'Recall Suspended bill', function(res){
-            if(res == 1){
-                SuspendService.recallBill(bill.DocNo).then(function(DocNo){
+        if (bill) {
+          Alert.showConfirm('Are you sure?', 'Recall Suspended bill', function (res) {
+            if (res == 1) {
+              SuspendService.recallBill(bill.DocNo).then(function (DocNo) {
                 $scope.$emit('initBill');
-                $scope.$emit("refresh-cart");
+                $scope.$emit('refresh-cart');
                 $scope.$emit('recallSuspendBill.modal.close');
                 // Reciept.printVoid(DocNo);
-              }, function(ex){
+              }, function (ex) {
                 console.log(ex);
               });
             }
-        });
+          });
         } else {
           //Alert.warning('Please select an item to void');
-          Alert.warning('Please select an item to suspend','ItouchLite');
+          Alert.warning('Please select an item to suspend', 'ItouchLite');
         }
 
-      }
+      };
 
       self.onItemTap = function (bill) {
-        if(bill){
-          self.data.bills = _.map(self.data.bills, function(item){
+        if (bill) {
+          self.data.bills = _.map(self.data.bills, function (item) {
             item.active = false;
             return item;
           });
@@ -65,15 +65,15 @@ angular.module('itouch.controllers')
           self.data.selectedItem = bill;
         }
 
-      }
+      };
 
-      self.view = function(){
-        $scope.selectedItem = angular.copy(self.data.selectedItem);        
-        if($scope.selectedItem){
+      self.view = function () {
+        $scope.selectedItem = angular.copy(self.data.selectedItem);
+        if ($scope.selectedItem) {
           self.modal.show();
           // self.data.selectedItem = null;
         }
-      }
+      };
 
       /**
        * Initiating Sub PLU modal dialog
@@ -98,14 +98,14 @@ angular.module('itouch.controllers')
         self.modal.hide();
       });*/
       /* Yi Yi Po*/
-       $ionicModal.fromTemplateUrl('main/recallSuspendedBill/billSuspendModal.html', {
+      $ionicModal.fromTemplateUrl('main/recallSuspendedBill/billSuspendModal.html', {
         id: 6,
         scope: $scope,
         backdropClickToClose: false,
         animation: 'slide-in-up'
-        }).then(function (modal) {
+      }).then(function (modal) {
         self.modal = modal;
-       });
+      });
       $scope.$on('bill.modal.close', function () {
         self.modal.hide();
       });
