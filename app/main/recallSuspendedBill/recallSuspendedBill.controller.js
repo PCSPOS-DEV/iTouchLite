@@ -55,7 +55,7 @@ angular.module('itouch.controllers')
 
       };
 
-      self.onItemTap = function (bill) {
+      $timeout(self.onItemTap = function (bill) {
         if (bill) {
           self.data.bills = _.map(self.data.bills, function (item) {
             item.active = false;
@@ -65,7 +65,7 @@ angular.module('itouch.controllers')
           self.data.selectedItem = bill;
         }
 
-      };
+      });
 
       self.view = function () {
         $scope.selectedItem = angular.copy(self.data.selectedItem);
