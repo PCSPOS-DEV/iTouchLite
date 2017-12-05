@@ -3,7 +3,7 @@
   <button class="button button-icon ion-printer" ng-if="!shiftSelectionShown" ng-click="printSuspendReciept(bill.header.DocNo)"></button>
   <h1 class="title">
   {{bill.header.DocNo}}
-   
+
   </h1>
     <button class="button button-icon ion-close-round button-small" ng-click="close()"></button>
   </ion-header-bar>
@@ -21,7 +21,7 @@
     <div class="row body">
       <div class="col title">
         {{bill.header.Title}}
-        
+
       </div>
     </div>
     <div class="row body" ng-if="bill.header.OrderTag">
@@ -36,7 +36,7 @@
             <div class="col-10">{{item.Qty}}</div>
           <div class="col-80">
             <span ng-if="item.ItemType == 'SKI' || item.ItemType == 'MOD'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </span>  
+            </span>
               {{print(item,'Desc')}}
             <span ng-if="item.ItemType == 'MOD'">**</span>
             <span ng-if="item.ItemType != 'MOD' && item.TakeAway == 'true'">*</span>

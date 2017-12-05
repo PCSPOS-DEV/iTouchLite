@@ -508,7 +508,7 @@ angular.module('itouch.services')
 
           item = ItemService.calculateTotal(item);
           item.discountAmount = 0;
-          if (item.ItemType != 'PWI' && item.ItemType != 'FRE' && item.ItemType != 'RDM' && item.ItemType != 'PWP') {
+          if (item.ItemType != 'PWI' && item.ItemType != 'FRE' && item.ItemType != 'RDM') {
             if (item.ReasonId == 0 && item.NoDiscount == 'false' ) {
               var applydiscountAmount = 0;
               if (discount.Percentage != 0) {

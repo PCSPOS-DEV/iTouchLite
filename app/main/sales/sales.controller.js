@@ -22,6 +22,7 @@ angular.module('itouch.controllers')
       $scope.salesKitUpdate = false;
       var submitted = false;
       var businessDate = ControlService.getBusinessDate(true);
+      var Suspended = false;
       $scope.salesKits = {
         list: {},
         selectedList: {},
@@ -985,6 +986,9 @@ angular.module('itouch.controllers')
         },
         QtyPlus: function (fn) {
           var item = $scope.cart.selectedItem;
+          if (Suspended == true) {
+            Alert.warning('Suspended Order: Action not allowed.');
+          }
           if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
             if (authorityCheck(fn)) {
               var qty = angular.copy(item.Qty);
@@ -1000,6 +1004,9 @@ angular.module('itouch.controllers')
         },
         QtyMinus: function (fn) {
           var item = $scope.cart.selectedItem;
+          if (Suspended == true) {
+            Alert.warning('Suspended Order: Action not allowed.');
+          }
           if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
             if (authorityCheck(fn)) {
               var qty = angular.copy(item.Qty);
@@ -1042,6 +1049,7 @@ angular.module('itouch.controllers')
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
               if (empty) {
                 if (authorityCheck(fn)) {
+                  Suspended = true;
                   $ionicModal.fromTemplateUrl('main/recallSuspendedBill/recallSuspendedBill.html', {
                     id: 14,
                     scope: $scope,
