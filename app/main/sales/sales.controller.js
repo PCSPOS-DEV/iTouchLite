@@ -989,9 +989,9 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           console.log('selected item');
           console.log(item.SuspendDepDocNo);
-          if (Suspended == true) {
+          if (Suspended == true && item.SuspendDepDocNo !== "") {
             Alert.warning('Suspended Order: Action not allowed.');
-          } else
+          } else if (item.SuspendDepDocNo === "") {
           if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
             if (authorityCheck(fn)) {
               var qty = angular.copy(item.Qty);
@@ -1003,13 +1003,13 @@ angular.module('itouch.controllers')
                 console.log(err);
               });
             }
-          }
+          }}
         },
         QtyMinus: function (fn) {
           var item = $scope.cart.selectedItem;
-          if (Suspended == true) {
+          if (Suspended == true && item.SuspendDepDocNo !== "") {
             Alert.warning('Suspended Order: Action not allowed.');
-          } else
+          } else if (item.SuspendDepDocNo === "") {
           if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
             if (authorityCheck(fn)) {
               var qty = angular.copy(item.Qty);
@@ -1023,7 +1023,7 @@ angular.module('itouch.controllers')
                 });
               }
             }
-          }
+          }}
         },
         ItemReverse: function (fn) {
           if (authorityCheck(fn)) {
