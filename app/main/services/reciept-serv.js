@@ -11,12 +11,12 @@ angular.module('itouch.services')
     self.formatDate = function (dateVal) {
       var newDate = new Date(dateVal);
 
-      var sMonth = self.padValue(newDate.getMonth() + 1);
-      var sDay = self.padValue(newDate.getDate());
-      var sYear = newDate.getFullYear();
+      // var sMonth = self.padValue(newDate.getMonth() + 1);
+      // var sDay = self.padValue(newDate.getDate());
+      // var sYear = newDate.getFullYear();
       var sHour = newDate.getHours();
-      var sMinute = self.padValue(newDate.getMinutes());
-      var sSecond = self.padValue(newDate.getSeconds());
+      // var sMinute = self.padValue(newDate.getMinutes());
+      // var sSecond = self.padValue(newDate.getSeconds());
       var sAMPM = 'AM';
 
       var iHourCheck = parseInt(sHour);

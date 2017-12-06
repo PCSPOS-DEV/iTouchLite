@@ -23,6 +23,7 @@ angular.module('itouch.controllers')
       var submitted = false;
       var businessDate = ControlService.getBusinessDate(true);
       var Suspended = false;
+     // var SuspendDepDocNo =
       $scope.salesKits = {
         list: {},
         selectedList: {},
@@ -986,9 +987,11 @@ angular.module('itouch.controllers')
         },
         QtyPlus: function (fn) {
           var item = $scope.cart.selectedItem;
+          console.log('selected item');
+          console.log(item.SuspendDepDocNo);
           if (Suspended == true) {
             Alert.warning('Suspended Order: Action not allowed.');
-          }
+          } else
           if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
             if (authorityCheck(fn)) {
               var qty = angular.copy(item.Qty);
@@ -1006,7 +1009,7 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           if (Suspended == true) {
             Alert.warning('Suspended Order: Action not allowed.');
-          }
+          } else
           if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
             if (authorityCheck(fn)) {
               var qty = angular.copy(item.Qty);
@@ -1049,6 +1052,9 @@ angular.module('itouch.controllers')
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
               if (empty) {
                 if (authorityCheck(fn)) {
+                  if (Suspended == true) {
+                    return Suspended = false;
+                  }
                   Suspended = true;
                   $ionicModal.fromTemplateUrl('main/recallSuspendedBill/recallSuspendedBill.html', {
                     id: 14,
@@ -1097,6 +1103,7 @@ angular.module('itouch.controllers')
         },
         AbortFunction: function (fn) {
           if (authorityCheck(fn)) {
+            Suspended = false;
             if (_.size($scope.cart.items) > 0) {
               /*Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
                 if (res == 1) {*/
