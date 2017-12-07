@@ -1006,32 +1006,13 @@ angular.module('itouch.controllers')
         },
         QtyPlus: function (fn) {
           var item = $scope.cart.selectedItem;
-          if (Suspended == true && item.SuspendDepDocNo !== "") {
+          if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
           } else if (item.SuspendDepDocNo === '') {
             if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
-            if (authorityCheck(fn)) {
-              var qty = angular.copy(item.Qty);
-              BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, ++qty).then(function () {
-                $scope.refreshCart().then(function () {
-                  $scope.selectItemWithLineNumber(item.LineNumber);
-                });
-              }, function (err) {
-                console.log(err);
-              });
-            }
-          }}
-        },
-        QtyMinus: function (fn) {
-          var item = $scope.cart.selectedItem;
-          if (Suspended == true && item.SuspendDepDocNo !== "") {
-            Alert.warning('Suspended Order: Action not allowed.');
-          } else if (item.SuspendDepDocNo === '') {
-            if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
-            if (authorityCheck(fn)) {
-              var qty = angular.copy(item.Qty);
-              if (qty > 1) {
-                BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, --qty).then(function () {
+              if (authorityCheck(fn)) {
+                var qty = angular.copy(item.Qty);
+                BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, ++qty).then(function () {
                   $scope.refreshCart().then(function () {
                     $scope.selectItemWithLineNumber(item.LineNumber);
                   });
@@ -1039,8 +1020,27 @@ angular.module('itouch.controllers')
                   console.log(err);
                 });
               }
-            }
-          }}
+            }}
+        },
+        QtyMinus: function (fn) {
+          var item = $scope.cart.selectedItem;
+          if (Suspended == true && item.SuspendDepDocNo !== '') {
+            Alert.warning('Suspended Order: Action not allowed.');
+          } else if (item.SuspendDepDocNo === '') {
+            if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
+              if (authorityCheck(fn)) {
+                var qty = angular.copy(item.Qty);
+                if (qty > 1) {
+                  BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, --qty).then(function () {
+                    $scope.refreshCart().then(function () {
+                    $scope.selectItemWithLineNumber(item.LineNumber);
+                  });
+                  }, function (err) {
+                    console.log(err);
+                  });
+                }
+              }
+            }}
         },
         ItemReverse: function (fn) {
           if (authorityCheck(fn)) {

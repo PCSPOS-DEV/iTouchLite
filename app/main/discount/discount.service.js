@@ -483,17 +483,20 @@ angular.module('itouch.services')
         if (!location) { location = LocationService.currentLocation;}
 
         angular.forEach(items, function (item) {
-          if (item.ReasonId === 0 && item.NoDiscount === 'false') {
-            var dItem = tenderDiscounts.items[item.LineNumber];
-            if (dItem) {
-              item = dItem;
-            }
-            item = ItemService.calculateTotal(item);
-            total += ((item.SubTotal + item.Tax5Amount) - (item.Discount + item.Tax5DiscAmount)).roundTo(2);
+          if (item.ItemType != 'PWI' && item.ItemType != 'FRE' && item.ItemType != 'RND') {
+            if (item.ReasonId === 0 && item.NoDiscount === 'false') {
+              var dItem = tenderDiscounts.items[item.LineNumber];
+              if (dItem) {
+                item = dItem;
+              }
+              item = ItemService.calculateTotal(item);
+              total += ((item.SubTotal + item.Tax5Amount) - (item.Discount + item.Tax5DiscAmount)).roundTo(2);
+              console.log('Total : ' + total);
 
-            if ((typeof tempTenderDiscounts.length !== 'undefined' || item.Discount != 0) && item.MultiDiscount != 'true')
+              if ((typeof tempTenderDiscounts.length !== 'undefined' || item.Discount != 0) && item.MultiDiscount != 'true')
               {
-              total -= (((item.SubTotal + item.Tax5Amount) - (item.Discount + item.Tax5DiscAmount))).roundTo(2);
+                total -= (((item.SubTotal + item.Tax5Amount) - (item.Discount + item.Tax5DiscAmount))).roundTo(2);
+              }
             }
           }
         });
@@ -508,7 +511,7 @@ angular.module('itouch.services')
 
           item = ItemService.calculateTotal(item);
           item.discountAmount = 0;
-          if (item.ItemType != 'PWI' && item.ItemType != 'FRE' && item.ItemType != 'RDM') {
+          if (item.ItemType != 'PWI' && item.ItemType != 'FRE' && item.ItemType != 'RND') {
             if (item.ReasonId == 0 && item.NoDiscount == 'false' ) {
               var applydiscountAmount = 0;
               if (discount.Percentage != 0) {
