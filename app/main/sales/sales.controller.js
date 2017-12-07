@@ -581,7 +581,7 @@ angular.module('itouch.controllers')
           $scope.qty.value = 1;
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
-          if (salesKit && !salesKit.isEmpty) {
+          if (salesKit && !salesKit.isEmpty && Object.keys(salesKit.component).length != 0) {
             if ($scope.showskModalModal == false) {
               $scope.showskModalModal = true;
               $timeout(function () {
@@ -589,12 +589,7 @@ angular.module('itouch.controllers')
                   salesKit: salesKit,
                   update: false
                 };
-                if (salesKit.component == null) {
-                  Alert.error('GGWP');
-                //   $scope.modals.salesKit.hide();
-                }
                 $scope.modals.salesKit.show();
-                console.log(salesKit);
               }, 200);
             }
           } else {
@@ -1033,8 +1028,8 @@ angular.module('itouch.controllers')
                 if (qty > 1) {
                   BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, --qty).then(function () {
                     $scope.refreshCart().then(function () {
-                    $scope.selectItemWithLineNumber(item.LineNumber);
-                  });
+                      $scope.selectItemWithLineNumber(item.LineNumber);
+                    });
                   }, function (err) {
                     console.log(err);
                   });
