@@ -19,7 +19,7 @@ angular.module('itouch.controllers')
 
       var checkQuantities = function (pwp) {
         var times = Math.floor(pwp.QtyEntered / pwp.Quantity);
-        // console.log(times);
+         console.log('times : ' + times);
         pwp.MaxQuantity = pwp.MaxQuantity * times;
         return pwp;
       };

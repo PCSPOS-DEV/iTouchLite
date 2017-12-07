@@ -23,6 +23,7 @@ angular.module('itouch.controllers')
       var submitted = false;
       var businessDate = ControlService.getBusinessDate(true);
       var Suspended = false;
+      var TotalEnterQty = 0;
      // var SuspendDepDocNo =
       $scope.salesKits = {
         list: {},
@@ -588,7 +589,12 @@ angular.module('itouch.controllers')
                   salesKit: salesKit,
                   update: false
                 };
+                if (salesKit.component == null) {
+                  Alert.error('GGWP');
+                //   $scope.modals.salesKit.hide();
+                }
                 $scope.modals.salesKit.show();
+                console.log(salesKit);
               }, 200);
             }
           } else {
@@ -646,7 +652,20 @@ angular.module('itouch.controllers')
                   item.TakeAway = true;
                 }
                 PWPService.getPWP(item, item.customQuantity || item.Qty).then(function (pwp) {
+
+                  if (item.Qty == undefined) {
+                    item.Qty = 0;
+                    if (item.customQuantity == undefined) {
+                      item.customQuantity = 1;
+                    }
+                  }
+                  // console.log(pwp);
+                  // console.log('item.Qty : ' + item.Qty);
+                  // console.log('pwp.Quantity : ' + pwp.Quantity);
+                  // console.log('item.customQuantity : ' + item.customQuantity);
+                  // if (pwp && (( (item.Qty >= pwp.Quantity) || item.customQuantity >= pwp.Quantity) || ( (item.Qty <= pwp.Quantity) || item.customQuantity <= pwp.Quantity))) {
                   if (pwp && ( (item.Qty >= pwp.Quantity) || item.customQuantity >= pwp.Quantity)) {
+
                     if ($scope.showpwpModal == false) {
                       $scope.showpwpModal = true;
                       $scope.pwp = pwp;
@@ -987,12 +1006,10 @@ angular.module('itouch.controllers')
         },
         QtyPlus: function (fn) {
           var item = $scope.cart.selectedItem;
-          console.log('selected item');
-          console.log(item.SuspendDepDocNo);
           if (Suspended == true && item.SuspendDepDocNo !== "") {
             Alert.warning('Suspended Order: Action not allowed.');
-          } else if (item.SuspendDepDocNo === "") {
-          if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
+          } else if (item.SuspendDepDocNo === '') {
+            if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
             if (authorityCheck(fn)) {
               var qty = angular.copy(item.Qty);
               BillService.changeItemQty(item.DocNo, item.ItemId, item.LineNumber, ++qty).then(function () {
@@ -1009,8 +1026,8 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== "") {
             Alert.warning('Suspended Order: Action not allowed.');
-          } else if (item.SuspendDepDocNo === "") {
-          if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
+          } else if (item.SuspendDepDocNo === '') {
+            if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
             if (authorityCheck(fn)) {
               var qty = angular.copy(item.Qty);
               if (qty > 1) {
