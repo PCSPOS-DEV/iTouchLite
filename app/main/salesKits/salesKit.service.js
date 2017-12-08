@@ -165,7 +165,7 @@ angular.module('itouch.services')
                 salesKit.list = {};
                 salesKit.selectedList = {};
 
-                promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections + ' AS sks INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ? AND Quantity>?', data: [ski.SaleKitItemsId, 0]})
+                promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections + ' AS sks INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ? AND Quantity>?', data: [ski.SaleKitItemsId, 0]},+ 'ORDER BY SalesKitsItems.ItemId DESC;')
                     .then(function (res) {
                       var selections = _.map(DB.fetchAll(res), function (row) {
                         row.SalesKitId = itemId;
@@ -184,6 +184,7 @@ angular.module('itouch.services')
                         selections.unshift(ski);
                         salesKit.selected.Selections = selections;
                         salesKit.component[ski.ItemId] = ski;
+                        console.log('ski.ItemId : ' + ski.ItemId);
                       }
                       else
                      {

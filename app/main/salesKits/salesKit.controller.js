@@ -14,6 +14,20 @@ angular.module('itouch.controllers')
       var customQty = 0;
       var oldCustomQty = 0;
 
+      $scope.$on('orderObjectBy', function () {
+        return function (items, field, reverse) {
+          var filtered = [];
+          angular.forEach(items, function (item) {
+            filtered.push(item);
+          });
+          filtered.sort(function (a, b) {
+            return (a[field] > b[field] ? 1 : -1);
+          });
+          if (reverse) {filtered.reverse();}
+          return filtered;
+        };
+      });
+
       $scope.$on('modal.shown', function (event, modal) {
         if (modal.id === 1) {
           $scope.selectedRow = null;

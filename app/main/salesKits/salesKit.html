@@ -13,7 +13,7 @@
         <div class="row components" style="height: 100px;">
           <div class="col">
           <!--ng-repeat="skit in salesKits.list" -->
-            <button class="button button-energized" ng-repeat="skit in salesKits.component"
+            <button class="button button-energized" ng-repeat="skit in salesKits.component | orderObjectBy:'Id':false"
                ng-click=" selectComponent(skit)" style="margin-right: 5px;" ng-if="skit.Quantity!=0">
                Component  {{$index+1}}
               <span class="badge badge-assertive">{{skit.Quantity - skit.OrderQty}}</span>

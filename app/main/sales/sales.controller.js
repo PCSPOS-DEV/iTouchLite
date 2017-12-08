@@ -590,6 +590,8 @@ angular.module('itouch.controllers')
                   update: false
                 };
                 $scope.modals.salesKit.show();
+                console.log(salesKit);
+                console.log(Object.keys(salesKit.component));
               }, 200);
             }
           } else {
