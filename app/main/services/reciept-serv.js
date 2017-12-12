@@ -51,16 +51,14 @@ angular.module('itouch.services')
       PrintService.addImage();
       PrintService.addLineBreak();
       angular.forEach(printData.Header, function (row) {
+        // console.log('rows');
+        // console.log(row);
         if (row.IsBold == 'false') {
           printer.addTextStyle(false, false, false);
+          printer.addTextSize(1, 1);
         } else {
           printer.addTextStyle(false, false, true);
-        }
-
-        if (row.Type == 'Header' && row.Sequence == 1) {
           printer.addTextSize(2, 2);
-        } else {
-          printer.addTextSize(1, 1);
         }
         printer.addText(row.Text + '\n');
       });
@@ -68,10 +66,10 @@ angular.module('itouch.services')
 
     self.creatRecieptBody = function (data, withSubTotalSection) {
       var subTotal = 0;
-
+      printer.addTextStyle(false, false, false);
+      printer.addTextSize(1, 1);
       printer.addTextAlign(printer.ALIGN_LEFT);
       PrintService.addHLine();
-      printer.addTextStyle(false, false, false);
 
       if (data.header.ReprintCount)
     {
