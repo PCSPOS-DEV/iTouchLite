@@ -26,6 +26,7 @@ angular.module('itouch.services')
           Restangular.one('GetItemsByLocations').get({LocationId: SettingsService.getLocationId()}).then(function (res) {
             try {
               var items = JSON.parse(res);
+              // console.log(items);
             } catch (ex) {
               deferred.reject('No results');
             }
@@ -234,12 +235,19 @@ angular.module('itouch.services')
         location = SettingsService.getLocationId();
         if (location) {
           var query = 'SELECT i.Id, i.Description1, i.Description2, PriceGroupId, i.Plu, i.ZeroPrice, i.AutoBundle, i.BelowCost, PluType, Taxable, MultiDiscount, NoDiscount FROM Item AS i ' +
-            'INNER JOIN ItemBarcodes AS b ON i.Id = b.ItemId ' +
-            'INNER JOIN SubPLU1 AS s1 ON i.SubPlu1Id = s1.Id ' +
-            'INNER JOIN SubPLU2 AS s2 ON i.SubPlu2Id = s2.Id ' +
-            'INNER JOIN SubPLU3 AS s3 ON i.SubPlu3Id = s3.Id ' +
-            'WHERE Housebarcode = ? OR b.Barcode = ? LIMIT 1';
+          'LEFT JOIN ItemBarcodes AS b ON i.Id = b.ItemId ' +
+          'INNER JOIN SubPLU1 AS s1 ON i.SubPlu1Id = s1.Id ' +
+          'INNER JOIN SubPLU2 AS s2 ON i.SubPlu2Id = s2.Id ' +
+          'INNER JOIN SubPLU3 AS s3 ON i.SubPlu3Id = s3.Id ' +
+          'WHERE b.Barcode = ?  OR Housebarcode = ? LIMIT 1';
+          // var query = 'SELECT i.Id, i.Description1, i.Description2, PriceGroupId, i.Plu, i.ZeroPrice, i.AutoBundle, i.BelowCost, PluType, Taxable, MultiDiscount, NoDiscount FROM Item AS i ' +
+          //   'INNER JOIN ItemBarcodes AS b ON i.Id = b.ItemId ' +
+          //   'INNER JOIN SubPLU1 AS s1 ON i.SubPlu1Id = s1.Id ' +
+          //   'INNER JOIN SubPLU2 AS s2 ON i.SubPlu2Id = s2.Id ' +
+          //   'INNER JOIN SubPLU3 AS s3 ON i.SubPlu3Id = s3.Id ' +
+          //   'WHERE Housebarcode = ? OR b.Barcode = ? LIMIT 1';
           barcode = '' + barcode;
+          // console.log(barcode);
           DB.query(query, [barcode, barcode]).then(function (result) {
             var item = DB.fetch(result);
             if (item) {
