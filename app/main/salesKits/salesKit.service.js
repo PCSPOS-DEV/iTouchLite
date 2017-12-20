@@ -161,11 +161,12 @@ angular.module('itouch.services')
               /*Yi Yi Po*/
               angular.forEach(salesKitItems, function (ski) {
                 salesKit.selected = angular.copy(ski);
+                // console.log(salesKit.selected);
                 ski.SalesKitId = itemId;
                 salesKit.list = {};
                 salesKit.selectedList = {};
 
-                promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections + ' AS sks INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ? AND Quantity>?', data: [ski.SaleKitItemsId, 0]},+ 'ORDER BY SalesKitsItems.ItemId DESC;')
+                promises.push(DB.select(DB_CONFIG.tableNames.salesKit.salesKitSelections + ' AS sks INNER JOIN ' + DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sks.SelectionId', '*, i.Id AS ItemId', { columns: 'SalesKitItemsId = ? AND Quantity>?', data: [ski.SaleKitItemsId, 0]})
                     .then(function (res) {
                       var selections = _.map(DB.fetchAll(res), function (row) {
                         row.SalesKitId = itemId;
@@ -174,7 +175,7 @@ angular.module('itouch.services')
                         row.Selectable = true;
                         return row;
                       });
-
+                      console.log(salesKit.selected.Id);
                       if (selections.length > 0)
                      {
                         ski.Selections = selections;
@@ -183,6 +184,12 @@ angular.module('itouch.services')
                         ski.Selectable = true;
                         selections.unshift(ski);
                         salesKit.selected.Selections = selections;
+                        if (salesKit.selected.Id == ski.ItemId) {
+                          ski.ItemId = 0;
+                          ski.Id = 0;
+                          // salesKit.selected.Id = 1;
+                          // salesKit.selected.ItemId = 1;
+                        }
                         salesKit.component[ski.ItemId] = ski;
                         console.log('ski.ItemId : ' + ski.ItemId);
                       }
@@ -203,6 +210,7 @@ angular.module('itouch.services')
                         salesKit.list[skisl.ItemId].QtyValid = skisl.Quantity;
                       });
 
+                      // console.log(selections);
                       return selections;
                     }));
 
