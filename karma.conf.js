@@ -2,7 +2,6 @@
 // Generated on Wed Jul 01 2015 13:51:22 GMT+0200 (CEST)
 
 
-
 module.exports = function (config) {
   // retrieve main files from bower
   var wiredep = require('wiredep');
