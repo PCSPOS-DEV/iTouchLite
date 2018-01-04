@@ -2,8 +2,8 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory('ShiftService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', '$localStorage', 'AuthService', 'ControlService', '$filter', 'ItemService',
-    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, $localStorage, AuthService, ControlService, $filter, ItemService) {
+  .factory('ShiftService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', '$localStorage', 'AuthService', 'ControlService', '$filter', 'ItemService', '$timeout'
+    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, $localStorage, AuthService, ControlService, $filter, ItemService, $timeout) {
       var self = this;
 
       self.fetch = function () {
@@ -294,7 +294,7 @@ angular.module('itouch.services')
         });
       };
 
-      self.dayEnd = function () {
+      $timeout(self.dayEnd = function () {
         var deferred = $q.defer();
         DB.clearQueue();
         DB.addDeleteToQueue('ShiftStatus');
@@ -314,7 +314,7 @@ angular.module('itouch.services')
         });
 
         return deferred.promise;
-      };
+      }, 2000);
 
       return self;
     }]);
