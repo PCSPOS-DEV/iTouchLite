@@ -290,10 +290,10 @@ angular.module('itouch.services')
           } else {
             addSpaces(4);
           }
-          addSpaces(8);
+          addSpaces(12);
 
-          if (lengths.end < 8) {
-            addSpaces(8 - lengths.end);
+          if (lengths.end < 12) {
+            addSpaces(12 - lengths.end);
           }
 
           printer.addText(endBlock + '\n');
