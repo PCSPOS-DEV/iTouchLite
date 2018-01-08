@@ -176,6 +176,7 @@ angular.module('itouch.services')
     };
 
     self.creatRecieptFooter = function (header, footerData) {
+      printer.addTextSize(1, 1);
       printer.addTextAlign(printer.ALIGN_CENTER);
       var bDate = ControlService.getBusinessDate();
       var shift = ShiftService.getCurrent();
@@ -193,6 +194,7 @@ angular.module('itouch.services')
         }
 
         printer.addText(row.Text + '\n');
+        printer.addTextStyle(false, false, false);
       });
       printer.addText('\nBDate: ' + businessDate + ' Shift: ' + (footerData.shift ? footerData.shift.Description1 : '' ) + ' M/C: ' + (footerData.machine ? footerData.machine.Code : '') + '\n');
       if (footerData.cashier) {
