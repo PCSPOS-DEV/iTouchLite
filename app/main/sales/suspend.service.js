@@ -2,8 +2,8 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory('SuspendService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService', 'Reciept', '$timeout',
-    function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService, Reciept, $timeout) {
+  .factory('SuspendService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService', 'Reciept',
+    function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService, Reciept) {
       var self = this;
 
       var self = this;
@@ -65,23 +65,21 @@ angular.module('itouch.services')
         return DB.executeQueue();
       };
 
-      $timeout(function () {
-        self.suspend = function (DocNo) {
-          return self.getBill(DocNo).then(function (bill) {
-            var header = _.first(bill.SuspendBillHeader);
-            return post(bill).then(function (res) {
-              Reciept.printSuspend(res);
-              return self.removeBill(header.DocNo);
-                      /*if (res == 'success') {
-                          return self.removeBill(header.DocNo);
-                      } else {
-                          return $q.reject(res);
-                      }*/
-            });
-
+      self.suspend = function (DocNo) {
+        return self.getBill(DocNo).then(function (bill) {
+          var header = _.first(bill.SuspendBillHeader);
+          return post(bill).then(function (res) {
+            Reciept.printSuspend(res);
+            return self.removeBill(header.DocNo);
+                    /*if (res == 'success') {
+                        return self.removeBill(header.DocNo);
+                    } else {
+                        return $q.reject(res);
+                    }*/
           });
-        };
-      }, 500);
+
+        });
+      };
 
       self.startAutoUpload = function () {
         if (enableAutoUpload) {

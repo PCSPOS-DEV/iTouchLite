@@ -55,18 +55,17 @@ angular.module('itouch.controllers')
 
       };
 
-      $timeout(function () {
-        self.onItemTap = function (bill) {
-          if (bill) {
-            self.data.bills = _.map(self.data.bills, function (item) {
-              item.active = false;
-              return item;
-            });
-            bill.active = true;
-            self.data.selectedItem = bill;
-          }
-        };
-      }, 500);
+      $timeout(self.onItemTap = function (bill) {
+        if (bill) {
+          self.data.bills = _.map(self.data.bills, function (item) {
+            item.active = false;
+            return item;
+          });
+          bill.active = true;
+          self.data.selectedItem = bill;
+        }
+
+      });
 
       self.view = function () {
         $scope.selectedItem = angular.copy(self.data.selectedItem);

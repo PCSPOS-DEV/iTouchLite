@@ -259,7 +259,7 @@ angular.module('itouch.controllers')
               // var oldItem = $scope.cart.selectedItem;
               // console.log(oldItem);
               voidProm = BillService.voidItem(oldItem);
-              item = angular.copy(selectedItem);
+              var item = angular.copy(selectedItem);
               angular.forEach($scope.salesKits.selectedList, function (item) {
                 item.LineNumber = oldItem.LineNumber;
                 item.DocNo = oldItem.DocNo;
