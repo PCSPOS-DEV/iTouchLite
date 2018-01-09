@@ -88,7 +88,7 @@ angular.module('itouch.services')
       }
 
       if (data.header.HeaderTitle)
-    {
+      {
         PrintService.addTitle(data.header.HeaderTitle + '\n');
       }
 
@@ -196,13 +196,13 @@ angular.module('itouch.services')
         printer.addText(row.Text + '\n');
         printer.addTextStyle(false, false, false);
       });
-      printer.addText('\nBDate: ' + businessDate + ' Shift: ' + (footerData.shift ? footerData.shift.Description1 : '' ) + ' M/C: ' + (footerData.machine ? footerData.machine.Code : '') + '\n');
+      printer.addText('\nBDate: ' + businessDate + ', Shift: ' + (footerData.shift ? footerData.shift.Description1 : '' ) + ', M/C: ' + (footerData.machine ? footerData.machine.Code : '') + '\n');
       if (footerData.cashier) {
-        printer.addText(curtSysDateTime + ' User: ' + footerData.cashier.Code + ' ' + header.DocNo + '\n');
+        printer.addText(curtSysDateTime + ', User: ' + footerData.cashier.Code + ' ' + header.DocNo + '\n');
       }
       else {
         AuthService.getUserById(header.CashierId).then(function (data) {
-          printer.addText(curtSysDateTime + ' User: ' + data.Code + ' ' + header.DocNo + '\n');
+          printer.addText(curtSysDateTime + ', User: ' + data.Code + ' ' + header.DocNo + '\n');
         });
       }
     //printer.addText('\nBDate: '+header.BusinessDate+' Shift: '+ (footerData.shift ? footerData.shift.Description1: '' ) +' M/C: '+ (footerData.machine ? footerData.machine.Code : '') +'\n');
@@ -226,16 +226,17 @@ angular.module('itouch.services')
               printData = data.printData;
 
               if (data && data.header && data.footerData) {
-                self.creatRecieptHeader();
-
                 if (data.header.DocType == 'VD') {
-                  PrintService.addTitle('Transaction Void');
-                  PrintService.addTitle(data.header.SalesDocNo);
+                  data.header.HeaderTitle = 'Transaction Void';
+                  data.header.HeaderTitle = data.header.SalesDocNo;
                 }
                 else if (data.header.DocType == 'AV')
-                  {PrintService.addTitle('Abort');}
+                  {data.header.HeaderTitle = 'Abort';}
+
+                self.creatRecieptHeader();
 
                 self.creatRecieptBody(data, true);
+
 
                 self.creatRecieptFooter(data.header, data.footerData);
 
@@ -265,9 +266,10 @@ angular.module('itouch.services')
             printData = data.printData;
             if (data && data.header) {
               self.creatRecieptHeader();
+
+              self.creatRecieptBody(data, data.header.Tax, true);
               PrintService.addTitle('Transaction Void');
               PrintService.addTitle(data.header.SalesDocNo);
-              self.creatRecieptBody(data, data.header.Tax, true);
 
               self.creatRecieptFooter(data.header, data.footerData);
 
@@ -296,8 +298,8 @@ angular.module('itouch.services')
             console.log(data.footerData.cashier.Code);
             printData = data.printData;
             if (data && data.header) {
+              data.header.HeaderTitle = 'Abort'
               self.creatRecieptHeader();
-              PrintService.addTitle('Abort');
 
               self.creatRecieptBody(data, false);
 
