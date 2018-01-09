@@ -26,32 +26,6 @@ angular.module('itouch.controllers')
       //var TotalEnterQty = 0;
      // var SuspendDepDocNo =
 
-     // Qty Numberpicker by Lynn Naing Zaw (14/12/2017)
-      var numArr = [];
-      for (var i = 1; i <= 50; i++) {
-        numArr.push(i);
-      }
-
-      var mobileSelect1 = new MobileSelect({
-        trigger: '#qty',
-        wheels: [
-            {data: numArr}
-        ],
-
-        callback: function (tempValue) {    //Mandatory
-          // console.log('RtempValue');
-          // console.log(tempValue);
-          var SelectedQTy = tempValue[0] + 1;
-          if (SelectedQTy) {
-            $scope.qty.value = SelectedQTy;
-            refresh();
-          } else {
-            $scope.qty.value = 1;
-          }
-        }
-      });
-      /* */
-
       $scope.salesKits = {
         list: {},
         selectedList: {},
@@ -83,27 +57,27 @@ angular.module('itouch.controllers')
         activeKeys: {}
       };
 
-      // $scope.numberPickerObject = {
-      //   inputValue: 1, //Optional
-      //   minValue: 1,
-      //   maxValue: 50,
-      //   precision: 3,  //Optional
-      //   decimalStep: 0.25,  //Optional
-      //   format: 'WHOLE',  //Optional - "WHOLE" or "DECIMAL"
-      //   unit: '',  //Optional - "m", "kg", "℃" or whatever you want
-      //   titleLabel: 'Set Qty',  //Optional
-      //   setLabel: 'Set',  //Optional
-      //   closeLabel: 'Close',  //Optional
-      //   setButtonType: 'button-positive',  //Optional
-      //   closeButtonType: 'button-stable',  //Optional
-      //   callback: function (val) {    //Mandatory
-      //     if (val) {
-      //       $scope.qty.value = val;
-      //     } else {
-      //       $scope.qty.value = 1;
-      //     }
-      //   }
-      // };
+      $scope.numberPickerObject = {
+        inputValue: 1, //Optional
+        minValue: 1,
+        maxValue: 50,
+        precision: 3,  //Optional
+        decimalStep: 0.25,  //Optional
+        format: 'WHOLE',  //Optional - "WHOLE" or "DECIMAL"
+        unit: '',  //Optional - "m", "kg", "℃" or whatever you want
+        titleLabel: 'Set Qty',  //Optional
+        setLabel: 'Set',  //Optional
+        closeLabel: 'Close',  //Optional
+        setButtonType: 'button-positive',  //Optional
+        closeButtonType: 'button-stable',  //Optional
+        callback: function (val) {    //Mandatory
+          if (val) {
+            $scope.qty.value = val;
+          } else {
+            $scope.qty.value = 1;
+          }
+        }
+      };
 
 
       /**
