@@ -265,11 +265,12 @@ angular.module('itouch.services')
           self.fetchData(DocNo).then(function (data) {
             printData = data.printData;
             if (data && data.header) {
+              data.header.HeaderTitle = 'Transaction Void';
+              data.header.HeaderTitle = data.header.SalesDocNo;
+
               self.creatRecieptHeader();
 
               self.creatRecieptBody(data, data.header.Tax, true);
-              PrintService.addTitle('Transaction Void');
-              PrintService.addTitle(data.header.SalesDocNo);
 
               self.creatRecieptFooter(data.header, data.footerData);
 
@@ -298,7 +299,7 @@ angular.module('itouch.services')
             console.log(data.footerData.cashier.Code);
             printData = data.printData;
             if (data && data.header) {
-              data.header.HeaderTitle = 'Abort'
+              data.header.HeaderTitle = 'Abort';
               self.creatRecieptHeader();
 
               self.creatRecieptBody(data, false);
