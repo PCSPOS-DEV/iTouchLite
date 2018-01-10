@@ -1067,9 +1067,9 @@ angular.module('itouch.controllers')
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
               if (empty) {
                 if (authorityCheck(fn)) {
-                  if (Suspended == true) {
-                    return Suspended = false;
-                  }
+                  // if (Suspended == true) {
+                  //   return Suspended = false;
+                  // }
                   Suspended = true;
                   $ionicModal.fromTemplateUrl('main/recallSuspendedBill/recallSuspendedBill.html', {
                     id: 14,
@@ -1091,7 +1091,7 @@ angular.module('itouch.controllers')
 
               } else {
                 SuspendService.suspend($scope.header.DocNo).then(function () {
-
+                  Suspended = true;
                   refresh();
                 }, function (ex) {
                   console.log(ex);
