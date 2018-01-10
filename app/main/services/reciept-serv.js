@@ -89,6 +89,8 @@ angular.module('itouch.services')
 
       if (data.header.HeaderTitle)
       {
+        printer.addTextStyle(false, false, false);
+        printer.addTextSize(2, 2);
         PrintService.addTitle(data.header.HeaderTitle + '\n');
       }
 
