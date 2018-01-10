@@ -43,7 +43,7 @@ angular.module('itouch.services')
           printer.addTextSize(1, 1);
         } else {
           printer.addTextStyle(false, false, false);
-          printer.addTextSize(2, 2);
+          printer.addTextSize(2, 1);
         }
         printer.addText(row.Text + '\n');
       });
@@ -113,8 +113,8 @@ angular.module('itouch.services')
           printer = PrintService.getPrinter();
           self.creatRecieptHeader();
           PrintService.addHLine();
-          printer.addTextSize(2, 2);
-          data.header.HeaderTitle('Add Float\n');
+          printer.addTextSize(2, 1);
+          PrintService.addTitle('Add Float\n');
           printer.addTextSize(1, 1);
           PrintService.addLine('Amount :', (floatAmount.toFixed(2)));
 
@@ -136,10 +136,10 @@ angular.module('itouch.services')
         try {
           printer = PrintService.getPrinter();
           self.creatRecieptHeader();
-          printer.addTextSize(2, 2);
-          data.header.HeaderTitle('Declare Cash\n');
-          printer.addTextSize(1, 1);
           PrintService.addHLine();
+          printer.addTextSize(2, 1);
+          PrintService.addTitle('Declare Cash\n');
+          printer.addTextSize(1, 1);
           PrintService.addLine('Cash in Drawer :', (amount.toFixed(2)) + '\n');
 
           self.creatRecieptFooter(shift);
@@ -283,7 +283,7 @@ angular.module('itouch.services')
             printer = PrintService.getPrinter();
             self.creatRecieptHeader();
             PrintService.addHLine();
-            data.header.HeaderTitle(data.shift ? 'Shift Closing Report' : 'Z Report');
+            PrintService.addTitle(data.shift ? 'Shift Closing Report' : 'Z Report');
             PrintService.alignCenter();
             if (data.shift) {
               PrintService.addTextLine('Shift : ' + data.shift.Description1);

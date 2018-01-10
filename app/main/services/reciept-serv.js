@@ -58,7 +58,7 @@ angular.module('itouch.services')
           printer.addTextSize(1, 1);
         } else {
           printer.addTextStyle(false, false, true);
-          printer.addTextSize(2, 2);
+          printer.addTextSize(2, 1);
         }
         printer.addText(row.Text + '\n');
       });
@@ -89,8 +89,6 @@ angular.module('itouch.services')
 
       if (data.header.HeaderTitle)
       {
-        printer.addTextStyle(false, false, false);
-        printer.addTextSize(2, 2);
         PrintService.addTitle(data.header.HeaderTitle + '\n');
       }
 

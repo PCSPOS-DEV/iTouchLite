@@ -251,10 +251,8 @@ angular.module('itouch.services')
 
       self.addTitle = function (text) {
         printer.addTextAlign(printer.ALIGN_CENTER);
-        printer.addTextSize(2, 2);
-        printer.addTextStyle(false, false, true);
+        printer.addTextSize(2, 1);
         printer.addText(text + '\n');
-        printer.addTextStyle(false, false, false);
         printer.addTextSize(1, 1);
         printer.addTextAlign(printer.ALIGN_LEFT);
       };
