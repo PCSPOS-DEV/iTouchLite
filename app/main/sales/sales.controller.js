@@ -582,7 +582,9 @@ angular.module('itouch.controllers')
           $scope.qty.value = 1;
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
-          if (salesKit && !salesKit.isEmpty && Object.keys(salesKit.component).length != 0) {
+          if (salesKit && !salesKit.isEmpty) {
+            console.log(salesKit);
+            console.log(Object.keys(salesKit.component).length);
             if ($scope.showskModalModal == false) {
               $scope.showskModalModal = true;
               $timeout(function () {
@@ -590,9 +592,16 @@ angular.module('itouch.controllers')
                   salesKit: salesKit,
                   update: false
                 };
-                $scope.modals.salesKit.show();
-                console.log(salesKit);
-                console.log(Object.keys(salesKit.component));
+                // $scope.modals.salesKit.show();
+                if (Object.keys(salesKit.component).length != 0) {
+                  $scope.modals.salesKit.show();
+                  console.log('GGWP');
+                } else {
+                  $scope.showskModalModal = false;
+                  $scope.salesKitUpdate = false;
+                  $scope.qty.value = 1;
+                  $scope.salesKit.save();
+                }
               }, 200);
             }
           } else {
@@ -1120,48 +1129,48 @@ angular.module('itouch.controllers')
           if (authorityCheck(fn)) {
             Suspended = false;
             if (_.size($scope.cart.items) > 0) {
-              /*Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
-                if (res == 1) {*/
-              BillService.getTempHeader($scope.header.DocNo).then(function (header) {
+              Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
+                if (res == 1) {
+                  BillService.getTempHeader($scope.header.DocNo).then(function (header) {
                     // $scope.tenderHeader = header;
                     // console.log($scope.header);
-                return BillService.updateHeaderTotals(header.DocNo).then(function () {
+                    return BillService.updateHeaderTotals(header.DocNo).then(function () {
                           //$scope.header.DocType = 'AV';
                           //$scope.header
-                  header.DocType = 'AV';
-                  return BillService.saveBill(header, $scope.cart.items).then(function (res) {
-                    Reciept.printAbort($scope.header.DocNo);
+                      header.DocType = 'AV';
+                      return BillService.saveBill(header, $scope.cart.items).then(function (res) {
+                        Reciept.printAbort($scope.header.DocNo);
                               /*Yi Yi Po*/
-                    $scope.billdetail = _.map($scope.cart.items, function (item) {
-                      if (item.SuspendDepDocNo) {
-                        $scope.header.isSuspended = true;
-                        $scope.header.SuspendDocNo = item.SuspendDepDocNo;
-                      }
-                      return item;
-                    });
-                    if ($scope.header.isSuspended) {
-                      var outletUrl = AppConfig.getOutletServerUrl();
-                      if (outletUrl) {
-                        Restangular.oneUrl('DeleteSuspendBill', outletUrl + 'DeleteSuspendBill').get({ SuspendDocNo: $scope.header.SuspendDocNo }).then(function (res) {
-                          if (res == 'success') {
-                            return true;
-                          } else {
-                            return $q.reject('Invalid service');
+                        $scope.billdetail = _.map($scope.cart.items, function (item) {
+                          if (item.SuspendDepDocNo) {
+                            $scope.header.isSuspended = true;
+                            $scope.header.SuspendDocNo = item.SuspendDepDocNo;
                           }
+                          return item;
                         });
-                      }
-                    }
+                        if ($scope.header.isSuspended) {
+                          var outletUrl = AppConfig.getOutletServerUrl();
+                          if (outletUrl) {
+                            Restangular.oneUrl('DeleteSuspendBill', outletUrl + 'DeleteSuspendBill').get({ SuspendDocNo: $scope.header.SuspendDocNo }).then(function (res) {
+                              if (res == 'success') {
+                                return true;
+                              } else {
+                                return $q.reject('Invalid service');
+                              }
+                            });
+                          }
+                        }
                         /*--*/
-                    refresh();
-                    initBill();
-                  }, function (res) {
-                    console.log(res);
-                  });
-                });
+                        refresh();
+                        initBill();
+                      }, function (res) {
+                        console.log(res);
+                      });
+                    });
 
+                  });
+                }
               });
-               /* }
-              });*/
             } else {
               Alert.warning('No items in the cart!');
             }
