@@ -89,7 +89,7 @@ angular.module('itouch.services')
             if (suspended == true && suspendedDepDocNo !== '') {
               console.log('GGWP');
             } else {
-              Reciept.printSuspend(res, suspendedDepDocNo);
+              Reciept.printSuspend(res);
             }
             return self.removeBill(header.DocNo);
                     /*if (res == 'success') {
