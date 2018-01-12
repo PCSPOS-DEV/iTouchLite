@@ -1178,8 +1178,10 @@ angular.module('itouch.controllers')
 
         },
         FoodModifier: function (fn) {
-          if (authorityCheck(fn)) {
-            var item = $scope.cart.selectedItem;
+          var item = $scope.cart.selectedItem;
+          if (Suspended == true && item.SuspendDepDocNo !== '') {
+            Alert.warning('Suspended Order: Action not allowed.');
+          } else if (authorityCheck(fn)) {;
             if (item && item.ItemType != 'MOD' && item.ItemType != 'SKT') {
               $scope.type = 'F';
               $scope.shownModal = 'mod';
@@ -1189,8 +1191,10 @@ angular.module('itouch.controllers')
 
         },
         BeveragesModifiers: function (fn) {
-          if (authorityCheck(fn)) {
-            var item = $scope.cart.selectedItem;
+          var item = $scope.cart.selectedItem;
+          if (Suspended == true && item.SuspendDepDocNo !== '') {
+            Alert.warning('Suspended Order: Action not allowed.');
+          } else if (authorityCheck(fn)) {
             if (item && item.ItemType != 'MOD' && item.ItemType != 'SKT') {
               $scope.type = 'B';
               $scope.shownModal = 'mod';
