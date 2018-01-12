@@ -10,6 +10,31 @@ angular.module('itouch.services')
       var entityId;
       var macId;
       var enableAutoUpload = true;
+      var suspendedDoc = null;
+      var bill;
+
+      var onSuccess = function (res) {
+        return _.map(DB.fetchAll(res), function (row) {
+          row.EntityId = entityId;
+          row.MachineId = macId;
+          return row;
+        });
+      };
+
+      var post = function (data) {
+        var config = $localStorage.itouchConfig;
+        if (config && config.baseUrl) {
+          return Restangular.oneUrl('uplink', config.baseUrl + 'UpdateSuspendBill').customPOST(
+                    JSON.stringify(data),
+                    '', {},
+            {
+                        // Authorization:'Basic ' + client,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+                );
+        }
+
+      };
 
       self.getBill = function (DocNo) {
         entityId = SettingsService.getEntityId();
@@ -49,14 +74,6 @@ angular.module('itouch.services')
         });
       };
 
-      var onSuccess = function (res) {
-        return _.map(DB.fetchAll(res), function (row) {
-          row.EntityId = entityId;
-          row.MachineId = macId;
-          return row;
-        });
-      };
-
       self.removeBill = function (DocNo) {
         DB.clearQueue();
         DB.addDeleteToQueue(DB_CONFIG.tableNames.bill.tempHeader, {columns: 'DocNo=?', data: [DocNo]});
@@ -65,11 +82,13 @@ angular.module('itouch.services')
         return DB.executeQueue();
       };
 
-      self.suspend = function (DocNo) {
+      self.suspend = function (DocNo, suspended) {
         return self.getBill(DocNo).then(function (bill) {
           var header = _.first(bill.SuspendBillHeader);
           return post(bill).then(function (res) {
-            Reciept.printSuspend(res);
+            if (suspended == true) {
+              Reciept.printSuspend(res);
+            }
             return self.removeBill(header.DocNo);
                     /*if (res == 'success') {
                         return self.removeBill(header.DocNo);
@@ -89,21 +108,6 @@ angular.module('itouch.services')
             self.upload();
           }, 120000);
         }
-      };
-
-      var post = function (data) {
-        var config = $localStorage.itouchConfig;
-        if (config && config.baseUrl) {
-          return Restangular.oneUrl('uplink', config.baseUrl + 'UpdateSuspendBill').customPOST(
-                    JSON.stringify(data),
-                    '', {},
-            {
-                        // Authorization:'Basic ' + client,
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-                );
-        }
-
       };
 
       self.fetchSuspendedBills = function () {

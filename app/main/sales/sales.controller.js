@@ -1099,7 +1099,7 @@ angular.module('itouch.controllers')
                 }
 
               } else {
-                SuspendService.suspend($scope.header.DocNo).then(function () {
+                SuspendService.suspend($scope.header.DocNo, Suspended).then(function () {
                   Suspended = true;
                   refresh();
                 }, function (ex) {
