@@ -1071,6 +1071,7 @@ angular.module('itouch.controllers')
         },
         CallSuspendBill: function (fn) {
           if (!buttonClicked.recallSuspendBillModal) {
+            var item = $scope.cart.selectedItem;
             buttonClicked.recallSuspendBillModal = true;
                 //if (authorityCheck(fn)) {
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
@@ -1099,8 +1100,8 @@ angular.module('itouch.controllers')
                 }
 
               } else {
-                SuspendService.suspend($scope.header.DocNo, Suspended).then(function () {
-                  Suspended = true;
+                SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
+                  Suspended = true; //GGWP
                   refresh();
                 }, function (ex) {
                   console.log(ex);
