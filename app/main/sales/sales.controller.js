@@ -875,6 +875,7 @@ angular.module('itouch.controllers')
         VoidTop: function (fn) {
           var item = $scope.cart.selectedItem;
           if (item) {
+            Suspended = false;
             if (item.ItemType == 'PWI') {
               return;
             } else if (item.ItemType == 'SKT') {
@@ -882,6 +883,7 @@ angular.module('itouch.controllers')
                 $scope.refreshCart().then(function () {
                   $scope.selectItemWithLineNumber();
                 });
+                Suspended = false;
               }, function (err) {
                 console.log(err);
               });
@@ -1071,7 +1073,6 @@ angular.module('itouch.controllers')
         },
         CallSuspendBill: function (fn) {
           if (!buttonClicked.recallSuspendBillModal) {
-            var item = $scope.cart.selectedItem;
             buttonClicked.recallSuspendBillModal = true;
                 //if (authorityCheck(fn)) {
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
@@ -1100,8 +1101,9 @@ angular.module('itouch.controllers')
                 }
 
               } else {
-                SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
-                  Suspended = true; //GGWP
+
+                SuspendService.suspend($scope.header.DocNo, Suspended).then(function () {
+                  Suspended = true;
                   refresh();
                 }, function (ex) {
                   console.log(ex);

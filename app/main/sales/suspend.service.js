@@ -82,13 +82,11 @@ angular.module('itouch.services')
         return DB.executeQueue();
       };
 
-      self.suspend = function (DocNo, suspended, suspendedDepDocNo) {
+      self.suspend = function (DocNo, suspended) {
         return self.getBill(DocNo).then(function (bill) {
           var header = _.first(bill.SuspendBillHeader);
           return post(bill).then(function (res) {
-            if (suspended == true && suspendedDepDocNo !== '') {
-              console.log('GGWP');
-            } else {
+            if (suspended == false) {
               Reciept.printSuspend(res);
             }
             return self.removeBill(header.DocNo);
