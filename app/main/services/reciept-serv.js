@@ -696,13 +696,13 @@ angular.module('itouch.services')
         console.log(ex);
       });
     };
-    self.printSuspend = function (DocNo) {
+    self.printSuspend = function (DocNo, suspendedDepDocNo) {
       if (PrintService.isConnected()) {
         try {
           printer = PrintService.getPrinter();
 
           if (printer) {
-            self.fetchSuspendData(DocNo).then(function (data) {
+            self.fetchSuspendData(suspendedDepDocNo).then(function (data) {
 
               printData = data.footerData.printData;
 
@@ -712,7 +712,7 @@ angular.module('itouch.services')
 
                 self.creatRecieptHeader();
 
-                self.creatRecieptBody(data, false);
+                self.creatRecieptBody(suspendedDepDocNo, false);
 
                 self.creatRecieptFooter(data.header, data.footerData);
 

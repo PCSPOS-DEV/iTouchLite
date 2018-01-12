@@ -875,6 +875,7 @@ angular.module('itouch.controllers')
         VoidTop: function (fn) {
           var item = $scope.cart.selectedItem;
           if (item) {
+            Suspended = false;
             if (item.ItemType == 'PWI') {
               return;
             } else if (item.ItemType == 'SKT') {
