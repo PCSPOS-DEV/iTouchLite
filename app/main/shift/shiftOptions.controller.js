@@ -188,8 +188,13 @@ angular.module('itouch.controllers')
       });
 
       $scope.flag = false;
+      var count = 0;
       self.openDayEnd = function () {
+        count ++;
         $scope.flag = true;
+        if (count > 1) {
+          Alert.warning('Processing: Please Wait');
+        }
         $q.all({
           declare: ShiftService.getDeclareCashShifts(),
           opened: ShiftService.getOpened(),
