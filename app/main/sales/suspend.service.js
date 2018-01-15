@@ -2,8 +2,8 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory('SuspendService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService', 'Reciept', '$timeout',
-    function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService, Reciept, $timeout) {
+  .factory('SuspendService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService', 'Reciept',
+    function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService, Reciept) {
       var self = this;
 
       var self = this;
@@ -85,24 +85,22 @@ angular.module('itouch.services')
       self.suspend = function (DocNo, suspended, suspendedDepDocNo) {
         return self.getBill(DocNo).then(function (bill) {
           var header = _.first(bill.SuspendBillHeader);
-          $timeout(function () {
-            return post(bill).then(function (res) {
-              if (suspended == true && suspendedDepDocNo !== '') {
-                console.log('GGWP');
-              } else {
-                Reciept.printSuspend(res);
-              }
-              return self.removeBill(header.DocNo);
+          return post(bill).then(function (res) {
+            if (suspended == true && suspendedDepDocNo !== '') {
+              console.log('GGWP');
+            } else {
+              Reciept.printSuspend(res);
+            }
+            return self.removeBill(header.DocNo);
                     /*if (res == 'success') {
                         return self.removeBill(header.DocNo);
                     } else {
                         return $q.reject(res);
                     }*/
-            });
           });
+
         });
       };
-
 
       self.startAutoUpload = function () {
         if (enableAutoUpload) {

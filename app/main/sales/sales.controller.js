@@ -1190,7 +1190,7 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
-          } else if (authorityCheck(fn)) {;
+          } else if (authorityCheck(fn)) {
             if (item && item.ItemType != 'MOD' && item.ItemType != 'SKT') {
               $scope.type = 'F';
               $scope.shownModal = 'mod';
