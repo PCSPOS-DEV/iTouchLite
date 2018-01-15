@@ -818,24 +818,25 @@ angular.module('itouch.controllers')
        * Invokes the given named function from $scope.salesFunctions
        * @param name
        */
-      $scope.flag = false;
+      // $scope.flag = false;
       $scope.invoke = function (fn) {
-        $scope.flag = true;
+        // $scope.flag = true;
         if (!_.isUndefined($scope.salesFunctions[fn.Name])) {
           $scope.data.barcodeMode = false;
           // if(authorityCheck(fn)) {
 
           if ((fn.Transact == 'true' && _.isEmpty($scope.cart.items))) {
             Alert.warning('Action not allowed');
-            $scope.flag = false;
+            // $scope.flag = false;
           } else {
             $scope.salesFunctions[fn.Name](fn);
-            $scope.flag = false;
+            // $scope.flag = false;
           }
 
           // }
         } else {
           throw new Error('Function ' + fn.Name + ' is not available.');
+          // $scope.flag = false;
         }
       };
 
@@ -875,6 +876,7 @@ angular.module('itouch.controllers')
        * Contains the list of functions for sales
        * @type {{VoidTop: $scope.salesFunctions.VoidTop}}
        */
+      $scope.flag = false;
       $scope.salesFunctions = {
         VoidTop: function (fn) {
 
@@ -1075,7 +1077,9 @@ angular.module('itouch.controllers')
             }
           }
         },
+        
         CallSuspendBill: function (fn) {
+          
           if (!buttonClicked.recallSuspendBillModal) {
             var item = $scope.cart.selectedItem;
             buttonClicked.recallSuspendBillModal = true;
@@ -1106,7 +1110,7 @@ angular.module('itouch.controllers')
                 }
 
               } else {
-
+                $scope.flag = true;
                 SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
                   Suspended = true; //GGWP
                   refresh();
@@ -1115,6 +1119,7 @@ angular.module('itouch.controllers')
                 }).finally(function () {
                   buttonClicked.recallSuspendBillModal = false;
                   Alert.success('Suspend completed');
+                  $scope.flag = false;
                 });
 
               }

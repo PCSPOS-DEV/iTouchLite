@@ -20,8 +20,8 @@
     </div>
     <div class="row">
       <div class="col-50 padding">
-        <button class="button button-large button-positive button-block" ng-click="ctrl.openDayEnd()"
-                ng-disabled="!ctrl.shiftData.dayEndPossible">
+        <button class="button button-large button-positive button-block" ng-click="ctrl.openDayEnd()" ng-dblclick="false"
+                ng-disabled="!ctrl.shiftData.dayEndPossible || flag">
 
           Day End Closing
         </button>
