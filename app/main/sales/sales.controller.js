@@ -388,7 +388,7 @@ angular.module('itouch.controllers')
         $scope.modals.loginlModal.hide();
         modalOpen = false;
         if (close) {
-          onGoingFunction = false;
+          var onGoingFunction = false;
         }
         // console.log(AuthService.getTempUser());
         if (onGoingFunction) {
@@ -1106,8 +1106,9 @@ angular.module('itouch.controllers')
                 }
 
               } else {
-
-                SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
+                $timeout(function () {
+                  SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
+                  });
                   Suspended = true; //GGWP
                   refresh();
                 }, function (ex) {
@@ -1190,7 +1191,7 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
-          } else if (authorityCheck(fn)) {;
+          } else if (authorityCheck(fn)) {
             if (item && item.ItemType != 'MOD' && item.ItemType != 'SKT') {
               $scope.type = 'F';
               $scope.shownModal = 'mod';
