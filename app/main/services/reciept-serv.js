@@ -227,11 +227,11 @@ angular.module('itouch.services')
 
               if (data && data.header && data.footerData) {
                 if (data.header.DocType == 'VD') {
-                  PrintService.addTitle = 'Transaction Void';
-                  PrintService.addTitle = data.header.SalesDocNo;
+                  data.header.HeaderTitle = 'Transaction Void';
+                  data.header.HeaderTitle = data.header.SalesDocNo;
                 }
                 else if (data.header.DocType == 'AV')
-                  {PrintService.addTitle = 'Abort';}
+                  {data.header.HeaderTitle = 'Abort';}
 
                 self.creatRecieptHeader();
 
@@ -265,8 +265,8 @@ angular.module('itouch.services')
           self.fetchData(DocNo).then(function (data) {
             printData = data.printData;
             if (data && data.header) {
-              PrintService.addTitle = 'Transaction Void';
-              PrintService.addTitle = data.header.SalesDocNo;
+              data.header.HeaderTitle = 'Transaction Void';
+              data.header.HeaderTitle = data.header.SalesDocNo;
 
               self.creatRecieptHeader();
 
@@ -299,7 +299,7 @@ angular.module('itouch.services')
             console.log(data.footerData.cashier.Code);
             printData = data.printData;
             if (data && data.header) {
-              PrintService.addTitle = 'Abort';
+              data.header.HeaderTitle = 'Abort';
               self.creatRecieptHeader();
 
               self.creatRecieptBody(data, false);

@@ -592,16 +592,16 @@ angular.module('itouch.controllers')
                   salesKit: salesKit,
                   update: false
                 };
-                // $scope.modals.salesKit.show();
-                if (Object.keys(salesKit.component).length != 0) {
-                  $scope.modals.salesKit.show();
-                  console.log('GGWP');
-                } else {
-                  $scope.showskModalModal = false;
-                  $scope.salesKitUpdate = false;
-                  $scope.qty.value = 1;
-                  $scope.salesKit.save();
-                }
+                $scope.modals.salesKit.show();
+                // if (Object.keys(salesKit.component).length != 0) {
+                //   $scope.modals.salesKit.show();
+                //   console.log('GGWP');
+                // } else {
+                //   $scope.showskModalModal = false;
+                //   $scope.salesKitUpdate = false;
+                //   $scope.qty.value = 1;
+                //   $scope.salesKit.save();
+                // }
               }, 200);
             }
           } else {
@@ -873,17 +873,17 @@ angular.module('itouch.controllers')
        */
       $scope.salesFunctions = {
         VoidTop: function (fn) {
+          
           var item = $scope.cart.selectedItem;
           if (item) {
-            Suspended = false;
             if (item.ItemType == 'PWI') {
               return;
             } else if (item.ItemType == 'SKT') {
               BillService.voidSalesKit(item).then(function () {
                 $scope.refreshCart().then(function () {
+                  Suspended = false;
                   $scope.selectItemWithLineNumber();
                 });
-                Suspended = false;
               }, function (err) {
                 console.log(err);
               });
@@ -1073,6 +1073,7 @@ angular.module('itouch.controllers')
         },
         CallSuspendBill: function (fn) {
           if (!buttonClicked.recallSuspendBillModal) {
+            var item = $scope.cart.selectedItem;
             buttonClicked.recallSuspendBillModal = true;
                 //if (authorityCheck(fn)) {
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
@@ -1102,8 +1103,8 @@ angular.module('itouch.controllers')
 
               } else {
 
-                SuspendService.suspend($scope.header.DocNo, Suspended).then(function () {
-                  Suspended = true;
+                SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
+                  Suspended = true; //GGWP
                   refresh();
                 }, function (ex) {
                   console.log(ex);
