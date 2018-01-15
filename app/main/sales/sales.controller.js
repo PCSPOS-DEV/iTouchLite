@@ -1114,6 +1114,7 @@ angular.module('itouch.controllers')
                   console.log(ex);
                 }).finally(function () {
                   buttonClicked.recallSuspendBillModal = false;
+                  Alert.success('Suspend completed');
                 });
 
               }

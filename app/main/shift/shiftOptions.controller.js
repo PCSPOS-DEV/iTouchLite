@@ -188,8 +188,13 @@ angular.module('itouch.controllers')
       });
 
       $scope.flag = false;
+      var count = 0;
       self.openDayEnd = function () {
+        count ++;
         $scope.flag = true;
+        if (count > 1) {
+          Alert.warning('Processing: Please Wait');
+        }
         $q.all({
           declare: ShiftService.getDeclareCashShifts(),
           opened: ShiftService.getOpened(),
@@ -230,7 +235,6 @@ angular.module('itouch.controllers')
               dayEnd = false;
               $scope.$emit('shift-changed');
               Alert.success('Day end completed');
-              $scope.flag = false;
               $ionicHistory.nextViewOptions({
                 disableAnimate: false,
                 disableBack: true
@@ -238,6 +242,7 @@ angular.module('itouch.controllers')
               UploadService.upload().finally(function () {
                 $state.go('app.home');
               });
+              $scope.flag = false;
 
             }, function (err) {
               dayEnd = false;
