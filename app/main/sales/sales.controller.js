@@ -818,15 +818,19 @@ angular.module('itouch.controllers')
        * Invokes the given named function from $scope.salesFunctions
        * @param name
        */
+      $scope.flag = false;
       $scope.invoke = function (fn) {
+        $scope.flag = true;
         if (!_.isUndefined($scope.salesFunctions[fn.Name])) {
           $scope.data.barcodeMode = false;
           // if(authorityCheck(fn)) {
 
           if ((fn.Transact == 'true' && _.isEmpty($scope.cart.items))) {
             Alert.warning('Action not allowed');
+            $scope.flag = false;
           } else {
             $scope.salesFunctions[fn.Name](fn);
+            $scope.flag = false;
           }
 
           // }
@@ -873,7 +877,7 @@ angular.module('itouch.controllers')
        */
       $scope.salesFunctions = {
         VoidTop: function (fn) {
-          
+
           var item = $scope.cart.selectedItem;
           if (item) {
             if (item.ItemType == 'PWI') {

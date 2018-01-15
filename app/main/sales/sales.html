@@ -126,7 +126,7 @@
           <div class="row wrapper">
             <div class="col">
               <ion-scroll zooming="false" direction="y" id="functions-bottom">
-                  <a href="" class="button" ng-repeat="fn in functions" ng-click="invoke(fn)"
+                  <a href="" class="button" ng-repeat="fn in functions" ng-click="invoke(fn)" ng-disabled="buttonDisabled"
                      ng-class="{ 'button-balanced': (fn.Name == 'FullTakeaway' && TakeAway) || (fn.Name == 'PartialTakeaway' && cart.selectedItem.TakeAway == 'true') }"
                   style="font-weight: bold;">{{ print(fn, 'Description')}}</a>
               </ion-scroll>
