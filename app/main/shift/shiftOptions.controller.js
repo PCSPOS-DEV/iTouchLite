@@ -187,7 +187,9 @@ angular.module('itouch.controllers')
         // }
       });
 
+      $scope.flag = false;
       self.openDayEnd = function () {
+        $scope.flag = true;
         $q.all({
           declare: ShiftService.getDeclareCashShifts(),
           opened: ShiftService.getOpened(),
@@ -228,6 +230,7 @@ angular.module('itouch.controllers')
               dayEnd = false;
               $scope.$emit('shift-changed');
               Alert.success('Day end completed');
+              $scope.flag = false;
               $ionicHistory.nextViewOptions({
                 disableAnimate: false,
                 disableBack: true
