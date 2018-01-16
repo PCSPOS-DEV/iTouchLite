@@ -583,8 +583,9 @@ angular.module('itouch.controllers')
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
           if (salesKit && !salesKit.isEmpty) {
-            console.log(salesKit);
-            console.log(Object.keys(salesKit.component).length);
+            console.log(salesKit); //GGWP
+            console.log(salesKit.list); //GGWP
+            // console.log(Object.keys(salesKit.component).length);
             if ($scope.showskModalModal == false) {
               $scope.showskModalModal = true;
               $timeout(function () {
@@ -927,6 +928,7 @@ angular.module('itouch.controllers')
                                 salesKit: salesKit,
                                 update: true
                               };
+                              Suspended = false;
                               $scope.modals.salesKit.show();
                             }
                           }, 500);
@@ -947,6 +949,7 @@ angular.module('itouch.controllers')
                   BillService.voidItem(item).then(function () {
                     $scope.refreshCart().then(function () {
                       $scope.selectItemWithLineNumber();
+                      Suspended = false;
                     });
 
                   }, function (err) {
@@ -1077,9 +1080,9 @@ angular.module('itouch.controllers')
             }
           }
         },
-        
+
         CallSuspendBill: function (fn) {
-          
+
           if (!buttonClicked.recallSuspendBillModal) {
             var item = $scope.cart.selectedItem;
             buttonClicked.recallSuspendBillModal = true;
