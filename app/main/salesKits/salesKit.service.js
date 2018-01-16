@@ -175,7 +175,7 @@ angular.module('itouch.services')
                         row.Selectable = true;
                         return row;
                       });
-                      console.log(salesKit.selected.Id);
+                      // console.log(salesKit.selected.Id); // GGWP
                       if (selections.length > 0)
                      {
                         ski.Selections = selections;
@@ -185,13 +185,14 @@ angular.module('itouch.services')
                         selections.unshift(ski);
                         salesKit.selected.Selections = selections;
                         if (salesKit.selected.Id == ski.ItemId) {
-                          ski.ItemId = 0;
-                          ski.Id = 0;
+                          ski.ItemId = 0.0001 * ski.ItemId;
+                          ski.Id = 0.0001 * ski.Id;
                           // salesKit.selected.Id = 1;
                           // salesKit.selected.ItemId = 1;
                         }
                         salesKit.component[ski.ItemId] = ski;
-                        console.log('ski.ItemId : ' + ski.ItemId);
+                        console.log('ski.Id : ' + ski.Id); //GGWP
+                        console.log('ski.ItemId : ' + ski.ItemId); //GGWP
                       }
                       else
                      {
