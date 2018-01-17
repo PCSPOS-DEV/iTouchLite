@@ -928,7 +928,7 @@ angular.module('itouch.controllers')
                                 salesKit: salesKit,
                                 update: true
                               };
-                              Suspended = false;
+
                               $scope.modals.salesKit.show();
                             }
                           }, 500);
@@ -949,7 +949,6 @@ angular.module('itouch.controllers')
                   BillService.voidItem(item).then(function () {
                     $scope.refreshCart().then(function () {
                       $scope.selectItemWithLineNumber();
-                      Suspended = false;
                     });
 
                   }, function (err) {
