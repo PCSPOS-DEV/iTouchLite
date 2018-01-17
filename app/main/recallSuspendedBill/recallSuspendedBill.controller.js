@@ -36,8 +36,8 @@ angular.module('itouch.controllers')
       self.recallBill = function () {
         var bill = self.data.selectedItem;
         if (bill) {
-          Alert.showConfirm('Are you sure?', 'Recall Suspended bill', function (res) {  //
-            if (res == 1) { //
+          // Alert.showConfirm('Are you sure?', 'Recall Suspended bill', function (res) {  //
+          //   if (res == 1) { //
               SuspendService.recallBill(bill.DocNo).then(function (DocNo) {
                 $scope.$emit('initBill');
                 $scope.$emit('refresh-cart');
@@ -46,8 +46,8 @@ angular.module('itouch.controllers')
               }, function (ex) {
                 console.log(ex);
               });
-            } //
-          }); //
+            // } //
+          // }); //
         } else {
           //Alert.warning('Please select an item to void');
           Alert.warning('Please select an item to suspend', 'ItouchLite');
@@ -55,7 +55,7 @@ angular.module('itouch.controllers')
 
       };
 
-      $timeout(self.onItemTap = function (bill) {
+      self.onItemTap = function (bill) {
         if (bill) {
           self.data.bills = _.map(self.data.bills, function (item) {
             item.active = false;
@@ -65,7 +65,7 @@ angular.module('itouch.controllers')
           self.data.selectedItem = bill;
         }
 
-      });
+      };
 
       self.view = function () {
         $scope.selectedItem = angular.copy(self.data.selectedItem);
