@@ -210,7 +210,7 @@ angular.module('itouch.services')
             startBlockMaxLength: 0
           };
           if (endBlock) {
-            lengths.startBlockMaxLength = lengths.total - 8;
+            lengths.startBlockMaxLength = lengths.total - 12;
 
             lengths.spaces = lengths.startBlockMaxLength - startBlock.length;
           } else {
@@ -231,11 +231,9 @@ angular.module('itouch.services')
           printer.addText('\t' + startBlock);
           addSpaces(lengths.spaces);
 
-          if (lengths.end < 8) {
-            addSpaces(8 - lengths.end);
+          if (lengths.end < 12) {
+            addSpaces(12 - lengths.end);
           }
-          console.log('lengths.end');console.log(lengths.end);
-          console.log('space'); console.log(addSpaces);
 
           printer.addText(endBlock + '\n');
         }
@@ -292,14 +290,12 @@ angular.module('itouch.services')
           } else {
             addSpaces(4);
           }
-          addSpaces(10);
+          addSpaces(12);
 
-          if (lengths.end < 10) {
-            addSpaces(10 - lengths.end);
+          if (lengths.end < 12) {
+            addSpaces(12 - lengths.end);
           }
-          console.log('lengths.end');console.log(lengths.end);
-          console.log('space'); console.log(addSpaces);
-          
+
           printer.addText(endBlock + '\n');
         }
       };
