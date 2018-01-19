@@ -10,9 +10,14 @@
           <img class="image-center padding" id="logo_image" height="100" ng-src="{{ctrl.images.logo}}">
         <!--</div>-->
 
-        <a class="item item-icon-left assertive" ng-click="ctrl.pickLogo()">
+        <a class="item item-icon-left" ng-click="ctrl.pickLogo()">
           <i class="icon ion-edit"></i>
           Change
+        </a>
+
+        <a class="item item-icon-left assertive" ng-click="ctrl.removeLogo()">
+          <i class="icon ion-close"></i>
+          Remove
         </a>
 
       </div>
@@ -26,9 +31,14 @@
         <img class="image-center padding" id="cart_background_image" height="100" ng-src="{{ctrl.images.cart_background}}">
         <!--</div>-->
 
-        <a class="item item-icon-left assertive" ng-click="ctrl.pickCartBack()">
+        <a class="item item-icon-left" ng-click="ctrl.pickCartBack()">
           <i class="icon ion-edit"></i>
           Change
+        </a>
+
+        <a class="item item-icon-left assertive" ng-click="ctrl.removeCartBack()">
+          <i class="icon ion-close"></i>
+          Remove
         </a>
 
       </div>

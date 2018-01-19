@@ -56,6 +56,13 @@ angular.module('itouch.controllers')
           });
       };
 
+      self.removeLogo = function () {
+        self.images = {
+          logo: 'main/assets/img/logo.png',
+        };
+        $scope.setImages();
+      };
+
       self.pickCartBack = function () {
         var options = {
           maximumImagesCount: 1,
@@ -80,6 +87,13 @@ angular.module('itouch.controllers')
           }, function (error) {
             // error getting photos
           });
+      };
+
+      self.removeCartBack = function () {
+        self.images = {
+          logo: 'main/assets/img/cart_back.jpg',
+        };
+        $scope.setImages();
       };
 
       var moveFile = function (name) {
