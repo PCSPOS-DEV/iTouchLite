@@ -61,6 +61,7 @@ angular.module('itouch.controllers')
           logo: 'main/assets/img/logo.png',
         };
         $scope.setImages();
+        $localStorage.images = self.images;
       };
 
       self.pickCartBack = function () {
@@ -91,8 +92,9 @@ angular.module('itouch.controllers')
 
       self.removeCartBack = function () {
         self.images = {
-          logo: 'main/assets/img/cart_back.jpg',
+          cart_background: 'main/assets/img/cart_back.jpg',
         };
+        $localStorage.images = self.images;
         $scope.setImages();
       };
 
