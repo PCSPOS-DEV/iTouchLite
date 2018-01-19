@@ -583,9 +583,6 @@ angular.module('itouch.controllers')
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
           if (salesKit && !salesKit.isEmpty) {
-            console.log(salesKit); //GGWP
-            console.log(salesKit.list); //GGWP
-            // console.log(Object.keys(salesKit.component).length);
             if ($scope.showskModalModal == false) {
               $scope.showskModalModal = true;
               $timeout(function () {
@@ -593,16 +590,11 @@ angular.module('itouch.controllers')
                   salesKit: salesKit,
                   update: false
                 };
-                $scope.modals.salesKit.show();
-                // if (Object.keys(salesKit.component).length != 0) {
-                //   $scope.modals.salesKit.show();
-                //   console.log('GGWP');
-                // } else {
-                //   $scope.showskModalModal = false;
-                //   $scope.salesKitUpdate = false;
-                //   $scope.qty.value = 1;
-                //   $scope.salesKit.save();
-                // }
+                if (Object.keys(salesKit.component).length != 0) {
+                  $scope.modals.salesKit.show();
+                } else {
+                  $scope.$broadcast('save', salesKit);
+                }
               }, 200);
             }
           } else {
@@ -880,7 +872,7 @@ angular.module('itouch.controllers')
       $scope.flag = false;
       $scope.salesFunctions = {
         VoidTop: function (fn) {
-
+          Suspended = false;
           var item = $scope.cart.selectedItem;
           if (item) {
             if (item.ItemType == 'PWI') {

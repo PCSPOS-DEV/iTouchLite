@@ -14,6 +14,33 @@ angular.module('itouch.controllers')
       var customQty = 0;
       var oldCustomQty = 0;
 
+      var full = function () {
+        /*
+        var items = 0;
+        angular.forEach($scope.salesKits.selectedList, function(item){
+          if(!item.Default){
+            items += item.Qty;
+          }
+        });
+        return items == $scope.salesKits.Quantity;*/
+        /*Yi Yi Po*/
+        var items = 0;
+        angular.forEach($scope.salesKits.selectedList, function (item) {
+          if (!item.Default) {
+            items += (item.Qty / item.QtyValid);
+          }
+        });
+        var componentCount = Object.keys($scope.salesKits.component).length;
+        var currentOrderQty = $scope.qty.value;
+        if (update) {
+          currentOrderQty = oldCustomQty;
+          componentCount = 1;
+        }
+        return items == (componentCount * currentOrderQty);
+        /*--*/
+
+      };
+
       $scope.$on('orderObjectBy', function () {
         return function (items, field, reverse) {
           var filtered = [];
@@ -110,6 +137,7 @@ angular.module('itouch.controllers')
 
         var validComponetQty = $scope.salesKits.component[kit.componetid].Quantity - $scope.salesKits.component[kit.componetid].OrderQty;
         var totalComponetQty = $scope.salesKits.component[kit.componetid].Quantity + $scope.salesKits.component[kit.componetid].OrderQty;
+
 
         if ($scope.cart.selectedItem && $scope.cart.selectedItem.ItemId == item.ItemId)
           {oldItem = $scope.cart.selectedItem;}
@@ -232,6 +260,12 @@ angular.module('itouch.controllers')
         }
       };
 
+      $scope.$on('save', function (event, salesKit) {
+        $scope.salesKits = salesKit;
+        submitted = false;
+        $scope.save();
+      });
+
       $scope.save = function () {
         if (!submitted) {
           if (full()) {
@@ -299,33 +333,6 @@ angular.module('itouch.controllers')
             Alert.warning('Entry not completed!');
           }
         }
-      };
-
-      var full = function () {
-        /*
-        var items = 0;
-        angular.forEach($scope.salesKits.selectedList, function(item){
-          if(!item.Default){
-            items += item.Qty;
-          }
-        });
-        return items == $scope.salesKits.Quantity;*/
-        /*Yi Yi Po*/
-        var items = 0;
-        angular.forEach($scope.salesKits.selectedList, function (item) {
-          if (!item.Default) {
-            items += (item.Qty / item.QtyValid);
-          }
-        });
-        var componentCount = Object.keys($scope.salesKits.component).length;
-        var currentOrderQty = $scope.qty.value;
-        if (update) {
-          currentOrderQty = oldCustomQty;
-          componentCount = 1;
-        }
-        return items == (componentCount * currentOrderQty);
-        /*--*/
-
       };
 
       $scope.close = function () {
