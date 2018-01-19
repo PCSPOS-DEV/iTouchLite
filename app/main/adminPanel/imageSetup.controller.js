@@ -57,11 +57,10 @@ angular.module('itouch.controllers')
       };
 
       self.removeLogo = function () {
-        self.images = {
-          logo: 'main/assets/img/logo.png',
-        };
-        $scope.setImages();
-        $localStorage.images = self.images;
+        if ($localStorage && $localStorage.images) {
+          self.images.logo = 'main/assets/img/logo.png';
+          $localStorage.images.logo = self.images.logo;
+        }
       };
 
       self.pickCartBack = function () {
@@ -91,11 +90,10 @@ angular.module('itouch.controllers')
       };
 
       self.removeCartBack = function () {
-        self.images = {
-          cart_background: 'main/assets/img/cart_back.jpg',
-        };
-        $localStorage.images = self.images;
-        $scope.setImages();
+        if ($localStorage && $localStorage.images) {
+          self.images.cart_background = 'main/assets/img/logo.png';
+          $localStorage.images.cart_background = self.images.cart_background;
+        }
       };
 
       var moveFile = function (name) {
