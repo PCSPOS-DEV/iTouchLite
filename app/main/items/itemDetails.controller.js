@@ -21,10 +21,5 @@ angular.module('itouch.controllers')
 
     $scope.close = function () {
       $scope.$emit('itemDetailsModal-close');
-<<<<<<< HEAD
     };
   }]);
-=======
-    }
-  }]);
->>>>>>> master
