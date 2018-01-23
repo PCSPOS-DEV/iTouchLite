@@ -160,7 +160,7 @@ angular.module('itouch.services')
 
 
     self.getBusinessDate = function () {
-      return (_.isNumber($localStorage.app_config.businessDate)) ? moment($localStorage.app_config.businessDate).format('YYYY-MM-DD') : $localStorage.app_config.businessDate;
+      return (_.isNumber($localStorage.app_config.businessDate)) ? moment($localStorage.app_config.businessDate).format('DD-MMM-YYYY') : $localStorage.app_config.businessDate;
     };
 
     self.setBusinessDate = function (bussinessdate) {

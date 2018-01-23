@@ -17,8 +17,6 @@ angular.module('itouch.controllers')
 
       var datePickerOptions = {
         callback: function (val) {
-          console.log('val');
-          console.log(val);
           SettingsService.setBusinessDate(val);
           refresh();
         },
