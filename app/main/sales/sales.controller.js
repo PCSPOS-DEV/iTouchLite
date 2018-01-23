@@ -880,7 +880,6 @@ angular.module('itouch.controllers')
             } else if (item.ItemType == 'SKT') {
               BillService.voidSalesKit(item).then(function () {
                 $scope.refreshCart().then(function () {
-                  Suspended = false;
                   $scope.selectItemWithLineNumber();
                 });
               }, function (err) {
@@ -1080,6 +1079,7 @@ angular.module('itouch.controllers')
                 //if (authorityCheck(fn)) {
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
               if (empty) {
+                SuspendService.voidBill($scope.header.DocNo);
                 if (authorityCheck(fn)) {
                   // if (Suspended == true) {
                   //   return Suspended = false;

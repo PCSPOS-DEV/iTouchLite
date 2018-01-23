@@ -82,6 +82,12 @@ angular.module('itouch.services')
         return DB.executeQueue();
       };
 
+      self.voidBill = function (DocNo) {
+        DB.clearQueue();
+        DB.addDeleteToQueue(DB_CONFIG.tableNames.bill.tempDetail, {columns: 'DocNo=?', data: [DocNo]});
+        return DB.executeQueue();
+      };
+
       self.suspend = function (DocNo, suspended, suspendedDepDocNo) {
         return self.getBill(DocNo).then(function (bill) {
           var header = _.first(bill.SuspendBillHeader);
