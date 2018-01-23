@@ -158,20 +158,37 @@ angular.module('itouch.services')
 
     };
 
+
+    self.getBusinessDate = function () {
+      return (_.isNumber($localStorage.app_config.businessDate)) ? moment($localStorage.app_config.businessDate).format('YYYY-MM-DD') : $localStorage.app_config.businessDate;
+    };
+
     self.setBusinessDate = function (bussinessdate) {
       settings.business_date = bussinessdate;
       $localStorage.app_config.businessDate = bussinessdate;
       DB.query('DELETE FROM ' + DB_CONFIG.tableNames.bill.tempHeader);
     };
 
-    self.getBusinessDate = function () {
-      if (settings.business_date) {
-        return settings.business_date;
-      }
-      else {
-        return null;
-      }
-    };
+    // self.setBusinessDate = function (bussinessdate) {
+    //   console.log('bussinessdate');
+    //   console.log(bussinessdate);
+    //   console.log('settings.business_date');
+    //   console.log(settings.business_date);
+    //   console.log('$localStorage.app_config.businessDate');
+    //   console.log($localStorage.app_config.businessDate);
+    //   settings.business_date = bussinessdate;
+    //   $localStorage.app_config.businessDate = bussinessdate;
+    //   DB.query('DELETE FROM ' + DB_CONFIG.tableNames.bill.tempHeader);
+    // };
+
+    // self.getBusinessDate = function () {
+    //   if (settings.business_date) {
+    //     return settings.business_date;
+    //   }
+    //   else {
+    //     return null;
+    //   }
+    // };
 
     return self;
   }]);

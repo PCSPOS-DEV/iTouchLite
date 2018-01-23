@@ -3,8 +3,8 @@
  */
 'use strict';
 angular.module('itouch.controllers')
-  .controller('GeneralSettingsCtrl', ['$scope', 'SettingsService', '$state', 'SyncService', 'AppConfig', 'Restangular', '$q', 'Alert',
-    function ($scope, SettingsService, $state, SyncService, AppConfig, Restangular, $q, Alert) {
+  .controller('GeneralSettingsCtrl', ['$scope', 'SettingsService', '$state', 'SyncService', 'AppConfig', 'Restangular', '$q', 'Alert', 'ionicDatePicker',
+    function ($scope, SettingsService, $state, SyncService, AppConfig, Restangular, $q, Alert, ionicDatePicker) {
       var self = this;
       self.settings = {};
 
@@ -14,6 +14,24 @@ angular.module('itouch.controllers')
           refresh();
         }
       });
+
+      var datePickerOptions = {
+        callback: function (val) {
+          console.log('val');
+          console.log(val);
+          SettingsService.setBusinessDate(val);
+          refresh();
+        },
+        setLabel: 'Set',
+        showTodayButton: true,
+      };
+
+
+      $scope.setBDate = function () {
+        console.log('GGWP');
+        ionicDatePicker.openDatePicker(datePickerOptions);
+
+      };
 
       var refresh = function () {
         try {
@@ -57,7 +75,7 @@ angular.module('itouch.controllers')
             SettingsService.setLocationId(self.settings.loc_id);
             SettingsService.setMachineId(self.settings.mac_id);
             SettingsService.setCashId(self.settings.cash_id);
-            SettingsService.setBusinessDate(self.settings.business_date);
+            // SettingsService.setBusinessDate(self.settings.business_date);
             SettingsService.save();
 
             SyncService.do().then(function () {
