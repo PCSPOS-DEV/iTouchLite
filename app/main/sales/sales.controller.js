@@ -1259,7 +1259,12 @@ angular.module('itouch.controllers')
               subTitle: '',
               scope: $scope,
               buttons: [
-                {text: 'Cancel'},
+                {
+                  text: 'Cancel',
+                  onTap: function (e) {
+                    $scope.data.tag = '';
+                  }
+                },
                 {
                   text: '<b>Save</b>',
                   type: 'button-positive',
