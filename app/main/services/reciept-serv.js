@@ -652,7 +652,9 @@ angular.module('itouch.services')
           var bills = JSON.parse(res);
                     //var header = _.first(bills.DBSuspendBillHeader);
           var header = ItemService.calculateTotal( _.first(bills.DBSuspendBillHeader));
-          var items = bills.DBSuspendBillDetail;
+          var items = bills.DBNSuspendBillDetail;
+          console.log('item');
+          console.log(items);
           _.forEach(items, function (item) {
             var itemdiscounts = [];
             _.forEach(bills.DBSuspendBillDiscounts, function (discount) {

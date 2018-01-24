@@ -67,6 +67,17 @@ angular.module('itouch.services')
               }
               return item;
             });
+            bill.NSuspendBillDetail = _.map(bill.SuspendBillDetail, function (item) {
+              if (item.SuspendDepDocNo) {
+                bill.SuspendNo = item.SuspendDepDocNo;
+              }
+              if (item.SuspendDepDocNo == '' || item.SuspendDepDocNo == null) {
+                var Nitem = item;
+              }
+              if (Nitem != undefined) {
+                return item;
+              }
+            });
             bill.SuspendBillHeader = [bill.SuspendBillHeader];
             return bill;
           });
@@ -90,8 +101,11 @@ angular.module('itouch.services')
 
       self.suspend = function (DocNo, suspended, suspendedDepDocNo) {
         return self.getBill(DocNo).then(function (bill) {
+          console.log(bill);
+          console.log('bill');
           var header = _.first(bill.SuspendBillHeader);
           return post(bill).then(function (res) {
+            console.log(res);
             if (suspended == true && suspendedDepDocNo !== '') {
               console.log('GGWP');
             } else {
