@@ -1251,10 +1251,18 @@ angular.module('itouch.controllers')
           }
         },
         OrderTag: function (fn) {
-          if ( window.cordova && window.cordova.plugins.Keyboard ) {
-            cordova.plugins.Keyboard.disableScroll( true );
-          }
+          // if ( window.cordova && window.cordova.plugins.Keyboard ) {
+          //   cordova.plugins.Keyboard.disableScroll( true );
+          // }
           if (authorityCheck(fn)) {
+            $('input').on('focus', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              setTimeout(
+                function () {
+                  windows.scrollTo(0, 0);
+                }, 100);
+            });
             $scope.data.tag = '';
             $ionicPopup.show({
               template: '<input type="number" ng-model="data.tag" autofocus>',
