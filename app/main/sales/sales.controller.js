@@ -1251,11 +1251,13 @@ angular.module('itouch.controllers')
           }
         },
         OrderTag: function (fn) {
-          cordova.plugins.Keyboard.disableScroll( true );
+          if ( window.cordova && window.cordova.plugins.Keyboard ) {
+            cordova.plugins.Keyboard.disableScroll( true );
+          }
           if (authorityCheck(fn)) {
             $scope.data.tag = '';
             $ionicPopup.show({
-              template: '<input type="number" ng-model="data.tag">',
+              template: '<input type="number" ng-model="data.tag" autofocus>',
               title: 'Order Tag',
               subTitle: '',
               scope: $scope,
