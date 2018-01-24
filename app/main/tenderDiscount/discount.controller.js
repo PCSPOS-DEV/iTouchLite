@@ -58,7 +58,7 @@ angular.module('itouch.controllers')
             $scope.data = {};
             // An elaborate, custom popup
             var myPopup = $ionicPopup.show({
-              template: '<input type="tel" ng-model="data.amount" autofocus>',
+              template: '<input type="tel" ng-model="data.amount" autofocus="autofocus">',
               title: 'Enter Amount',
               subTitle: '',
               scope: $scope,

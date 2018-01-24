@@ -545,7 +545,7 @@ angular.module('itouch.controllers')
           priceFormShown = true;
           $scope.data.amount = '';
           return $ionicPopup.show({
-            template: '<input type="tel" id="priceTextBox" ng-model="data.amount" autofocus>',
+            template: '<input type="tel" id="priceTextBox" ng-model="data.amount" autofocus="autofocus">',
             title: 'Enter Amount',
             subTitle: '',
             scope: $scope,
@@ -1254,7 +1254,7 @@ angular.module('itouch.controllers')
           if (authorityCheck(fn)) {
             $scope.data.tag = '';
             $ionicPopup.show({
-              template: '<input type="number" ng-model="data.tag" autofocus>',
+              template: '<input type="number" ng-model="data.tag" autofocus="autofocus">',
               title: 'Order Tag',
               subTitle: '',
               scope: $scope,
