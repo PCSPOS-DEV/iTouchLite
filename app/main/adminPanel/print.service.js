@@ -164,7 +164,7 @@ angular.module('itouch.services')
             startBlockMaxLength: 0
           };
 
-          lengths.startBlockMaxLength = lengths.total - (4 + 14 + 2); // 4: qty, 12: price
+          lengths.startBlockMaxLength = lengths.total - (4 + 12 + 2); // 4: qty, 12: price
 
           if (startBlock.length > lengths.startBlockMaxLength) {
             startBlock = startBlock.slice(0, (lengths.startBlockMaxLength - 2));
@@ -172,7 +172,7 @@ angular.module('itouch.services')
             // console.log(startBlock);
           }
 
-          lengths.spaces = ((lengths.total - ((lengths.qty ? 4 : 0) + 14)) - lengths.start );
+          lengths.spaces = ((lengths.total - ((lengths.qty ? 4 : 0) + 12)) - lengths.start );
           lengths.spaces  = lengths.spaces < 1 ? 1 : lengths.spaces;
 
           if (qtyBlock) {
@@ -184,8 +184,8 @@ angular.module('itouch.services')
 
           addSpaces(lengths.spaces);
 
-          if (lengths.end < 14) {
-            addSpaces(14 - lengths.end);
+          if (lengths.end < 12) {
+            addSpaces(12 - lengths.end);
           }
 
           printer.addText(endBlock + '\n');
@@ -245,6 +245,8 @@ angular.module('itouch.services')
           text += '-';
         }
         text += ' \n';
+        printer.addTextStyle(false, false, false);
+        printer.addTextSize(1, 1);
         printer.addText(text);
 
       };
