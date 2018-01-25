@@ -45,7 +45,7 @@
             <span ng-if="item.NoDiscount =='true'">**</span>
             <span ng-if="item.ItemType != 'MOD' && item.TakeAway == 'true'">*</span>
           </div>
-          <div class="col-20 text-right"> {{(item.SubTotal + item.Tax5Amount).toFixed(2)}}</div>
+          <div class="col-30 text-right"> {{(item.SubTotal + item.Tax5Amount).toFixed(2)}}</div>
           </div>
           <div class="row" ng-repeat="discount in item.discounts" ng-if="discount.Description1">
             <div class="col-60 col-offset-20">{{print(discount,'Description')}}</div>
