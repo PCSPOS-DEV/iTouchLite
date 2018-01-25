@@ -116,7 +116,9 @@ angular.module('itouch.services')
           printer.addTextSize(2, 1);
           PrintService.addTitle('Add Float\n');
           printer.addTextSize(1, 1);
-          PrintService.addLine('Amount :', (floatAmount.toFixed(2)));
+          console.log(floatAmount);
+          // console.log(floatAmount.toFixed(2));
+          PrintService.addLine('Amount :', floatAmount + '.00');
 
           self.creatRecieptFooter();
 
