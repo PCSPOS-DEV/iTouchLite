@@ -34,18 +34,18 @@
         <div ng-repeat="item in bill.items">
           <div class="row" ng-if="item.ItemId != '0'">
             <div class="col-10">{{item.Qty}}</div>
-          <div class="col-70">
+          <div class="col-80">
             <span ng-if="item.ItemType == 'SKI' || item.ItemType == 'MOD'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </span>
               {{print(item,'Desc')}}
             <span ng-if="item.ItemType == 'MOD'">**</span>
             <span ng-if="item.ItemType != 'MOD' && item.TakeAway == 'true'">*</span>
           </div>
-          <div class="col-30 text-right"> {{(item.SubTotal + item.Tax5Amount).toFixed(2)}}</div>
+          <div class="col-10 text-right"> {{(item.SubTotal + item.Tax5Amount).toFixed(2)}}</div>
           </div>
           <div class="row" ng-repeat="discount in item.discounts">
             <div class="col-60 col-offset-20">{{print(discount,'Description')}}</div>
-            <div class="col-20 text-right" > {{(discount.DiscountAmount*-1).toFixed(2)}}</div>
+            <div class="col-20 text-right"> {{(discount.DiscountAmount*-1).toFixed(2)}}</div>
           </div>
           <div class="row" ng-if="item.ReasonId">
             <div class="col" style="padding-left: 90px">
