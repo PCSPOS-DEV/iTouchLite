@@ -1159,15 +1159,26 @@ angular.module('itouch.controllers')
           }
 
         },
-        Shiftoption: function (fn) {
-          if (_.isEmpty($scope.cart.items)) {
-            if (authorityCheck(fn)) {
-              $state.go('app.shift');
+        Shiftoption: function (fn) {console.log($scope.cart.items);
+          var suspenditem = 0;
+          SuspendService.fetchSuspendedBills().then(function (data) {
+            suspenditem = parseInt(data.length);
+            if (_.isEmpty($scope.cart.items)) {  
+              console.log(suspenditem);     
+              if (suspenditem == 0) { // GGWP
+                console.log('success');
+                if (authorityCheck(fn)) {
+                  $state.go('app.shift');
+                }
+              } else {
+                Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+              }
             }
-          }
-          else {
-            Alert.warning('Cart is not empty.', 'ItouchLite');
-          }
+            else {
+              Alert.warning('Cart is not empty.', 'ItouchLite');
+            }
+          });
+          
         },
         AbortFunction: function (fn) {
           if (authorityCheck(fn)) {
