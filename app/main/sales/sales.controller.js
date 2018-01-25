@@ -952,36 +952,38 @@ angular.module('itouch.controllers')
             }
 
             if (last == 0) {
-              BillService.getTempHeader($scope.header.DocNo).then(function (header) {
-                return BillService.updateHeaderTotals(header.DocNo).then(function () {
-                  return BillService.saveBill(header, $scope.cart.items).then(function (res) {
-                    $scope.billdetail = _.map($scope.cart.items, function (item) {
-                      if (item.SuspendDepDocNo) {
-                        $scope.header.isSuspended = true;
-                        $scope.header.SuspendDocNo = item.SuspendDepDocNo;
+              if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {} else {
+                BillService.getTempHeader($scope.header.DocNo).then(function (header) {
+                  return BillService.updateHeaderTotals(header.DocNo).then(function () {
+                    return BillService.saveBill(header, $scope.cart.items).then(function (res) {
+                      $scope.billdetail = _.map($scope.cart.items, function (item) {
+                        if (item.SuspendDepDocNo) {
+                          $scope.header.isSuspended = true;
+                          $scope.header.SuspendDocNo = item.SuspendDepDocNo;
+                        }
+                        return item;
+                      });
+                      if ($scope.header.isSuspended) {
+                        var outletUrl = AppConfig.getOutletServerUrl();
+                        if (outletUrl) {
+                          Restangular.oneUrl('DeleteSuspendBill', outletUrl + 'DeleteSuspendBill').get({ SuspendDocNo: $scope.header.SuspendDocNo }).then(function (res) {
+                            if (res == 'success') {
+                              return true;
+                            } else {
+                              return $q.reject('Invalid service');
+                            }
+                          });
+                        }
                       }
-                      return item;
+                      refresh();
+                      initBill();
+                    }, function (res) {
+                      console.log(res);
                     });
-                    if ($scope.header.isSuspended) {
-                      var outletUrl = AppConfig.getOutletServerUrl();
-                      if (outletUrl) {
-                        Restangular.oneUrl('DeleteSuspendBill', outletUrl + 'DeleteSuspendBill').get({ SuspendDocNo: $scope.header.SuspendDocNo }).then(function (res) {
-                          if (res == 'success') {
-                            return true;
-                          } else {
-                            return $q.reject('Invalid service');
-                          }
-                        });
-                      }
-                    }
-                    refresh();
-                    initBill();
-                  }, function (res) {
-                    console.log(res);
                   });
-                });
 
-              });
+                });
+              }
             }
           } else {
             if (!buttonClicked.voidBill) {
