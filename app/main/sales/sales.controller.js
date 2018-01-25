@@ -23,6 +23,7 @@ angular.module('itouch.controllers')
       var submitted = false;
       var businessDate = ControlService.getBusinessDate(true);
       var Suspended = false;
+
       //var TotalEnterQty = 0;
      // var SuspendDepDocNo =
 
@@ -874,6 +875,7 @@ angular.module('itouch.controllers')
         VoidTop: function (fn) {
           Suspended = false;
           var item = $scope.cart.selectedItem;
+          var last = Object.keys($scope.cart.items).length - 1;
           if (item) {
             if (item.ItemType == 'PWI') {
               return;
@@ -947,6 +949,39 @@ angular.module('itouch.controllers')
                   });
                 }
               }
+            }
+
+            if (last == 0) {
+              BillService.getTempHeader($scope.header.DocNo).then(function (header) {
+                return BillService.updateHeaderTotals(header.DocNo).then(function () {
+                  return BillService.saveBill(header, $scope.cart.items).then(function (res) {
+                    $scope.billdetail = _.map($scope.cart.items, function (item) {
+                      if (item.SuspendDepDocNo) {
+                        $scope.header.isSuspended = true;
+                        $scope.header.SuspendDocNo = item.SuspendDepDocNo;
+                      }
+                      return item;
+                    });
+                    if ($scope.header.isSuspended) {
+                      var outletUrl = AppConfig.getOutletServerUrl();
+                      if (outletUrl) {
+                        Restangular.oneUrl('DeleteSuspendBill', outletUrl + 'DeleteSuspendBill').get({ SuspendDocNo: $scope.header.SuspendDocNo }).then(function (res) {
+                          if (res == 'success') {
+                            return true;
+                          } else {
+                            return $q.reject('Invalid service');
+                          }
+                        });
+                      }
+                    }
+                    refresh();
+                    initBill();
+                  }, function (res) {
+                    console.log(res);
+                  });
+                });
+
+              });
             }
           } else {
             if (!buttonClicked.voidBill) {
@@ -1079,7 +1114,6 @@ angular.module('itouch.controllers')
                 //if (authorityCheck(fn)) {
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
               if (empty) {
-                SuspendService.voidBill($scope.header.DocNo);
                 if (authorityCheck(fn)) {
                   // if (Suspended == true) {
                   //   return Suspended = false;
