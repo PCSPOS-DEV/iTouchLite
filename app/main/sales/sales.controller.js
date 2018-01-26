@@ -500,10 +500,10 @@ angular.module('itouch.controllers')
        * Manages the sales item click event
        * @param item
        */
-      $scope.bflag = false;
+      $scope.bkey = false;
       var priceFormShown = false;
       $scope.onKeyClick = function (item) {
-        $scope.bflag = true;
+        $scope.bkey = true;
         $scope.data.barcodeMode = false;
         if (item) {
           if (item.Type == 'P') {
@@ -538,8 +538,9 @@ angular.module('itouch.controllers')
             });
           }
           fetchSelectedItem($scope.selectedItem);
-          $scope.bflag = false;
+          
         }
+        $scope.bkey = false;
       };
 
       var showPriceForm = function () {
