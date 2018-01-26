@@ -500,8 +500,10 @@ angular.module('itouch.controllers')
        * Manages the sales item click event
        * @param item
        */
+      $scope.bflag = false;
       var priceFormShown = false;
       $scope.onKeyClick = function (item) {
+        $scope.bflag = true;
         $scope.data.barcodeMode = false;
         if (item) {
           if (item.Type == 'P') {
@@ -536,6 +538,7 @@ angular.module('itouch.controllers')
             });
           }
           fetchSelectedItem($scope.selectedItem);
+          $scope.bflag = false;
         }
       };
 
@@ -1163,8 +1166,8 @@ angular.module('itouch.controllers')
           var suspenditem = 0;
           SuspendService.fetchSuspendedBills().then(function (data) {
             suspenditem = parseInt(data.length);
-            if (_.isEmpty($scope.cart.items)) {  
-              console.log(suspenditem);     
+            if (_.isEmpty($scope.cart.items)) {
+              console.log(suspenditem);
               if (suspenditem == 0) { // GGWP
                 console.log('success');
                 if (authorityCheck(fn)) {
@@ -1178,7 +1181,7 @@ angular.module('itouch.controllers')
               Alert.warning('Cart is not empty.', 'ItouchLite');
             }
           });
-          
+
         },
         AbortFunction: function (fn) {
           if (authorityCheck(fn)) {

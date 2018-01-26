@@ -35,7 +35,7 @@
             <div class="col buttons clearfix">
               <div class="clearfix">
                 <button class="btn" ng-repeat="key in keyboard.activeKeys"
-                     ng-style="{'background-color': key.Colour }" on-tap="onKeyClick(key)">
+                     ng-style="{'background-color': key.Colour }" on-tap="onKeyClick(key)" ng-disabled="bflag">
                   <div style="font-weight: bold;">
                     <p class="desc1">{{ print(key, 'KeyDesc', 1) || print(key, 'PageDesc', 1) }}</p>
                     <p class="desc2">{{ print(key, 'KeyDesc', 2) || print(key, 'PageDesc', 2) }}</p>
