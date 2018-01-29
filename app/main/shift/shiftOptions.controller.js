@@ -2,10 +2,11 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService', '$timeout', 'Reciept', 'UploadService',
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService) {
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService', '$timeout', 'Reciept', 'UploadService', 'SuspendService',
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService, SuspendService) {
       var self = this;
       var dayEnd = false;
+      var suspenditem = 0;
 
       $scope.shiftListType = null;
       self.shiftData = shiftData;
@@ -62,18 +63,36 @@ angular.module('itouch.controllers')
       };
 
       self.openShiftCloseModal = function () {
-        $scope.shiftListType = 'close';
-        self.shiftModal.show();
+        SuspendService.fetchSuspendedBills().then(function (data) {
+          suspenditem = parseInt(data.length);
+          console.log(suspenditem);
+          if (suspenditem == 0) { // GGWP
+            $scope.shiftListType = 'close';
+            self.shiftModal.show();
+          } else {
+            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+          }
+        });
+        
       };
 
       self.openShiftExitModal = function () {
-        Alert.showConfirm('Are you sure?', 'Exit current shift', function (val) {
-          if (val == 1) {
-            dayEnd = false;
-            ShiftService.clearCurrent();
-            showReopenModal();
+        SuspendService.fetchSuspendedBills().then(function (data) {
+          suspenditem = parseInt(data.length);
+          console.log(suspenditem);
+          if (suspenditem == 0) { // GGWP
+            Alert.showConfirm('Are you sure?', 'Exit current shift', function (val) {
+              if (val == 1) {
+                dayEnd = false;
+                ShiftService.clearCurrent();
+                showReopenModal();
+              }
+            });
+          } else {
+            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
           }
         });
+        
       };
 
       self.openDeclareCash = function () {
@@ -189,62 +208,70 @@ angular.module('itouch.controllers')
 
       $scope.flag = false;
       self.openDayEnd = function () {
-        $scope.flag = true;
-        $q.all({
-          declare: ShiftService.getDeclareCashShifts(),
-          opened: ShiftService.getOpened(),
-          cartEmpty: CartItemService.isEmpty()
-        }).then(function (data) {
-          if (!data.cartEmpty) {
-            // if(!dayEnd) {
-            dayEnd = true;
-            Alert.warning('Unsaved items should be saved before day end');
-            // }
-            return true;
-          }
+        Alert.showConfirm('Are you sure you want to day end closing ?', 'Close Shift?', function (res) {
+          if (res == 1) {
+            $scope.flag = true;
+            $q.all({
+              declare: ShiftService.getDeclareCashShifts(),
+              opened: ShiftService.getOpened(),
+              cartEmpty: CartItemService.isEmpty()
+            }).then(function (data) {
+              if (!data.cartEmpty) {
+                // if(!dayEnd) {
+                // $scope.flag = false;
+                dayEnd = true;
+                Alert.warning('Unsaved items should be saved before day end');
+                // }
+                return true;
+              }
 
-          if (data.declare.length > 0) {
-            // if(!dayEnd){
-            dayEnd = true;
-            Alert.warning('Declare Cash before day end');
-            // }
+              if (data.declare.length > 0) {
+                // if(!dayEnd){
+                // $scope.flag = false;
+                dayEnd = true;
+                Alert.warning('Declare Cash before day end');
+                // }
 
-            // self.openDeclareCash();
-            return true;
-          }
+                // self.openDeclareCash();
+                return true;
+              }
 
-          if (data.opened.length > 0) {
-            // if(!dayEnd){
-            Alert.warning('Close shifts before day end');
-            dayEnd = true;
-            // }
+              if (data.opened.length > 0) {
+                // if(!dayEnd){
+                // $scope.flag = false;
+                Alert.warning('Close shifts before day end');
+                dayEnd = true;
+                // }
 
-            // self.openShiftCloseModal();
-            return true;
-          }
+                // self.openShiftCloseModal();
+                return true;
+              }
 
-          var businessDate = angular.copy(ControlService.getBusinessDate());
-          Report.printShiftClosingReport(null, businessDate);
-          $timeout(function () {
-            ShiftService.dayEnd().then(function () {
-              dayEnd = false;
-              $scope.$emit('shift-changed');
-              Alert.success('Day end completed');
-              $ionicHistory.nextViewOptions({
-                disableAnimate: false,
-                disableBack: true
-              });
-              UploadService.upload().finally(function () {
-                $state.go('app.home');
-              });
-              $scope.flag = false;
+              var businessDate = angular.copy(ControlService.getBusinessDate());
+              Report.printShiftClosingReport(null, businessDate);
+              $timeout(function () {
+                ShiftService.dayEnd().then(function () {
+                  dayEnd = false;
+                  $scope.$emit('shift-changed');
+                  Alert.success('Day end completed');
+                  $ionicHistory.nextViewOptions({
+                    disableAnimate: false,
+                    disableBack: true
+                  });
+                  UploadService.upload().finally(function () {
+                    $state.go('app.home');
+                  });
+                  $scope.flag = false;
 
-            }, function (err) {
-              dayEnd = false;
-              console.log(err);
+                }, function (err) {
+                  dayEnd = false;
+                  console.log(err);
+                });
+              }, 500);
             });
-          }, 500);
+          }
         });
+        
       };
 
       /**
@@ -284,5 +311,18 @@ angular.module('itouch.controllers')
         bdate.subtract(1, 'days');
         Report.printShiftClosingReport(null, bdate);
       };
+
+      // var SuspendShift = function () {
+      //   var suspenditem = 0;
+      //   SuspendService.fetchSuspendedBills().then(function (data) {
+      //     suspenditem = parseInt(data.length);
+      //     console.log(suspenditem);
+      //     if (suspenditem == 0) { // GGWP
+
+      //     } else {
+      //       Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+      //     }
+      //   });
+      // }
 
     }]);
