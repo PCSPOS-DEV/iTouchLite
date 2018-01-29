@@ -63,27 +63,27 @@
     <div class="row body" ng-if="bill.header.DocType != 'AV'">
       <div class="col">
         <div class="row">
-          <div class="col-70">SUBTOTAL</div>
-          <div class="col-30 text-right">$ {{bill.subTotal.toFixed(2)}}</div>
+          <div class="col-75">SUBTOTAL</div>
+          <div class="col-25 text-right padding-left" style="padding-left: 15px;">$ {{bill.subTotal.toFixed(2)}}</div>
         </div>
         <div class="row body" ng-repeat="discount in bill.tenderDiscounts">
           <!--{{item.PayTypeId}}-->
-          <div class="col-70">{{print(discount, 'Description')}}</div>
-          <div class="col-30 text-right">$ {{ (discount.Amount * -1).toFixed(2)}}</div>
+          <div class="col-75">{{print(discount, 'Description')}}</div>
+          <div class="col-25 text-right padding-left" style="padding-left: 15px;">$ {{ (discount.Amount * -1).toFixed(2)}}</div>
         </div>
         <div class="row body" ng-if="bill.tenderDiscounts && bill.tenderDiscounts.length > 0">
           <!--{{item.PayTypeId}}-->
-          <div class="col-70">Sub Total After Discount</div>
-          <div class="col-30 text-right">$ {{ (bill.subTotal - bill.tenderDiscountTotal).toFixed(2) }}</div>
+          <div class="col-75">Sub Total After Discount</div>
+          <div class="col-25 text-right padding-left" style="padding-left: 15px;">$ {{ (bill.subTotal - bill.tenderDiscountTotal).toFixed(2) }}</div>
         </div>
         <div class="row">
-          <div class="col-70">TOTAL</div>
-          <div class="col-30 text-right">$ {{bill.header.Total.toFixed(2)}}</div>
+          <div class="col-75">TOTAL</div>
+          <div class="col-25 text-right padding-left" style="padding-left: 15px;">$ {{bill.header.Total.toFixed(2)}}</div>
         </div>
           <div class="row" ng-repeat="item in bill.transactions">
             <!--{{item.PayTypeId}}-->
-            <div class="col-70">{{print(item, 'Description').toUpperCase() || 'ROUNDED'}}</div>
-            <div class="col-30 text-right">$ {{(item.Amount+item.ChangeAmount).toFixed(2)}}</div>
+            <div class="col-75">{{print(item, 'Description').toUpperCase() || 'ROUNDED'}}</div>
+            <div class="col-25 text-right padding-left" style="padding-left: 15px;">$ {{(item.Amount+item.ChangeAmount).toFixed(2)}}</div>
           </div>
           <div class="row">
             <div class="col">

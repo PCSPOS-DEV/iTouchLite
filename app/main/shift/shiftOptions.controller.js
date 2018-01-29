@@ -208,7 +208,7 @@ angular.module('itouch.controllers')
 
       $scope.flag = false;
       self.openDayEnd = function () {
-        Alert.showConfirm('Are you sure you want to day end closing ?', 'Close Shift?', function (res) {
+        Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
           if (res == 1) {
             $scope.flag = true;
             $q.all({
@@ -311,18 +311,5 @@ angular.module('itouch.controllers')
         bdate.subtract(1, 'days');
         Report.printShiftClosingReport(null, bdate);
       };
-
-      // var SuspendShift = function () {
-      //   var suspenditem = 0;
-      //   SuspendService.fetchSuspendedBills().then(function (data) {
-      //     suspenditem = parseInt(data.length);
-      //     console.log(suspenditem);
-      //     if (suspenditem == 0) { // GGWP
-
-      //     } else {
-      //       Alert.warning('Suspend Item is not empty.', 'ItouchLite');
-      //     }
-      //   });
-      // }
 
     }]);
