@@ -103,7 +103,7 @@ angular.module('itouch.services')
      * @returns {Date}
      */
     self.isNewBusinessDate = function () {
-      if (self.getBusinessDate() && moment([2018, 0, 1]).diff(self.getBusinessDate())) {
+      if (self.getBusinessDate() && moment().diff(self.getBusinessDate())) {
         return false;
       } else {
         return true;
