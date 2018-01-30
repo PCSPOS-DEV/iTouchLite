@@ -13,7 +13,7 @@ angular.module('itouch.services')
     var user = null;
 
     var setParameters = function () {
-      printer = PrintService.getPrinter();
+      
       location = LocationService.currentLocation;
       bDate = ControlService.getBusinessDate();
       shift = ShiftService.getCurrent();
@@ -24,29 +24,35 @@ angular.module('itouch.services')
 
     self.getAll = function () {
       PrinterSettings.get().then(function (res) {
-        $log.log(res);
-        data = res;
+        return data = res;
       });
     };
     self.getAll();
 
     self.creatRecieptHeader = function () {
-
+      printer = PrintService.getPrinter();
       printer.addTextAlign(printer.ALIGN_CENTER);
 
       PrintService.addImage();
       PrintService.addLineBreak();
 
-      angular.forEach(data.Header, function (row) {
-        if (row.IsBold == 'false') {
-          printer.addTextStyle(false, false, false);
-          printer.addTextSize(1, 1);
-        } else {
-          printer.addTextStyle(false, false, false);
-          printer.addTextSize(2, 1);
-        }
-        printer.addText(row.Text + '\n');
-      });
+        self.getAll();
+        console.log(data);
+      if (data != null) {
+        angular.forEach(data.Header, function (row) {
+          console.log('rows');
+          console.log(row);
+          if (row.IsBold == 'false') {
+            printer.addTextStyle(false, false, false);
+            printer.addTextSize(1, 1);
+          } else {
+            printer.addTextStyle(false, false, true);
+            printer.addTextSize(2, 1);
+          }
+          printer.addText(row.Text + '\n');
+        });
+      }
+      data = null;
     };
 
     self.creatRecieptBody = function (data) {
@@ -116,8 +122,6 @@ angular.module('itouch.services')
           printer.addTextSize(2, 1);
           PrintService.addTitle('Add Float\n');
           printer.addTextSize(1, 1);
-          console.log(floatAmount);
-          // console.log(floatAmount.toFixed(2));
           PrintService.addLine('Amount :', floatAmount + '.00');
 
           self.creatRecieptFooter();

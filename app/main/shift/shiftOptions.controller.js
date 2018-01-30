@@ -65,7 +65,6 @@ angular.module('itouch.controllers')
       self.openShiftCloseModal = function () {
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
-          console.log(suspenditem);
           if (suspenditem == 0) { // GGWP
             $scope.shiftListType = 'close';
             self.shiftModal.show();
@@ -79,7 +78,6 @@ angular.module('itouch.controllers')
       self.openShiftExitModal = function () {
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
-          console.log(suspenditem);
           if (suspenditem == 0) { // GGWP
             Alert.showConfirm('Are you sure?', 'Exit current shift', function (val) {
               if (val == 1) {

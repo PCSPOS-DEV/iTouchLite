@@ -1164,7 +1164,7 @@ angular.module('itouch.controllers')
           }
 
         },
-        Shiftoption: function (fn) {console.log($scope.cart.items);
+        Shiftoption: function (fn) {
           if (_.isEmpty($scope.cart.items)) {
             if (authorityCheck(fn)) {
               $state.go('app.shift');
