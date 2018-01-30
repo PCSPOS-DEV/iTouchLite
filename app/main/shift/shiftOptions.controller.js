@@ -7,6 +7,7 @@ angular.module('itouch.controllers')
       var self = this;
       var dayEnd = false;
       var suspenditem = 0;
+      var ask = 0;
 
       $scope.shiftListType = null;
       self.shiftData = shiftData;
@@ -198,70 +199,75 @@ angular.module('itouch.controllers')
       });
 
       $scope.flag = false;
+
       self.openDayEnd = function () {
-        Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
-          if (res == 1) {
-            $scope.flag = true;
-            $q.all({
-              declare: ShiftService.getDeclareCashShifts(),
-              opened: ShiftService.getOpened(),
-              cartEmpty: CartItemService.isEmpty()
-            }).then(function (data) {
-              if (!data.cartEmpty) {
-                // if(!dayEnd) {
-                // $scope.flag = false;
-                dayEnd = true;
-                Alert.warning('Unsaved items should be saved before day end');
-                // }
-                return true;
-              }
+        // if (ask == 0) { console.log('GGWP');ask = 0;} else console.log(ask); $scope.flag = true;
+        if (ask == 0) { 
+          Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
+            if (res == 1) {
+              $scope.flag = true;
+              $q.all({
+                declare: ShiftService.getDeclareCashShifts(),
+                opened: ShiftService.getOpened(),
+                cartEmpty: CartItemService.isEmpty()
+              }).then(function (data) {
+                ask = 1;
+                if (!data.cartEmpty) {
+                  // if(!dayEnd) {
+                  // $scope.flag = false;
+                  dayEnd = true;
+                  Alert.warning('Unsaved items should be saved before day end');
+                  // }
+                  return true;
+                }
 
-              if (data.declare.length > 0) {
-                // if(!dayEnd){
-                // $scope.flag = false;
-                dayEnd = true;
-                Alert.warning('Declare Cash before day end');
-                // }
+                if (data.declare.length > 0) {
+                  // if(!dayEnd){
+                  // $scope.flag = false;
+                  dayEnd = true;
+                  Alert.warning('Declare Cash before day end');
+                  // }
 
-                // self.openDeclareCash();
-                return true;
-              }
+                  // self.openDeclareCash();
+                  return true;
+                }
 
-              if (data.opened.length > 0) {
-                // if(!dayEnd){
-                // $scope.flag = false;
-                Alert.warning('Close shifts before day end');
-                dayEnd = true;
-                // }
+                if (data.opened.length > 0) {
+                  // if(!dayEnd){
+                  // $scope.flag = false;
+                  Alert.warning('Close shifts before day end');
+                  dayEnd = true;
+                  // }
 
-                // self.openShiftCloseModal();
-                return true;
-              }
+                  // self.openShiftCloseModal();
+                  return true;
+                }
 
-              var businessDate = angular.copy(ControlService.getBusinessDate());
-              Report.printShiftClosingReport(null, businessDate);
-              $timeout(function () {
-                ShiftService.dayEnd().then(function () {
-                  dayEnd = false;
-                  $scope.$emit('shift-changed');
-                  Alert.success('Day end completed');
-                  $ionicHistory.nextViewOptions({
-                    disableAnimate: false,
-                    disableBack: true
+                var businessDate = angular.copy(ControlService.getBusinessDate());
+                Report.printShiftClosingReport(null, businessDate);
+                $timeout(function () {
+                  ShiftService.dayEnd().then(function () {
+                    dayEnd = false;
+                    $scope.$emit('shift-changed');
+                    Alert.success('Day end completed');
+                    $ionicHistory.nextViewOptions({
+                      disableAnimate: false,
+                      disableBack: true
+                    });
+                    UploadService.upload().finally(function () {
+                      $state.go('app.home');
+                    });
+                    $scope.flag = false;
+
+                  }, function (err) {
+                    dayEnd = false;
+                    console.log(err);
                   });
-                  UploadService.upload().finally(function () {
-                    $state.go('app.home');
-                  });
-                  $scope.flag = false;
-
-                }, function (err) {
-                  dayEnd = false;
-                  console.log(err);
-                });
-              }, 500);
-            });
-          }
-        });
+                }, 500);
+              });
+            }
+          });
+        }
 
       };
 
