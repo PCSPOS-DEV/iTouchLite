@@ -372,7 +372,7 @@ angular.module('itouch', [
           showTodayButton: true,
           dateFormat: 'dd MMMM yyyy',
           closeOnSelect: false,
-          disableWeekdays: [6]
+          disableWeekdays: []
         };
         ionicDatePickerProvider.configDatePicker(datePickerObj);
 
