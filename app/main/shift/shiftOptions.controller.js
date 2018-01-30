@@ -72,25 +72,18 @@ angular.module('itouch.controllers')
             Alert.warning('Suspend Item is not empty.', 'ItouchLite');
           }
         });
-        
+
       };
 
       self.openShiftExitModal = function () {
-        SuspendService.fetchSuspendedBills().then(function (data) {
-          suspenditem = parseInt(data.length);
-          if (suspenditem == 0) { // GGWP
-            Alert.showConfirm('Are you sure?', 'Exit current shift', function (val) {
-              if (val == 1) {
-                dayEnd = false;
-                ShiftService.clearCurrent();
-                showReopenModal();
-              }
-            });
-          } else {
-            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+        Alert.showConfirm('Are you sure?', 'Exit current shift', function (val) {
+          if (val == 1) {
+            dayEnd = false;
+            ShiftService.clearCurrent();
+            showReopenModal();
           }
         });
-        
+
       };
 
       self.openDeclareCash = function () {
@@ -269,7 +262,7 @@ angular.module('itouch.controllers')
             });
           }
         });
-        
+
       };
 
       /**
