@@ -14,6 +14,10 @@
                 <input type="text" ng-model="ctrl.settings.outletServerUrl">
               </label>
               <label class="item item-input item-stacked-label">
+                <span class="input-label">Business Date</span>
+                <input type="text" ng-model="ctrl.settings.business_date" ng-click="setBDate()" readonly>
+              </label>
+              <label class="item item-input item-stacked-label">
                 <span class="input-label">Location ID</span>
                 <input type="tel" ng-model="ctrl.settings.loc_id">
               </label>
@@ -29,10 +33,7 @@
                 <span class="input-label">Cash ID</span>
                 <input type="tel" ng-model="ctrl.settings.cash_id">
               </label>
-               <label class="item item-input item-stacked-label">
-                <span class="input-label">Business Date</span>
-                <input type="text" ng-model="ctrl.settings.business_date" ng-click="setBDate()"" readonly>
-              </label>
+               
             </div>
             <div class="row">
               <div class="col">

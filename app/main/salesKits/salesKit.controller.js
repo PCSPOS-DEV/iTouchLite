@@ -13,6 +13,7 @@ angular.module('itouch.controllers')
       var update = false;
       var customQty = 0;
       var oldCustomQty = 0;
+      var kit1 = 0;
 
       var full = function () {
         /*
@@ -263,7 +264,9 @@ angular.module('itouch.controllers')
       $scope.$on('save', function (event, salesKit) {
         $scope.salesKits = salesKit;
         submitted = false;
+        kit1 = 1;
         $scope.save();
+        
       });
 
       $scope.save = function () {
@@ -271,6 +274,13 @@ angular.module('itouch.controllers')
           if (full()) {
             submitted = true;
             var item = angular.copy($scope.salesKits);
+            if(kit1 == 1) {
+              item.Qty = $scope.qty.value;
+              angular.forEach(item.selectedList, function (item) {
+                item.Qty *= $scope.qty.value;  
+              });
+              kit1 = 2;
+            }
             var omitList = ['$$hashKey', 'Default', 'Quantity', 'Priority', 'PLU_Description1', 'PLU_Description2', 'KitchenId', 'SubPlu1Id', 'SubPlu2Id', 'SubPlu3Id', 'DepartmentId', 'UOM_Id', 'HouseBarCode', 'Selected', 'AddedAt', 'key'];
             var selectedList = [];
             _.map(item.selectedList, function (i) {
@@ -289,6 +299,9 @@ angular.module('itouch.controllers')
             var operations = [];
             var voidProm = null;
             item.Qty = customQty;
+            if(kit1 == 2) {
+              item.Qty = $scope.qty.value;
+            }
             if (update) {
               // var oldItem = $scope.cart.selectedItem;
               // console.log(oldItem);
