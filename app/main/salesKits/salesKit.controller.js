@@ -33,6 +33,9 @@ angular.module('itouch.controllers')
         });
         var componentCount = Object.keys($scope.salesKits.component).length;
         var currentOrderQty = $scope.qty.value;
+        if (kit1 == 1) {
+          update = false;
+        }
         if (update) {
           currentOrderQty = oldCustomQty;
           componentCount = 1;
@@ -264,6 +267,7 @@ angular.module('itouch.controllers')
       $scope.$on('save', function (event, salesKit) {
         $scope.salesKits = salesKit;
         submitted = false;
+        
         kit1 = 1;
         $scope.save();
         
@@ -271,6 +275,8 @@ angular.module('itouch.controllers')
 
       $scope.save = function () {
         if (!submitted) {
+          console.log('full');
+          console.log(full());
           if (full()) {
             submitted = true;
             var item = angular.copy($scope.salesKits);
