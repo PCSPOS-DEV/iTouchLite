@@ -66,12 +66,12 @@ angular.module('itouch.controllers')
       self.openShiftCloseModal = function () {
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
-          if (suspenditem == 0) { // GGWP
+          // if (suspenditem == 0) { // GGWP
             $scope.shiftListType = 'close';
             self.shiftModal.show();
-          } else {
-            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
-          }
+          // } else {
+          //   Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+          // }
         });
 
       };
@@ -84,7 +84,6 @@ angular.module('itouch.controllers')
             showReopenModal();
           }
         });
-
       };
 
       self.openDeclareCash = function () {
@@ -199,10 +198,9 @@ angular.module('itouch.controllers')
       });
 
       $scope.flag = false;
-
-      self.openDayEnd = function () {
-        // if (ask == 0) { console.log('GGWP');ask = 0;} else console.log(ask); $scope.flag = true;
+      self.openDayEnd = function() {
         if (ask == 0) { 
+          ask = 1;
           Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
             if (res == 1) {
               $scope.flag = true;
@@ -211,21 +209,18 @@ angular.module('itouch.controllers')
                 opened: ShiftService.getOpened(),
                 cartEmpty: CartItemService.isEmpty()
               }).then(function (data) {
-                ask = 1;
                 if (!data.cartEmpty) {
                   // if(!dayEnd) {
-                  // $scope.flag = false;
-                  dayEnd = true;
-                  Alert.warning('Unsaved items should be saved before day end');
+                    dayEnd = true;
+                    Alert.warning('Unsaved items should be saved before day end');
                   // }
                   return true;
                 }
 
                 if (data.declare.length > 0) {
                   // if(!dayEnd){
-                  // $scope.flag = false;
-                  dayEnd = true;
-                  Alert.warning('Declare Cash before day end');
+                    dayEnd = true;
+                    Alert.warning('Declare Cash before day end');
                   // }
 
                   // self.openDeclareCash();
@@ -234,9 +229,8 @@ angular.module('itouch.controllers')
 
                 if (data.opened.length > 0) {
                   // if(!dayEnd){
-                  // $scope.flag = false;
-                  Alert.warning('Close shifts before day end');
-                  dayEnd = true;
+                    Alert.warning('Close shifts before day end');
+                    dayEnd = true;
                   // }
 
                   // self.openShiftCloseModal();
@@ -257,7 +251,6 @@ angular.module('itouch.controllers')
                     UploadService.upload().finally(function () {
                       $state.go('app.home');
                     });
-                    $scope.flag = false;
 
                   }, function (err) {
                     dayEnd = false;
@@ -268,8 +261,8 @@ angular.module('itouch.controllers')
             }
           });
         }
-
-      };
+        
+      }
 
       /**
        * Opens the Business Date picker
