@@ -387,9 +387,9 @@ angular.module('itouch.services')
         DB.clearQueue();
         var def = $q.defer();
         return self.loadLineNewNumber().then(function (ln) {
-          var success = function () {
-            // BillService.saveReceiptId(bill.header.DocNo);
-          };
+          // var success = function () {
+          //   // BillService.saveReceiptId(bill.header.DocNo);
+          // };
           item.LineNumber = ln;
           item.ParentItemLineNumber = 0;
           angular.forEach(item.selectedList, function (sKItem) {
@@ -878,17 +878,17 @@ angular.module('itouch.services')
 
           angular.forEach(required, function (attribute) {
             if (_.isUndefined(skitem[attribute]) || skitem[attribute] == null) {
-                errors.push('Field ' + attribute + ' cannot be empty');
-              }
+              errors.push('Field ' + attribute + ' cannot be empty');
+            }
           });
           if (skitem.Selections) {
             angular.forEach(skitem.Selections, function (item) {
-                angular.forEach(required, function (attribute) {
-                  if (_.isUndefined(item[attribute]) || item[attribute] == null) {
-                    errors.push('Field [' + skitem.LineNumber + ']' + attribute + ' cannot be empty');
-                  }
-                });
+              angular.forEach(required, function (attribute) {
+                if (_.isUndefined(item[attribute]) || item[attribute] == null) {
+                  errors.push('Field [' + skitem.LineNumber + ']' + attribute + ' cannot be empty');
+                }
               });
+            });
           } else {
             errors.push('Nothing selected');
           }
@@ -1072,14 +1072,14 @@ angular.module('itouch.services')
               ]).then(function () {
                 deferred.resolve();
               }, function (ex) {
-                  deferred.reject(ex);
-                });
+                deferred.reject(ex);
+              });
 
               self.findSalesItems(salesKitItem.LineNumber).then(function (modifierItems) {
                 angular.forEach(modifierItems, function (modifier) {
                   DB.delete(DB_CONFIG.tableNames.bill.tempDetail, { columns: 'ItemId=? AND ItemType=? AND LineNumber=?', data: [modifier.ItemId, modifier.ItemType, modifier.LineNumber] });
                   DB.insert(DB_CONFIG.tableNames.bill.voidItems, _.pick(modifier, ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'IsExported', 'SysDateTime',
-                   'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal', 'SeqNo' ]));
+                    'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal', 'SeqNo' ]));
                 });
               });
               queue.push(deferred.promise);
@@ -1272,6 +1272,10 @@ angular.module('itouch.services')
         return DB.select(DB_CONFIG.tableNames.bill.stockTransactions, '*', { columns: 'DocNo=?', data: [DocNo] }).then(function (res) { return DB.fetchAll(res); });
       };
 
+      self.voidRounded = function () {
+        DB.delete(DB_CONFIG.tableNames.bill.tempDetail, {columns: 'ItemType=? AND ItemId=?', data: ['RND', '0']});
+      };
+
       self.updateHeaderTotals = function (DocNo, items) {
         DB.delete(DB_CONFIG.tableNames.bill.tempDetail, {columns: 'ItemType=? AND ItemId=?', data: ['RND', '0']});
         var location = LocationService.currentLocation;
@@ -1315,8 +1319,8 @@ angular.module('itouch.services')
                 itemTotalForTax += (item.OrgPrice * item.Qty).roundTo(2);
                 if (location.Tax5Option != 3) {
                   if (item.Price != 0) {
-                     arrExclusive.push(_.pick(item, ['Qty', 'OrgPrice', 'DiscAmount', 'AlteredPrice', 'TakeAway', 'Taxable', 'ItemType']));
-                   }
+                    arrExclusive.push(_.pick(item, ['Qty', 'OrgPrice', 'DiscAmount', 'AlteredPrice', 'TakeAway', 'Taxable', 'ItemType']));
+                  }
                 }
               }
               else
@@ -1431,25 +1435,25 @@ angular.module('itouch.services')
                 data.header.Tax5DiscAmount = sum.Tax5DiscAmount;
                   //console.log("updateHeaderTotals calculation");
                 var tempItem = {
-                    DocNo: data.header.DocNo,
-                    BusinessDate: data.header.BusinessDate,
-                    LocationId: data.header.LocationId,
-                    MachineId: data.header.MachineId,
-                    ItemId: 0,
-                    LineNumber: -1,
-                    ItemType: 'RND',
-                    Qty: 1,
-                    Tax1Amount: tax1Diff,
-                    Tax2Amount: tax2Diff,
-                    Tax3Amount: tax3Diff,
-                    Tax4Amount: tax4Diff,
-                    Tax5Amount: tax5Diff,
-                    PluType: 0,
-                    NoDiscount: true,
-                    MultiDiscount: false,
-                    Taxable: false,
-                    BelowCost: false
-                  };
+                  DocNo: data.header.DocNo,
+                  BusinessDate: data.header.BusinessDate,
+                  LocationId: data.header.LocationId,
+                  MachineId: data.header.MachineId,
+                  ItemId: 0,
+                  LineNumber: -1,
+                  ItemType: 'RND',
+                  Qty: 1,
+                  Tax1Amount: tax1Diff,
+                  Tax2Amount: tax2Diff,
+                  Tax3Amount: tax3Diff,
+                  Tax4Amount: tax4Diff,
+                  Tax5Amount: tax5Diff,
+                  PluType: 0,
+                  NoDiscount: true,
+                  MultiDiscount: false,
+                  Taxable: false,
+                  BelowCost: false
+                };
 
 
                 tempItem.Desc1 = 'Rounded';
@@ -1462,21 +1466,21 @@ angular.module('itouch.services')
                    //if(tax1Diff > 0 || tax2Diff > 0 || tax3Diff > 0 || tax4Diff > 0 || tax5Diff > 0){
                 if (tax1Diff != 0 || tax2Diff != 0 || tax3Diff != 0 || tax4Diff != 0 || tax5Diff != 0) {
 
-                    if (location.Tax5Option == 3) {
-                       tempItem.SubTotal = tax5Diff * -1;
-                     } else {
-                       tempItem.SubTotal = 0;
-                     }
-                    tempItem.Tax1Amount = tax1Diff;
-                    tempItem.Tax2Amount = tax2Diff;
-                    tempItem.Tax3Amount = tax3Diff;
-                    tempItem.Tax4Amount = tax4Diff;
-                    tempItem.Tax5Amount = tax5Diff;
+                  if (location.Tax5Option == 3) {
+                    tempItem.SubTotal = tax5Diff * -1;
+                  } else {
+                    tempItem.SubTotal = 0;
+                  }
+                  tempItem.Tax1Amount = tax1Diff;
+                  tempItem.Tax2Amount = tax2Diff;
+                  tempItem.Tax3Amount = tax3Diff;
+                  tempItem.Tax4Amount = tax4Diff;
+                  tempItem.Tax5Amount = tax5Diff;
 
                      //tempItem.Tax5Amount=tax5Diff;
                      //DB.delete(DB_CONFIG.tableNames.bill.tempDetail, {columns:'ItemType=? AND ItemId=?', data: ['RND','0']});
                      //adjPromise = DB.insert(DB_CONFIG.tableNames.bill.tempDetail, tempItem);
-                  }
+                }
                 DB.delete(DB_CONFIG.tableNames.bill.tempDetail, {columns: 'ItemType=? AND ItemId=?', data: ['RND', '0']});
                 adjPromise = DB.insert(DB_CONFIG.tableNames.bill.tempDetail, tempItem);
                    //else {
@@ -1512,31 +1516,31 @@ angular.module('itouch.services')
         }
         return $q.all(promises).then(function (data) {
           if (data.header && data.items) {
-           data.header.SubTotal = 0;
-           data.header.DiscAmount = 0;
-           data.header.Tax1Amount = 0;
-           data.header.Tax2Amount = 0;
-           data.header.Tax3Amount = 0;
-           data.header.Tax4Amount = 0;
-           data.header.Tax5Amount = 0;
-           data.header.Tax1DiscAmount = 0;
-           data.header.Tax2DiscAmount = 0;
-           data.header.Tax3DiscAmount = 0;
-           data.header.Tax4DiscAmount = 0;
-           data.header.Tax5DiscAmount = 0;
+            data.header.SubTotal = 0;
+            data.header.DiscAmount = 0;
+            data.header.Tax1Amount = 0;
+            data.header.Tax2Amount = 0;
+            data.header.Tax3Amount = 0;
+            data.header.Tax4Amount = 0;
+            data.header.Tax5Amount = 0;
+            data.header.Tax1DiscAmount = 0;
+            data.header.Tax2DiscAmount = 0;
+            data.header.Tax3DiscAmount = 0;
+            data.header.Tax4DiscAmount = 0;
+            data.header.Tax5DiscAmount = 0;
 
-           var itemTotalForTax = 0, itemTax5AmountTotal = 0, itemTax5DiscAmountTotal = 0, itemDiscountTotal = 0, itemSubTotal = 0, arrExclusive = [];
-           var tax1Diff = 0,
+            var itemTotalForTax = 0, itemTax5AmountTotal = 0, itemTax5DiscAmountTotal = 0, itemDiscountTotal = 0, itemSubTotal = 0, arrExclusive = [];
+            var tax1Diff = 0,
               tax2Diff = 0,
               tax3Diff = 0,
               tax4Diff = 0,
               tax5Diff = 0;
-           var Tax5Perc = 0;
-           var itemTotalForNoTax = 0, itemDiscTotalForNoTax = 0;
-           var detailTax1Total = 0, detailTax2Total = 0, detailTax3Total = 0, detailTax4Total = 0, detailTax5Total = 0;
-           var headerTax1Total = 0, headerTax2Total = 0, headerTax3Total = 0, headerTax4Total = 0, headerTax5Total = 0;
+            var Tax5Perc = 0;
+            var itemTotalForNoTax = 0, itemDiscTotalForNoTax = 0;
+            var detailTax1Total = 0, detailTax2Total = 0, detailTax3Total = 0, detailTax4Total = 0, detailTax5Total = 0;
+            var headerTax1Total = 0, headerTax2Total = 0, headerTax3Total = 0, headerTax4Total = 0, headerTax5Total = 0;
 
-           angular.forEach(data.items, function (item) {
+            angular.forEach(data.items, function (item) {
               Tax5Perc = item.Tax5Perc;
               if (item.Taxable == 'true') {
                 /*Yi Yi Po*/
@@ -1547,8 +1551,8 @@ angular.module('itouch.services')
 
                 if (location.Tax5Option != 3) {
                   if (item.Price != 0) {
-                     arrExclusive.push(_.pick(item, ['Qty', 'OrgPrice', 'DiscAmount', 'AlteredPrice', 'TakeAway', 'Taxable', 'ItemType']));
-                   }
+                    arrExclusive.push(_.pick(item, ['Qty', 'OrgPrice', 'DiscAmount', 'AlteredPrice', 'TakeAway', 'Taxable', 'ItemType']));
+                  }
                 }
               }
               else
@@ -1566,9 +1570,9 @@ angular.module('itouch.services')
 
 
             });
-           var tempHeader = {};
+            var tempHeader = {};
 
-           if (location.Tax5Option == 3) {
+            if (location.Tax5Option == 3) {
                   /*Yi Yi Po*/
               tempHeader.SubTotal = itemTotalForTax;
               tempHeader.AlteredPrice = itemTotalForTax;
@@ -1606,8 +1610,8 @@ angular.module('itouch.services')
               data.header.Tax5DiscAmount = tempHeader.Tax5DiscAmount;*/
 
 
-           var columns = 'SUM(SubTotal) AS SubTotal,SUM(Tax1Amount) AS Tax1Amount, SUM(Tax2Amount) AS Tax2Amount, SUM(Tax3Amount) AS Tax3Amount, SUM(Tax4Amount) AS Tax4Amount, SUM(Tax5Amount) AS Tax5Amount, SUM(Tax1DiscAmount) AS Tax1DiscAmount, SUM(Tax2DiscAmount) AS Tax2DiscAmount, SUM(Tax3DiscAmount) AS Tax3DiscAmount,  SUM(Tax4DiscAmount) AS Tax4DiscAmount,  SUM(Tax5DiscAmount) AS Tax5DiscAmount';
-           return DB.select(DB_CONFIG.tableNames.bill.tempDetail, columns, { columns: 'DocNo = ?', data: [data.header.DocNo] }).then(function (res) {
+            var columns = 'SUM(SubTotal) AS SubTotal,SUM(Tax1Amount) AS Tax1Amount, SUM(Tax2Amount) AS Tax2Amount, SUM(Tax3Amount) AS Tax3Amount, SUM(Tax4Amount) AS Tax4Amount, SUM(Tax5Amount) AS Tax5Amount, SUM(Tax1DiscAmount) AS Tax1DiscAmount, SUM(Tax2DiscAmount) AS Tax2DiscAmount, SUM(Tax3DiscAmount) AS Tax3DiscAmount,  SUM(Tax4DiscAmount) AS Tax4DiscAmount,  SUM(Tax5DiscAmount) AS Tax5DiscAmount';
+            return DB.select(DB_CONFIG.tableNames.bill.tempDetail, columns, { columns: 'DocNo = ?', data: [data.header.DocNo] }).then(function (res) {
               var sum = DB.fetch(res);
               var adjPromise = null;
               if (sum) {
@@ -1646,44 +1650,44 @@ angular.module('itouch.services')
 
 
                 if (tax1Diff > 0 || tax2Diff > 0 || tax3Diff > 0 || tax4Diff > 0 || tax5Diff > 0) {
-                    var tempItem = {
-                       DocNo: data.header.DocNo,
-                       BusinessDate: data.header.BusinessDate,
-                       LocationId: data.header.LocationId,
-                       MachineId: data.header.MachineId,
-                       ItemId: 0,
-                       LineNumber: -1,
-                       ItemType: 'RND',
-                       Qty: 1,
-                       Tax1Amount: tax1Diff,
-                       Tax2Amount: tax2Diff,
-                       Tax3Amount: tax3Diff,
-                       Tax4Amount: tax4Diff,
-                       Tax5Amount: tax5Diff,
-                       PluType: 0,
-                       NoDiscount: true,
-                       MultiDiscount: false,
-                       Taxable: false,
-                       BelowCost: false
-                     };
-                    if (location.Tax5Option == 3) {
-                       tempItem.SubTotal = tax5Diff * -1;
-                     } else {
-                       tempItem.SubTotal = 0;
-                     }
-                    tempItem.Desc1 = 'Rounded';
-                    tempItem.Desc2 = 'Rounded';
-                    tempItem.TakeAway = false;
-                    tempItem.OrderedDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
-                    tempItem = prepareItem(tempItem);
-                     /*Yi Yi Po*/
-                    DB.delete(DB_CONFIG.tableNames.bill.tempDetail, {columns: 'ItemType=?', data: ['RND']});
-                     /*--*/
-                    adjPromise = DB.insert(DB_CONFIG.tableNames.bill.tempDetail, tempItem);
-
+                  var tempItem = {
+                    DocNo: data.header.DocNo,
+                    BusinessDate: data.header.BusinessDate,
+                    LocationId: data.header.LocationId,
+                    MachineId: data.header.MachineId,
+                    ItemId: 0,
+                    LineNumber: -1,
+                    ItemType: 'RND',
+                    Qty: 1,
+                    Tax1Amount: tax1Diff,
+                    Tax2Amount: tax2Diff,
+                    Tax3Amount: tax3Diff,
+                    Tax4Amount: tax4Diff,
+                    Tax5Amount: tax5Diff,
+                    PluType: 0,
+                    NoDiscount: true,
+                    MultiDiscount: false,
+                    Taxable: false,
+                    BelowCost: false
+                  };
+                  if (location.Tax5Option == 3) {
+                    tempItem.SubTotal = tax5Diff * -1;
                   } else {
-                    adjPromise = $q.when(true);
+                    tempItem.SubTotal = 0;
                   }
+                  tempItem.Desc1 = 'Rounded';
+                  tempItem.Desc2 = 'Rounded';
+                  tempItem.TakeAway = false;
+                  tempItem.OrderedDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+                  tempItem = prepareItem(tempItem);
+                     /*Yi Yi Po*/
+                  DB.delete(DB_CONFIG.tableNames.bill.tempDetail, {columns: 'ItemType=?', data: ['RND']});
+                     /*--*/
+                  adjPromise = DB.insert(DB_CONFIG.tableNames.bill.tempDetail, tempItem);
+
+                } else {
+                  adjPromise = $q.when(true);
+                }
               } else {
                 adjPromise = $q.when(true);
               }
@@ -1698,9 +1702,9 @@ angular.module('itouch.services')
             });
 
 
-         } else {
-           return $q.reject('No valid bill for this DocNo');
-         }
+          } else {
+            return $q.reject('No valid bill for this DocNo');
+          }
         });
 
       };
