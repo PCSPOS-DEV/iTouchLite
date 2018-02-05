@@ -1115,7 +1115,7 @@ angular.module('itouch.controllers')
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
               if (empty) {
                 if (authorityCheck(fn)) {
-                  BillService.voidRounded();
+                  // BillService.voidRounded();
                   // if (Suspended == true) {
                   //   return Suspended = false;
                   // }

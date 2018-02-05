@@ -156,6 +156,7 @@ angular.module('itouch.services')
               header.BusinessDate = ControlService.getBusinessDate(true);
               header.DocNo = BillService.getCurrentReceiptId();
               TempBillHeaderService.update(header.DocNo, header, true);
+              BillService.voidRounded();
 
               return DB.executeQueue();
             }
