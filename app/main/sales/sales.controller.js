@@ -32,24 +32,56 @@ angular.module('itouch.controllers')
         numArr.push(i);
       }
 
-      var mobileSelect1 = new MobileSelect({
-        trigger: '#qty',
-        wheels: [
-            {data: numArr}
+      var config = {
+        title: 'Select a quantity',
+        items: [
+          {data: numArr}
         ],
-
-        callback: function (tempValue) {    //Mandatory
-          // console.log('RtempValue');
-          // console.log(tempValue);
-          var SelectedQTy = tempValue[0] + 1;
-          if (SelectedQTy) {
-            $scope.qty.value = SelectedQTy;
-            refresh();
-          } else {
-            $scope.qty.value = 1;
-          }
+        positiveButtonText: 'Done',
+        negativeButtonText: 'Cancel'
+      };
+      $scope.QtySelect = function () {
+        console.log('1');
+        if (window.SelectorCordovaPlugin) {
+          var configSimple1 = {
+            title: 'How Many Fruit?',
+            items: [
+              {data: numArr}
+            ],
+            positiveButtonText: 'Ok',
+            negativeButtonText: 'Cancel'
+          };
+          window.SelectorCordovaPlugin.showSelector(configSimple1, function (result) {
+            console.log('result: ' + JSON.stringify(result));
+            var alertPopup = $ionicPopup.alert({
+              title: 'You Selected',
+              template: '<center>' + result[0].description + ' ' + result[1].description + '(s)' + '</center>'
+            });
+          });
+        } else {
+          console.log('no plugin');
+          alert('cordova-wheel-selector-plugin not available in browser, install and run on device!');
         }
-      });
+      };
+
+      // var mobileSelect1 = new MobileSelect({
+      //   trigger: '#qty',
+      //   wheels: [
+      //       {data: numArr}
+      //   ],
+
+      //   callback: function (tempValue) {    //Mandatory
+      //     // console.log('RtempValue');
+      //     // console.log(tempValue);
+      //     var SelectedQTy = tempValue[0] + 1;
+      //     if (SelectedQTy) {
+      //       $scope.qty.value = SelectedQTy;
+      //       refresh();
+      //     } else {
+      //       $scope.qty.value = 1;
+      //     }
+      //   }
+      // });
 
       $scope.salesKits = {
         list: {},
@@ -1141,6 +1173,7 @@ angular.module('itouch.controllers')
               } else {
                 $scope.flag = true;
                 SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
+                  console.log($scope.header.DocNo);
                   Suspended = true; //GGWP
                   refresh();
                 }, function (ex) {
@@ -1189,19 +1222,21 @@ angular.module('itouch.controllers')
         //   });
         // },
         AbortFunction: function (fn) {
+          $scope.flag = false;
           if (authorityCheck(fn)) {
             Suspended = false;
             if (_.size($scope.cart.items) > 0) {
-              Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
-                if (res == 1) {
-                  BillService.getTempHeader($scope.header.DocNo).then(function (header) {
+              // Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
+              //   if (res == 1) {
+              $scope.flag = true;
+              BillService.getTempHeader($scope.header.DocNo).then(function (header) {
                     // $scope.tenderHeader = header;
                     // console.log($scope.header);
-                    return BillService.updateHeaderTotals(header.DocNo).then(function () {
+                return BillService.updateHeaderTotals(header.DocNo).then(function () {
                           //$scope.header.DocType = 'AV';
                           //$scope.header
-                      header.DocType = 'AV';
-                      return BillService.saveBill(header, $scope.cart.items).then(function (res) {
+                  header.DocType = 'AV';
+                  return BillService.saveBill(header, $scope.cart.items).then(function (res) {
                         Reciept.printAbort($scope.header.DocNo);
                               /*Yi Yi Po*/
                         $scope.billdetail = _.map($scope.cart.items, function (item) {
@@ -1209,6 +1244,7 @@ angular.module('itouch.controllers')
                             $scope.header.isSuspended = true;
                             $scope.header.SuspendDocNo = item.SuspendDepDocNo;
                           }
+                          $scope.flag = false;
                           return item;
                         });
                         if ($scope.header.isSuspended) {
@@ -1229,14 +1265,15 @@ angular.module('itouch.controllers')
                       }, function (res) {
                         console.log(res);
                       });
-                    });
+                });
 
-                  });
-                }
               });
+              //   }
+              // });
             } else {
               Alert.warning('No items in the cart!');
             }
+            $scope.flag = false;
           }
 
         },

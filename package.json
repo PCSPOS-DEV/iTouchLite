@@ -84,6 +84,7 @@
     "cordova-plugin-whitelist": "1",
     "cordova-plugin-x-toast": "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git",
     "cordova-sqlite-storage": "https://github.com/litehelpers/Cordova-sqlite-storage.git",
+    "cordova-wheel-selector-plugin": "^1.0.9",
     "ionic-plugin-keyboard": "~2.2.1",
     "mobile-select": "^1.1.2",
     "resgrid.cordova.plugins.rollbar": "~1.4.0",
@@ -113,7 +114,8 @@
         "ROLLBAR_ENVIRONMENT": "<rollbar_environment>"
       },
       "com.bluefletch.honeywell.captuvo": {},
-      "cordova-plugin-image-picker": {}
+      "cordova-plugin-image-picker": {},
+      "cordova-wheel-selector-plugin": {}
     }
   }
 }
