@@ -84,6 +84,7 @@
     "cordova-plugin-whitelist": "1",
     "cordova-plugin-x-toast": "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git",
     "cordova-sqlite-storage": "https://github.com/litehelpers/Cordova-sqlite-storage.git",
+    "ionic-angular": "^3.9.2",
     "ionic-plugin-keyboard": "~2.2.1",
     "mobile-select": "^1.1.2",
     "resgrid.cordova.plugins.rollbar": "~1.4.0",

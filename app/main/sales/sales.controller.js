@@ -27,29 +27,29 @@ angular.module('itouch.controllers')
       //var TotalEnterQty = 0;
      // var SuspendDepDocNo =
 
-      var numArr = [];
-      for (var i = 1; i <= 50; i++) {
-        numArr.push(i);
-      }
+      // var numArr = [];
+      // for (var i = 1; i <= 50; i++) {
+      //   numArr.push(i);
+      // }
 
-      var mobileSelect1 = new MobileSelect({
-        trigger: '#qty',
-        wheels: [
-            {data: numArr}
-        ],
+      // var mobileSelect1 = new MobileSelect({
+      //   trigger: '#qty',
+      //   wheels: [
+      //       {data: numArr}
+      //   ],
 
-        callback: function (tempValue) {    //Mandatory
-          // console.log('RtempValue');
-          // console.log(tempValue);
-          var SelectedQTy = tempValue[0] + 1;
-          if (SelectedQTy) {
-            $scope.qty.value = SelectedQTy;
-            refresh();
-          } else {
-            $scope.qty.value = 1;
-          }
-        }
-      });
+      //   callback: function (tempValue) {    //Mandatory
+      //     // console.log('RtempValue');
+      //     // console.log(tempValue);
+      //     var SelectedQTy = tempValue[0] + 1;
+      //     if (SelectedQTy) {
+      //       $scope.qty.value = SelectedQTy;
+      //       refresh();
+      //     } else {
+      //       $scope.qty.value = 1;
+      //     }
+      //   }
+      // });
 
       $scope.salesKits = {
         list: {},
@@ -1141,6 +1141,7 @@ angular.module('itouch.controllers')
               } else {
                 $scope.flag = true;
                 SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
+                  console.log($scope.header.DocNo);
                   Suspended = true; //GGWP
                   refresh();
                 }, function (ex) {
@@ -1189,11 +1190,13 @@ angular.module('itouch.controllers')
         //   });
         // },
         AbortFunction: function (fn) {
+          $scope.flag = false;
           if (authorityCheck(fn)) {
             Suspended = false;
             if (_.size($scope.cart.items) > 0) {
               Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
                 if (res == 1) {
+                  $scope.flag = true;
                   BillService.getTempHeader($scope.header.DocNo).then(function (header) {
                     // $scope.tenderHeader = header;
                     // console.log($scope.header);
@@ -1209,6 +1212,7 @@ angular.module('itouch.controllers')
                             $scope.header.isSuspended = true;
                             $scope.header.SuspendDocNo = item.SuspendDepDocNo;
                           }
+                          $scope.flag = false;
                           return item;
                         });
                         if ($scope.header.isSuspended) {
@@ -1237,6 +1241,7 @@ angular.module('itouch.controllers')
             } else {
               Alert.warning('No items in the cart!');
             }
+            $scope.flag = false;
           }
 
         },
