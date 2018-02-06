@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('VoidBillCtrl', ['$scope', 'VoidBillService', 'ControlService', 'Reciept', 'Alert', '$ionicModal', '$timeout',
-    function ($scope, VoidBillService, ControlService, Reciept, Alert, $ionicModal, $timeout) {
+  .controller('VoidBillCtrl', ['$scope', 'VoidBillService', 'ControlService', 'Reciept', 'Alert', '$ionicModal', '$timeout', 'BillService',
+    function ($scope, VoidBillService, ControlService, Reciept, Alert, $ionicModal, $timeout, BillService) {
       var self = this;
       self.data = {
         bills: [],
@@ -18,7 +18,6 @@ angular.module('itouch.controllers')
       });
 
       var refresh = function () {
-
         self.loading = true;
         VoidBillService.getBillList(ControlService.getBusinessDate(true)).then(function (data) {
           self.data.bills = data;
@@ -38,6 +37,7 @@ angular.module('itouch.controllers')
         if (bill) {
           Alert.showConfirm('Are you sure?', 'Void bill', function (res) {
             if (res == 1) {
+              BillService.voidOldBill();
               VoidBillService.voidBill(bill.DocNo).then(function (DocNo) {
                 $scope.$emit('initBill');
                 $scope.$emit('refresh-cart');

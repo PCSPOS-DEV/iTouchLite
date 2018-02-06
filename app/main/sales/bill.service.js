@@ -1276,6 +1276,10 @@ angular.module('itouch.services')
         DB.delete(DB_CONFIG.tableNames.bill.tempDetail, {columns: 'ItemType=? AND ItemId=?', data: ['RND', '0']});
       };
 
+      self.voidOldBill = function () {
+        DB.delete(DB_CONFIG.tableNames.bill.tempHeader);
+      };
+
       self.updateHeaderTotals = function (DocNo, items) {
         DB.delete(DB_CONFIG.tableNames.bill.tempDetail, {columns: 'ItemType=? AND ItemId=?', data: ['RND', '0']});
         var location = LocationService.currentLocation;
