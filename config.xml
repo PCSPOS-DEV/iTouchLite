@@ -74,5 +74,4 @@
     <plugin name="com.bluefletch.honeywell.captuvo" spec="https://github.com/BlueFletch/cordova-plugin-honeywell-captuvo.git" />
     <plugin name="cordova-plugin-image-picker" spec="https://github.com/wymsee/cordova-imagePicker.git" />
     <engine name="ios" spec="~4.5.4" />
-    <plugin name="cordova-wheel-selector-plugin" spec="^1.0.9" />
 </widget>
