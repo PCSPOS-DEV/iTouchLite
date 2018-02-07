@@ -13,7 +13,7 @@ angular.module('itouch.services')
     var user = null;
 
     var setParameters = function () {
-      
+      printer = PrintService.getPrinter();
       location = LocationService.currentLocation;
       bDate = ControlService.getBusinessDate();
       shift = ShiftService.getCurrent();
@@ -24,35 +24,33 @@ angular.module('itouch.services')
 
     self.getAll = function () {
       PrinterSettings.get().then(function (res) {
-        return data = res;
+        $log.log(res);
+        data = res;
       });
     };
     self.getAll();
 
     self.creatRecieptHeader = function () {
-      printer = PrintService.getPrinter();
+
       printer.addTextAlign(printer.ALIGN_CENTER);
 
       PrintService.addImage();
       PrintService.addLineBreak();
 
-        self.getAll();
-        console.log(data);
-      if (data != null) {
-        angular.forEach(data.Header, function (row) {
-          console.log('rows');
-          console.log(row);
-          if (row.IsBold == 'false') {
-            printer.addTextStyle(false, false, false);
-            printer.addTextSize(1, 1);
-          } else {
-            printer.addTextStyle(false, false, true);
-            printer.addTextSize(2, 1);
-          }
-          printer.addText(row.Text + '\n');
-        });
-      }
-      data = null;
+      angular.forEach(data.Header, function (row) {
+        if (row.IsBold == 'true') {
+          printer.addTextStyle(false, false, true);
+        } else {
+          printer.addTextStyle(false, false, false);
+        }
+
+        if (row.Type == 'Header' && row.Sequence == 1) {
+          printer.addTextSize(2, 2);
+        } else {
+          printer.addTextSize(1, 1);
+        }
+        printer.addText(row.Text + '\n');
+      });
     };
 
     self.creatRecieptBody = function (data) {
@@ -343,11 +341,11 @@ angular.module('itouch.services')
               //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(row.Count-voidCashCount) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
 
               //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(rowCount-voidCashCount) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
-              var voidCashCount = (data.voidtransactionBreakdown[row.Id] || 0);
-              var rowCount = (row.Count || 0);
+                var voidCashCount = (data.voidtransactionBreakdown[row.Id] || 0);
+                var rowCount = (row.Count || 0);
               //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(rowCount-((voidCashCount?voidCashCount:0)*2)) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
-              PrintService.addTextLine('  *' + row.Description1 + '      ' + '' + (rowCount - ((voidCashCount ? voidCashCount : 0) * 2)) + '      ' + ((row.Amount) || 0).toFixed(2) + '*');
-            });
+                PrintService.addTextLine('  *' + row.Description1 + '      ' + '' + (rowCount - ((voidCashCount ? voidCashCount : 0) * 2)) + '      ' + ((row.Amount) || 0).toFixed(2) + '*');
+              });
             }
             if (data.transactionBreakdown && data.transactionBreakdown.nonCash) {
               PrintService.addTextLine('NON-CASH COLLECTION');
@@ -355,31 +353,31 @@ angular.module('itouch.services')
               /*PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount)||0).toFixed(2), ""+(row.Count||0));*/
               // localTotal += row.Amount;
               //var voidRowCount=data.voidtransactionBreakdown[row.Id]?data.voidtransactionBreakdown[row.Id]:0;
-              var voidRowCount = (data.voidtransactionBreakdown[row.Id] || 0);
-              var rowCount = (row.Count || 0);
-              PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount) || 0).toFixed(2), '' + (rowCount - (voidRowCount * 2)));
+                var voidRowCount = (data.voidtransactionBreakdown[row.Id] || 0);
+                var rowCount = (row.Count || 0);
+                PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount) || 0).toFixed(2), '' + (rowCount - (voidRowCount * 2)));
               //PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount)||0).toFixed(2), ""+(row.Count-voidRowCount));
-            });
+              });
             }
 
             if (data.overTenderBreakdown) {
               PrintService.addTextLine('  OVER TENDER COLLECTION');
               _.forEach(data.overTenderBreakdown, function (row) {
-              var desc = '';
-              switch (row.OverTenderTypeId) {
-                case 2:
-                  desc = 'Credit Note';
-                  break;
-                default:
-                  desc = 'Forfeited';
-              }
-              var  vdOvertransCount = (data.voidoverTenderBreakdown[row.OverTenderTypeId] || 0);
-              var rowCount = (row.Count || 0);
-              PrintService.addReportLine(' ' + desc, (row.Amount || 0).toFixed(2), '' + (rowCount - (vdOvertransCount * 2)));
+                var desc = '';
+                switch (row.OverTenderTypeId) {
+                  case 2:
+                    desc = 'Credit Note';
+                    break;
+                  default:
+                    desc = 'Forfeited';
+                }
+                var  vdOvertransCount = (data.voidoverTenderBreakdown[row.OverTenderTypeId] || 0);
+                var rowCount = (row.Count || 0);
+                PrintService.addReportLine(' ' + desc, (row.Amount || 0).toFixed(2), '' + (rowCount - (vdOvertransCount * 2)));
 
               //PrintService.addReportLine(" "+desc, (row.Amount||0).toFixed(2), ""+(row.Count||0));
               //PrintService.addReportLine(" "+desc, (row.Amount||0).toFixed(2), ""+(row.Count -vdOvertransCount));
-            });
+              });
             }
             PrintService.addTabbedLine('LOCAL TOTAL', localTotal.toFixed(2));
             PrintService.addLineBreak();
