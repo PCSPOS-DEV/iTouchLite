@@ -23,34 +23,6 @@ angular.module('itouch.controllers')
       var submitted = false;
       var businessDate = ControlService.getBusinessDate(true);
       var Suspended = false;
-
-      //var TotalEnterQty = 0;
-     // var SuspendDepDocNo =
-
-      // var numArr = [];
-      // for (var i = 1; i <= 50; i++) {
-      //   numArr.push(i);
-      // }
-
-      // var mobileSelect1 = new MobileSelect({
-      //   trigger: '#qty',
-      //   wheels: [
-      //       {data: numArr}
-      //   ],
-
-      //   callback: function (tempValue) {    //Mandatory
-      //     // console.log('RtempValue');
-      //     // console.log(tempValue);
-      //     var SelectedQTy = tempValue[0] + 1;
-      //     if (SelectedQTy) {
-      //       $scope.qty.value = SelectedQTy;
-      //       refresh();
-      //     } else {
-      //       $scope.qty.value = 1;
-      //     }
-      //   }
-      // });
-
       $scope.salesKits = {
         list: {},
         selectedList: {},
@@ -82,27 +54,27 @@ angular.module('itouch.controllers')
         activeKeys: {}
       };
 
-      // $scope.numberPickerObject = {
-      //   inputValue: 1, //Optional
-      //   minValue: 1,
-      //   maxValue: 50,
-      //   precision: 3,  //Optional
-      //   decimalStep: 0.25,  //Optional
-      //   format: 'WHOLE',  //Optional - "WHOLE" or "DECIMAL"
-      //   unit: '',  //Optional - "m", "kg", "℃" or whatever you want
-      //   titleLabel: 'Set Qty',  //Optional
-      //   setLabel: 'Set',  //Optional
-      //   closeLabel: 'Close',  //Optional
-      //   setButtonType: 'button-positive',  //Optional
-      //   closeButtonType: 'button-stable',  //Optional
-      //   callback: function (val) {    //Mandatory
-      //     if (val) {
-      //       $scope.qty.value = val;
-      //     } else {
-      //       $scope.qty.value = 1;
-      //     }
-      //   }
-      // };
+      $scope.numberPickerObject = {
+        inputValue: 1, //Optional
+        minValue: 1,
+        maxValue: 50,
+        precision: 3,  //Optional
+        decimalStep: 0.25,  //Optional
+        format: 'WHOLE',  //Optional - "WHOLE" or "DECIMAL"
+        unit: '',  //Optional - "m", "kg", "℃" or whatever you want
+        titleLabel: 'Set Qty',  //Optional
+        setLabel: 'Set',  //Optional
+        closeLabel: 'Close',  //Optional
+        setButtonType: 'button-positive',  //Optional
+        closeButtonType: 'button-stable',  //Optional
+        callback: function (val) {    //Mandatory
+          if (val) {
+            $scope.qty.value = val;
+          } else {
+            $scope.qty.value = 1;
+          }
+        }
+      };
 
 
       /**
@@ -413,7 +385,7 @@ angular.module('itouch.controllers')
         $scope.modals.loginlModal.hide();
         modalOpen = false;
         if (close) {
-          var onGoingFunction = false;
+          onGoingFunction = false;
         }
         // console.log(AuthService.getTempUser());
         if (onGoingFunction) {
@@ -563,9 +535,7 @@ angular.module('itouch.controllers')
           }
           fetchSelectedItem($scope.selectedItem);
           $timeout(function () { $scope.bkey = false;}, 200); // in case of increase the waiting time
-
         }
-        // $scope.bkey = false;
       };
 
       var showPriceForm = function () {
@@ -682,20 +652,13 @@ angular.module('itouch.controllers')
                   item.TakeAway = true;
                 }
                 PWPService.getPWP(item, item.customQuantity || item.Qty).then(function (pwp) {
-
                   if (item.Qty == undefined) {
                     item.Qty = 0;
                     if (item.customQuantity == undefined) {
                       item.customQuantity = 1;
                     }
                   }
-                  // console.log(pwp);
-                  // console.log('item.Qty : ' + item.Qty);
-                  // console.log('pwp.Quantity : ' + pwp.Quantity);
-                  // console.log('item.customQuantity : ' + item.customQuantity);
-                  // if (pwp && (( (item.Qty >= pwp.Quantity) || item.customQuantity >= pwp.Quantity) || ( (item.Qty <= pwp.Quantity) || item.customQuantity <= pwp.Quantity))) {
                   if (pwp && ( (item.Qty >= pwp.Quantity) || item.customQuantity >= pwp.Quantity)) {
-
                     if ($scope.showpwpModal == false) {
                       $scope.showpwpModal = true;
                       $scope.pwp = pwp;
@@ -841,25 +804,20 @@ angular.module('itouch.controllers')
        * Invokes the given named function from $scope.salesFunctions
        * @param name
        */
-      // $scope.flag = false;
       $scope.invoke = function (fn) {
-        // $scope.flag = true;
         if (!_.isUndefined($scope.salesFunctions[fn.Name])) {
           $scope.data.barcodeMode = false;
           // if(authorityCheck(fn)) {
 
           if ((fn.Transact == 'true' && _.isEmpty($scope.cart.items))) {
             Alert.warning('Action not allowed');
-            // $scope.flag = false;
           } else {
             $scope.salesFunctions[fn.Name](fn);
-            // $scope.flag = false;
           }
 
           // }
         } else {
           throw new Error('Function ' + fn.Name + ' is not available.');
-          // $scope.flag = false;
         }
       };
 
@@ -904,7 +862,6 @@ angular.module('itouch.controllers')
         VoidTop: function (fn) {
           Suspended = false;
           var item = $scope.cart.selectedItem;
-          var last = Object.keys($scope.cart.items).length - 1;
           if (item) {
             if (item.ItemType == 'PWI') {
               return;
@@ -950,7 +907,6 @@ angular.module('itouch.controllers')
                                 salesKit: salesKit,
                                 update: true
                               };
-
                               $scope.modals.salesKit.show();
                             }
                           }, 500);
@@ -979,10 +935,6 @@ angular.module('itouch.controllers')
                 }
               }
             }
-
-            // if (last == 0) {
-            //   BillService.voidRounded();
-            // }
           } else {
             if (!buttonClicked.voidBill) {
               buttonClicked.voidBill = true;
@@ -1063,7 +1015,8 @@ angular.module('itouch.controllers')
                   console.log(err);
                 });
               }
-            }}
+            }
+          }
         },
         QtyMinus: function (fn) {
           var item = $scope.cart.selectedItem;
@@ -1083,7 +1036,8 @@ angular.module('itouch.controllers')
                   });
                 }
               }
-            }}
+            }
+          }
         },
         ItemReverse: function (fn) {
           if (authorityCheck(fn)) {
@@ -1105,9 +1059,7 @@ angular.module('itouch.controllers')
             }
           }
         },
-
         CallSuspendBill: function (fn) {
-
           if (!buttonClicked.recallSuspendBillModal) {
             var item = $scope.cart.selectedItem;
             buttonClicked.recallSuspendBillModal = true;
@@ -1115,10 +1067,6 @@ angular.module('itouch.controllers')
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
               if (empty) {
                 if (authorityCheck(fn)) {
-                  // BillService.voidRounded();
-                  // if (Suspended == true) {
-                  //   return Suspended = false;
-                  // }
                   Suspended = true;
                   $ionicModal.fromTemplateUrl('main/recallSuspendedBill/recallSuspendedBill.html', {
                     id: 14,
@@ -1164,31 +1112,11 @@ angular.module('itouch.controllers')
             if (authorityCheck(fn)) {
               $state.go('app.shift');
             }
-          } else {
+          }
+          else {
             Alert.warning('Cart is not empty.', 'ItouchLite');
           }
-
         },
-        // Shiftoption: function (fn) {console.log($scope.cart.items);
-        //   var suspenditem = 0;
-        //   SuspendService.fetchSuspendedBills().then(function (data) {
-        //     suspenditem = parseInt(data.length);
-        //     if (_.isEmpty($scope.cart.items)) {
-        //       console.log(suspenditem);
-        //       if (suspenditem == 0) { // GGWP
-        //         console.log('success');
-        //         if (authorityCheck(fn)) {
-        //           $state.go('app.shift');
-        //         }
-        //       } else {
-        //         Alert.warning('Suspend Item is not empty.', 'ItouchLite');
-        //       }
-        //     }
-        //     else {
-        //       Alert.warning('Cart is not empty.', 'ItouchLite');
-        //     }
-        //   });
-        // },
         AbortFunction: function (fn) {
           $scope.flag = false;
           if (authorityCheck(fn)) {
@@ -1314,17 +1242,12 @@ angular.module('itouch.controllers')
           if (authorityCheck(fn)) {
             $scope.data.tag = '';
             $ionicPopup.show({
-              template: '<input type="number" ng-model="data.tag" autofocus="autofocus">',
+              template: '<input type="tel" ng-model="data.tag" autofocus="autofocus">',
               title: 'Order Tag',
               subTitle: '',
               scope: $scope,
               buttons: [
-                {
-                  text: 'Cancel',
-                  onTap: function (e) {
-                    $scope.data.tag = '';
-                  }
-                },
+                {text: 'Cancel'},
                 {
                   text: '<b>Save</b>',
                   type: 'button-positive',
