@@ -13,7 +13,7 @@ angular.module('itouch.services')
     var user = null;
 
     var setParameters = function () {
-      
+
       location = LocationService.currentLocation;
       bDate = ControlService.getBusinessDate();
       shift = ShiftService.getCurrent();
@@ -36,8 +36,8 @@ angular.module('itouch.services')
       PrintService.addImage();
       PrintService.addLineBreak();
 
-        self.getAll();
-        console.log(data);
+      self.getAll();
+      console.log(data);
       if (data != null) {
         angular.forEach(data.Header, function (row) {
           console.log('rows');
@@ -94,7 +94,7 @@ angular.module('itouch.services')
         shift = sh;
       }
       printer.addTextAlign(printer.ALIGN_CENTER);
-      printer.addText('\nBDate: ' + bDate.format('DD/MM/YYYY') + ', Shift: ' + shift.Description1 + ', M/C: ' + machine.Code + '\n');
+      printer.addText('\nBDate: ' + moment(bDate).format('DD/MM/YYYY') + ', Shift: ' + shift.Description1 + ', M/C: ' + machine.Code + '\n');
     //printer.addText(now+' User: '+ user.Id +'\n');
       printer.addText(now + ', User: ' + user.Code + '\n');
     };
@@ -250,19 +250,20 @@ angular.module('itouch.services')
     self.printShiftClosingReport = function (shiftId, businessDate) {
       setParameters();
       if (businessDate) {
-        bDate = businessDate;
+        bDate = moment(businessDate).format('YYYY-MM-DD');
+        console.log(bDate);
       }
       $q.all({
         shift: ShiftService.getById(shiftId),
-        header: TransactService.getHeaderDetails(shiftId, bDate.format('YYYY-MM-DD')),
-        trans: TransactService.getTransDetails(shiftId, bDate.format('YYYY-MM-DD')),
-        transactionAmounts: TransactService.getTransactionAmounts(bDate.format('YYYY-MM-DD'), shiftId),
-        transactionBreakdown: TransactService.getTransactionBreakdown(bDate.format('YYYY-MM-DD'), shiftId),
-        voidtransactionBreakdown: TransactService.getVoidTransactionBreakdown(bDate.format('YYYY-MM-DD'), shiftId),
-        gst: TransactService.getGst(bDate.format('YYYY-MM-DD'), shiftId),
-        overTenderBreakdown: TransactService.getOverTenderBreakdown(bDate.format('YYYY-MM-DD'), shiftId),
-        voidoverTenderBreakdown: TransactService.getVoidOverTenderBreakdown(bDate.format('YYYY-MM-DD'), shiftId),
-        recCount: TransactService.getReceiptCount(bDate.format('YYYY-MM-DD'), shiftId),
+        header: TransactService.getHeaderDetails(shiftId, bDate),
+        trans: TransactService.getTransDetails(shiftId, bDate),
+        transactionAmounts: TransactService.getTransactionAmounts(bDate, shiftId),
+        transactionBreakdown: TransactService.getTransactionBreakdown(bDate, shiftId),
+        voidtransactionBreakdown: TransactService.getVoidTransactionBreakdown(bDate, shiftId),
+        gst: TransactService.getGst(bDate, shiftId),
+        overTenderBreakdown: TransactService.getOverTenderBreakdown(bDate, shiftId),
+        voidoverTenderBreakdown: TransactService.getVoidOverTenderBreakdown(bDate, shiftId),
+        recCount: TransactService.getReceiptCount(bDate, shiftId),
       }).then(function (data) {
       // console.log(data);
         if (data.header.void) {
@@ -296,7 +297,7 @@ angular.module('itouch.services')
             }
 
             PrintService.addLineBreak();
-            PrintService.addTextLine('BUSINESS DATE : ' + bDate.format('DD/MM/YYYY'));
+            PrintService.addTextLine('BUSINESS DATE : ' + moment(bDate).format('DD/MM/YYYY'));
           //PrintService.addTextLine('TAKEN BY : '+ user.Id);
             PrintService.addTextLine('TAKEN BY : ' + user.Code);
 
@@ -343,11 +344,11 @@ angular.module('itouch.services')
               //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(row.Count-voidCashCount) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
 
               //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(rowCount-voidCashCount) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
-              var voidCashCount = (data.voidtransactionBreakdown[row.Id] || 0);
-              var rowCount = (row.Count || 0);
+                var voidCashCount = (data.voidtransactionBreakdown[row.Id] || 0);
+                var rowCount = (row.Count || 0);
               //PrintService.addTextLine("  *"+row.Description1 + "      " + ""+(rowCount-((voidCashCount?voidCashCount:0)*2)) + "      " + ((row.Amount - row.ChangeAmount)||0).toFixed(2)+"*");
-              PrintService.addTextLine('  *' + row.Description1 + '      ' + '' + (rowCount - ((voidCashCount ? voidCashCount : 0) * 2)) + '      ' + ((row.Amount) || 0).toFixed(2) + '*');
-            });
+                PrintService.addTextLine('  *' + row.Description1 + '      ' + '' + (rowCount - ((voidCashCount ? voidCashCount : 0) * 2)) + '      ' + ((row.Amount) || 0).toFixed(2) + '*');
+              });
             }
             if (data.transactionBreakdown && data.transactionBreakdown.nonCash) {
               PrintService.addTextLine('NON-CASH COLLECTION');
@@ -355,31 +356,31 @@ angular.module('itouch.services')
               /*PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount)||0).toFixed(2), ""+(row.Count||0));*/
               // localTotal += row.Amount;
               //var voidRowCount=data.voidtransactionBreakdown[row.Id]?data.voidtransactionBreakdown[row.Id]:0;
-              var voidRowCount = (data.voidtransactionBreakdown[row.Id] || 0);
-              var rowCount = (row.Count || 0);
-              PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount) || 0).toFixed(2), '' + (rowCount - (voidRowCount * 2)));
+                var voidRowCount = (data.voidtransactionBreakdown[row.Id] || 0);
+                var rowCount = (row.Count || 0);
+                PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount) || 0).toFixed(2), '' + (rowCount - (voidRowCount * 2)));
               //PrintService.addReportLine(row.Description1, ((row.Amount - row.ChangeAmount)||0).toFixed(2), ""+(row.Count-voidRowCount));
-            });
+              });
             }
 
             if (data.overTenderBreakdown) {
               PrintService.addTextLine('  OVER TENDER COLLECTION');
               _.forEach(data.overTenderBreakdown, function (row) {
-              var desc = '';
-              switch (row.OverTenderTypeId) {
+                var desc = '';
+                switch (row.OverTenderTypeId) {
                 case 2:
                   desc = 'Credit Note';
                   break;
                 default:
                   desc = 'Forfeited';
               }
-              var  vdOvertransCount = (data.voidoverTenderBreakdown[row.OverTenderTypeId] || 0);
-              var rowCount = (row.Count || 0);
-              PrintService.addReportLine(' ' + desc, (row.Amount || 0).toFixed(2), '' + (rowCount - (vdOvertransCount * 2)));
+                var  vdOvertransCount = (data.voidoverTenderBreakdown[row.OverTenderTypeId] || 0);
+                var rowCount = (row.Count || 0);
+                PrintService.addReportLine(' ' + desc, (row.Amount || 0).toFixed(2), '' + (rowCount - (vdOvertransCount * 2)));
 
               //PrintService.addReportLine(" "+desc, (row.Amount||0).toFixed(2), ""+(row.Count||0));
               //PrintService.addReportLine(" "+desc, (row.Amount||0).toFixed(2), ""+(row.Count -vdOvertransCount));
-            });
+              });
             }
             PrintService.addTabbedLine('LOCAL TOTAL', localTotal.toFixed(2));
             PrintService.addLineBreak();
