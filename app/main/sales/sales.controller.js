@@ -499,6 +499,7 @@ angular.module('itouch.controllers')
       $scope.bkey = false;
       var priceFormShown = false;
       $scope.onKeyClick = function (item) {
+        $scope.$emit('BlockMenu', false);
         $scope.bkey = true;
         $scope.data.barcodeMode = false;
         if (item) {
@@ -862,6 +863,7 @@ angular.module('itouch.controllers')
         VoidTop: function (fn) {
           Suspended = false;
           var item = $scope.cart.selectedItem;
+          var last = Object.keys($scope.cart.items).length - 1;
           if (item) {
             if (item.ItemType == 'PWI') {
               return;
@@ -934,6 +936,9 @@ angular.module('itouch.controllers')
                   });
                 }
               }
+            }
+            if (last == 0) {
+              $scope.$emit('BlockMenu', true);
             }
           } else {
             if (!buttonClicked.voidBill) {
@@ -1421,5 +1426,12 @@ angular.module('itouch.controllers')
         }
       };
 
+      $scope.$on('CartCheck', function () {
+        if (_.isEmpty($scope.cart.items)) {
+          $scope.$emit('BlockMenu', true);
+        } else {
+          $scope.$emit('BlockMenu', false);
+        }
+      });
 
     }]);
