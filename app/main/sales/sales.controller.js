@@ -356,6 +356,7 @@ angular.module('itouch.controllers')
         $scope.showpwpModal = false;
         $scope.qty.value = 1;
         $scope.pwpModal.remove();
+        $scope.$emit('BlockMenu', true);
       });
 
       /**

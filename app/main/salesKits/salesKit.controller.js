@@ -267,23 +267,23 @@ angular.module('itouch.controllers')
       $scope.$on('save', function (event, salesKit) {
         $scope.salesKits = salesKit;
         submitted = false;
-        
+
         kit1 = 1;
         $scope.save();
-        
+
       });
 
       $scope.save = function () {
         if (!submitted) {
-          console.log('full');
-          console.log(full());
+          // console.log('full');
+          // console.log(full());
           if (full()) {
             submitted = true;
             var item = angular.copy($scope.salesKits);
-            if(kit1 == 1) {
+            if (kit1 == 1) {
               item.Qty = $scope.qty.value;
               angular.forEach(item.selectedList, function (item) {
-                item.Qty *= $scope.qty.value;  
+                item.Qty *= $scope.qty.value;
               });
               kit1 = 2;
             }
@@ -305,7 +305,7 @@ angular.module('itouch.controllers')
             var operations = [];
             var voidProm = null;
             item.Qty = customQty;
-            if(kit1 == 2) {
+            if (kit1 == 2) {
               item.Qty = $scope.qty.value;
             }
             if (update) {
@@ -356,6 +356,7 @@ angular.module('itouch.controllers')
 
       $scope.close = function () {
         //$scope.cart.selectedItem=null;
+        $scope.$emit('BlockMenu', true);
         $scope.$emit('skModalModal-close');
       };
 
