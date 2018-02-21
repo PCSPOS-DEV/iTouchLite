@@ -205,13 +205,14 @@ angular.module('itouch.services')
                       }
 
                       angular.forEach(selections, function (skisl) {
+                        if (skisl.SalesKitItemsId != undefined) {
+                          skisl.ItemId = parseInt(skisl.ItemId + String(skisl.SalesKitItemsId));
+                        }
                         salesKit.list[skisl.ItemId] = skisl;
                         salesKit.list[skisl.ItemId].Qty = 0;
                         salesKit.list[skisl.ItemId].componetid = ski.ItemId;
                         salesKit.list[skisl.ItemId].QtyValid = skisl.Quantity;
                       });
-
-                      // console.log(selections);
                       return selections;
                     }));
 
