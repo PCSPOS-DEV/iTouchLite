@@ -356,7 +356,6 @@ angular.module('itouch.controllers')
 
       $scope.close = function () {
         //$scope.cart.selectedItem=null;
-        $scope.$emit('BlockMenu', true);
         $scope.$emit('skModalModal-close');
       };
 

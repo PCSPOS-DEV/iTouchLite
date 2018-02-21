@@ -331,6 +331,7 @@ angular.module('itouch.controllers')
         $scope.showskModalModal = false;
         $scope.qty.value = 1;
         $scope.modals.salesKit.hide();
+        $scope.$emit('BlockMenu', true);
       });
 
       /**
@@ -341,6 +342,7 @@ angular.module('itouch.controllers')
         $scope.salesKitUpdate = false;
         $scope.qty.value = 1;
         $scope.modals.salesKit.hide();
+        $scope.$emit('BlockMenu', true);
       });
 
       /**
