@@ -20,6 +20,9 @@ angular.module('itouch.controllers')
       $scope.user = user;
       $scope.tempUser = null;
       $scope.salesKitUpdate = false;
+      var numpadValue = '';
+      var setValueManually = false;
+      var temp = 0;
       var submitted = false;
       var businessDate = ControlService.getBusinessDate(true);
       var Suspended = false;
@@ -402,8 +405,35 @@ angular.module('itouch.controllers')
           $scope.data.barcodeMode = false;
           ShowQtyBox = true;
           $scope.qty.nvalue = '';
+          $scope.qty.uvalue = '';
           return $ionicPopup.show({
-            template: '<input type="number" id="QtyBox" ng-model="qty.nvalue" autofocus>',
+            template: [
+              '<input type="number" id="QtyBox" ng-value="qty.nvalue||qty.uvalue" readonly>' +
+              '<div class="row" style="padding: 5px 25px 0px;">' +
+              '<div class="numpad" style="background-color: E9E9E9">' +
+                '<div class="button1-row1" style= "padding: 5px 0px 0px;">' +
+                  '<a href="" ng-click="numpadClick(\'7\')" class="button">7</a>' +
+                  '<a href="" ng-click="numpadClick(\'8\')" class="button">8</a>' +
+                  '<a href="" ng-click="numpadClick(\'9\')" class="button">9</a>' +
+                '</div>' +
+                '<div class="button1-row1">' +
+                  '<a href="" ng-click="numpadClick(\'4\')" class="button">4</a>' +
+                  '<a href="" ng-click="numpadClick(\'5\')" class="button">5</a>' +
+                  '<a href="" ng-click="numpadClick(\'6\')" class="button">6</a>' +
+                '</div>' +
+                '<div class="button1-row1">' +
+                  '<a href="" ng-click="numpadClick(\'1\')" class="button">1</a>' +
+                  '<a href="" ng-click="numpadClick(\'2\')" class="button">2</a>' +
+                  '<a href="" ng-click="numpadClick(\'3\')" class="button">3</a>' +
+                '</div>' +
+                '<div class="button1-row1">' +
+                  '<a href="" ng-click="numpadDelete()" class="button">Del</a>' +
+                  '<a href="" ng-click="numpadClick(\'0\')" class="button">0</a>' +
+                  '<a href="" ng-click="numpadClear()" class="button">C</a>' +
+                '</div>' +
+              '</div>' +
+              '</div>'
+            ],
             title: 'Set Qty',
             subTitle: '',
             scope: $scope,
@@ -413,12 +443,17 @@ angular.module('itouch.controllers')
                 text: '<b>Save</b>',
                 type: 'button-positive',
                 onTap: function (e) {
-                  var qty = $scope.qty.nvalue;
-                  console.log(qty);
+                  var qty = parseInt($scope.qty.nvalue || $scope.qty.uvalue);
+                  $scope.qty.uvalue = 0;
+                  numpadValue = '';
                   if (!qty || _.isNaN(qty) || qty == 0) {
                     //don't allow the user to close unless he enters wifi password
-                    e.preventDefault();
-                  } else {
+                    $scope.qty.value = 1;
+                    // e.preventDefault();
+                  } else if (qty > 50) {
+                    Alert.error('Maxmium Qty Exceed. Set Qty to 50');
+                    $scope.qty.value = 50;
+                  }  else {
                     $scope.qty.value = qty;
                   }
                 }
@@ -426,10 +461,96 @@ angular.module('itouch.controllers')
             ]
           }).finally(function (res) {
             ShowQtyBox = false;
+            $scope.qty.nvalue = 0;
+            $scope.qty.uvalue = 0;
+            temp = 0;
             return res;
           });
         } else {
           return $q.reject('already open');
+        }
+      };
+
+
+      // var dotClicked = false;
+      var last = null;
+      var first = null;
+      /**
+       * Handles the number-pad click events
+       * @param value
+       */
+      $scope.numpadClick = function (value) {
+        numpadValue += value;
+        temp = numpadValue;
+        if (!$scope.qty.uvalue) {
+          $scope.qty.uvalue = $scope.qty.nvalue;
+        }
+
+        // if (dotClicked) {
+        //   var index = $scope.qty.uvalue.indexOf('.');
+        //   var tail = $scope.tenderHeader.UpdatedTenderTotal.substr(index + 1, $scope.tenderHeader.UpdatedTenderTotal.length - index);
+        //   if (parseFloat(tail.substr(1, 1)) >= 1) {
+        //     return;
+        //   }
+        //   if (tail == '00') {
+        //     $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.UpdatedTenderTotal.substr(0, $scope.tenderHeader.UpdatedTenderTotal.indexOf('.') + 1) + value + '0';
+        //   } else {
+        //     $scope.tenderHeader.UpdatedTenderTotal = $scope.tenderHeader.UpdatedTenderTotal.substr(0, $scope.tenderHeader.UpdatedTenderTotal.indexOf('.') + 2) + value;
+        //   }
+        //   return;
+        // }
+
+        if (temp.length == 1) {
+          $scope.qty.uvalue = temp;
+        // } else if (temp.length == 2) {
+        //   $scope.qty.uvalue= temp = '0.' + temp;
+        } else if (temp.length >= 2) {
+          last = temp.substr(temp.length - 1, 1);
+          first = temp.substr(0, temp.length - 1);
+          console.log('last : ' + last);
+          console.log('first : ' + first);
+          $scope.qty.uvalue = first + last;
+        }
+        // numpadValue = '';
+        setValueManually = true;
+      };
+
+      // $scope.numpadDotClick = function () {
+      //   if (!$scope.qty.uvalue) {
+      //     $scope.qty.uvalue = $scope.qty.nvalue;
+      //   }
+      //   if (!dotClicked && numpadValue != '') {
+      //     numpadValue = parseInt(numpadValue || 0) + '.00';
+      //     $scope.tenderHeader.UpdatedTenderTotal = numpadValue;
+      //     dotClicked = true;
+      //   }
+      // };
+
+      /**
+       * Clears the number-pad input
+       */
+      $scope.numpadClear = function () {
+        if (setValueManually) {
+          $scope.qty.uvalue = 0;
+          numpadValue = '';
+          // dotClicked = false;
+          setValueManually = false;
+        }
+      };
+
+      /**
+       * Delete last the number-pad input
+       */
+      $scope.numpadDelete = function () {
+        if (temp.length == 1) {
+          $scope.qty.uvalue = 0;
+          numpadValue = '';
+        } else if (temp.length >= 2) {
+          last = temp.substr(temp.length - 1, 1);
+          first = temp.substr(0, temp.length - 1);
+          var del = temp.substr(0, temp.length - 1);
+          $scope.qty.uvalue = del;
+          temp = del;
         }
       };
       /**
