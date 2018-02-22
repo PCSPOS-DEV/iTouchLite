@@ -410,26 +410,34 @@ angular.module('itouch.controllers')
             template: [
               '<style>.popup-container.popup-showing{top: 0%;}</style>' +
               '<input type="number" id="QtyBox" ng-value="qty.nvalue||qty.uvalue" readonly>' +
-              '<div class="row" style="padding: 5px 25px 0px;">' +
-              '<div class="numpad" style="background-color: E9E9E9">' +
+              '<div class="row" style="padding: 5px 0px 0px; background-color: E9E9E9">' +
+              '<div class="numpad">' +
                 '<div class="button1-row1" style= "padding: 5px 0px 0px;">' +
                   '<a href="" ng-click="numpadClick(\'7\')" class="button">7</a>' +
                   '<a href="" ng-click="numpadClick(\'8\')" class="button">8</a>' +
                   '<a href="" ng-click="numpadClick(\'9\')" class="button">9</a>' +
+                  '&emsp;' +
+                  '<a href="" ng-click="" class="button"> </a>' +
                 '</div>' +
                 '<div class="button1-row1">' +
                   '<a href="" ng-click="numpadClick(\'4\')" class="button">4</a>' +
                   '<a href="" ng-click="numpadClick(\'5\')" class="button">5</a>' +
                   '<a href="" ng-click="numpadClick(\'6\')" class="button">6</a>' +
+                  '&emsp;' +
+                  '<a href="" ng-click="" class="button"> </a>' +
                 '</div>' +
                 '<div class="button1-row1">' +
                   '<a href="" ng-click="numpadClick(\'1\')" class="button">1</a>' +
                   '<a href="" ng-click="numpadClick(\'2\')" class="button">2</a>' +
                   '<a href="" ng-click="numpadClick(\'3\')" class="button">3</a>' +
+                  '&emsp;' +
+                  '<a href="" ng-click="numpadDelete()" class="button">Del</a>' +
                 '</div>' +
                 '<div class="button1-row1">' +
-                  '<a href="" ng-click="numpadDelete()" class="button">Del</a>' +
+                  '<a href="" ng-click="" class="button"> </a>' +
                   '<a href="" ng-click="numpadClick(\'0\')" class="button">0</a>' +
+                  '<a href="" ng-click="" class="button"> </a>' +
+                  '&emsp;' +
                   '<a href="" ng-click="numpadClear()" class="button">C</a>' +
                 '</div>' +
               '</div>' +
