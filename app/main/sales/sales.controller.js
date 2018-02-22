@@ -408,6 +408,7 @@ angular.module('itouch.controllers')
           $scope.qty.uvalue = '';
           return $ionicPopup.show({
             template: [
+              '<style>.popup-container.popup-showing{top: -20%;}</style>' +
               '<input type="number" id="QtyBox" ng-value="qty.nvalue||qty.uvalue" readonly>' +
               '<div class="row" style="padding: 5px 25px 0px;">' +
               '<div class="numpad" style="background-color: E9E9E9">' +
