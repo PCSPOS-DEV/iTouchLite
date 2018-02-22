@@ -54,27 +54,27 @@ angular.module('itouch.controllers')
         activeKeys: {}
       };
 
-      $scope.numberPickerObject = {
-        inputValue: 1, //Optional
-        minValue: 1,
-        maxValue: 50,
-        precision: 3,  //Optional
-        decimalStep: 0.25,  //Optional
-        format: 'WHOLE',  //Optional - "WHOLE" or "DECIMAL"
-        unit: '',  //Optional - "m", "kg", "℃" or whatever you want
-        titleLabel: 'Set Qty',  //Optional
-        setLabel: 'Set',  //Optional
-        closeLabel: 'Close',  //Optional
-        setButtonType: 'button-positive',  //Optional
-        closeButtonType: 'button-stable',  //Optional
-        callback: function (val) {    //Mandatory
-          if (val) {
-            $scope.qty.value = val;
-          } else {
-            $scope.qty.value = 1;
-          }
-        }
-      };
+      // $scope.numberPickerObject = {
+      //   inputValue: 1, //Optional
+      //   minValue: 1,
+      //   maxValue: 50,
+      //   precision: 3,  //Optional
+      //   decimalStep: 0.25,  //Optional
+      //   format: 'WHOLE',  //Optional - "WHOLE" or "DECIMAL"
+      //   unit: '',  //Optional - "m", "kg", "℃" or whatever you want
+      //   titleLabel: 'Set Qty',  //Optional
+      //   setLabel: 'Set',  //Optional
+      //   closeLabel: 'Close',  //Optional
+      //   setButtonType: 'button-positive',  //Optional
+      //   closeButtonType: 'button-stable',  //Optional
+      //   callback: function (val) {    //Mandatory
+      //     if (val) {
+      //       $scope.qty.value = val;
+      //     } else {
+      //       $scope.qty.value = 1;
+      //     }
+      //   }
+      // };
 
 
       /**
@@ -396,7 +396,42 @@ angular.module('itouch.controllers')
         }
       });
 
-
+      var ShowQtyBox = false;
+      $scope.ShowQtyBox = function () {
+        if (!ShowQtyBox) {
+          $scope.data.barcodeMode = false;
+          ShowQtyBox = true;
+          $scope.qty.nvalue = '';
+          return $ionicPopup.show({
+            template: '<input type="number" id="QtyBox" ng-model="qty.nvalue" autofocus>',
+            title: 'Set Qty',
+            subTitle: '',
+            scope: $scope,
+            buttons: [
+              {text: 'Cancel'},
+              {
+                text: '<b>Save</b>',
+                type: 'button-positive',
+                onTap: function (e) {
+                  var qty = $scope.qty.nvalue;
+                  console.log(qty);
+                  if (!qty || _.isNaN(qty) || qty == 0) {
+                    //don't allow the user to close unless he enters wifi password
+                    e.preventDefault();
+                  } else {
+                    $scope.qty.value = qty;
+                  }
+                }
+              }
+            ]
+          }).finally(function (res) {
+            ShowQtyBox = false;
+            return res;
+          });
+        } else {
+          return $q.reject('already open');
+        }
+      };
       /**
        * Loads the layout for sales keys & pages
        * @returns {*|Promise.<TResult>}
