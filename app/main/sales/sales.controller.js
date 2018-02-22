@@ -408,7 +408,7 @@ angular.module('itouch.controllers')
           $scope.qty.uvalue = '';
           return $ionicPopup.show({
             template: [
-              '<style>.popup-container.popup-showing{top: -20%;}</style>' +
+              '<style>.popup-container.popup-showing{top: 0%;}</style>' +
               '<input type="number" id="QtyBox" ng-value="qty.nvalue||qty.uvalue" readonly>' +
               '<div class="row" style="padding: 5px 25px 0px;">' +
               '<div class="numpad" style="background-color: E9E9E9">' +
@@ -447,13 +447,12 @@ angular.module('itouch.controllers')
                   var qty = parseInt($scope.qty.nvalue || $scope.qty.uvalue);
                   $scope.qty.uvalue = 0;
                   numpadValue = '';
-                  if (!qty || _.isNaN(qty) || qty == 0) {
+                  if (!qty || _.isNaN(qty)) {
                     //don't allow the user to close unless he enters wifi password
                     $scope.qty.value = 1;
                     // e.preventDefault();
-                  } else if (qty > 50) {
-                    Alert.error('Maxmium Qty Exceed. Set Qty to 50');
-                    $scope.qty.value = 50;
+                  } else if (qty == 0) {
+                    e.preventDefault();
                   }  else {
                     $scope.qty.value = qty;
                   }
@@ -551,6 +550,7 @@ angular.module('itouch.controllers')
           first = temp.substr(0, temp.length - 1);
           var del = temp.substr(0, temp.length - 1);
           $scope.qty.uvalue = del;
+          numpadValue = del;
           temp = del;
         }
       };
