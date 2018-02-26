@@ -58,8 +58,6 @@ angular.module('itouch.controllers')
       };
 
       var addItem = function (item) {
-        console.log($scope.pwp);
-        console.log(item);
         if (item) {
           $timeout(function () {
             temp += item.Price;
