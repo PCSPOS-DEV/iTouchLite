@@ -5,6 +5,7 @@ angular.module('itouch.services')
 .factory('PWPService', ['LocationService', 'DB', 'DB_CONFIG', '$q', '$localStorage', 'Restangular', 'SettingsService', 'ControlService', 'Alert',
   function (LocationService, DB, DB_CONFIG, $q, $localStorage, Restangular, SettingsService, ControlService, Alert) {
     var self = this;
+    var type = 0;
     self.fetchItemsByPWP = function () {
       var deferred = $q.defer();
       Restangular.one('GetItemsByPwp').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
@@ -82,49 +83,57 @@ angular.module('itouch.services')
       DB_CONFIG.tableNames.pwp.itemsByPwp + ' AS i ON p.Id = i.PwpId  LEFT OUTER JOIN ' +
       DB_CONFIG.tableNames.item.item + ' AS it ON i.ItemId = it.Id' +
     ' WHERE IsMultiItemPromotion = \'false\' ' +
-    ' AND p.ItemId = ? AND FromDate < ? AND ToDate > ?';
+    ' AND p.ItemId = ?';
+    //  AND FromDate < ? AND ToDate > ?';
 
-      DB.query(query, [item.Id, businessDate, businessDate]).then(function (result) {
+      DB.query(query, [item.Id]).then(function (result) {
         var resultSet =  DB.fetchAll(result);
-        var MaxItemsPerReceipt = resultSet[0].MaxNoOfItemsPerReceipt;
         var pwp = null;
         if (resultSet.length > 0 ) {
-          pwp = _.pick(_.first(resultSet), ['Id', 'Code', 'Description1', 'Description2', 'FromDate', 'ToDate', 'Quantity', 'ItemId', 'MaxQuantity', 'MaxPrice', 'PriceLevelId']);
-          if (qty > MaxItemsPerReceipt && MaxItemsPerReceipt < 0) {
-            pwp.QtyEntered = MaxItemsPerReceipt;
+          type = 1;
+          var RFromDate = resultSet[0].FromDate;
+          var RToDate = resultSet[0].ToDate;
+          if (RFromDate < businessDate && businessDate < RToDate) {
+            var MaxItemsPerReceipt = resultSet[0].MaxNoOfItemsPerReceipt;
+            pwp = _.pick(_.first(resultSet), ['Id', 'Code', 'Description1', 'Description2', 'FromDate', 'ToDate', 'Quantity', 'ItemId', 'MaxQuantity', 'MaxPrice', 'PriceLevelId']);
+            if (qty > MaxItemsPerReceipt && MaxItemsPerReceipt < 0) {
+              pwp.QtyEntered = MaxItemsPerReceipt;
+            } else {
+              pwp.QtyEntered = qty;
+            }
+            var applicableQty = Math.floor(pwp.QtyEntered / pwp.Quantity);
+            // Bug fix for applicableQty = NaN prevent PWP panel open.
+            // By Lynn Naing Zaw - 7/12/2017
+            if (isNaN(applicableQty)) {
+              applicableQty = 1;
+            }
+            // pwp.QtyEntered = qty;
+
+            if (pwp.QtyEntered == undefined) {
+              pwp.QtyEntered = 1;
+            }
+            /** */
+
+            pwp.selectedItems = {};
+            pwp.item = item;
+            pwp.TotalChildQty = pwp.MaxQuantity * applicableQty;
+            pwp.SuggestedQty = pwp.Quantity * applicableQty;
+            pwp.MaxPrice = pwp.MaxPrice * applicableQty;
+            // pwp.TotalChildQty = pwp.MaxQuantity * applicableQty;
+            // pwp.QtyEntered = qty;
+            pwp.Qty = 0;
+
+            pwp.items = _.map(resultSet, function (row) {
+              var item = _.pick(row, ['SubItemId', 'MaxQuantity', 'SubItemMaxQty', 'SubItemPrice', 'DiscountId', 'ItemDesc1', 'ItemDesc2', 'PriceGroupId', 'Plu', 'DiscountId']);
+              item.SubItemMaxQty = item.SubItemMaxQty * applicableQty;
+              return item;
+            });
+            deferred.resolve(pwp);
           } else {
-            pwp.QtyEntered = qty;
+            Alert.error('Expire promotion period');
           }
-          var applicableQty = Math.floor(pwp.QtyEntered / pwp.Quantity);
-          // Bug fix for applicableQty = NaN prevent PWP panel open.
-          // By Lynn Naing Zaw - 7/12/2017
-          if (isNaN(applicableQty)) {
-            applicableQty = 1;
-          }
-          // pwp.QtyEntered = qty;
-
-          if (pwp.QtyEntered == undefined) {
-            pwp.QtyEntered = 1;
-          }
-          /** */
-
-          pwp.selectedItems = {};
-          pwp.item = item;
-          pwp.TotalChildQty = pwp.MaxQuantity * applicableQty;
-          pwp.SuggestedQty = pwp.Quantity * applicableQty;
-          pwp.MaxPrice = pwp.MaxPrice * applicableQty;
-          // pwp.TotalChildQty = pwp.MaxQuantity * applicableQty;
-          // pwp.QtyEntered = qty;
-          pwp.Qty = 0;
-
-          pwp.items = _.map(resultSet, function (row) {
-            var item = _.pick(row, ['SubItemId', 'MaxQuantity', 'SubItemMaxQty', 'SubItemPrice', 'DiscountId', 'ItemDesc1', 'ItemDesc2', 'PriceGroupId', 'Plu', 'DiscountId']);
-            item.SubItemMaxQty = item.SubItemMaxQty * applicableQty;
-            return item;
-          });
+        } if (type == 0) {
           deferred.resolve(pwp);
-        } else {
-          Alert.error('Expire promotion period');
         }
 
       }, function (err) {
