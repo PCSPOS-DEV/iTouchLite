@@ -417,14 +417,14 @@ angular.module('itouch.controllers')
                   '<a href="" ng-click="numpadClick(\'8\')" class="button">8</a>' +
                   '<a href="" ng-click="numpadClick(\'9\')" class="button">9</a>' +
                   '&nbsp;&nbsp;&nbsp;' +
-                  '<a href="" ng-click="" class="button"> </a>' +
+                  '<a href="" ng-click="numpadPlus()" class="button">+</a>' +
                 '</div>' +
                 '<div class="button1-row1">' +
                   '<a href="" ng-click="numpadClick(\'4\')" class="button">4</a>' +
                   '<a href="" ng-click="numpadClick(\'5\')" class="button">5</a>' +
                   '<a href="" ng-click="numpadClick(\'6\')" class="button">6</a>' +
                   '&nbsp;&nbsp;&nbsp;' +
-                  '<a href="" ng-click="" class="button"> </a>' +
+                  '<a href="" ng-click="numpadMinus()" class="button">-</a>' +
                 '</div>' +
                 '<div class="button1-row1">' +
                   '<a href="" ng-click="numpadClick(\'1\')" class="button">1</a>' +
@@ -434,9 +434,9 @@ angular.module('itouch.controllers')
                   '<a href="" ng-click="numpadDelete()" class="button">Del</a>' +
                 '</div>' +
                 '<div class="button1-row1">' +
-                  '<a href="" ng-click="" class="button"> </a>' +
+                  '<a href="" ng-click="numpadClick(\'00\')" class="button">00</a>' +
                   '<a href="" ng-click="numpadClick(\'0\')" class="button">0</a>' +
-                  '<a href="" ng-click="" class="button"> </a>' +
+                  '<a href="" ng-click="numpadDotClick()" class="button">.</a>' +
                   '&nbsp;&nbsp;&nbsp;' +
                   '<a href="" ng-click="numpadClear()" class="button">C</a>' +
                 '</div>' +
@@ -487,6 +487,14 @@ angular.module('itouch.controllers')
        * Handles the number-pad click events
        * @param value
        */
+      $scope.numpadPlus = function () {
+        $scope.qty.uvalue = parseInt($scope.qty.uvalue) + 1;
+      };
+
+      $scope.numpadMinus = function () {
+        $scope.qty.uvalue -= 1;
+      };
+
       $scope.numpadClick = function (value) {
         numpadValue += value;
         temp = numpadValue;
