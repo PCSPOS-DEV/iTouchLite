@@ -67,6 +67,7 @@ angular.module('itouch.controllers')
               Alert.warning('The child total price excced the limit of maximum price.');
               $scope.selectedRow.Qty--;
               $scope.pwp.Qty--;
+              temp -= $scope.selectedRow.Price;
               if ($scope.selectedRow.Qty == 0) {
                 $scope.clearSelected();
               }
@@ -113,6 +114,7 @@ angular.module('itouch.controllers')
           $scope.selectedRow.Qty--;
           $scope.pwp.Qty--;
           $scope.tempSubTotal -= $scope.selectedRow.Price;
+          temp -= $scope.selectedRow.Price;
           if ($scope.tempSubTotal == 0) {
             temp = 0;
           }
