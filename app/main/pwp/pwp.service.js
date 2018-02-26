@@ -90,13 +90,12 @@ angular.module('itouch.services')
         var pwp = null;
         if (resultSet.length > 0 ) {
           pwp = _.pick(_.first(resultSet), ['Id', 'Code', 'Description1', 'Description2', 'FromDate', 'ToDate', 'Quantity', 'ItemId', 'MaxQuantity', 'MaxPrice', 'PriceLevelId']);
-          if (qty > MaxItemsPerReceipt) {
+          if (qty > MaxItemsPerReceipt && MaxItemsPerReceipt < 0) {
             pwp.QtyEntered = MaxItemsPerReceipt;
           } else {
             pwp.QtyEntered = qty;
           }
           var applicableQty = Math.floor(pwp.QtyEntered / pwp.Quantity);
-          console.log('applicableQty : '+ applicableQty);
           // Bug fix for applicableQty = NaN prevent PWP panel open.
           // By Lynn Naing Zaw - 7/12/2017
           if (isNaN(applicableQty)) {

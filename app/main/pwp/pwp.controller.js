@@ -61,7 +61,7 @@ angular.module('itouch.controllers')
         if (item) {
           $timeout(function () {
             temp += item.Price;
-            if (temp < $scope.pwp.MaxPrice) {
+            if (temp < $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
               $scope.tempSubTotal = temp;
             } else {
               Alert.warning('The child total price excced the limit of maximum price.');
