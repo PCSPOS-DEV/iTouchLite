@@ -2,10 +2,9 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-.factory('PWPService', ['LocationService', 'DB', 'DB_CONFIG', '$q', '$localStorage', 'Restangular', 'SettingsService', 'ControlService',
-  function (LocationService, DB, DB_CONFIG, $q, $localStorage, Restangular, SettingsService, ControlService) {
+.factory('PWPService', ['LocationService', 'DB', 'DB_CONFIG', '$q', '$localStorage', 'Restangular', 'SettingsService', 'ControlService', 'Alert',
+  function (LocationService, DB, DB_CONFIG, $q, $localStorage, Restangular, SettingsService, ControlService, Alert) {
     var self = this;
-
     self.fetchItemsByPWP = function () {
       var deferred = $q.defer();
       Restangular.one('GetItemsByPwp').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
@@ -51,7 +50,7 @@ angular.module('itouch.services')
             }
           }
           else
-        {
+          {
             deferred.resolve();
           }
         } catch (ex) {
@@ -72,32 +71,29 @@ angular.module('itouch.services')
     self.savePWP = function (items) {
       DB.addInsertToQueue(DB_CONFIG.tableNames.pwp.pwp, items);
     };
-//TODO: business date validation
     self.getPWP = function (item, qty) {
       var deferred = $q.defer();
-      var businessDate = ControlService.getBusinessDate(true);
+      var businessDate = moment(ControlService.getBusinessDate(true)).format('YYYY-MM-DDTHH:MM:SS');
       var query = 'SELECT ' +
-      'p.Id, Code, p.Description1, p.Description2, PriceLevelId, FromDate, ToDate, Quantity, p.MaxQuantity, p.MaxPrice, p.itemId, ' +
+      'p.Id, Code, p.Description1, p.Description2, PriceLevelId, FromDate, ToDate, Quantity, p.MaxQuantity, p.MaxPrice, p.itemId, p.MaxNoOfItems, p.MaxNoOfItemsPerReceipt,' +
       'i.ItemId AS SubItemId, i.MaxQuantity AS SubItemMaxQty, i.Price AS SubItemPrice, i.DiscountId, ' +
       ' it.Description1 AS ItemDesc1, it.Description2 AS ItemDesc2, it.PriceGroupId, it.Plu FROM ' +
       DB_CONFIG.tableNames.pwp.pwp + ' AS p LEFT OUTER JOIN ' +
       DB_CONFIG.tableNames.pwp.itemsByPwp + ' AS i ON p.Id = i.PwpId  LEFT OUTER JOIN ' +
       DB_CONFIG.tableNames.item.item + ' AS it ON i.ItemId = it.Id' +
     ' WHERE IsMultiItemPromotion = \'false\' ' +
-    ' AND p.ItemId = ?';
-    // + " AND FromDate > ? AND ToDate < ?";
+    ' AND p.ItemId = ? AND FromDate < ? AND ToDate > ?';
 
-      DB.query(query, [item.Id]).then(function (result) {
+      DB.query(query, [item.Id, businessDate, businessDate]).then(function (result) {
         var resultSet =  DB.fetchAll(result);
-      // console.log(resultSet);
         var pwp = null;
-        if (resultSet.length > 0) {
+        if (resultSet.length > 0 ) {
           pwp = _.pick(_.first(resultSet), ['Id', 'Code', 'Description1', 'Description2', 'FromDate', 'ToDate', 'Quantity', 'ItemId', 'MaxQuantity', 'MaxPrice', 'PriceLevelId']);
           var applicableQty = Math.floor(qty / pwp.Quantity);
 
           // Bug fix for applicableQty = NaN prevent PWP panel open.
           // By Lynn Naing Zaw - 7/12/2017
-          if (isNaN(applicableQty)){
+          if (isNaN(applicableQty)) {
             applicableQty = 1;
           }
           pwp.QtyEntered = qty;
@@ -120,8 +116,11 @@ angular.module('itouch.services')
             item.SubItemMaxQty = item.SubItemMaxQty * applicableQty;
             return item;
           });
+          deferred.resolve(pwp);
+        } else {
+          Alert.error('Expire promotion period');
         }
-        deferred.resolve(pwp);
+
       }, function (err) {
         deferred.reject(err.message);
       });

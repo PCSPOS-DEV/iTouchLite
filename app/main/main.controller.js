@@ -224,7 +224,7 @@ angular.module('itouch.controllers')
     });
     $scope.Menu = false;
     $scope.ToggleMenu = function () {
-      setTimeout(function() {
+      setTimeout(function () {
         $scope.$broadcast('CartCheck');
       }, 200);
       $scope.$on('BlockMenu', function (event, check) {
@@ -233,7 +233,7 @@ angular.module('itouch.controllers')
         } else {
           $scope.Menu = false;
         }
-      }); 
+      });
     };
 
     $scope.$on('BlockMenu', function (event, check) {
@@ -242,6 +242,6 @@ angular.module('itouch.controllers')
       } else {
         $scope.Menu = false;
       }
-    }); 
+    });
 
   }]);
