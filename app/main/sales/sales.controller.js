@@ -436,7 +436,7 @@ angular.module('itouch.controllers')
                 '<div class="button1-row1">' +
                   '<a href="" ng-click="numpadClick(\'00\')" class="button">00</a>' +
                   '<a href="" ng-click="numpadClick(\'0\')" class="button">0</a>' +
-                  '<a href="" ng-click="numpadDotClick()" class="button">.</a>' +
+                  '<a href="" ng-click="numpadDotClick()" class="button"> </a>' +
                   '&nbsp;&nbsp;&nbsp;' +
                   '<a href="" ng-click="numpadClear()" class="button">C</a>' +
                 '</div>' +
@@ -489,10 +489,14 @@ angular.module('itouch.controllers')
        */
       $scope.numpadPlus = function () {
         $scope.qty.uvalue = parseInt($scope.qty.uvalue) + 1;
+        numpadValue = parseInt(numpadValue) + 1;
+        temp = String(parseInt(temp) + 1);
       };
 
       $scope.numpadMinus = function () {
         $scope.qty.uvalue -= 1;
+        numpadValue -= 1;
+        temp -= 1;
       };
 
       $scope.numpadClick = function (value) {
@@ -561,9 +565,7 @@ angular.module('itouch.controllers')
         if (temp.length == 1) {
           $scope.qty.uvalue = 0;
           numpadValue = '';
-        } else if (temp.length >= 2) {
-          last = temp.substr(temp.length - 1, 1);
-          first = temp.substr(0, temp.length - 1);
+        } else {
           var del = temp.substr(0, temp.length - 1);
           $scope.qty.uvalue = del;
           numpadValue = del;
