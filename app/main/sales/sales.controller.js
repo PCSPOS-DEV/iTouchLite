@@ -1292,6 +1292,7 @@ angular.module('itouch.controllers')
                 }).finally(function () {
                   buttonClicked.recallSuspendBillModal = false;
                   Alert.success('Suspend completed');
+                  $scope.$emit('BlockMenu', true);
                   $scope.flag = false;
                 });
 
