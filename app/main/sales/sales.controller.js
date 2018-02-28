@@ -494,9 +494,13 @@ angular.module('itouch.controllers')
       };
 
       $scope.numpadMinus = function () {
-        $scope.qty.uvalue -= 1;
-        numpadValue -= 1;
-        temp -= 1;
+        if (numpadValue < 1 || temp < 1) {
+          Alert.warning('Action not Allowed.');
+        } else {
+          $scope.qty.uvalue -= 1;
+          numpadValue -= 1;
+          temp = String(temp - 1);
+        }
       };
 
       $scope.numpadClick = function (value) {
