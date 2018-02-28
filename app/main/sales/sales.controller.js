@@ -526,10 +526,18 @@ angular.module('itouch.controllers')
         //   $scope.qty.uvalue= temp = '0.' + temp;
         } else if (temp.length >= 2) {
           last = temp.substr(temp.length - 1, 1);
-          first = temp.substr(0, temp.length - 1);
-          console.log('last : ' + last);
-          console.log('first : ' + first);
-          $scope.qty.uvalue = first + last;
+          first = String(parseInt(temp.substr(0, temp.length - 1)) / 1);
+          // console.log('last 1 : ' + last);
+          // console.log('first 1 : ' + first);
+          if ( first == 0 || first == 00) {
+            numpadValue = last;
+            temp = last;
+            $scope.qty.uvalue = last;
+          } else {
+            $scope.qty.uvalue = first + last;
+            numpadValue = first + last;
+            temp = first + last;
+          }
         }
         // numpadValue = '';
         setValueManually = true;
