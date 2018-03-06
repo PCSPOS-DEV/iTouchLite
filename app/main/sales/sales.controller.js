@@ -334,7 +334,7 @@ angular.module('itouch.controllers')
         $scope.showskModalModal = false;
         $scope.qty.value = 1;
         $scope.modals.salesKit.hide();
-        $scope.$emit('BlockMenu', true);
+        // $scope.$emit('BlockMenu', false);
       });
 
       /**
@@ -345,7 +345,7 @@ angular.module('itouch.controllers')
         $scope.salesKitUpdate = false;
         $scope.qty.value = 1;
         $scope.modals.salesKit.hide();
-        $scope.$emit('BlockMenu', true);
+        $scope.$emit('BlockMenu', false);
       });
 
       /**
@@ -361,7 +361,7 @@ angular.module('itouch.controllers')
         $scope.showpwpModal = false;
         $scope.qty.value = 1;
         $scope.pwpModal.remove();
-        $scope.$emit('BlockMenu', true);
+        // $scope.$emit('BlockMenu', false);
       });
 
       /**

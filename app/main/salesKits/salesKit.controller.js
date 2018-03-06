@@ -279,6 +279,7 @@ angular.module('itouch.controllers')
           // console.log(full());
           if (full()) {
             submitted = true;
+            $scope.$emit('BlockMenu', true);
             var item = angular.copy($scope.salesKits);
             if (kit1 == 1) {
               item.Qty = $scope.qty.value;
