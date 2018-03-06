@@ -66,12 +66,12 @@ angular.module('itouch.controllers')
       self.openShiftCloseModal = function () {
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
-          // if (suspenditem == 0) { // GGWP
+          if (suspenditem == 0) { // GGWP
             $scope.shiftListType = 'close';
             self.shiftModal.show();
-          // } else {
-          //   Alert.warning('Suspend Item is not empty.', 'ItouchLite');
-          // }
+          } else {
+            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+          }
         });
 
       };
