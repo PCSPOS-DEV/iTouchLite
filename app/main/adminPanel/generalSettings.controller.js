@@ -26,7 +26,7 @@ angular.module('itouch.controllers')
 
 
       $scope.setBDate = function () {
-        console.log('GGWP');
+        // console.log('GGWP');
         ionicDatePicker.openDatePicker(datePickerOptions);
 
       };

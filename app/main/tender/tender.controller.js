@@ -341,6 +341,7 @@ angular.module('itouch.controllers')
           }
           seq++;
           $scope.numpadClear();
+          $scope.$emit('BlockMenu', true);
         }
 
       };
