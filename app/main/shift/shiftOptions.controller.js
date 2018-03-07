@@ -237,31 +237,37 @@ angular.module('itouch.controllers')
                   return true;
                 }
 
-                var businessDate = angular.copy(ControlService.getBusinessDate());
-                Report.printShiftClosingReport(null, businessDate);
-                $timeout(function () {
-                  ShiftService.dayEnd().then(function () {
-                    dayEnd = false;
-                    $scope.$emit('shift-changed');
-                    Alert.success('Day end completed');
-                    $ionicHistory.nextViewOptions({
-                      disableAnimate: false,
-                      disableBack: true
-                    });
-                    UploadService.upload().finally(function () {
-                      $state.go('app.home');
-                    });
-
-                  }, function (err) {
-                    dayEnd = false;
-                    console.log(err);
-                  });
-                }, 500);
+                shiftclosingReport();
               });
             }
           });
+        } else {
+          shiftclosingReport();
         }
         
+      }
+
+      var shiftclosingReport = function () {
+        var businessDate = angular.copy(ControlService.getBusinessDate());
+        Report.printShiftClosingReport(null, businessDate);
+        $timeout(function () {
+          ShiftService.dayEnd().then(function () {
+            dayEnd = false;
+            $scope.$emit('shift-changed');
+            Alert.success('Day end completed');
+            $ionicHistory.nextViewOptions({
+              disableAnimate: false,
+              disableBack: true
+            });
+            UploadService.upload().finally(function () {
+              $state.go('app.home');
+            });
+
+          }, function (err) {
+            dayEnd = false;
+            console.log(err);
+          });
+        }, 500);
       }
 
       /**
