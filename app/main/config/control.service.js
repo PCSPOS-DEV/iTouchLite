@@ -80,7 +80,7 @@ angular.module('itouch.services')
      */
     self.setDayEndDate = function (m) {
       $localStorage.app_config.dayEndDate = m.valueOf();
-      self.setBusinessDate(moment().format('DD-MM-YYYY')); //setting business date to 2000-jan-01 (month is 0 based in js)
+      self.setBusinessDate(moment()) //setting business date to 2000-jan-01 (month is 0 based in js)
       // $localStorage.app_config.businessDate = moment().valueOf();
     };
 

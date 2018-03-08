@@ -132,7 +132,7 @@ angular.module('itouch.services')
         return deferred.promise;
       };
 
-      self.getById = function (id) {
+      self.getById = function (id, type) {
         var deferred = $q.defer();
         location = SettingsService.getLocationId();
         if (location) {
@@ -145,8 +145,10 @@ angular.module('itouch.services')
             var item = DB.fetch(result);
             if (item) {
               self.getPrice(item.Plu, item.PriceGroupId, item.Taxable).then(function (data) {
-                if (data) {
-                  _.extend(item, data);
+                if (type != 0) {
+                  if (data) {
+                    _.extend(item, data);
+                  }
                 }
                 // console.log('price');
                 // console.log(item);

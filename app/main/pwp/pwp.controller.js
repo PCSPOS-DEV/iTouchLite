@@ -90,7 +90,7 @@ angular.module('itouch.controllers')
           } else {
             item.Qty = 1;
             var promise;
-            if (item.SubItemPrice != 0) {
+            if (item.SubItemPrice >= 0) {
               item.Price = item.SubItemPrice;
               item.OrgPrice = item.SubItemPrice;
               item.AlteredPrice = item.SubItemPrice;
@@ -160,8 +160,9 @@ angular.module('itouch.controllers')
           if (!_.isEmpty($scope.pwp.selectedItems)) {
             submitted = true;
             var items = {};
+            var itemT = 0;
             angular.forEach($scope.pwp.selectedItems, function (i) {
-              items[i.SubItemId] = ItemService.getById(i.SubItemId);
+              items[i.SubItemId] = ItemService.getById(i.SubItemId, itemT);
             });
             $q.all(items).then(function (data) {
               // console.log(data);
