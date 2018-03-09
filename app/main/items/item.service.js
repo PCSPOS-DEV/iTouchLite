@@ -307,7 +307,17 @@ angular.module('itouch.services')
         return deferred.promise;
       };
 
+      var strid, pinid, idlen;
       self.getItemById = function (id) {
+        var itype = typeof id;
+        if (itype == 'number'){
+          strid = id;
+        } else {
+          pinid = id.indexOf('-');
+          idlen = id.length;
+          strid = parseInt(id.substr(pinid + 1, idlen));
+        }
+
         var deferred = $q.defer();
         location = LocationService.currentLocation;
         if (location) {
@@ -318,7 +328,7 @@ angular.module('itouch.services')
             'INNER JOIN PriceGroups AS p ON i.Plu = p.Plu AND i.PriceGroupId = p.PriceGroupId ' +
             'WHERE i.Id = ? AND p.PriceLevelId = ? GROUP BY i.Id';
           // console.log(query);
-          DB.query(query, [id, location.PriceLevelId]).then(function (result) {
+          DB.query(query, [strid, location.PriceLevelId]).then(function (result) {
             var item = DB.fetch(result);
             item.OrgPrice = angular.copy(item.Price);
             if (item.Taxable == 'true') {
