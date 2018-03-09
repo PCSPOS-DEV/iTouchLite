@@ -159,9 +159,11 @@ angular.module('itouch.services')
               var promises = [];
               salesKit.component = {};
               /*Yi Yi Po*/
-              angular.forEach(salesKitItems, function (ski) {
+              salesKitItems.sort(function(b, a){
+                return a.Id-b.Id;
+              });
+              angular.forEach(salesKitItems, function (ski) {  
                 salesKit.selected = angular.copy(ski);
-                // console.log(salesKit.selected);
                 ski.SalesKitId = itemId;
                 salesKit.list = {};
                 salesKit.selectedList = {};
@@ -177,25 +179,15 @@ angular.module('itouch.services')
                       });
                       // console.log(salesKit.selected.Id); // GGWP
                       if (selections.length > 0)
-                     {
+                      {
                         ski.Selections = selections;
                         ski.Selected = true;
                         ski.Qty = 0;
                         ski.Selectable = true;
                         selections.unshift(ski);
                         salesKit.selected.Selections = selections;
-                        if (salesKit.selected.Id == ski.ItemId) {
-                          ski.ItemId = 0.0001 * ski.ItemId;
-                          ski.Id = 0.0001 * ski.Id;
-                          // salesKit.selected.Id = 1;
-                          // salesKit.selected.ItemId = 1;
-                        }
                         salesKit.component[ski.ItemId] = ski;
-                        console.log('ski.Id : ' + ski.Id); //GGWP
-                        console.log('ski.ItemId : ' + ski.ItemId); //GGWP
-                      }
-                      else
-                     {
+                      } else { 
                         ski.Qty = ski.Quantity;
                         ski.Quantity = ski.Quantity;
                         ski.Selected = true;
@@ -203,10 +195,9 @@ angular.module('itouch.services')
                         ski.Selectable = false;
                         salesKit.selectedList[ski.ItemId] = ski;
                       }
-
                       angular.forEach(selections, function (skisl) {
                         if (skisl.SalesKitItemsId != undefined) {
-                          skisl.ItemId = parseInt(skisl.ItemId + String(skisl.SalesKitItemsId));
+                          skisl.ItemId = String(skisl.SalesKitItemsId)+ '-' + skisl.ItemId;
                         }
                         salesKit.list[skisl.ItemId] = skisl;
                         salesKit.list[skisl.ItemId].Qty = 0;
