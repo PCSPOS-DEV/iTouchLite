@@ -447,7 +447,12 @@ angular.module('itouch.controllers')
             subTitle: '',
             scope: $scope,
             buttons: [
-              {text: 'Cancel'},
+              {
+                text: 'Cancel',
+                onTap: function (e) {
+                  $scope.numpadClear();
+                }
+              },
               {
                 text: '<b>Save</b>',
                 type: 'button-positive',
@@ -488,14 +493,18 @@ angular.module('itouch.controllers')
        * @param value
        */
       $scope.numpadPlus = function () {
-        $scope.qty.uvalue = parseInt($scope.qty.uvalue) + 1;
-        numpadValue = parseInt(numpadValue) + 1;
-        temp = String(parseInt(temp) + 1);
+        if ($scope.qty.uvalue != '' || numpadValue != '' || temp != '') {
+          $scope.qty.uvalue = parseInt($scope.qty.uvalue) + 1;
+          numpadValue = parseInt(numpadValue) + 1;
+          temp = String(parseInt(temp) + 1);
+        } else {
+          Alert.warning('Invalid Operation.');
+        }
       };
 
       $scope.numpadMinus = function () {
-        if (numpadValue < 1 || temp < 1) {
-          Alert.warning('Action not Allowed.');
+        if (numpadValue < 1 || temp < 1 || $scope.qty.uvalue < 1) {
+          Alert.warning('Invalid Operation.');
         } else {
           $scope.qty.uvalue -= 1;
           numpadValue -= 1;
@@ -577,11 +586,14 @@ angular.module('itouch.controllers')
         if (temp.length == 1) {
           $scope.qty.uvalue = 0;
           numpadValue = '';
-        } else {
+          temp = 0;
+        } else if (temp.length >= 2){
           var del = temp.substr(0, temp.length - 1);
           $scope.qty.uvalue = del;
           numpadValue = del;
           temp = del;
+        } else {
+          $scope.numpadClear();
         }
       };
       /**
@@ -773,6 +785,7 @@ angular.module('itouch.controllers')
           $scope.qty.value = 1;
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
+          // console.log(salesKit);
           if (salesKit && !salesKit.isEmpty) {
             if ($scope.showskModalModal == false) {
               $scope.showskModalModal = true;
