@@ -138,7 +138,8 @@ angular.module('itouch.services')
             deferred.resolve(pwp);
           } else {
             Alert.error('Expire promotion period');
-            return expire = true;
+            var expire = true;
+            deferred.resolve(expire);
           }
         } else {
           type = 0;

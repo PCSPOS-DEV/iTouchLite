@@ -361,7 +361,7 @@ angular.module('itouch.controllers')
         $scope.showpwpModal = false;
         $scope.qty.value = 1;
         $scope.pwpModal.remove();
-        // $scope.$emit('BlockMenu', false);
+        $scope.$emit('BlockMenu', true);
       });
 
       /**
@@ -862,7 +862,7 @@ angular.module('itouch.controllers')
                       item.customQuantity = 1;
                     }
                   }
-                  if (pwp && ( (item.Qty >= pwp.Quantity) || item.customQuantity >= pwp.Quantity)) {
+                  if (pwp && ( (item.Qty >= pwp.Quantity) || item.customQuantity >= pwp.Quantity) && pwp != true) {
                     if ($scope.showpwpModal == false) {
                       $scope.showpwpModal = true;
                       $scope.pwp = pwp;
@@ -876,8 +876,9 @@ angular.module('itouch.controllers')
                         $scope.pwpModal.show();
                       });
                     }
+                  } else if (pwp == true) {   
+                    $scope.$emit('BlockMenu', true);
                   } else {
-
                     CartItemService.addItemToCart($scope.header.DocNo, item).then(function (it) {
                       $scope.refreshCart().then(function () {
                         //$scope.scrollTo(it.LineNumber);
