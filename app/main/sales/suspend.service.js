@@ -48,7 +48,6 @@ angular.module('itouch.services')
           header.EntityId = entityId;
           promises.push($q.all({
             SuspendBillHeader: $q.when(header),
-            SuspendBillFilter: [],
             SuspendBillDetail: DB.select(DB_CONFIG.tableNames.bill.tempDetail, '*', {
               columns: 'DocNo=?',
               data: [DocNo]
@@ -96,7 +95,7 @@ angular.module('itouch.services')
             if (suspended == true && suspendedDepDocNo !== '') {
               console.log('GGWP');
             } else {
-              Reciept.printSuspend(res, bill);
+              Reciept.printSuspend(res);
             }
             return self.removeBill(header.DocNo);
                     /*if (res == 'success') {

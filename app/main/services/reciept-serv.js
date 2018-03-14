@@ -646,18 +646,13 @@ angular.module('itouch.services')
     };
 
     /*Yi Yi Po*/
-    self.fetchSuspendData = function (DocNo, bill) {
+    self.fetchSuspendData = function (DocNo) {
       return Restangular.one('GetSuspendBill').get({DocNo: DocNo}).then(function (res) {
         try {
           var bills = JSON.parse(res);
+                    //var header = _.first(bills.DBSuspendBillHeader);
           var header = ItemService.calculateTotal( _.first(bills.DBSuspendBillHeader));
-          var items = bill.SuspendBillFilter;
-          angular.forEach(bill.SuspendBillDetail, function (value, key) {
-            if (value.SuspendDepDocNo == '' && value.ItemType != 'RND') {
-              console.log(value);
-              bill.SuspendBillFilter.push(value);
-            }
-          });
+          var items = bills.DBSuspendBillDetail;
           _.forEach(items, function (item) {
             var itemdiscounts = [];
             _.forEach(bills.DBSuspendBillDiscounts, function (discount) {
@@ -699,14 +694,13 @@ angular.module('itouch.services')
         console.log(ex);
       });
     };
-    self.printSuspend = function (DocNo, bill) {
-
+    self.printSuspend = function (DocNo) {
       if (PrintService.isConnected()) {
         try {
           printer = PrintService.getPrinter();
 
           if (printer) {
-            self.fetchSuspendData(DocNo, bill).then(function (data) {
+            self.fetchSuspendData(DocNo).then(function (data) {
 
               printData = data.footerData.printData;
 
