@@ -1072,13 +1072,17 @@ angular.module('itouch.controllers')
             if (item.ItemType == 'PWI') {
               return;
             } else if (item.ItemType == 'SKT') {
-              BillService.voidSalesKit(item).then(function () {
-                $scope.refreshCart().then(function () {
-                  $scope.selectItemWithLineNumber();
+              if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
+                Alert.warning('Item Void not allowed.', 'ItouchLite');
+              } else {
+                BillService.voidSalesKit(item).then(function () {
+                  $scope.refreshCart().then(function () {
+                    $scope.selectItemWithLineNumber();
+                  });
+                }, function (err) {
+                  console.log(err);
                 });
-              }, function (err) {
-                console.log(err);
-              });
+              }
             }
             // else if(item.ItemType == 'PWP'){
             //   var promises = [BillService.voidItem(item)];
@@ -1123,6 +1127,8 @@ angular.module('itouch.controllers')
                       });
                     });
                   }
+                } else {
+                  Alert.warning('This item is unchangable', 'ItouchLite');
                 }
               } else {
                 if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
