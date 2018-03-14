@@ -356,8 +356,9 @@ angular.module('itouch.controllers')
       /**
        * Biding an event to catch modal close call
        */
-      $scope.$on('pwpModal-close', function () {
+      $scope.$on('pwpModal-close', function (modal, pwpitem) {
         // selectLastItem();
+        $scope.cart.selectedItem = pwpitem;
         $scope.showpwpModal = false;
         $scope.qty.value = 1;
         $scope.pwpModal.remove();

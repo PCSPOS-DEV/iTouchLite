@@ -91,7 +91,7 @@ angular.module('itouch.services')
         var resultSet =  DB.fetchAll(result);
         console.log(resultSet);
         console.log(resultSet.length);
-        console.log(type)
+        console.log(type);
         var pwp = null;
         if (resultSet.length > 0 ) {
           type = 1;
