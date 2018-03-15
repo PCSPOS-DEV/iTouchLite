@@ -226,6 +226,7 @@ angular.module('itouch.controllers')
         return BillService.getTempHeader(rec_id).then(function (header) {
           var promise;
           if (!header) {
+            BillService.voidOldBill();
             return BillService.initHeader().then(function (header) {
               // console.log(header);
               $scope.refreshCart();
