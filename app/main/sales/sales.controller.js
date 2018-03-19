@@ -787,7 +787,7 @@ angular.module('itouch.controllers')
           $scope.qty.value = 1;
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
-          // console.log(salesKit);
+          console.log(salesKit);
           if (salesKit && !salesKit.isEmpty) {
             if ($scope.showskModalModal == false) {
               $scope.showskModalModal = true;
@@ -1081,6 +1081,7 @@ angular.module('itouch.controllers')
                   $scope.refreshCart().then(function () {
                     $scope.selectItemWithLineNumber();
                   });
+                  $scope.$emit('BlockMenu', true);
                 }, function (err) {
                   console.log(err);
                 });
