@@ -335,7 +335,7 @@ angular.module('itouch.controllers')
         $scope.showskModalModal = false;
         $scope.qty.value = 1;
         $scope.modals.salesKit.hide();
-        // $scope.$emit('BlockMenu', false);
+        $scope.navMenuCtrl();
       });
 
       /**
@@ -346,7 +346,7 @@ angular.module('itouch.controllers')
         $scope.salesKitUpdate = false;
         $scope.qty.value = 1;
         $scope.modals.salesKit.hide();
-        $scope.$emit('BlockMenu', false);
+        $scope.navMenuCtrl();
       });
 
       /**
@@ -363,15 +363,19 @@ angular.module('itouch.controllers')
         $scope.showpwpModal = false;
         $scope.qty.value = 1;
         $scope.pwpModal.remove();
-        $scope.$emit('BlockMenu', true);
+        $scope.navMenuCtrl();
       });
 
       /**
        * Biding an event to catch modal close call
        */
-      // $scope.$on('pwpModal-save', function () {
-      //   $scope.pwpModal.hide();
-      // });
+      $scope.$on('pwpModal-save', function (modal, pwpitem) {
+        $scope.cart.selectedItem = pwpitem;
+        $scope.showpwpModal = false;
+        $scope.qty.value = 1;
+        $scope.pwpModal.remove();
+        $scope.navMenuCtrl();
+      });
 
       /**
        * Initiating shift modal dialog
@@ -1060,6 +1064,17 @@ angular.module('itouch.controllers')
         }
       };
 
+      $scope.navMenuCtrl = function () {
+        $timeout(function () {
+          var last = Object.keys($scope.cart.items).length - 1;
+          console.log('last : ' + last);
+          if (last >= 0) {
+            $scope.$emit('BlockMenu', false);
+          } else {
+            $scope.$emit('BlockMenu', true);
+          }
+        }, 200);
+      }
       /**
        * Contains the list of functions for sales
        * @type {{VoidTop: $scope.salesFunctions.VoidTop}}
@@ -1081,7 +1096,7 @@ angular.module('itouch.controllers')
                   $scope.refreshCart().then(function () {
                     $scope.selectItemWithLineNumber();
                   });
-                  $scope.$emit('BlockMenu', true);
+                  $scope.navMenuCtrl();
                 }, function (err) {
                   console.log(err);
                 });
@@ -1143,16 +1158,14 @@ angular.module('itouch.controllers')
                     $scope.refreshCart().then(function () {
                       $scope.selectItemWithLineNumber();
                     });
-
+                    $scope.navMenuCtrl();
                   }, function (err) {
                     console.log(err);
                   });
                 }
               }
             }
-            if (last == 0) {
-              $scope.$emit('BlockMenu', true);
-            }
+            $scope.navMenuCtrl();
           } else {
             if (!buttonClicked.voidBill) {
               buttonClicked.voidBill = true;

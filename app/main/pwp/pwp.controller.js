@@ -230,7 +230,7 @@ angular.module('itouch.controllers')
                   });
                 } else {
                   $scope.$emit('refresh-cart');
-                  $scope.$emit('pwpModal-close', res[0]);
+                  $scope.$emit('pwpModal-save', res[0]);
                   return $scope.pwp.item;
                 }
 
