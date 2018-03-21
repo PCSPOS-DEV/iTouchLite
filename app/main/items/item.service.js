@@ -311,12 +311,13 @@ angular.module('itouch.services')
       self.getItemById = function (id) {
         var itype = typeof id;
         if (itype == 'number'){
-          strid = id;
-        } else {
-          pinid = id.indexOf('-');
-          idlen = id.length;
-          strid = parseInt(id.substr(pinid + 1, idlen));
+          strid = Math.floor(id);
         }
+        // else {
+        //   pinid = id.indexOf('-');
+        //   idlen = id.length;
+        //   strid = parseInt(id.substr(pinid + 1, idlen));
+        // }
 
         var deferred = $q.defer();
         location = LocationService.currentLocation;
