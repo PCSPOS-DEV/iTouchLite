@@ -320,6 +320,19 @@ angular.module('itouch.services')
       }
     };
 
+    self.printSignal = function () {
+      if (PrintService.isConnected()) {
+        try {
+          printer = PrintService.getPrinter();
+          printer.send();
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        Alert.success('printer not connected', 'Error');
+      }
+    };
+
     self.getBillHeader = function (DocNo) {
       return DB.query('SELECT v.*, s.DocNo  AS SalesDocNo  FROM ' + DB_CONFIG.tableNames.bill.header + ' AS v LEFT OUTER JOIN ' + DB_CONFIG.tableNames.bill.header + ' AS s ON v.DocNo = s.VoidDocNo WHERE v.DocNo = ?', [DocNo]).then(function (res) {
         var item = DB.fetch(res);

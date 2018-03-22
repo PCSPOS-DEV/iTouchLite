@@ -2,7 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService', '$timeout', 'Reciept', 'UploadService', 'SuspendService',
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService',
+   '$timeout', 'Reciept', 'UploadService', 'SuspendService', 
     function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService, SuspendService) {
       var self = this;
       var dayEnd = false;
@@ -66,12 +67,12 @@ angular.module('itouch.controllers')
       self.openShiftCloseModal = function () {
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
-          if (suspenditem == 0) { // GGWP
+          // if (suspenditem == 0) { // GGWP
             $scope.shiftListType = 'close';
             self.shiftModal.show();
-          } else {
-            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
-          }
+          // } else {
+          //   Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+          // }
         });
 
       };
@@ -109,71 +110,74 @@ angular.module('itouch.controllers')
 
       var openCashPopUp = function (shift, dayEnd) {
         Reciept.openDrawer();
-        $scope.data = {};
-        var buttons = [
-          {
-            text: '<b>Ok</b>',
-            type: 'button-positive',
-            onTap: function (e) {
-              if ($scope.data.cash && !_.isNaN($scope.data.cash)) {
-                return $scope.data.cash;
-              } else {
-                e.preventDefault();
-                Alert.warning('Entered value is invalid!');
+        Reciept.printSignal();
+        setTimeout(function () {
+          $scope.data = {};
+          var buttons = [
+            {
+              text: '<b>Ok</b>',
+              type: 'button-positive',
+              onTap: function (e) {
+                if ($scope.data.cash && !_.isNaN($scope.data.cash)) {
+                  return $scope.data.cash;
+                } else {
+                  e.preventDefault();
+                  Alert.warning('Entered value is invalid!');
+                }
               }
             }
-          }
-        ];
+          ];
 
-        if (!dayEnd) {
-          buttons.push({
-            text: 'Later',
-            onTap: function (e) {
-              return 'later';
-            }
+          if (!dayEnd) {
+            buttons.push({
+              text: 'Later',
+              onTap: function (e) {
+                return 'later';
+              }
+            });
+          }
+
+          // An elaborate, custom popup
+          var myPopup = $ionicPopup.show({
+            template: '<input type="number" ng-model="data.cash">',
+            title: 'Declare Cash',
+            // subTitle: 'Please use normal things',
+            scope: $scope,
+            buttons: buttons
           });
-        }
 
-        // An elaborate, custom popup
-        var myPopup = $ionicPopup.show({
-          template: '<input type="number" ng-model="data.cash">',
-          title: 'Declare Cash',
-          // subTitle: 'Please use normal things',
-          scope: $scope,
-          buttons: buttons
-        });
+          myPopup.then(function (cash) {
+            var promise = null;
+            if (cash == 'later') {
 
-        myPopup.then(function (cash) {
-          var promise = null;
-          if (cash == 'later') {
+              ShiftService.declareCashLater(shift.Id).then(function () {
+                refreshData();
+                self.shiftModal.hide();
+                showReopenModal();
+              }, function (err) {
+                console.log(err);
+              });
+            } else {
+              ShiftService.declareCash(cash, shift.Id).then(function (DocNo) {
+                // if(cash && !_.isNaN(cash)){
+                self.shiftModal.hide();
+                Report.printDeclareCash(shift, cash);
+                refreshData();
 
-            ShiftService.declareCashLater(shift.Id).then(function () {
-              refreshData();
-              self.shiftModal.hide();
-              showReopenModal();
-            }, function (err) {
-              console.log(err);
-            });
-          } else {
-            ShiftService.declareCash(cash, shift.Id).then(function (DocNo) {
-              // if(cash && !_.isNaN(cash)){
-              self.shiftModal.hide();
-              Report.printDeclareCash(shift, cash);
-              refreshData();
+                Report.printShiftClosingReport(shift.Id);
 
-              Report.printShiftClosingReport(shift.Id);
+                showReopenModal();
+                // } else {
+                //   Alert.warning('Entered value is invalid!');
+                // }
 
-              showReopenModal();
-              // } else {
-              //   Alert.warning('Entered value is invalid!');
-              // }
-
-            }, function (err) {
-              console.log(err);
-            });
-          }
-          // console.log('Tapped!', res);
-        });
+              }, function (err) {
+                console.log(err);
+              });
+            }
+            // console.log('Tapped!', res);
+          });
+        }, 500);
       };
 
       /**
@@ -201,8 +205,8 @@ angular.module('itouch.controllers')
       self.openDayEnd = function() {
         if (ask == 0) { 
           ask = 1;
-          Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
-            if (res == 1) {
+          // Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
+          //   if (res == 1) {
               $scope.flag = true;
               $q.all({
                 declare: ShiftService.getDeclareCashShifts(),
@@ -239,8 +243,8 @@ angular.module('itouch.controllers')
 
                 shiftclosingReport();
               });
-            }
-          });
+          //   }
+          // });
         } else {
           shiftclosingReport();
         }
