@@ -19,7 +19,7 @@
       </div>
       <div class="col col-40">
         <div class="stats">
-          <div class="row">
+          <div class="row" >
             <div class="col col-33">Quantity Entered</div>
             <div class="col">{{pwp.QtyEntered}}</div>
             <div class="col col-33">Max Price</div>
@@ -33,13 +33,15 @@
           </div>
         </div>
         <div>
-            <div class="row">
+          <div class="info">
+            <div class="row sblock">
               <div class="col col-50">Description</div>
               <div class="col col-25">Price</div>
               <div class="col col-25">Qty</div>
             </div>
+          </div>
         </div>
-        <div class="col">
+        <div class="col" style="border-style: solid; border-width: 1px 0px 0px 0px;">
           <ion-scroll zooming="false" direction="y" style="height: 140px;">
           <div class="selected-items">
             <div ng-repeat="item in pwp.selectedItems | orderObjectBy :'AddedAt'" class="row" ng-class="{selected: item.selected == true}" ng-click="selectRow(item)">
@@ -50,7 +52,7 @@
           </div>
         </ion-scroll>
         </div>
-          <div class="row">
+          <div class="row" style="border-style: solid; border-width: 1px 0px 0px 0px;">
             <div class="col col-50">Total</div>
             <div class="col col-25">{{tempSubTotal | currency}}</div>
             <div class="col col-25">{{pwp.Qty}}</div>

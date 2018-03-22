@@ -410,8 +410,8 @@ angular.module('itouch.controllers')
         if (!ShowQtyBox) {
           $scope.data.barcodeMode = false;
           ShowQtyBox = true;
-          $scope.qty.nvalue = '';
-          $scope.qty.uvalue = '';
+          $scope.qty.nvalue = 0;
+          $scope.qty.uvalue = 0;
           return $ionicPopup.show({
             template: [
               '<style>.popup-container.popup-showing{top: 0%;}</style>' +

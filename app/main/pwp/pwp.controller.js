@@ -132,11 +132,8 @@ angular.module('itouch.controllers')
         if ($scope.selectedRow && $scope.selectedRow.Default != true) {
           if (flag == false) {
             SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
-            console.log(SubItemTotalPrice)
             temp = temp - SubItemTotalPrice;
-            console.log(temp);
             $scope.tempSubTotal = $scope.tempSubTotal - SubItemTotalPrice;
-            console.log($scope.tempSubTotal);
           }
           removeSelectedItem($scope.selectedRow.SubItemId);
           $scope.selectRow(null);
