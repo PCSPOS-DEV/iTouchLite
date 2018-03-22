@@ -42,7 +42,7 @@
           </div>
         </div>
         <div class="col" style="border-style: solid; border-width: 1px 0px 0px 0px;">
-          <ion-scroll zooming="false" direction="y" style="height: 140px;">
+          <ion-scroll zooming="false" direction="y" style="height: 170px;">
           <div class="selected-items">
             <div ng-repeat="item in pwp.selectedItems | orderObjectBy :'AddedAt'" class="row" ng-class="{selected: item.selected == true}" ng-click="selectRow(item)">
               <div class="col col-50">{{print(item, 'ItemDesc')}}</div>
