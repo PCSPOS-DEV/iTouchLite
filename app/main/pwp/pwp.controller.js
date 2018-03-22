@@ -60,13 +60,17 @@ angular.module('itouch.controllers')
 
       var addItem = function (item) {
         if (item) {
+          if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
+            Alert.warning('You have selected the maximum children allowed for this PWP.');
+            return true;
+          }
           $timeout(function () {
             temp += item.Price;
             if (temp <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
               $scope.tempSubTotal = temp;
               SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
             } else {
-              Alert.warning('The child total price excced the limit of maximum price.');
+              Alert.warning('The child total price exceed the limit of maximum price.');
               console.log($scope.selectedRow);
               $scope.selectedRow.Qty--;
               $scope.pwp.Qty--;
@@ -78,10 +82,7 @@ angular.module('itouch.controllers')
               return true;
             }
           }, 200);
-          if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
-            Alert.warning('You have selected the maximum children allowed for this PWP.');
-            return true;
-          }
+          
           var exItem = _.findWhere($scope.pwp.selectedItems, { SubItemId: item.SubItemId});
           if (exItem) {
             if (exItem && item.SubItemMaxQty > exItem.Qty) {
@@ -130,8 +131,12 @@ angular.module('itouch.controllers')
       $scope.clearSelected = function (flag) {
         if ($scope.selectedRow && $scope.selectedRow.Default != true) {
           if (flag == false) {
+            SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
+            console.log(SubItemTotalPrice)
             temp = temp - SubItemTotalPrice;
+            console.log(temp);
             $scope.tempSubTotal = $scope.tempSubTotal - SubItemTotalPrice;
+            console.log($scope.tempSubTotal);
           }
           removeSelectedItem($scope.selectedRow.SubItemId);
           $scope.selectRow(null);
