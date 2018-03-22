@@ -504,13 +504,17 @@ angular.module('itouch.controllers')
           numpadValue = parseInt(numpadValue) + 1;
           temp = String(parseInt(temp) + 1);
         } else {
-          Alert.warning('Invalid Operation.');
+          $scope.qty.uvalue = 1;
+          numpadValue = 1;
+          temp = 1;
         }
       };
 
       $scope.numpadMinus = function () {
         if (numpadValue < 1 || temp < 1 || $scope.qty.uvalue < 1) {
-          Alert.warning('Invalid Operation.');
+          $scope.qty.uvalue = 0;
+          numpadValue = 0;
+          temp = 0;
         } else {
           $scope.qty.uvalue -= 1;
           numpadValue -= 1;
