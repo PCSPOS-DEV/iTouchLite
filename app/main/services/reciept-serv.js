@@ -651,13 +651,18 @@ angular.module('itouch.services')
         try {
           var bills = JSON.parse(res);
           var header = ItemService.calculateTotal( _.first(bills.DBSuspendBillHeader));
-          var items = bill.SuspendBillFilter;
-          angular.forEach(bill.SuspendBillDetail, function (value, key) {
-            if (value.SuspendDepDocNo == '' && value.ItemType != 'RND') {
-              console.log(value);
-              bill.SuspendBillFilter.push(value);
-            }
-          });
+          if (bill == undefined) {
+            var items = bills.DBSuspendBillDetail;
+          }
+          else {
+            var items = bill.SuspendBillFilter;
+            angular.forEach(bill.SuspendBillDetail, function (value, key) {
+              if (value.SuspendDepDocNo == '' && value.ItemType != 'RND') {
+                console.log(value);
+                bill.SuspendBillFilter.push(value);
+              }
+            });
+          }
           _.forEach(items, function (item) {
             var itemdiscounts = [];
             _.forEach(bills.DBSuspendBillDiscounts, function (discount) {
