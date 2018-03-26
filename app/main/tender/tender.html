@@ -5,13 +5,13 @@
         <div class="col col-50">
           <div class="row">
             <div class="col col-50 underlined">
-              <div class="row">
+              <div class="row" style="padding:15px 5px 5px;">
                 <div class="col">Receipt No</div>
                 <div class="col">{{ tenderHeader.DocNo }}</div>
               </div>
             </div>
             <div class="col col-40 underlined">
-              <div class="row">
+              <div class="row" style="padding:15px 5px 5px;">
                 <div class="col">NA</div>
                 <div class="col">{{ tenderHeader.Tax3Amount.toFixed(2) }}</div>
               </div>
@@ -19,13 +19,13 @@
           </div>
           <div class="row">
             <div class="col col-50 underlined">
-              <div class="row">
+              <div class="row" style="padding:5px;">
                 <div class="col">Discount</div>
                 <div class="col">{{ (tenderHeader.Discount+tenderHeader.Tax5DiscAmount).toFixed(2) }}</div>
               </div>
             </div>
             <div class="col col-40 underlined">
-              <div class="row">
+              <div class="row" v>
                 <div class="col">NA</div>
                 <div class="col">{{ tenderHeader.Tax4Amount.toFixed(2) }}</div>
               </div>
@@ -33,13 +33,13 @@
           </div>
           <div class="row">
             <div class="col col-50 underlined">
-              <div class="row">
+              <div class="row" style="padding:5px;">
                 <div class="col">NA</div>
                 <div class="col">{{ tenderHeader.Tax1Amount.toFixed(2)}}</div>
               </div>
             </div>
             <div class="col col-40 underlined">
-              <div class="row">
+              <div class="row" style="padding:5px;">
                 <div class="col">GST 7%</div>
                 <div class="col">{{ (tenderHeader.Tax5Amount - tenderHeader.Tax5DiscAmount||0).toFixed(2) }}</div>
               </div>
@@ -47,13 +47,13 @@
           </div>
           <div class="row">
             <div class="col col-50 underlined">
-              <div class="row">
+              <div class="row" style="padding:5px;">
                 <div class="col">NA</div>
                 <div class="col">{{ tenderHeader.Tax2Amount.toFixed(2) }}</div>
               </div>
             </div>
             <div class="col col-40 underlined">
-              <div class="row">
+              <div class="row" style="padding:5px;">
                 <div class="col">&nbsp;</div>
                 <div class="col">&nbsp;</div>
               </div>
@@ -63,7 +63,7 @@
 
 
         <div class="col col-50 totals">
-          <div class="row">
+          <div class="row" style="padding:15px 5px 5px;">
             <div class="col col-60">Sub Total</div>
             <div class="col col-40">
               <div class="total">
