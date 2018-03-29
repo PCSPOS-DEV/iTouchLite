@@ -253,7 +253,9 @@ angular.module('itouch.controllers')
 
       var shiftclosingReport = function () {
         var businessDate = angular.copy(ControlService.getBusinessDate());
-        Report.printShiftClosingReport(null, businessDate);
+        $timeout(function () {
+          Report.printShiftClosingReport(null, businessDate);
+        }, 100);
         $timeout(function () {
           ShiftService.dayEnd().then(function () {
             dayEnd = false;
@@ -271,7 +273,7 @@ angular.module('itouch.controllers')
             dayEnd = false;
             console.log(err);
           });
-        }, 500);
+        }, 200);
       }
 
       /**
