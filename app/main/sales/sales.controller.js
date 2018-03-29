@@ -225,6 +225,7 @@ angular.module('itouch.controllers')
         var rec_id = BillService.getCurrentReceiptId();
         return BillService.getTempHeader(rec_id).then(function (header) {
           var promise;
+          $scope.navMenuCtrl();
           if (!header) {
             BillService.voidOldBill();
             return BillService.initHeader().then(function (header) {
@@ -983,6 +984,7 @@ angular.module('itouch.controllers')
           $scope.cart.items = items;
           $scope.cart.isEmpty = _.isEmpty(items);
           $scope.cart.summery = CartItemService.getSummery();
+          $scope.navMenuCtrl();
           if (!$scope.cart.isEmpty) {
             angular.forEach($scope.cart.items, function (item, key) {
               if ($scope.cart.selectedItem && $scope.cart.selectedItem.ItemId == item.ItemId && $scope.cart.selectedItem.LineNumber == item.LineNumber) {
