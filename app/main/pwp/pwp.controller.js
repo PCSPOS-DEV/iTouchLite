@@ -12,6 +12,8 @@ angular.module('itouch.controllers')
       $scope.tempSubTotal = 0;
       var temp = 0;
       SubItemTotalPrice = 0;
+      $scope.disableP = false;
+      $scope.disableA = false;
 
       $scope.$on('modal.shown', function () {
         if ($scope.shownModal == 'pwp') {
@@ -28,8 +30,12 @@ angular.module('itouch.controllers')
       };
 
       $scope.selectItem = function (item) {
+        $scope.disableA = true;
         addItem(item);
         $scope.selectRow(item);
+        $timeout(function () {
+          $scope.disableA = false;
+        }, 200);
       };
 
       var addPrice = function (item) {
@@ -55,13 +61,20 @@ angular.module('itouch.controllers')
       };
 
       $scope.addSelected = function () {
+        $scope.disableP = true;
         addItem($scope.selectedRow);
+        $timeout(function () {
+          $scope.disableP = false;
+        }, 200);
       };
 
+      var tempD = 0;
       var addItem = function (item) {
         if (item) {
           if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
             Alert.warning('You have selected the maximum children allowed for this PWP.');
+            tempD = 1;
+            
             return true;
           }
           $timeout(function () {
@@ -70,7 +83,11 @@ angular.module('itouch.controllers')
               $scope.tempSubTotal = temp;
               SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
             } else {
-              Alert.warning('The child total price exceed the limit of maximum price.');
+              if (tempD == 0) {
+                Alert.warning('The child total price exceed the limit of maximum price.');
+              } else {
+                tempD = 0;
+              }
               console.log($scope.selectedRow);
               $scope.selectedRow.Qty--;
               $scope.pwp.Qty--;

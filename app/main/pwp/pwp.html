@@ -9,7 +9,7 @@
         <ion-scroll zooming="false" direction="y" style="height: 470px;">
           <!--<div class="row wrapper">-->
             <!--<div class="col">-->
-              <button ng-disabled="item.SubItemMaxQty <= item.Qty" class="button pwp-item button-calm" ng-repeat="item in pwp.items" ng-click="selectItem(item)">
+              <button ng-disabled="item.SubItemMaxQty <= item.Qty || disableA" class="button pwp-item button-calm" ng-repeat="item in pwp.items" ng-click="selectItem(item)">
                 <div>{{print(item, 'ItemDesc')}}</div>
                 <div>{{ '(Max : '+item.SubItemMaxQty+')' }}</div>
               </button>
@@ -60,7 +60,7 @@
         <div class="operations">
           <div class="row">
             <div class="col">
-              <button class="button button-full button-stable" ng-click="addSelected()">+</button>
+              <button class="button button-full button-stable" ng-click="addSelected()" ng-disabled="disableP" ng-dblclick="true">+</button>
             </div>
             <div class="col">
               <button class="button button-full button-stable" ng-click="removeSelected()">-</button>
