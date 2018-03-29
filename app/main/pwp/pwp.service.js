@@ -6,7 +6,6 @@ angular.module('itouch.services')
   function (LocationService, DB, DB_CONFIG, $q, $localStorage, Restangular, SettingsService, ControlService, Alert, PWPCtrl) {
     var self = this;
     var type = 0;
-    var expire = false;
     self.fetchItemsByPWP = function () {
       var deferred = $q.defer();
       Restangular.one('GetItemsByPwp').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
@@ -100,7 +99,7 @@ angular.module('itouch.services')
           console.log('RFromDate : ' + RFromDate);
           console.log('RToDate : ' + RToDate);
           console.log('businessDate : ' + businessDate);
-          if (RFromDate < businessDate && businessDate < RToDate) {
+          if (RFromDate < businessDate && businessDate <= RToDate) {
             var MaxItemsPerReceipt = resultSet[0].MaxNoOfItemsPerReceipt;
             pwp = _.pick(_.first(resultSet), ['Id', 'Code', 'Description1', 'Description2', 'FromDate', 'ToDate', 'Quantity', 'ItemId', 'MaxQuantity', 'MaxPrice', 'PriceLevelId']);
             if (qty > MaxItemsPerReceipt && MaxItemsPerReceipt < 0) {
@@ -137,9 +136,11 @@ angular.module('itouch.services')
             });
             deferred.resolve(pwp);
           } else {
-            Alert.error('Expire promotion period');
-            var expire = true;
-            deferred.resolve(expire);
+            // Alert.error('Expire promotion period');
+            console.log ('Expire promotion period');
+            var expire = 'expire';
+            
+            deferred.resolve(pwp, expire);
           }
         } else {
           type = 0;
