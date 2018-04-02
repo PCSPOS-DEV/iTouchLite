@@ -74,7 +74,7 @@ angular.module('itouch.services')
     };
     self.getPWP = function (item, qty) {
       var deferred = $q.defer();
-      var businessDate = moment(ControlService.getBusinessDate(true)).format('YYYY-MM-DDTHH:MM:SS');
+      var businessDate = moment(ControlService.getBusinessDate(true)).format('YYYY-MM-DDT00:00:00');
       var query = 'SELECT ' +
       'p.Id, Code, p.Description1, p.Description2, PriceLevelId, FromDate, ToDate, Quantity, p.MaxQuantity, p.MaxPrice, p.itemId, p.MaxNoOfItems, p.MaxNoOfItemsPerReceipt,' +
       'i.ItemId AS SubItemId, i.MaxQuantity AS SubItemMaxQty, i.Price AS SubItemPrice, i.DiscountId, ' +
