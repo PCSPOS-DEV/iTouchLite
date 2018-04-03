@@ -10,10 +10,14 @@ angular.module('itouch.services')
 
       var columnList = ['BusinessDate', 'LocationId', 'MachineId', 'DocNo', 'ItemId', 'LineNumber', 'SeqNo', 'DiscountFrom', 'DiscountId', 'DiscountCode', 'DiscountFor', 'DiscountType', 'DiscountAmount', 'DiscountPercentage'];
 
-
-      var getSeqNo = function (itemId, lineNumber) {
+      var eng = 0;
+      var getSeqNo = function (itemId, lineNumber, leng) {
         return DB.max(self.table, 'SeqNo', { columns: 'ItemId = ? AND LineNumber = ?', data: [itemId, lineNumber] }).then(function (ln) {
-          return ++ln;
+          if(eng >= leng){
+            eng = 0;
+          }
+          eng =  eng + 1;
+          return eng;
         });
       };
 
@@ -38,8 +42,9 @@ angular.module('itouch.services')
         return errors;
       };
 
-      self.insert = function (item, addInsertToQueue) {
-        return getSeqNo(item.ItemId, item.LineNumber).then(function (seqNo) {
+      self.insert = function (item, bills, addInsertToQueue) {
+        var leng = bills.DBSuspendBillDiscounts.length;
+        return getSeqNo(item.ItemId, item.LineNumber, leng).then(function (seqNo) {
           item.SeqNo = seqNo;
           item = _.pick(item, columnList);
           var errors = self.validate(item);

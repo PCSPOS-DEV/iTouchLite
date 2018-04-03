@@ -153,7 +153,7 @@ angular.module('itouch.services')
               _.forEach(bills.DBSuspendBillDiscounts, function (discount) {
                 discount.BusinessDate = ControlService.getBusinessDate(true);
                 discount.DocNo = BillService.getCurrentReceiptId();
-                TempBillDiscountsService.insert(discount, false);
+                TempBillDiscountsService.insert(discount, bills, true);
               });
 
               header.BusinessDate = ControlService.getBusinessDate(true);
