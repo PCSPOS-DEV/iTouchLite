@@ -38,11 +38,14 @@ angular.module('itouch.controllers')
         }, 200);
       };
 
-      var addPrice = function (item) {
+      var addPrice = function (item, discPercent) {
         return ItemService.getPrice(item.Plu, parseInt(item.PriceGroupId)).then(function (data) {
-          item.Price = data ? data.Price : 0;
-          item.OrgPrice = data ? data.OrgPrice : 0;
-          item.AlteredPrice = data ? data.AlteredPrice : 0;
+          var Bdisc = data ? data.AlteredPrice : 0;
+          var Adisc = Bdisc - (((Bdisc/100) * discPercent).toFixed(2));
+          item.AlteredPrice = (((Bdisc/100) * discPercent).toFixed(2));
+          item.Price = Adisc;
+          item.SubItemPrice = Adisc;
+          item.OrgPrice = data ? data.OrgPrice : 0;  
           item.StdCost = data ? data.StdCost : 0;
           item.PriceLevelId  = data ? data.PriceLevelId : 0;
           return item;
@@ -111,13 +114,28 @@ angular.module('itouch.controllers')
           } else {
             item.Qty = 1;
             var promise;
-            if (item.SubItemPrice >= 0) {
-              item.Price = item.SubItemPrice;
-              item.OrgPrice = item.SubItemPrice;
-              item.AlteredPrice = item.SubItemPrice;
-              promise = $q.when(item);
+            if (item.DiscountId == null) {
+              if (item.SubItemPrice >= 0) {
+                item.Price = item.SubItemPrice;
+                item.OrgPrice = item.SubItemPrice;
+                item.AlteredPrice = item.SubItemPrice;
+                promise = $q.when(item);
+              } else {
+                promise = addPrice(item);
+              }
             } else {
-              promise = addPrice(item);
+              if (item.SubItemPrice != 0 && item.DiscountId != null) {
+                item.Price = item.SubItemPrice;
+                item.OrgPrice = item.SubItemPrice;
+                item.AlteredPrice = item.SubItemPrice;
+                promise = $q.when(item);
+              } else {
+                DiscountService.getDiscountById(item.DiscountId).then(function(dis){
+                  addPrice(item, dis.Percentage);
+                });
+                promise = $q.when(item);
+                // promise = addPrice(item);
+              }
             }
             promise.then(function (item) {
               // item.MaxQuantity--;
@@ -132,6 +150,7 @@ angular.module('itouch.controllers')
 
       $scope.removeSelected = function () {
         if ($scope.selectedRow && $scope.selectedRow.Qty > 0) {
+          console.log();
           $scope.selectedRow.Qty--;
           $scope.pwp.Qty--;
           $scope.tempSubTotal -= $scope.selectedRow.Price;
