@@ -160,14 +160,18 @@ angular.module('itouch.services')
       var uploading = false;
       self.upload = function () {
         if (!uploading) {
+          console.log('3');
           uploading = true;
           DB.clearQueue();
+          console.log('2');
           return self.getBills().then(function (bills) {
             console.log(bills);
             var promises = [];
+            console.log('1');
             angular.forEach(bills, function (bill) {
-              if (typeof (bill.BillHeader) !== 'undefined')
-                    {
+              console.log(bill);
+              console.log(bill.BillHeader);
+              if (typeof (bill.BillHeader) !== 'undefined') {
                 var DocNo = bill.BillHeader.DocNo;
                 bill.BillHeader = [bill.BillHeader];
                 promises.push(post(bill).then(function (res) {
