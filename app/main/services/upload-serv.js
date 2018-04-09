@@ -160,17 +160,16 @@ angular.module('itouch.services')
       var uploading = false;
       self.upload = function () {
         if (!uploading) {
-          console.log('3');
           uploading = true;
           DB.clearQueue();
-          console.log('2');
           return self.getBills().then(function (bills) {
-            console.log(bills);
             var promises = [];
-            console.log('1');
             angular.forEach(bills, function (bill) {
-              console.log(bill);
-              console.log(bill.BillHeader);
+              if (bill.BillDetail != undefined) {
+                angular.forEach(bill.BillDetail, function (ids) {
+                  ids.ItemId = Math.floor(ids.ItemId);
+                });
+              }
               if (typeof (bill.BillHeader) !== 'undefined') {
                 var DocNo = bill.BillHeader.DocNo;
                 bill.BillHeader = [bill.BillHeader];
@@ -230,8 +229,6 @@ angular.module('itouch.services')
       };
 
       var post = function (data) {
-        console.log('BusinessDate');
-        console.log(data);
         var config = $localStorage.itouchConfig;
         if (config && config.baseUrl) {
           return Restangular.oneUrl('uplink', config.baseUrl + 'UpdateBill').customPOST(
