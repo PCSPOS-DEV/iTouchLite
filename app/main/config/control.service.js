@@ -80,7 +80,7 @@ angular.module('itouch.services')
      */
     self.setDayEndDate = function (m) {
       $localStorage.app_config.dayEndDate = m.valueOf();
-      self.setBusinessDate(moment().format('DD-MM-YYYY'));//setting business date to 2000-jan-01 (month is 0 based in js)
+      self.setBusinessDate(moment([1950, 0, 1])); //setting business date to 1950-jan-01 (month is 0 based in js)
       // $localStorage.app_config.businessDate = moment().valueOf();
     };
 
@@ -90,7 +90,7 @@ angular.module('itouch.services')
      * @returns {Date}
        */
     self.getNextBusinessDate = function () {
-      if (self.getBusinessDate() && moment().diff(self.getBusinessDate())) {
+      if(self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())){
         return self.getBusinessDate().add(1, 'days');
       } else {
         return (self.getDayEndDate() ? self.getDayEndDate().add(1, 'days') : moment());
@@ -103,7 +103,7 @@ angular.module('itouch.services')
      * @returns {Date}
      */
     self.isNewBusinessDate = function () {
-      if (self.getBusinessDate() && moment().diff(self.getBusinessDate())) {
+      if(self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())){
         return false;
       } else {
         return true;
@@ -115,7 +115,7 @@ angular.module('itouch.services')
      * @returns {string}
        */
     self.getNextDocId = function () {
-      if ($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)) {
+      if($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)){
         var newId = parseInt($localStorage.app_config.currentDocId.substring(1, 6));
         return 'R' + ('00000' + ++newId).slice(-5);
       } else {
