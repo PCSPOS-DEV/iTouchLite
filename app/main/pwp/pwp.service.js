@@ -99,7 +99,7 @@ angular.module('itouch.services')
           console.log('RFromDate : ' + RFromDate);
           console.log('RToDate : ' + RToDate);
           console.log('businessDate : ' + businessDate);
-          if (RFromDate < businessDate && businessDate <= RToDate) {
+          if (RFromDate <= businessDate && businessDate <= RToDate) {
             var MaxItemsPerReceipt = resultSet[0].MaxNoOfItemsPerReceipt;
             pwp = _.pick(_.first(resultSet), ['Id', 'Code', 'Description1', 'Description2', 'FromDate', 'ToDate', 'Quantity', 'ItemId', 'MaxQuantity', 'MaxPrice', 'PriceLevelId']);
             if (qty > MaxItemsPerReceipt && MaxItemsPerReceipt < 0) {
