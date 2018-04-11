@@ -166,7 +166,7 @@ angular.module('itouch.services')
 
     self.getBusinessDate = function () {
       if (settings.business_date) {
-        return (_.isNumber(settings.business_date)) ? moment(settings.business_date).format('DD-MM-YYYY') : settings.business_date;
+        return (_.isNumber(settings.business_date)) ? moment(settings.business_date).format('DD-MMM-YYYY') : settings.business_date;
         // return settings.business_date;
       }
       else{
