@@ -67,12 +67,12 @@ angular.module('itouch.controllers')
       self.openShiftCloseModal = function () {
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
-          // if (suspenditem == 0) { // GGWP
+          if (suspenditem == 0) { // GGWP
             $scope.shiftListType = 'close';
             self.shiftModal.show();
-          // } else {
-          //   Alert.warning('Suspend Item is not empty.', 'ItouchLite');
-          // }
+          } else {
+            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+          }
         });
 
       };
@@ -159,7 +159,7 @@ angular.module('itouch.controllers')
               });
             } else {
               ShiftService.declareCash(cash, shift.Id).then(function (DocNo) {
-                // if(cash && !_.isNaN(cash)){
+                if(cash && !_.isNaN(cash)){
                 self.shiftModal.hide();
                 Report.printDeclareCash(shift, cash);
                 refreshData();
@@ -167,9 +167,9 @@ angular.module('itouch.controllers')
                 Report.printShiftClosingReport(shift.Id);
 
                 showReopenModal();
-                // } else {
-                //   Alert.warning('Entered value is invalid!');
-                // }
+                } else {
+                  Alert.warning('Entered value is invalid!');
+                }
 
               }, function (err) {
                 console.log(err);
