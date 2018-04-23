@@ -2,10 +2,10 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('SalesCtrl', ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal',
+  .controller('SalesCtrl', ['$scope', 'KeyBoardService', '$timeout', 'ItemService', 'SubPLU1Service', 'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', '$ionicModal', '$http',
     'AuthService', 'CartItemService', 'ControlService', 'ionicDatePicker', 'FunctionsService', '$filter', 'SalesKitService', 'DiscountService', 'BillService', 'ShiftService',
     'PWPService', '$ionicScrollDelegate', 'Alert', '$q', '$ionicPopup', 'header', 'user', 'shift', '$state', '$rootScope', 'Reciept', '$cordovaToast', 'SuspendService', 'AppConfig', 'Restangular',
-    function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal,
+    function ($scope, KeyBoardService, $timeout, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service, PriceGroupService, $ionicModal, $http,
               AuthService, CartItemService, ControlService, ionicDatePicker, FunctionsService, $filter, SalesKitService, DiscountService, BillService, ShiftService,
               PWPService, $ionicScrollDelegate, Alert, $q, $ionicPopup, header, user, shift, $state, $rootScope, Reciept, $cordovaToast, SuspendService, AppConfig, Restangular) {
       $scope.showpwpModal = false;
@@ -26,6 +26,10 @@ angular.module('itouch.controllers')
       var submitted = false;
       var businessDate = ControlService.getBusinessDate(true);
       var Suspended = false;
+      var request = new XMLHttpRequest();
+      var requestUrl = 'http://172.16.110.99:999/api/Item';
+      var ApiArray = new Array();
+      var UpData;
       $scope.salesKits = {
         list: {},
         selectedList: {},
@@ -891,6 +895,7 @@ angular.module('itouch.controllers')
                     $scope.$emit('BlockMenu', true);
                   } else {
                     CartItemService.addItemToCart($scope.header.DocNo, item).then(function (it) {
+                      console.log('item');console.log(item);
                       $scope.refreshCart().then(function () {
                         //$scope.scrollTo(it.LineNumber);
                         $scope.qty.value = 1;
@@ -975,13 +980,228 @@ angular.module('itouch.controllers')
           $state.go('app.tender', {DocNo: $scope.header.DocNo});
         }
       };
+      /**
+       * Secondary display Post
+       */
+      $scope.PostApi = function () {
+        var DitemArray = new Array;
+        var Nitem;
+        angular.forEach($scope.cart.items, function(Ditem) {
+          console.log('Ditem');
+          console.log(Ditem);
+          DitemArray.push(Ditem);
+          console.log('DArray');
+          console.log(DitemArray);
+          Nitem = DitemArray[DitemArray.length-1];
+          console.log('Nitem');
+          console.log(Nitem);
+          console.log(Nitem.ItemId);
+          console.log(Nitem.LineNumber);
+          console.log(Nitem.itemType);
+          $http({
+            method: 'POST',
+            url: 'http://172.16.110.99:999/api/Item',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            data: {
+              "itemDescription": Nitem.Desc1,
+              "itemQuantity": Nitem.Qty,
+              "itemTotal": Nitem.Total,
+              "itemDiscount": Nitem.Discount,
+              "itemOrgPrice": Nitem.OrgPrice,
+              "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+              "machineId": Nitem.MachineId,
+              "locationId": Nitem.LocationId,
+              "docNo": Nitem.DocNo,
+              "itemType": Nitem.ItemType,
+              "itemId" : Nitem.ItemId,
+              "lineNumber" : Nitem.LineNumber
+            }
+          }).then(function successCallback(response) {
+          console.log('Nice');
+          }, function errorCallback(response) {
+            console.log(response);
+          });
+        });
+      };
+
+
+      /**
+       * Secondary display Delete
+       */
+      $scope.DeleteApi = function (item) {
+        console.log('item');
+        console.log(item);
+        if (item) {
+          $scope.DeleteFunction(item);
+        } else {
+          angular.forEach($scope.cart.items, function(Ditem) {
+            $scope.DeleteFunction(Ditem);
+          });
+        }
+      };
+
+      $scope.DeleteFunction = function (Ditem) {
+        $http({
+          method: 'DELETE',
+          url: 'http://172.16.110.99:999/api/Item',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: {
+            "itemDescription": Ditem.Desc1,
+            "itemQuantity": Ditem.Qty,
+            "itemTotal": Ditem.Total,
+            "itemDiscount": Ditem.Discount,
+            "itemOrgPrice": Ditem.OrgPrice,
+            "itemOrderedDateTime": moment(Ditem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+            "machineId": Ditem.MachineId,
+            "locationId": Ditem.LocationId,
+            "docNo": Ditem.DocNo,
+            "itemType": Ditem.ItemType,
+            "itemId" : Ditem.ItemId,
+            "lineNumber" : Ditem.LineNumber
+          }
+        }).then(function successCallback(response) {
+        console.log('Deleted');
+        }, function errorCallback(response) {
+          console.log(response);
+        });
+      }
+
+      /**
+       * Secondary display Post
+       */
+      $scope.$on('SDisplay-post', function () {
+        $scope.PostApi();
+      });
+
+      /**
+       * Secondary display Delete
+       */
+      $scope.$on('SDisplay-delete', function (where) {
+        console.log('where are u');
+        console.log(where);
+        $scope.DeleteApi();
+      });
 
       /**
        * Refreshes the cart data from it's service
        */
       $scope.refreshCart = function () {
+        console.log('AEIOU');
         return CartItemService.fetchItemsFromDb().then(function (items) {
           $scope.cart.items = items;
+          console.log(items);
+          if(items == null) {
+            console.log('empty');
+          } else {
+            console.log('gg');
+          }
+          // $scope.DeleteApi();
+          // $scope.PostApi();
+          
+          setTimeout(function () {
+            $scope.PostApi();
+          }, 100);
+
+            // var ApiData = new Object();
+            // ApiData.itemDescription = Ditem.Desc1;
+            // ApiData.itemQuantity = Ditem.Qty;
+            // ApiData.itemTotal = Ditem.Total;
+            // ApiData.itemDiscount = Ditem.Discount;
+            // ApiData.itemOrgPrice = Ditem.OrgPrice;
+            // ApiData.itemOrderedDataTime = moment(Ditem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ");
+            // ApiData.machineId = Ditem.MachineId;
+            // ApiData.locationId = Ditem.LocationId;
+            // ApiData.docNo = Ditem.DocNo;
+            // ApiData.itemType = Ditem.ItemType;
+
+            // ApiArray.push(ApiData);
+            // ApiData = {
+            //   itemDescription : Ditem.Desc1,
+            //   itemQuantity : Ditem.Qty,
+            //   itemTotal : Ditem.Total,
+            //   itemDiscount : Ditem.Discount,
+            //   itemOrgPrice : Ditem.OrgPrice,
+            //   itemOrderedDataTime : moment(Ditem.OrderedDateTime).format("YYYY-MM-DDTHH:MM:SS"),
+            //   // itemOrderedDataTime : 2018-04-18T05:25:58.287Z
+            //   machineId : Ditem.MachineId,
+            //   locationId : Ditem.LocationId,
+            //   docNo : Ditem.DocNo,
+            //   itemType : Ditem.ItemType,
+            // }
+            // console.log(ApiData);
+            // console.log(JSON.stringify(ApiData));
+            // console.log(ApiArray);
+            // console.log(JSON.stringify(ApiArray));
+            // upData = ApiData;
+            // console.log(JSON.stringify(upData));
+          
+          // console.log(ApiData);
+          // var upDate = JSON.parse(ApiData);
+          // console.log(upDate);
+
+        //   $.post(requestUrl, {
+        //     upData
+        //   },
+        //   function(data, status) {
+        //     console.log('Data : ' + data + ' Status : ' + status );
+        //   },
+        //   dataType = 'text/json',
+        // )
+          // $.ajax({
+          //   url: 'http://172.16.110.99:999/api/Item/',
+          //   method: "POST",
+          //   // crossDomain : true,
+          //   // xhrFields: {
+          //   //     withCredentials: true
+          //   // },
+          //   datatype: 'json',
+          //   headers: {
+          //     'Content-Type': 'application/json',
+          //     'Accept': 'application/json',
+          //     // 'Access-Control-Allow-Methods' : 'http://172.16.110.99:999/api/Item'
+          //   },
+          //   // processData: false,
+          //   data: {
+          //     "itemDescription": "string",
+          //     "itemQuantity": 0,
+          //     "itemTotal": 0,
+          //     "itemDiscount": 0,
+          //     "itemOrgPrice": 0,
+          //     "itemOrderedDateTime": "2018-04-19T02:50:37.929Z",
+          //     "machineId": 0,
+          //     "locationId": 0,
+          //     "docNo": "string",
+          //     "itemType": "S"
+          //   },
+          //   success: function(data) {
+          //     console.log('Nice');
+          //   },
+          //   error: function(data) {
+          //     console.log(data);
+          //   }
+          // })
+          
+
+          // request.open('GET', requestUrl, true);
+          // request.onload = function () {
+  
+          //   // Begin accessing JSON data here
+          //   var data = JSON.parse(this.response);
+          //   console.log(data);
+            
+          //   if (request.status >= 200 && request.status < 400) {
+          //     console.log('post');
+          //     // request.open('DELETE', 'http://172.16.110.99:999/api/Item', true);
+          //   } else {
+          //     console.log('error');
+          //   }
+          // }
+          // request.send();
+
           $scope.cart.isEmpty = _.isEmpty(items);
           $scope.cart.summery = CartItemService.getSummery();
           $scope.navMenuCtrl();
@@ -1092,6 +1312,7 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           var last = Object.keys($scope.cart.items).length - 1;
           if (item) {
+            $scope.DeleteApi(item);
             if (item.ItemType == 'PWI') {
               return;
             } else if (item.ItemType == 'SKT') {
@@ -1170,7 +1391,7 @@ angular.module('itouch.controllers')
                   });
                 }
               }
-            }
+            }       
             $scope.navMenuCtrl();
           } else {
             if (!buttonClicked.voidBill) {
@@ -1360,8 +1581,8 @@ angular.module('itouch.controllers')
           if (authorityCheck(fn)) {
             Suspended = false;
             if (_.size($scope.cart.items) > 0) {
-              Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
-                if (res == 1) {
+              // Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
+              //   if (res == 1) {
                   $scope.flag = true;
                   BillService.getTempHeader($scope.header.DocNo).then(function (header) {
                     // $scope.tenderHeader = header;
@@ -1370,6 +1591,7 @@ angular.module('itouch.controllers')
                           //$scope.header.DocType = 'AV';
                           //$scope.header
                       header.DocType = 'AV';
+                      $scope.DeleteApi();
                       return BillService.saveBill(header, $scope.cart.items).then(function (res) {
                         Reciept.printAbort($scope.header.DocNo);
                               /*Yi Yi Po*/
@@ -1401,8 +1623,8 @@ angular.module('itouch.controllers')
                       });
                     });
 
-                  });
-                }
+                //   });
+                // }
               });
             } else {
               Alert.warning('No items in the cart!');
@@ -1518,7 +1740,6 @@ angular.module('itouch.controllers')
           }
         }
       };
-
       /**
        * To store the function which was running until the authority check failed
        * @type {}
