@@ -40,7 +40,7 @@ angular.module('itouch.controllers')
           //   if (res == 1) { //
               SuspendService.recallBill(bill.DocNo).then(function (DocNo) {
                 $scope.$emit('initBill');
-                $scope.$emit('refresh-cart');
+                $scope.$emit('refresh-susp-cart');
                 $scope.$emit('recallSuspendBill.modal.close');
                 // Reciept.printVoid(DocNo);
               }, function (ex) {

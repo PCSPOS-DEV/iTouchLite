@@ -1100,32 +1100,29 @@ angular.module('itouch.controllers')
       }
 
       /**
-       * Secondary display Post
-       */
-      // $scope.$on('SDisplay-post', function () {
-      //   $scope.PostApi();
-      // });
-
-      /**
-       * Secondary display Delete
-       */
-      $scope.$on('SDisplay-delete', function (where) {
-        console.log('where are u');
-        console.log(where);
-        $scope.DeleteApi();
-      });
-
-      /**
        * Refreshes the cart data from it's service
        */
-      $scope.refreshCart = function () {
-        console.log('AEIOU');
+      $scope.refreshCart = function (susp) {
+        console.log('susp : ' + susp);
         return CartItemService.fetchItemsFromDb().then(function (items) {
           $scope.cart.items = items;
+          console.log($scope.cart.items);
+          var DitemArray = new Array;
+          
           angular.forEach($scope.cart.items, function(Ditem) {
-            $scope.PutFunction(Ditem);
+            console.log('Ditem');console.log(Ditem);
+            DitemArray.push(Ditem); 
+            if (susp == 1) {
+              $scope.PostFunction(Ditem);
+            } else {
+              $scope.PutFunction(Ditem);
+            }
           });
-          console.log(items);
+          console.log('Length : ' + DitemArray.length);
+          if (DitemArray.length == 0) {
+            $scope.DeleteApi();
+          }
+          
   
           $scope.cart.isEmpty = _.isEmpty(items);
           $scope.cart.summery = CartItemService.getSummery();
@@ -1161,7 +1158,10 @@ angular.module('itouch.controllers')
         $scope.refreshCart();
       });
 
-
+      $scope.$on('refresh-susp-cart', function () {
+        var susp = 1;
+        $scope.refreshCart(susp);
+      });
       /**
        * Invokes the given named function from $scope.salesFunctions
        * @param name
@@ -1474,6 +1474,7 @@ angular.module('itouch.controllers')
                 SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
                   console.log($scope.header.DocNo);
                   Suspended = true; //GGWP
+                  $scope.DeleteApi();
                   refresh();
                 }, function (ex) {
                   console.log(ex);
@@ -1733,6 +1734,7 @@ angular.module('itouch.controllers')
         if ($scope.modals.recallSuspendBillModal) {
           $scope.modals.recallSuspendBillModal.hide();
           buttonClicked.recallSuspendBillModal = false;
+          $scope.refreshCart();
         }
       });
 
