@@ -151,7 +151,10 @@ angular.module('itouch.services')
             } else {
               ndItem.Qty++;
             }
-            return BillService.updateItem(ndItem);
+            BillService.updateItem(ndItem);
+            var upitem =  ndItem;
+            upitem.update = 1;
+            return upitem;
           } else {
             if (item.customQuantity) {
               item.Qty = item.customQuantity;

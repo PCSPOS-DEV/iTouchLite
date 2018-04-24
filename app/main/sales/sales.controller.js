@@ -895,11 +895,11 @@ angular.module('itouch.controllers')
                     $scope.$emit('BlockMenu', true);
                   } else {
                     CartItemService.addItemToCart($scope.header.DocNo, item).then(function (it) {
-                      console.log('item');console.log(item);
                       $scope.refreshCart().then(function () {
                         //$scope.scrollTo(it.LineNumber);
                         $scope.qty.value = 1;
                         $scope.selectItemWithLineNumber(it.LineNumber);
+                        $scope.PostApi(it);
                       });
                     }, function (ex) {
                       console.log(ex);
@@ -983,48 +983,77 @@ angular.module('itouch.controllers')
       /**
        * Secondary display Post
        */
-      $scope.PostApi = function () {
-        var DitemArray = new Array;
-        var Nitem;
+      $scope.PostApi = function (it) {
+        console.log('it');console.log(it);
+        var DitemArray = new Array;;
         angular.forEach($scope.cart.items, function(Ditem) {
-          console.log('Ditem');
-          console.log(Ditem);
-          DitemArray.push(Ditem);
-          console.log('DArray');
-          console.log(DitemArray);
-          Nitem = DitemArray[DitemArray.length-1];
-          console.log('Nitem');
-          console.log(Nitem);
-          console.log(Nitem.ItemId);
-          console.log(Nitem.LineNumber);
-          console.log(Nitem.itemType);
-          $http({
-            method: 'POST',
-            url: 'http://172.16.110.99:999/api/Item',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            data: {
-              "itemDescription": Nitem.Desc1,
-              "itemQuantity": Nitem.Qty,
-              "itemTotal": Nitem.Total,
-              "itemDiscount": Nitem.Discount,
-              "itemOrgPrice": Nitem.OrgPrice,
-              "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-              "machineId": Nitem.MachineId,
-              "locationId": Nitem.LocationId,
-              "docNo": Nitem.DocNo,
-              "itemType": Nitem.ItemType,
-              "itemId" : Nitem.ItemId,
-              "lineNumber" : Nitem.LineNumber
-            }
-          }).then(function successCallback(response) {
-          console.log('Nice');
-          }, function errorCallback(response) {
-            console.log(response);
-          });
+          if (it.update == 1 ) {
+            if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+              $scope.PutFunction(Ditem);
+            } 
+          } else {
+            if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+              $scope.PostFunction(Ditem);
+            } 
+          }
         });
       };
+
+      $scope.PostFunction = function (Nitem) {
+        $http({
+          method: 'POST',
+          url: 'http://172.16.110.99:999/api/Item',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: {
+            "itemDescription": Nitem.Desc1,
+            "itemQuantity": Nitem.Qty,
+            "itemTotal": Nitem.Total,
+            "itemDiscount": Nitem.Discount,
+            "itemOrgPrice": Nitem.OrgPrice,
+            "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+            "machineId": Nitem.MachineId,
+            "locationId": Nitem.LocationId,
+            "docNo": Nitem.DocNo,
+            "itemType": Nitem.ItemType,
+            "itemId" : Nitem.ItemId,
+            "lineNumber" : Nitem.LineNumber
+          }
+        }).then(function successCallback(response) {
+        console.log('Nice');
+        }, function errorCallback(response) {
+          console.log(response);
+        });
+      }
+
+      $scope.PutFunction = function (Nitem) {
+        $http({
+          method: 'PUT',
+          url: 'http://172.16.110.99:999/api/Item',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: {
+            "itemDescription": Nitem.Desc1,
+            "itemQuantity": Nitem.Qty,
+            "itemTotal": Nitem.Total,
+            "itemDiscount": Nitem.Discount,
+            "itemOrgPrice": Nitem.OrgPrice,
+            "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+            "machineId": Nitem.MachineId,
+            "locationId": Nitem.LocationId,
+            "docNo": Nitem.DocNo,
+            "itemType": Nitem.ItemType,
+            "itemId" : Nitem.ItemId,
+            "lineNumber" : Nitem.LineNumber
+          }
+        }).then(function successCallback(response) {
+        console.log('Nice');
+        }, function errorCallback(response) {
+          console.log(response);
+        });
+      }
 
 
       /**
@@ -1073,9 +1102,9 @@ angular.module('itouch.controllers')
       /**
        * Secondary display Post
        */
-      $scope.$on('SDisplay-post', function () {
-        $scope.PostApi();
-      });
+      // $scope.$on('SDisplay-post', function () {
+      //   $scope.PostApi();
+      // });
 
       /**
        * Secondary display Delete
@@ -1102,9 +1131,9 @@ angular.module('itouch.controllers')
           // $scope.DeleteApi();
           // $scope.PostApi();
           
-          setTimeout(function () {
-            $scope.PostApi();
-          }, 100);
+          // setTimeout(function () {
+          //   $scope.PostApi();
+          // }, 100);
 
             // var ApiData = new Object();
             // ApiData.itemDescription = Ditem.Desc1;
