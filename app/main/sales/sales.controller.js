@@ -1151,6 +1151,8 @@ angular.module('itouch.controllers')
       $scope.refreshCart();
 
       $rootScope.$on('refresh-cart', function () {
+        console.log('emit?');
+        $scope.DeleteApi();
         $scope.refreshCart();
       });
 
