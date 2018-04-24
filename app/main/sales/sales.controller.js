@@ -1122,115 +1122,11 @@ angular.module('itouch.controllers')
         console.log('AEIOU');
         return CartItemService.fetchItemsFromDb().then(function (items) {
           $scope.cart.items = items;
+          angular.forEach($scope.cart.items, function(Ditem) {
+            $scope.PutFunction(Ditem);
+          });
           console.log(items);
-          if(items == null) {
-            console.log('empty');
-          } else {
-            console.log('gg');
-          }
-          // $scope.DeleteApi();
-          // $scope.PostApi();
-          
-          // setTimeout(function () {
-          //   $scope.PostApi();
-          // }, 100);
-
-            // var ApiData = new Object();
-            // ApiData.itemDescription = Ditem.Desc1;
-            // ApiData.itemQuantity = Ditem.Qty;
-            // ApiData.itemTotal = Ditem.Total;
-            // ApiData.itemDiscount = Ditem.Discount;
-            // ApiData.itemOrgPrice = Ditem.OrgPrice;
-            // ApiData.itemOrderedDataTime = moment(Ditem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ");
-            // ApiData.machineId = Ditem.MachineId;
-            // ApiData.locationId = Ditem.LocationId;
-            // ApiData.docNo = Ditem.DocNo;
-            // ApiData.itemType = Ditem.ItemType;
-
-            // ApiArray.push(ApiData);
-            // ApiData = {
-            //   itemDescription : Ditem.Desc1,
-            //   itemQuantity : Ditem.Qty,
-            //   itemTotal : Ditem.Total,
-            //   itemDiscount : Ditem.Discount,
-            //   itemOrgPrice : Ditem.OrgPrice,
-            //   itemOrderedDataTime : moment(Ditem.OrderedDateTime).format("YYYY-MM-DDTHH:MM:SS"),
-            //   // itemOrderedDataTime : 2018-04-18T05:25:58.287Z
-            //   machineId : Ditem.MachineId,
-            //   locationId : Ditem.LocationId,
-            //   docNo : Ditem.DocNo,
-            //   itemType : Ditem.ItemType,
-            // }
-            // console.log(ApiData);
-            // console.log(JSON.stringify(ApiData));
-            // console.log(ApiArray);
-            // console.log(JSON.stringify(ApiArray));
-            // upData = ApiData;
-            // console.log(JSON.stringify(upData));
-          
-          // console.log(ApiData);
-          // var upDate = JSON.parse(ApiData);
-          // console.log(upDate);
-
-        //   $.post(requestUrl, {
-        //     upData
-        //   },
-        //   function(data, status) {
-        //     console.log('Data : ' + data + ' Status : ' + status );
-        //   },
-        //   dataType = 'text/json',
-        // )
-          // $.ajax({
-          //   url: 'http://172.16.110.99:999/api/Item/',
-          //   method: "POST",
-          //   // crossDomain : true,
-          //   // xhrFields: {
-          //   //     withCredentials: true
-          //   // },
-          //   datatype: 'json',
-          //   headers: {
-          //     'Content-Type': 'application/json',
-          //     'Accept': 'application/json',
-          //     // 'Access-Control-Allow-Methods' : 'http://172.16.110.99:999/api/Item'
-          //   },
-          //   // processData: false,
-          //   data: {
-          //     "itemDescription": "string",
-          //     "itemQuantity": 0,
-          //     "itemTotal": 0,
-          //     "itemDiscount": 0,
-          //     "itemOrgPrice": 0,
-          //     "itemOrderedDateTime": "2018-04-19T02:50:37.929Z",
-          //     "machineId": 0,
-          //     "locationId": 0,
-          //     "docNo": "string",
-          //     "itemType": "S"
-          //   },
-          //   success: function(data) {
-          //     console.log('Nice');
-          //   },
-          //   error: function(data) {
-          //     console.log(data);
-          //   }
-          // })
-          
-
-          // request.open('GET', requestUrl, true);
-          // request.onload = function () {
   
-          //   // Begin accessing JSON data here
-          //   var data = JSON.parse(this.response);
-          //   console.log(data);
-            
-          //   if (request.status >= 200 && request.status < 400) {
-          //     console.log('post');
-          //     // request.open('DELETE', 'http://172.16.110.99:999/api/Item', true);
-          //   } else {
-          //     console.log('error');
-          //   }
-          // }
-          // request.send();
-
           $scope.cart.isEmpty = _.isEmpty(items);
           $scope.cart.summery = CartItemService.getSummery();
           $scope.navMenuCtrl();
