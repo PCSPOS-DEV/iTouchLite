@@ -1010,7 +1010,7 @@ angular.module('itouch.controllers')
             "itemDescription": Nitem.Desc1,
             "itemQuantity": Nitem.Qty,
             "itemTotal": Nitem.Total,
-            "itemDiscount": Nitem.Discount,
+            "itemDiscount": Nitem.Discount + Nitem.Tax5DiscAmount,
             "itemOrgPrice": Nitem.OrgPrice,
             "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
             "machineId": Nitem.MachineId,
@@ -1021,7 +1021,7 @@ angular.module('itouch.controllers')
             "lineNumber" : Nitem.LineNumber
           }
         }).then(function successCallback(response) {
-        console.log('Nice');
+          console.log('Post');
         }, function errorCallback(response) {
           console.log(response);
         });
@@ -1038,7 +1038,7 @@ angular.module('itouch.controllers')
             "itemDescription": Nitem.Desc1,
             "itemQuantity": Nitem.Qty,
             "itemTotal": Nitem.Total,
-            "itemDiscount": Nitem.Discount,
+            "itemDiscount": Nitem.Discount + Nitem.Tax5DiscAmount,
             "itemOrgPrice": Nitem.OrgPrice,
             "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
             "machineId": Nitem.MachineId,
@@ -1049,7 +1049,7 @@ angular.module('itouch.controllers')
             "lineNumber" : Nitem.LineNumber
           }
         }).then(function successCallback(response) {
-        console.log('Nice');
+          console.log('Update');
         }, function errorCallback(response) {
           console.log(response);
         });
@@ -1082,7 +1082,7 @@ angular.module('itouch.controllers')
             "itemDescription": Ditem.Desc1,
             "itemQuantity": Ditem.Qty,
             "itemTotal": Ditem.Total,
-            "itemDiscount": Ditem.Discount,
+            "itemDiscount": Ditem.Discount + Ditem.Tax5DiscAmount,
             "itemOrgPrice": Ditem.OrgPrice,
             "itemOrderedDateTime": moment(Ditem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
             "machineId": Ditem.MachineId,
@@ -1093,7 +1093,7 @@ angular.module('itouch.controllers')
             "lineNumber" : Ditem.LineNumber
           }
         }).then(function successCallback(response) {
-        console.log('Deleted');
+        console.log('Delete');
         }, function errorCallback(response) {
           console.log(response);
         });
