@@ -984,7 +984,7 @@ angular.module('itouch.controllers')
        * Secondary display Post
        */
       $scope.PostApi = function (it) {
-        console.log('it');console.log(it);
+        // console.log('it');console.log(it);
         var DitemArray = new Array;;
         angular.forEach($scope.cart.items, function(Ditem) {
           if (it.update == 1 ) {
@@ -1107,21 +1107,15 @@ angular.module('itouch.controllers')
         return CartItemService.fetchItemsFromDb().then(function (items) {
           $scope.cart.items = items;
           console.log($scope.cart.items);
-          var DitemArray = new Array;
           
           angular.forEach($scope.cart.items, function(Ditem) {
-            console.log('Ditem');console.log(Ditem);
-            DitemArray.push(Ditem); 
+            // console.log('Ditem');console.log(Ditem);
             if (susp == 1) {
               $scope.PostFunction(Ditem);
             } else {
               $scope.PutFunction(Ditem);
             }
           });
-          console.log('Length : ' + DitemArray.length);
-          if (DitemArray.length == 0) {
-            $scope.DeleteApi();
-          }
           
   
           $scope.cart.isEmpty = _.isEmpty(items);
@@ -1150,9 +1144,10 @@ angular.module('itouch.controllers')
       };
       $scope.refreshCart();
 
-      $rootScope.$on('refresh-cart', function () {
-        console.log('emit?');
-        $scope.DeleteApi();
+      $rootScope.$on('refresh-cart', function (event, tendered) {
+        if (tendered == true) {
+          $scope.DeleteApi();
+        }
         $scope.refreshCart();
       });
 

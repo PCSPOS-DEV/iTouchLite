@@ -282,7 +282,7 @@ angular.module('itouch.controllers')
                   });
 
                   $rootScope.$emit('initBill');
-                  $rootScope.$emit('refresh-cart');
+                  $rootScope.$emit('refresh-cart', true);
                   $state.go('app.sales', {}, {reload: true});
 
                 }, function (err) {
