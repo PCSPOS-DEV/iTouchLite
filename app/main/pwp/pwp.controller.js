@@ -258,16 +258,18 @@ angular.module('itouch.controllers')
                     items.push({ item: savedItem, DiscountId: item.DiscountId });
                   }
                 });
-                // console.log(data);
                 if (items.length > 0) {
                   return DiscountService.saveMultipleTempDiscountItem($scope.header.DocNo, items).then(function () {
-                    $scope.$emit('refresh-cart');
+                    $scope.refreshCart().then(function () {
+                      $scope.PostApi(res, 2);
+                    });
+                  }).finally(function () {
                     $scope.$emit('pwpModal-close');
-                  }, function (errors) {
-                    console.log(errors);
-                  });
+                  })
                 } else {
-                  $scope.$emit('refresh-cart');
+                  $scope.refreshCart().then(function () {
+                    $scope.PostApi(res, 2);
+                  });
                   $scope.$emit('pwpModal-save', res[0]);
                   return $scope.pwp.item;
                 }

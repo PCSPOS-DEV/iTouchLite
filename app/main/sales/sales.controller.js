@@ -988,8 +988,8 @@ angular.module('itouch.controllers')
        * Secondary display Post
        */
       $scope.PostApi = function (it, type) {
-        console.log('it');console.log(it);
-        console.log('type');console.log(type);
+        // console.log('it');console.log(it);
+        // console.log('type');console.log(type);
         // console.log('$scope.cart.items');console.log($scope.cart.items);
         var DitemArray = new Array;;
         angular.forEach($scope.cart.items, function(Ditem) {
@@ -1007,7 +1007,13 @@ angular.module('itouch.controllers')
                   $scope.PostFunction(Ditem);
                 } 
               })
-            } else {
+            } else if (type == 2) { // PWP
+              angular.forEach(it, function(Citem) {
+                if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
+                  $scope.PostFunction(Ditem);
+                } 
+              })
+            }else {
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);
               } 
@@ -1085,7 +1091,8 @@ angular.module('itouch.controllers')
       /**
        * Secondary display Delete
        */
-      $scope.DeleteApi = function (item, type) {
+      var delpwp = 0;
+      $scope.DeleteApi = function (item) {
         console.log(item);
         if (item) {
           if (item.ItemType == "SKT" ) { // SaleKit
@@ -1095,6 +1102,17 @@ angular.module('itouch.controllers')
               }
             });
             $scope.DeleteFunction(item);
+          } else if (item.ItemType == 'PWP') { 
+            $scope.DeleteFunction(item);
+            delpwp = 1;
+            if (delpwp == 1) {
+              angular.forEach($scope.cart.items, function(Ditem) {
+                if (Ditem.ParentItemLineNumber == item.LineNumber) {
+                  $scope.DeleteFunction(Ditem);
+                }
+              });
+            }
+            delpwp = 0;
           } else {
             $scope.DeleteFunction(item);
           }
