@@ -264,7 +264,7 @@ angular.module('itouch.controllers')
                       $scope.PostApi(res, 2);
                     });
                   }).finally(function () {
-                    $scope.$emit('pwpModal-close');
+                    $scope.$emit('pwpModal-close', res[0]);
                   })
                 } else {
                   $scope.refreshCart().then(function () {
