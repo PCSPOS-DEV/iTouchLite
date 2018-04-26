@@ -1016,27 +1016,14 @@ angular.module('itouch.controllers')
         });
       };
 
-      $scope.PostFunction = function (Nitem, type) {
+      $scope.PostFunction = function (Nitem) {
         console.log('post');
         console.log(Nitem);
-        console.log(type);
         console.log(TempDeleteItem);
         if (TempDeleteItem != null) {
-          
           $scope.DeleteFunction(TempDeleteItem);
           TempDeleteItem = null;
         }
-        // console.log(Nitem.Qty);
-        // console.log(Nitem.DiscAmount);
-        // console.log(Nitem.Tax5DiscAmount);
-        // console.log(Nitem.OrgPrice);
-        // console.log(Nitem.OrderedDateTime);
-        // console.log(Nitem.MachineId);
-        // console.log(Nitem.LocationId);
-        // console.log(Nitem.DocNo);
-        // console.log(Nitem.ItemType);
-        // console.log(Math.floor(Nitem.ItemId));
-        // console.log(Nitem.LineNumber);
         $http({
           method: 'POST',
           url: 'http://172.16.110.99:999/api/Item',
@@ -1099,8 +1086,9 @@ angular.module('itouch.controllers')
        * Secondary display Delete
        */
       $scope.DeleteApi = function (item, type) {
+        console.log(item);
         if (item) {
-          if (type == 1 ) { // SaleKit
+          if (item.ItemType == "SKT" ) { // SaleKit
             angular.forEach($scope.cart.items, function(Ditem) {
               if (Ditem.ParentItemLineNumber == item.LineNumber) {
                 $scope.DeleteFunction(Ditem);
@@ -1280,15 +1268,14 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           var last = Object.keys($scope.cart.items).length - 1;
           if (item) { 
+            $scope.DeleteApi(item);
             if (item.ItemType == 'PWI') {
-              $scope.DeleteApi(item);
               return;
             } else if (item.ItemType == 'SKT') {
               if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
                 Alert.warning('Item Void not allowed.', 'ItouchLite');
               } else {        
                 BillService.voidSalesKit(item).then(function () {
-                  $scope.DeleteApi(item, 1);
                   $scope.refreshCart().then(function () {
                     $scope.selectItemWithLineNumber();
                   });
