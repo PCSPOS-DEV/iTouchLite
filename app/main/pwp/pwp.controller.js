@@ -63,7 +63,7 @@ angular.module('itouch.controllers')
         $scope.selectedRow = item;
       };
 
-      $scope.addSelected = function () {
+      $scope.addSelected = function () { 
         $scope.disableP = true;
         addItem($scope.selectedRow);
         $timeout(function () {
@@ -74,6 +74,10 @@ angular.module('itouch.controllers')
       var tempD = 0;
       var addItem = function (item) {
         if (item) {
+          if (item.SubItemMaxQty <= item.Qty) {
+            Alert.warning('You have selected the maximum children allowed for this item.')
+            return true;
+          }
           if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
             Alert.warning('You have selected the maximum children allowed for this PWP.');
             tempD = 1;
