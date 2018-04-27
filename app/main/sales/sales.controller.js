@@ -1049,7 +1049,8 @@ angular.module('itouch.controllers')
             "docNo": Nitem.DocNo,
             "itemType": Nitem.ItemType,
             "itemId" : Math.floor(Nitem.ItemId),
-            "lineNumber" : Nitem.LineNumber
+            "lineNumber" : Nitem.LineNumber,
+            "parentItemLineNumber" : Nitem.ParentItemLineNumber
           }
         }).then(function successCallback(response) {
           console.log('Post');
@@ -1078,7 +1079,8 @@ angular.module('itouch.controllers')
             "docNo": Nitem.DocNo,
             "itemType": Nitem.ItemType,
             "itemId" : Math.floor(Nitem.ItemId),
-            "lineNumber" : Nitem.LineNumber
+            "lineNumber" : Nitem.LineNumber,
+            "parentItemLineNumber" : Nitem.ParentItemLineNumber
           }
         }).then(function successCallback(response) {
           console.log('Update');
@@ -1142,7 +1144,8 @@ angular.module('itouch.controllers')
             "docNo": Ditem.DocNo,
             "itemType": Ditem.ItemType,
             "itemId" : Math.floor(Ditem.ItemId),
-            "lineNumber" : Ditem.LineNumber
+            "lineNumber" : Ditem.LineNumber,
+            "parentItemLineNumber" : Ditem.ParentItemLineNumber
           }
         }).then(function successCallback(response) {
         console.log('Delete');
