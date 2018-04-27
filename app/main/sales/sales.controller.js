@@ -364,8 +364,9 @@ angular.module('itouch.controllers')
        * Biding an event to catch modal close call
        */
       $scope.$on('pwpModal-close', function (modal, pwpitem) {
-        // selectLastItem();
-        $scope.cart.selectedItem = pwpitem;
+        // selectLastItem(); //lol
+        $scope.refreshCart();
+        // $scope.cart.selectedItem = pwpitem;
         $scope.showpwpModal = false;
         $scope.qty.value = 1;
         $scope.pwpModal.remove();
@@ -1023,9 +1024,9 @@ angular.module('itouch.controllers')
       };
 
       $scope.PostFunction = function (Nitem) {
-        console.log('post');
-        console.log(Nitem);
-        console.log(TempDeleteItem);
+        // console.log('post');
+        // console.log(Nitem);
+        // console.log(TempDeleteItem);
         if (TempDeleteItem != null) {
           $scope.DeleteFunction(TempDeleteItem);
           TempDeleteItem = null;
@@ -1058,8 +1059,7 @@ angular.module('itouch.controllers')
       }
 
       $scope.PutFunction = function (Nitem) {
-        console.log('put');
-        console.log(Nitem);
+        // console.log(Nitem);
         $http({
           method: 'PUT',
           url: 'http://172.16.110.99:999/api/Item',
@@ -1093,7 +1093,7 @@ angular.module('itouch.controllers')
        */
       var delpwp = 0;
       $scope.DeleteApi = function (item) {
-        console.log(item);
+        // console.log(item);
         if (item) {
           if (item.ItemType == "SKT" ) { // SaleKit
             angular.forEach($scope.cart.items, function(Ditem) {
@@ -1155,10 +1155,12 @@ angular.module('itouch.controllers')
        * Refreshes the cart data from it's service
        */
       $scope.refreshCart = function (susp) {
-        console.log('susp : ' + susp);
+        // console.log('susp : ' + susp);
+        
+        // // lol
         return CartItemService.fetchItemsFromDb().then(function (items) {
           $scope.cart.items = items;
-          console.log($scope.cart.items);
+          // console.log($scope.cart.items);
           
           angular.forEach($scope.cart.items, function(Ditem) {
             // console.log('Ditem');console.log(Ditem);
@@ -1174,6 +1176,17 @@ angular.module('itouch.controllers')
           $scope.cart.summery = CartItemService.getSummery();
           $scope.navMenuCtrl();
           if (!$scope.cart.isEmpty) {
+            var last = $scope.cart.items[Object.keys($scope.cart.items)[Object.keys($scope.cart.items).length - 1]];
+            if (last.ItemType == 'PWI') {
+              angular.forEach($scope.cart.items, function (item) {
+                if (last.ParentItemLineNumber == item.LineNumber) { last = item; }
+                $scope.cart.selectedItem = item; 
+                
+              });
+            } else {
+              $scope.cart.selectedItem = last;
+            }
+             
             angular.forEach($scope.cart.items, function (item, key) {
               if ($scope.cart.selectedItem && $scope.cart.selectedItem.ItemId == item.ItemId && $scope.cart.selectedItem.LineNumber == item.LineNumber) {
                 $scope.cart.items[key] = item;
@@ -1368,7 +1381,8 @@ angular.module('itouch.controllers')
                   });
                 }
               }
-            }       
+            }
+            $scope.refreshCart();       
             $scope.navMenuCtrl();
           } else {
             if (!buttonClicked.voidBill) {
