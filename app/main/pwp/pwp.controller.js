@@ -30,12 +30,12 @@ angular.module('itouch.controllers')
       };
 
       $scope.selectItem = function (item) {
-        $scope.disableA = true;
+        // $scope.disableA = true;
         addItem(item);
         $scope.selectRow(item);
         $timeout(function () {
           $scope.disableA = false;
-        }, 200);
+        }, 100);
       };
 
       var addPrice = function (item, discPercent) {
