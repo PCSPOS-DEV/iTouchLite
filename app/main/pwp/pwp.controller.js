@@ -14,6 +14,7 @@ angular.module('itouch.controllers')
       SubItemTotalPrice = 0;
       $scope.disableP = false;
       $scope.disableA = false;
+      var voiditem = 0;
 
       $scope.$on('modal.shown', function () {
         if ($scope.shownModal == 'pwp') {
@@ -79,6 +80,10 @@ angular.module('itouch.controllers')
             return true;
           }
           if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
+            $scope.selectedRow = null;
+            if ($scope.selectedRow == null) {
+              voiditem = 1;
+            }
             Alert.warning('You have selected the maximum children allowed for this PWP.');
             tempD = 1;
             
@@ -169,7 +174,9 @@ angular.module('itouch.controllers')
       };
 
       $scope.clearSelected = function (flag) {
-        if ($scope.selectedRow && $scope.selectedRow.Default != true) {
+        console.log($scope.selectedRow);
+        if ($scope.selectedRow && $scope.selectedRow.Default != true && voiditem == 0) {
+          console.log('1');
           if (flag == false) {
             SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
             temp = temp - SubItemTotalPrice;
@@ -177,6 +184,9 @@ angular.module('itouch.controllers')
           }
           removeSelectedItem($scope.selectedRow.SubItemId);
           $scope.selectRow(null);
+        } else {
+          voiditem = 0;
+          Alert.warning('No selected item to clear.');
         }
       };
 
