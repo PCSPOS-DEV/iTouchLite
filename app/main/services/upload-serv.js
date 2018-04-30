@@ -167,7 +167,8 @@ angular.module('itouch.services')
             angular.forEach(bills, function (bill) {
               if (bill.BillDetail != undefined) {
                 angular.forEach(bill.BillDetail, function (ids) {
-                  ids.ItemId = Math.floor(ids.ItemId);
+                  // ids.ItemId = Math.floor(ids.ItemId);
+                  console.log(ids.ItemId);
                 });
               }
               if (typeof (bill.BillHeader) !== 'undefined') {

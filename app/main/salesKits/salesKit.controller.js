@@ -285,9 +285,13 @@ angular.module('itouch.controllers')
               item.Qty = $scope.qty.value;
               angular.forEach(item.selectedList, function (item) {
                 item.Qty *= $scope.qty.value;
+                item.ItemId = Math.floor(item.ItemId);
               });
               kit1 = 2;
             }
+            angular.forEach(item.selectedList, function (item) {
+              item.ItemId = Math.floor(item.ItemId);
+            });
             var omitList = ['$$hashKey', 'Default', 'Quantity', 'Priority', 'PLU_Description1', 'PLU_Description2', 'KitchenId', 'SubPlu1Id', 'SubPlu2Id', 'SubPlu3Id', 'DepartmentId', 'UOM_Id', 'HouseBarCode', 'Selected', 'AddedAt', 'key'];
             var selectedList = [];
             _.map(item.selectedList, function (i) {
