@@ -357,6 +357,13 @@ angular.module('itouch', [
           return stopPropagation;
         };
 
+        var BDate = new Date();
+        var fYear = new Date();
+        var tYear = new Date();
+        fYear.setFullYear(BDate.getFullYear() - 3); // - 3 year from current year
+        // console.log(fYear);
+        tYear.setFullYear(BDate.getFullYear() + 3); // + 3 year from current year
+        // console.log(fYear);
             //datepicker configuration
         var datePickerObj = {
           inputDate: new Date(),
@@ -367,8 +374,8 @@ angular.module('itouch', [
           weeksList: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
           monthsList: ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
           templateType: 'popup',
-          from: new Date(2012, 8, 1),
-          to: new Date(2018, 8, 1),
+          from: fYear,
+          to: tYear,
           showTodayButton: true,
           dateFormat: 'dd MMMM yyyy',
           closeOnSelect: false,
