@@ -347,7 +347,7 @@ angular.module('itouch.controllers')
                   console.log(item);
                   if (item[0].ItemType == 'SKI') {
                     console.log(item[0]);
-                    $scope.PostFunction(item[0]);
+                    $scope.PostFunction(item[0], 1);
                   } else {
                     console.log('post sk');
                     $scope.PostApi(item, 1);

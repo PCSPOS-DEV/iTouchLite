@@ -1022,11 +1022,11 @@ angular.module('itouch.controllers')
         });
       };
 
-      $scope.PostFunction = function (Nitem) {
-        // console.log('post');
+      $scope.PostFunction = function (Nitem, del) {
+        // console.log(del);
         // console.log(Nitem);
         // console.log(TempDeleteItem);
-        if (TempDeleteItem != null) {
+        if (TempDeleteItem != null && del == 1) {
           $scope.DeleteFunction(TempDeleteItem);
           TempDeleteItem = null;
         }
@@ -1115,6 +1115,8 @@ angular.module('itouch.controllers')
               });
             }
             delpwp = 0;
+          } else if (item.ItemType == 'SKI') { 
+            console.log('Not Delete');
           } else {
             $scope.DeleteFunction(item);
           }
