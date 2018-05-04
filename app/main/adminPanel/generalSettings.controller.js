@@ -39,6 +39,7 @@ angular.module('itouch.controllers')
             mac_id: SettingsService.getMachineId(),
             cash_id: SettingsService.getCashId(),
             business_date: SettingsService.getBusinessDate(),
+            displayurl : AppConfig.getDisplayUrl(),
             url: AppConfig.getBaseUrl(),
             outletServerUrl: AppConfig.getOutletServerUrl(),
           };
@@ -68,7 +69,7 @@ angular.module('itouch.controllers')
             if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id)) {
               return false;
             }
-
+            AppConfig.setDisplayUrl(self.settings.displayurl);
             SettingsService.setEntityId(self.settings.ent_id);
             SettingsService.setLocationId(self.settings.loc_id);
             SettingsService.setMachineId(self.settings.mac_id);

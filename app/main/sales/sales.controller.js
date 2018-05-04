@@ -27,7 +27,7 @@ angular.module('itouch.controllers')
       var businessDate = ControlService.getBusinessDate(true);
       var Suspended = false;
       var request = new XMLHttpRequest();
-      var requestUrl = 'http://172.16.110.99:999/api/Item';
+      var requestUrl = AppConfig.getDisplayUrl();
       var ApiArray = new Array();
       var TempDeleteItem = null;
       var UpData;
