@@ -993,7 +993,7 @@ angular.module('itouch.controllers')
         // console.log('$scope.cart.items');console.log($scope.cart.items);
         var DitemArray = new Array;;
         angular.forEach($scope.cart.items, function(Ditem) {
-          if (it.update == 1 ) {
+          if (it.update == 1) {
             if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
               $scope.PutFunction(Ditem);
             } 
@@ -1013,7 +1013,9 @@ angular.module('itouch.controllers')
                   $scope.PostFunction(Ditem);
                 } 
               })
-            }else {
+            } else if (type == 3) {
+              console.log(it);
+            } else {
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);
               } 
@@ -1026,13 +1028,9 @@ angular.module('itouch.controllers')
         // console.log(del);
         // console.log(Nitem);
         // console.log(TempDeleteItem);
-        if (TempDeleteItem != null && del == 1) {
-          $scope.DeleteFunction(TempDeleteItem);
-          TempDeleteItem = null;
-        }
         $http({
           method: 'POST',
-          url: 'http://172.16.110.99:999/api/Item',
+          url: requestUrl,
           headers: {
             'Content-Type': 'application/json'
           },
@@ -1058,12 +1056,17 @@ angular.module('itouch.controllers')
         });
       }
 
-      $scope.PutFunction = function (Nitem) {
-        // console.log('put');
-        // console.log(Nitem);
+      $scope.PutFunction = function (Nitem, upf) {
+        // console.log('put');  
+        if (TempDeleteItem != null && upf == 1) {
+          PrevItemId = Math.floor(TempDeleteItem.ItemId);
+          TempDeleteItem = null;
+        } else {
+          PrevItemId = Math.floor(Nitem.ItemId);
+        }
         $http({
           method: 'PUT',
-          url: 'http://172.16.110.99:999/api/Item',
+          url: requestUrl,
           headers: {
             'Content-Type': 'application/json'
           },
@@ -1071,7 +1074,7 @@ angular.module('itouch.controllers')
             "itemDescription": Nitem.Desc1,
             "itemQuantity": Nitem.Qty,
             "itemTotal": Nitem.Total,
-            "itemDiscount": Nitem.Discount + Nitem.Tax5DiscAmount,
+            "itemDiscount": Nitem.Discount + Nitem.Tax5DiscAmount || Nitem.DiscAmount + Nitem.Tax5DiscAmount,
             "itemOrgPrice": Nitem.OrgPrice,
             "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.sssZ"),
             "machineId": Nitem.MachineId,
@@ -1079,6 +1082,7 @@ angular.module('itouch.controllers')
             "docNo": Nitem.DocNo,
             "itemType": Nitem.ItemType,
             "itemId" : Math.floor(Nitem.ItemId),
+            "previousItemId" : PrevItemId,
             "lineNumber" : Nitem.LineNumber,
             "parentItemLineNumber" : Nitem.ParentItemLineNumber
           }
@@ -1130,7 +1134,7 @@ angular.module('itouch.controllers')
       $scope.DeleteFunction = function (Ditem) {
         $http({
           method: 'DELETE',
-          url: 'http://172.16.110.99:999/api/Item',
+          url: requestUrl,
           headers: {
             'Content-Type': 'application/json'
           },

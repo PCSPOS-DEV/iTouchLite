@@ -88,9 +88,9 @@ angular.module('itouch.services')
 
       DB.query(query, [item.Id]).then(function (result) {
         var resultSet =  DB.fetchAll(result);
-        console.log(resultSet);
-        console.log(resultSet.length);
-        console.log(type);
+        // console.log(resultSet);
+        // console.log(resultSet.length);
+        // console.log(type);
         var pwp = null;
         if (resultSet.length > 0 ) {
           type = 1;
