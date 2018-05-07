@@ -13,9 +13,54 @@ angular.module('itouch.controllers')
       var update = false;
       var customQty = 0;
       var oldCustomQty = 0;
+      var kit1 = 0;
+
+      var full = function () {
+        /*
+        var items = 0;
+        angular.forEach($scope.salesKits.selectedList, function(item){
+          if(!item.Default){
+            items += item.Qty;
+          }
+        });
+        return items == $scope.salesKits.Quantity;*/
+        /*Yi Yi Po*/
+        var items = 0;
+        angular.forEach($scope.salesKits.selectedList, function (item) {
+          if (!item.Default) {
+            items += (item.Qty / item.QtyValid);
+          }
+        });
+        var componentCount = Object.keys($scope.salesKits.component).length;
+        var currentOrderQty = $scope.qty.value;
+        if (kit1 == 1) {
+          update = false;
+        }
+        if (update) {
+          currentOrderQty = oldCustomQty;
+          componentCount = 1;
+        }
+        return items == (componentCount * currentOrderQty);
+        /*--*/
+
+      };
+
+      $scope.$on('orderObjectBy', function () {
+        return function (items, field, reverse) {
+          var filtered = [];
+          angular.forEach(items, function (item) {
+            filtered.push(item);
+          });
+          filtered.sort(function (a, b) {
+            return (a[field] > b[field] ? 1 : -1);
+          });
+          if (reverse) {filtered.reverse();}
+          return filtered;
+        };
+      });
 
       $scope.$on('modal.shown', function (event, modal) {
-        if (modal.id == 1) {
+        if (modal.id === 1) {
           $scope.selectedRow = null;
           submitted = false;
           $ionicScrollDelegate.$getByHandle('salesKit').scrollTop();
@@ -96,6 +141,7 @@ angular.module('itouch.controllers')
 
         var validComponetQty = $scope.salesKits.component[kit.componetid].Quantity - $scope.salesKits.component[kit.componetid].OrderQty;
         var totalComponetQty = $scope.salesKits.component[kit.componetid].Quantity + $scope.salesKits.component[kit.componetid].OrderQty;
+
 
         if ($scope.cart.selectedItem && $scope.cart.selectedItem.ItemId == item.ItemId)
           {oldItem = $scope.cart.selectedItem;}
@@ -218,11 +264,30 @@ angular.module('itouch.controllers')
         }
       };
 
+      $scope.$on('save', function (event, salesKit) {
+        $scope.salesKits = salesKit;
+        submitted = false;
+        kit1 = 1;
+        $scope.save();
+      });
+
       $scope.save = function () {
         if (!submitted) {
           if (full()) {
             submitted = true;
+            $scope.$emit('BlockMenu', true);
             var item = angular.copy($scope.salesKits);
+            if (kit1 == 1) {
+              item.Qty = $scope.qty.value;
+              angular.forEach(item.selectedList, function (item) {
+                item.Qty *= $scope.qty.value;
+                item.ItemId = Math.floor(item.ItemId);
+              });
+              kit1 = 2;
+            }
+            angular.forEach(item.selectedList, function (item) {
+              item.ItemId = Math.floor(item.ItemId);
+            });
             var omitList = ['$$hashKey', 'Default', 'Quantity', 'Priority', 'PLU_Description1', 'PLU_Description2', 'KitchenId', 'SubPlu1Id', 'SubPlu2Id', 'SubPlu3Id', 'DepartmentId', 'UOM_Id', 'HouseBarCode', 'Selected', 'AddedAt', 'key'];
             var selectedList = [];
             _.map(item.selectedList, function (i) {
@@ -241,6 +306,9 @@ angular.module('itouch.controllers')
             var operations = [];
             var voidProm = null;
             item.Qty = customQty;
+            if (kit1 == 2) {
+              item.Qty = $scope.qty.value;
+            }
             if (update) {
               // var oldItem = $scope.cart.selectedItem;
               // console.log(oldItem);
@@ -272,6 +340,13 @@ angular.module('itouch.controllers')
                   $scope.scrollTo(item.LineNumber);
                   $scope.qty.value = 1;
                   $scope.selectItemWithLineNumber(item.LineNumber);
+                  // if (item[0].ItemType == 'SKI') {
+                  //   console.log('update sk');
+                  //   $scope.PutFunction(item[0], 1);
+                  // } else {
+                  //   console.log('post sk');
+                  //   $scope.PostApi(item, 1);
+                  // }     
                 });
               }).finally(function () {
                 $scope.$emit('skModalModal-save');
@@ -285,33 +360,6 @@ angular.module('itouch.controllers')
             Alert.warning('Entry not completed!');
           }
         }
-      };
-
-      var full = function () {
-        /*
-        var items = 0;
-        angular.forEach($scope.salesKits.selectedList, function(item){
-          if(!item.Default){
-            items += item.Qty;
-          }
-        });
-        return items == $scope.salesKits.Quantity;*/
-        /*Yi Yi Po*/
-        var items = 0;
-        angular.forEach($scope.salesKits.selectedList, function (item) {
-          if (!item.Default) {
-            items += (item.Qty / item.QtyValid);
-          }
-        });
-        var componentCount = Object.keys($scope.salesKits.component).length;
-        var currentOrderQty = $scope.qty.value;
-        if (update) {
-          currentOrderQty = oldCustomQty;
-          componentCount = 1;
-        }
-        return items == (componentCount * currentOrderQty);
-        /*--*/
-
       };
 
       $scope.close = function () {
