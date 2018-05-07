@@ -1015,6 +1015,10 @@ angular.module('itouch.controllers')
               })
             } else if (type == 3) {
               console.log(it);
+            } else if (type == 4) {
+              if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+                $scope.PutFunction(Ditem, 1);
+              } 
             } else {
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);

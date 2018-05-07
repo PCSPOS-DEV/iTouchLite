@@ -285,9 +285,9 @@ angular.module('itouch.controllers')
               });
               kit1 = 2;
             }
-            angular.forEach(item.selectedList, function (item) {
-              item.ItemId = Math.floor(item.ItemId);
-            });
+            // angular.forEach(item.selectedList, function (item) {
+            //   item.ItemId = Math.floor(item.ItemId);
+            // });
             var omitList = ['$$hashKey', 'Default', 'Quantity', 'Priority', 'PLU_Description1', 'PLU_Description2', 'KitchenId', 'SubPlu1Id', 'SubPlu2Id', 'SubPlu3Id', 'DepartmentId', 'UOM_Id', 'HouseBarCode', 'Selected', 'AddedAt', 'key'];
             var selectedList = [];
             _.map(item.selectedList, function (i) {
@@ -340,13 +340,13 @@ angular.module('itouch.controllers')
                   $scope.scrollTo(item.LineNumber);
                   $scope.qty.value = 1;
                   $scope.selectItemWithLineNumber(item.LineNumber);
-                  // if (item[0].ItemType == 'SKI') {
-                  //   console.log('update sk');
-                  //   $scope.PutFunction(item[0], 1);
-                  // } else {
-                  //   console.log('post sk');
-                  //   $scope.PostApi(item, 1);
-                  // }     
+                  if (item[0].ItemType == 'SKI') {
+                    console.log('update sk');
+                    $scope.PostApi(item[0], 4);
+                  } else {
+                    console.log('post sk');
+                    $scope.PostApi(item, 1);
+                  }     
                 });
               }).finally(function () {
                 $scope.$emit('skModalModal-save');
