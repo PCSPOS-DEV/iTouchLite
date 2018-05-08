@@ -1572,8 +1572,8 @@ angular.module('itouch.controllers')
           if (authorityCheck(fn)) {
             Suspended = false;
             if (_.size($scope.cart.items) > 0) {
-              // Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
-              //   if (res == 1) {
+              Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
+                if (res == 1) {
                   $scope.flag = true;
                   BillService.getTempHeader($scope.header.DocNo).then(function (header) {
                     // $scope.tenderHeader = header;
@@ -1614,8 +1614,8 @@ angular.module('itouch.controllers')
                       });
                     });
 
-                //   });
-                // }
+                  });
+                }
               });
             } else {
               Alert.warning('No items in the cart!');

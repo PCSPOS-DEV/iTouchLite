@@ -176,11 +176,6 @@ angular.module('itouch.controllers')
               Alert.warning('No selected item to clear.');
               return true;
             }
-            // console.log($scope.selectedRow.Qty);
-            // console.log($scope.selectedRow.SubItemPrice);
-            // console.log($scope.tempSubTotal);
-            // console.log(temp);
-            // console.log(SubItemTotalPrice);
             SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice; 
             temp = temp - SubItemTotalPrice;
             $scope.tempSubTotal = $scope.tempSubTotal - SubItemTotalPrice;
