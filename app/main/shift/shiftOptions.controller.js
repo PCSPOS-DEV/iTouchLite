@@ -278,7 +278,9 @@ angular.module('itouch.controllers')
       /**
        * Opens the Business Date picker
        */
-      var systemDate = moment(new Date());
+      var systemDate = new Date();
+      var tDay= new Date();
+      tDay.setDate(systemDate.getDate() + 1); 
       self.openDatePicker = function (currentDate) {
         var datePickerOptions = {
           callback: function (val) {
@@ -286,19 +288,19 @@ angular.module('itouch.controllers')
           },
           inputDate: ControlService.getNextBusinessDate().isValid() ? ControlService.getNextBusinessDate().toDate() : new Date(),
           setLabel: 'Set Bu. Date',
-          showTodayButton: true,
           /*
           * System Date
           */
-          from: systemDate && systemDate.isValid() ? systemDate.add(0, 'days').toDate() : moment().toDate(),
-          to: systemDate && systemDate.isValid() ? systemDate.add(1, 'days').toDate() : moment().toDate(),
+          from: systemDate,
+          to: tDay,
           /*
           * Current Date
           */
           // from: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
           // to: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
-          // showTodayButton: false
+          showTodayButton: false,
         };
+
 
         ionicDatePicker.openDatePicker(datePickerOptions);
       };
