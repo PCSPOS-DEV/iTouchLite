@@ -197,7 +197,7 @@ angular.module('itouch.services')
                       }
                       angular.forEach(selections, function (skisl) {
                         if (skisl.SalesKitItemsId != undefined) {
-                          skisl.ItemId = String(skisl.ItemId) + '.' + skisl.SalesKitItemsId;
+                          skisl.ItemId = String(skisl.ItemId) + '.00' + skisl.SalesKitItemsId;
                         }
                         salesKit.list[skisl.ItemId] = skisl;
                         salesKit.list[skisl.ItemId].Qty = 0;
