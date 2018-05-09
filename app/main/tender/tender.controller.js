@@ -187,6 +187,7 @@ angular.module('itouch.controllers')
 
               var stockTransactions = [];
               angular.forEach(bill, function (item, key) {
+                console.log(item);
                 stockTransactions.push({
                   BusinessDate: businessDate,
                   LocationId: item.LocationId,
