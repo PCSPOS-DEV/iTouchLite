@@ -5,6 +5,7 @@ angular.module('itouch.services')
   .factory('ItemService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'LocationService', 'PriceGroupService',
     function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, LocationService, PriceGroupService) {
       var self = this;
+      var fetchedDate = 0;
 
       var location = LocationService.currentLocation;
       if (!location) {
@@ -20,13 +21,28 @@ angular.module('itouch.services')
         });
       };
 
+      self.fetchDate = function () {
+        console.log(fetchedDate);
+        // if (fetchedDate == 0 ) {
+        //   console.log('1');
+        //   Restangular.one('GetItemsByLocations').get({LocationId: SettingsService.getLocationId()}).then(function (res) {
+        //     fetchedDate = JSON.parse(res);
+        //     // console.log(fetchedDate);
+        //     return fetchedDate;
+        //   })
+        // } else {
+          console.log('2');
+          return fetchedDate;
+        // }
+      }
+      
       self.fetchItems = function () {
         var deferred = $q.defer();
         try {
           Restangular.one('GetItemsByLocations').get({LocationId: SettingsService.getLocationId()}).then(function (res) {
             try {
               var items = JSON.parse(res);
-              // console.log(items);
+              fetchedDate = items;
             } catch (ex) {
               deferred.reject('No results');
             }

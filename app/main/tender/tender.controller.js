@@ -185,24 +185,41 @@ angular.module('itouch.controllers')
                 });
               }
 
+              var fitems = ItemService.fetchDate();
+              var fditem;
+              var ItemUOMId;
               var stockTransactions = [];
+              console.log(bill);
               angular.forEach(bill, function (item, key) {
+                console.log(item.ItemId);
+                angular.forEach(fitems, function (fitem, key) {
+                  // console.log(fitem.Id);
+                  
+                  if (fitem.Id == item.ItemId) {
+                    console.log('dd');
+                    // console.log(fitem.UOM_Id);
+                    ItemUOMId = fitem.UOM_Id;
+                    console.log(ItemUOMId);
+                    stockTransactions.push({
+                      BusinessDate: businessDate,
+                      LocationId: item.LocationId,
+                      MachineId: item.MachineId,
+                      LineNumber: item.LineNumber,
+                      DocNo: $scope.tenderHeader.DocNo,
+                      ItemId: item.ItemId,
+                      SeqNo: 1,
+                      DocType: 'SA',
+                      StdCost: item.StdCost,
+                      Qty: item.Qty,
+                      BaseUOMId: ItemUOMId,
+                      IsExported: false
+    
+                    });
+                  } 
+                })
                 console.log(item);
-                stockTransactions.push({
-                  BusinessDate: businessDate,
-                  LocationId: item.LocationId,
-                  MachineId: item.MachineId,
-                  LineNumber: item.LineNumber,
-                  DocNo: $scope.tenderHeader.DocNo,
-                  ItemId: item.ItemId,
-                  SeqNo: 1,
-                  DocType: 'SA',
-                  StdCost: item.StdCost,
-                  Qty: item.Qty,
-                  BaseUOMId: 1,
-                  IsExported: false
-
-                });
+                console.log(key);
+                
               });
               var header = _.omit($scope.tenderHeader, ['TaxAmount', 'Total', 'TenderTotal', 'TotalRounded']);
 
