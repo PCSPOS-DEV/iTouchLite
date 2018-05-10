@@ -3,9 +3,10 @@ angular.module('itouch.services')
 .service('Report', ['$log', 'PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert', 'TransactService',
   function ($log, PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert, TransactService) {
     var self = this;
-    var data = null;
-    var printer = null;
-    var location = null;
+    var Pdata = null;
+    var printer = PrintService.getPrinter();
+    var location = LocationService.currentLocation;
+    var data = PrinterSettings.fetchData();
     var bDate = null;
     var shift = null;
     var machine = null;
@@ -25,7 +26,7 @@ angular.module('itouch.services')
     self.getAll = function () {
       PrinterSettings.get().then(function (res) {
         $log.log(res);
-        data = res;
+        Pdata = res;
       });
     };
     self.getAll();
@@ -33,12 +34,10 @@ angular.module('itouch.services')
     self.creatRecieptHeader = function () {
 
       printer.addTextAlign(printer.ALIGN_CENTER);
-
       PrintService.addImage();
       PrintService.addLineBreak();
-
       angular.forEach(data.Header, function (row) {
-        if (row.IsBold == 'false') {
+        if (row.IsBold == false) {
           printer.addTextStyle(false, false, false);
           printer.addTextSize(1, 1);
         } else {
