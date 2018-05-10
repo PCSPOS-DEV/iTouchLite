@@ -139,7 +139,7 @@ angular.module('itouch.controllers')
               }
             });*/
             Alert.showConfirm('Are you sure you want to close this shift (' + shift.Id + ')?', 'Close Shift?', function (res) {
-              if (res == 1) {
+              if (res == 1) { // need to be comment to prevent alert
                 ShiftService.closeShift(shift.Id || null).then(function (success) {
                   //var businessDate = angular.copy(ControlService.getBusinessDate());
                   //Report.printShiftClosingReport(shift.Id, businessDate);

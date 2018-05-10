@@ -36,7 +36,9 @@ angular.module('itouch.services')
       printer.addTextAlign(printer.ALIGN_CENTER);
       PrintService.addImage();
       PrintService.addLineBreak();
-      angular.forEach(data.Header, function (row) {
+      var data = PrinterSettings.fetchData();
+      if (data != null) {
+        angular.forEach(data.Header, function (row) {
         if (row.IsBold == false) {
           printer.addTextStyle(false, false, false);
           printer.addTextSize(1, 1);
@@ -46,6 +48,8 @@ angular.module('itouch.services')
         }
         printer.addText(row.Text + '\n');
       });
+      }
+      data = null;
     };
 
     self.creatRecieptBody = function (data) {

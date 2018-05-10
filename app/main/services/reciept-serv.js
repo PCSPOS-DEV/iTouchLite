@@ -53,7 +53,7 @@ angular.module('itouch.services')
       angular.forEach(printData.Header, function (row) {
         // console.log('rows');
         // console.log(row);
-        if (row.IsBold == false) {
+        if (row.IsBold == 'false') {
           printer.addTextStyle(false, false, false);
           printer.addTextSize(1, 1);
         } else {
@@ -187,7 +187,7 @@ angular.module('itouch.services')
       var machine = SettingsService.getCurrentMachine();
 
       angular.forEach(printData.Footer, function (row) {
-        if (row.IsBold == false) {
+        if (row.IsBold == 'false') {
           printer.addTextStyle(false, false, false);
         } else {
           printer.addTextStyle(false, false, true);
