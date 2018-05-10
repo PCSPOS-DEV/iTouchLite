@@ -718,10 +718,11 @@ angular.module('itouch.controllers')
       $scope.bkey = false;
       var priceFormShown = false;
       $scope.onKeyClick = function (item) {
-        console.time("test");
+        // console.time("test");
         $scope.$emit('BlockMenu', false);
-        console.log($scope.bkey);
+        // console.log($scope.bkey);
         $scope.bkey = true;
+        Alert.showLoading();
         $scope.data.barcodeMode = false;
         if (item) {
           if (item.Type == 'P') {
@@ -756,7 +757,7 @@ angular.module('itouch.controllers')
             });
           }
           fetchSelectedItem($scope.selectedItem);
-          $timeout(function () { $scope.bkey = false;}, 500); // in case of increase the waiting time
+          $timeout(function () { $scope.bkey = false; Alert.hideLoading();}, 200); // in case of increase the waiting time
         }
       };
 
