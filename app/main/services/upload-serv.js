@@ -186,7 +186,7 @@ angular.module('itouch.services')
               }
               else {
                 promises.push(postVoidDocNos(bill).then(function (res) {
-                  console.log('UpdateVoidDocNo' + res);
+                  console.log('UpdateVoidDocNo : ' + res);
                 }));
               }
 

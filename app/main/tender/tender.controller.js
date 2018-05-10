@@ -13,6 +13,7 @@ angular.module('itouch.controllers')
       var payTransactions = [];
       $scope.payTransactions = [];
       var businessDate = ControlService.getBusinessDate(true);
+      var sitems = 0;
       var tenderDiscount = {
         header: null,
         discount: null
@@ -31,7 +32,15 @@ angular.module('itouch.controllers')
         submitted = false;
         DiscountService.clearTempTenderDiscounts();
         initBill();
+        syncItem();
       });
+
+      var syncItem = function () {
+        Restangular.one('GetItemsByLocations').get({LocationId: SettingsService.getLocationId()}).then(function (res) {
+          items = JSON.parse(res);
+          sitems = items
+        })
+      } 
 
       var initBill = function () {
         //console.log($stateParams.DocNo);
@@ -189,17 +198,14 @@ angular.module('itouch.controllers')
               var fditem;
               var ItemUOMId;
               var stockTransactions = [];
+              console.log(sitems);
               console.log(bill);
               angular.forEach(bill, function (item, key) {
-                console.log(item.ItemId);
-                angular.forEach(fitems, function (fitem, key) {
-                  // console.log(fitem.Id);
-                  
+                console.log('item.ItemId : ' + item.ItemId);
+                angular.forEach(sitems, function (fitem, key) {
                   if (fitem.Id == item.ItemId) {
-                    console.log('dd');
-                    // console.log(fitem.UOM_Id);
                     ItemUOMId = fitem.UOM_Id;
-                    console.log(ItemUOMId);
+                    console.log('ItemUOMId : ' + ItemUOMId);
                     stockTransactions.push({
                       BusinessDate: businessDate,
                       LocationId: item.LocationId,
@@ -216,10 +222,7 @@ angular.module('itouch.controllers')
     
                     });
                   } 
-                })
-                console.log(item);
-                console.log(key);
-                
+                }) 
               });
               var header = _.omit($scope.tenderHeader, ['TaxAmount', 'Total', 'TenderTotal', 'TotalRounded']);
 
