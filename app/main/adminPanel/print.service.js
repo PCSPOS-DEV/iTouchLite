@@ -2,8 +2,8 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory('PrintService', ['ErrorService', '$q', '$localStorage',
-    function (ErrorService, $q, $localStorage) {
+  .factory('PrintService', ['ErrorService', '$q', '$localStorage', 'Alert',
+    function (ErrorService, $q, $localStorage, Alert) {
       var self = this;
 
       var ePosDev = new epson.ePOSDevice();
@@ -22,6 +22,7 @@ angular.module('itouch.services')
         var deferred = $q.defer();
         self.status = 'connecting';
         if (ePosDev && _.isObject(ePosDev)) {
+          Alert.showLoading();
           console.log('connecting');
           ePosDev.connect($localStorage.printeSettings.ipAddress, $localStorage.printeSettings.port, function (resultConnect) {
             var deviceId = 'local_printer';
@@ -54,6 +55,7 @@ angular.module('itouch.services')
                   self.drawerOpen = false;
                 };
 
+                Alert.hideLoading();
                 deferred.resolve();
                 //Registers the print complete event
               });
@@ -62,6 +64,7 @@ angular.module('itouch.services')
               //Displays error messages
               self.status = 'failed';
               deferred.reject('connect error');
+              Alert.hideLoading();
             }
           }, {'eposprint': true});
         } else {
