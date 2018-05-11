@@ -44,6 +44,7 @@ angular.module('itouch.controllers')
         switch ($scope.shiftListType) {
           case 'open':
             if (shift.OpenDateTime) {
+              Alert.showLoading();
               ShiftService.saveCurrent(shift);
               $scope.$emit('shift-changed');
               $scope.$emit('shift-modal-close');
@@ -54,6 +55,7 @@ angular.module('itouch.controllers')
                 });
                 $state.go('app.sales');
               }, 1000);
+              // Alert.hideLoading();
             } else {
               $scope.shiftSelectionShown = false;
             }
@@ -90,6 +92,7 @@ angular.module('itouch.controllers')
       };
 
       $scope.save = function () {
+        Alert.showLoading();
         $q.all({
           save: ShiftService.saveCurrent($scope.shift),
           addFloat: ShiftService.addFloat($scope.shift, $scope.shift.RA)
@@ -111,6 +114,7 @@ angular.module('itouch.controllers')
         }, function (err) {
           console.log(err);
         });
+        // Alert.hideLoading();
         // $scope.$emit("shift-modal-close");
       };
 
