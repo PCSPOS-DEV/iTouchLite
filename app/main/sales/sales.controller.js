@@ -1537,6 +1537,7 @@ angular.module('itouch.controllers')
 
               } else {
                 $scope.flag = true;
+                Alert.showLoading();
                 SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
                   console.log($scope.header.DocNo);
                   Suspended = true; //GGWP
@@ -1548,6 +1549,7 @@ angular.module('itouch.controllers')
                   buttonClicked.recallSuspendBillModal = false;
                   Alert.success('Suspend completed');
                   $scope.$emit('BlockMenu', true);
+                  Alert.hideLoading();
                   $scope.flag = false;
                 });
 
