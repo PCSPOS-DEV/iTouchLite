@@ -286,6 +286,15 @@ angular.module('itouch', [
                   }]
                 }
               })
+              .state('app.syncdetaillogs', {
+                url: '/logs',
+                views: {
+                  'menuContent': {
+                    templateUrl: 'main/logs/logsDetail.html',
+                    controller: 'LogsDetailCtrl as ctrl'
+                  }
+                }
+              })
 
               .state('app.admin', {
                 url: '/admin',

@@ -59,15 +59,15 @@ angular.module('itouch.services')
                     console.log('sync done');
                     syncLog.log('Sync Complete', 1);
                     syncLog.log('-----*-----*-----', 1);
-                    var logs = syncLog.getLog();
-                    console.log(logs);
+                    // var logs = syncLog.getLog();
+                    // console.log(logs);
                   }, function (ex) {
                     console.log('sync error', ex);
                     syncLog.log('Sync Error : ' + ex, 1);
                     syncLog.log('Sync Complete', 1);
                     syncLog.log('-----*-----*-----', 1);
-                    var logs = syncLog.getLog();
-                    console.log(logs);
+                    // var logs = syncLog.getLog();
+                    // console.log(logs);
                     Alert.error(ex);
                   }).finally(function () {
                     Alert.hideLoading();

@@ -24,6 +24,7 @@ angular.module('itouch.controllers')
         { name: 'functions', text: 'Functions', template: 'main/adminPanel/functions.html' },
         { name: 'printer', text: 'Printer', template: 'main/adminPanel/printerSetup.html' },
         { name: 'images', text: 'Images', template: 'main/adminPanel/imageSetup.html' },
+        { name: 'logs', text: 'Logs', template: 'main/adminPanel/logs.html' },
       ];
 
       $scope.$on('$ionicView.afterEnter', function (event, data) {
