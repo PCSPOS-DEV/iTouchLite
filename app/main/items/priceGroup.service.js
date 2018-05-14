@@ -23,16 +23,20 @@ angular.module('itouch.services')
           try {
             var items = JSON.parse(res);
           } catch (ex) {
+            syncLog.log('  PriceGroups Sync Fail : No results', 1);
             deferred.reject('No results');
           }
           if (items) {
             self.save(items);
+            syncLog.log('  PriceGroups Sync Complete : ' + items.length + ' items found', 1);
             deferred.resolve();
           } else {
+            syncLog.log('  PriceGroups Sync Error : Unknown machine', 1);
             deferred.reject('Unknown machine');
           }
         }, function (err) {
           console.error(err);
+          syncLog.log('  PriceGroups Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {

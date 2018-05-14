@@ -7,6 +7,7 @@ angular.module('itouch.services')
       var self = this;
       var users = [];
       var tempUser = null;
+      syncLog = SettingsService.StartSyncLog();
 
       self.fetchUsers = function () {
         var deferred = $q.defer();
@@ -20,12 +21,15 @@ angular.module('itouch.services')
               return _.omit(user, 'EncPass');
             });
             DB.addInsertToQueue(DB_CONFIG.tableNames.auth.staff, users);
+            syncLog.log('  User Sync Complete', 1);
             deferred.resolve();
           }, function (err) {
+            syncLog.log('  User Sync Error : Could fetch data from the server', 1);
             deferred.reject('Could fetch data from the server');
             console.error(err);
           });
         } else {
+          syncLog.log('  User Sync Fail : Location ID is not available', 1);
           deferred.reject('Location ID is not available');
         }
         return deferred.promise;

@@ -16,6 +16,7 @@ angular.module('itouch.services')
         }
         deferred.resolve(true);
       });
+      syncLog.log('  Functions Sync Complete', 1);
       return deferred.promise;
     };
 

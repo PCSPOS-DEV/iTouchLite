@@ -55,23 +55,29 @@ angular.module('itouch.services')
                 var items = JSON.parse(res);
                 if (items) {
                   self.saveDiscounts(items);
+                  syncLog.log('  Discounts Sync Complete : ' + items.length + ' items found', 1);
                   deferred.resolve();
                 } else {
+                  syncLog.log('  Discounts Sync Error : Unknown machine', 1);
                   deferred.reject('Unknown machine');
                 }
               }
               else {
+                syncLog.log('  Discounts Sync Complete', 1);
                 deferred.resolve();
               }
             } catch (ex) {
+              syncLog.log('  Discounts Sync Error : No results', 1);
               deferred.reject('No results');
             }
 
           }, function (err) {
             console.error(err);
+            syncLog.log('  Discounts Sync Error : Unable to fetch data from the server', 1);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
+          syncLog.log('  Discounts Sync Error : ' + ex, 1);
           deferred.reject(ex);
         }
         return deferred.promise;
@@ -90,22 +96,28 @@ angular.module('itouch.services')
                 var items = JSON.parse(res);
                 if (items) {
                   self.saveDiscountsFor(items);
+                  syncLog.log('  DiscountsFor Sync Complete : ' + items.length + ' items found', 1);
                   deferred.resolve();
                 } else {
+                  syncLog.log('  DiscountsFor Sync Error : Unknown machine', 1);
                   deferred.reject('Unknown machine');
                 }
               }
               else {
+                syncLog.log('  DiscountsFor Sync Complete', 1);
                 deferred.resolve();
               }
             } catch (ex) {
+              syncLog.log('  DiscountsFor Sync Error : No results', 1);
               deferred.reject('No results');
             }
           }, function (err) {
             console.error(err);
+            syncLog.log('  DiscountsFor Sync Error : Unable to fetch data from the server', 1);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
+          syncLog.log('  DiscountsFor Sync Error : ' + ex, 1);
           deferred.reject(ex);
         }
         return deferred.promise;

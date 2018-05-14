@@ -5,6 +5,7 @@ angular.module('itouch.services')
   .factory('SalesKitService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', 'ItemService', 'LocationService', 'AuthService', '$filter', 'ControlService', 'TenderService', 'BillService',
     function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, ItemService, LocationService, AuthService, $filter, ControlService, TenderService, BillService) {
       var self = this;
+      syncLog = SettingsService.StartSyncLog();
 
       var location = LocationService.currentLocation;
       renameProperty(location, 'PriceLevel', 'PriceLevelId');
@@ -29,8 +30,10 @@ angular.module('itouch.services')
               var items = JSON.parse(res);
               if (items) {
                 self.saveKitApplicablePeriod(items);
+                syncLog.log('  SalesKits Sync Complete', 1);
                 deferred.resolve();
               } else {
+                syncLog.log('  SalesKits Sync Fail : Unable to fetch sales kits', 1);
                 deferred.reject('Unable to fetch sales kits');
               }
             }
@@ -39,9 +42,11 @@ angular.module('itouch.services')
             }
           }, function (err) {
             console.error(err);
+            syncLog.log('  SalesKits Sync Error : Unable to fetch data from the server', 1);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
+          syncLog.log('  SalesKits Sync Error : ' + ex, 1);
           deferred.reject(ex);
         }
 

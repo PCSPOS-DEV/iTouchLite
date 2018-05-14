@@ -21,6 +21,7 @@ angular.module('itouch.services')
             });
             console.log(Pdata);
           } catch (ex) {
+            syncLog.log('  PrinterSettings Sync Error : ' + ex, 1);
             deferred.resolve([]);
           }
           if (items) {
@@ -29,15 +30,19 @@ angular.module('itouch.services')
               return _.omit(item, 'LocationId');
             });
             self.save(items);
+            syncLog.log('  PrinterSettings Sync Complete : ' + items.length + ' items found', 1);
             deferred.resolve(items);
           } else {
+            syncLog.log('  PrinterSettings Sync Complete', 1);
             deferred.resolve([]);
           }
         }, function (err) {
           console.error(err);
+          syncLog.log('  PrinterSettings Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {
+        syncLog.log('  PrinterSettings Sync Error : ' + ex, 1);
         deferred.reject(ex);
       }
 

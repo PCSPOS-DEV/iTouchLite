@@ -17,19 +17,24 @@ angular.module('itouch.services')
                   return _.omit(item, 'EntityId');
                 });
                 self.save(items);
+                syncLog.log('  Reasons Sync Complete : ' + items.length + ' reasons found', 1);
                 deferred.resolve();
               } else {
+                syncLog.log('  Reasons Sync Error : Unable to fetch Shifts', 1);
                 deferred.reject('Unable to fetch Shifts');
               }
             } else {
+              syncLog.log('  Reasons Sync Error : Unable to fetch Shifts', 1);
               deferred.reject('Unable to fetch Shifts');
             }
 
           }, function (err) {
             throw new Error(err);
+            syncLog.log('  Reasons Sync Error : Unable to fetch data from the server', 1);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
+          syncLog.log('  Reasons Sync Error : ' + ex, 1);
           deferred.reject(ex);
         }
 

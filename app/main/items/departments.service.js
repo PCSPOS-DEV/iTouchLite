@@ -13,19 +13,24 @@ angular.module('itouch.services')
           try {
             var items = JSON.parse(res);
           } catch (ex) {
+            syncLog.log('  Departments Sync Error : No results', 1);
             deferred.reject('No results');
           }
           if (items) {
             self.save(items);
+            syncLog.log('  Departments Sync Complete : ' + items.length + ' items found', 1);
             deferred.resolve(items);
           } else {
+            syncLog.log('  Departments Sync Error : Unknown machine', 1);
             deferred.reject('Unknown machine');
           }
         }, function (err) {
           console.error(err);
+          syncLog.log('  Departments Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {
+        syncLog.log('  Departments Sync Error : ' + ex, 1);
         deferred.reject(ex);
       }
 

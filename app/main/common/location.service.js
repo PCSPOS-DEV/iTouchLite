@@ -5,6 +5,7 @@ angular.module('itouch.services')
   .factory('LocationService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
     var self = this;
     self.currentLocation = $localStorage.location;
+    syncLog = SettingsService.StartSyncLog();
 
     self.fetch = function () {
       var deferred = $q.defer();
@@ -14,15 +15,19 @@ angular.module('itouch.services')
             var items = JSON.parse(res);
           } catch (ex) {
             deferred.reject('No results');
+            syncLog.log('  Locations Sync Fail : No results', 1);
           }
           if (items) {
             self.save(items);
+            syncLog.log('  Locations Sync Complete', 1);
             deferred.resolve(items);
           } else {
+            syncLog.log('  Locations Sync Error : Unknown machine', 1);
             deferred.reject('Unknown machine');
           }
         }, function (err) {
           console.error(err);
+          syncLog.log('  Locations Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {

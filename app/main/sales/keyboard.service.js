@@ -6,6 +6,7 @@ angular.module('itouch.services')
     var self = this;
     var pages;
     var keys;
+    syncLog = SettingsService.StartSyncLog();
 
     self.fetchLayout = function () {
       var deferred = $q.defer();
@@ -14,16 +15,20 @@ angular.module('itouch.services')
           var kBLayouts = JSON.parse(res);
           if (kBLayouts) {
             self.saveLayout(kBLayouts);
+            syncLog.log('  Layout Sync Complete', 1);
             deferred.resolve();
           } else {
+            syncLog.log('  Layout Sync Error : Unknown machine', 1);
             deferred.reject('Unknown machine');
           }
 
         }, function (err) {
           console.error(err);
+          syncLog.log('  Layout Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {
+        syncLog.log('  Layout Sync Fail : ' + ex, 1);
         deferred.reject(ex);
       }
 
@@ -37,13 +42,16 @@ angular.module('itouch.services')
           var pageSet = JSON.parse(res);
           if (pageSet && pageSet.length > 0) {
             self.savePages(pageSet);
+            syncLog.log('  Page Sync Complete', 1);
             deferred.resolve(pageSet);
           } else {
+            syncLog.log('  Page Sync Error : Unknown machine', 1);
             deferred.reject('Unknown machine');
           }
 
         }, function (err) {
           console.error(err);
+          syncLog.log('  Page Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
 
@@ -68,20 +76,25 @@ angular.module('itouch.services')
                 return pageKey;
               });
               self.savePageInfo(pageInfo);
+              syncLog.log('  PageInfo Sync Complete', 1);
               deferred.resolve();
             } else {
+              syncLog.log('  PageInfo Sync Error : Unknown machine', 1);
               deferred.reject('Unknown machine');
             }
           }
           else {
+            syncLog.log('  PageInfo Sync Complete', 1);
             deferred.resolve();
           }
 
         }, function (err) {
           console.error(err);
+          syncLog.log('  PageInfo Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {
+        syncLog.log('  Page Sync Fail : ' + ex, 1);
         deferred.reject(ex);
       }
 
@@ -111,8 +124,10 @@ angular.module('itouch.services')
                 return key;
               });
               self.saveKeys(keys);
+              syncLog.log('  Keys Sync Complete', 1);
               deferred.resolve(keys);
             } else {
+              syncLog.log('  Keys Sync Error : Unable to fetch keys for this machine', 1);
               deferred.reject('Unable to fetch keys for this machine');
             }
           }
@@ -121,9 +136,11 @@ angular.module('itouch.services')
           }
         }, function (err) {
           console.error(err);
+          syncLog.log('  Keys Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {
+        syncLog.log('  Keys Sync Fail : ' + ex, 1);
         deferred.reject(ex);
       }
 

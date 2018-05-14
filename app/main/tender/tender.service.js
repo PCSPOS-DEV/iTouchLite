@@ -4,6 +4,7 @@
 angular.module('itouch.services')
 .factory('TenderService', ['LocationService', 'DB', 'DB_CONFIG', '$q', '$localStorage', 'Restangular', 'SettingsService', 'ControlService', function (LocationService, DB, DB_CONFIG, $q, $localStorage, Restangular, SettingsService, ControlService) {
   var self = this;
+  syncLog = SettingsService.StartSyncLog();
 
   self.fetchTenderTypes = function () {
     var deferred = $q.defer();
@@ -11,16 +12,20 @@ angular.module('itouch.services')
       try {
         var items = JSON.parse(res);
       } catch (ex) {
+        syncLog.log('  TenderTypes Sync Fail : No results', 1);
         deferred.reject('No results');
       }
       if (items) {
         self.save(items);
+        syncLog.log('  TenderTypes Sync Complete', 1);
         deferred.resolve();
       } else {
+        syncLog.log('  TenderTypes Sync Error : Unknown machine', 1);
         deferred.reject('Unknown machine');
       }
     }, function (err) {
       console.error(err);
+      syncLog.log('  TenderTypes Sync Error : Unable to fetch data from the server', 1);
       deferred.reject('Unable to fetch data from the server');
     });
 

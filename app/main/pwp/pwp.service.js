@@ -14,20 +14,25 @@ angular.module('itouch.services')
             var items = JSON.parse(res);
             if (items) {
               self.saveItemsByPWP(items);
+              syncLog.log('  ItemsByPWP Sync Complete : ' + items.length + ' items found', 1);
               deferred.resolve();
             }
             else {
+              syncLog.log('  ItemsByPWP Sync Error : Unknown machine', 1);
               deferred.reject('Unknown machine');
             }
           }
           else {
+            syncLog.log('  ItemsByPWP Sync Complete', 1);
             deferred.resolve();
           }
         } catch (ex) {
+          syncLog.log('  ItemsByPWP Sync Error : No results', 1);
           deferred.reject('No results');
         }
       }, function (err) {
         console.error(err);
+        syncLog.log('  ItemsByPWP Sync Error : Unable to fetch data from the server', 1);
         deferred.reject('Unable to fetch data from the server');
       });
 
@@ -45,20 +50,25 @@ angular.module('itouch.services')
             });
             if (items) {
               self.savePWP(items);
+              syncLog.log('  PWP Sync Complete : ' + items.length + ' items found', 1);
               deferred.resolve();
             } else {
+              syncLog.log('  PWP Sync Error : Unknown machine', 1);
               deferred.reject('Unknown machine');
             }
           }
           else
           {
+            syncLog.log('  PWP Sync Complete', 1);
             deferred.resolve();
           }
         } catch (ex) {
+          syncLog.log('  PWP Sync Error : No results', 1);
           deferred.reject('No results');
         }
       }, function (err) {
         console.error(err);
+        syncLog.log('  PWP Sync Error : Unable to fetch data from the server', 1);
         deferred.reject('Unable to fetch data from the server');
       });
 

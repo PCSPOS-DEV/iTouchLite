@@ -17,9 +17,11 @@ angular.module('itouch.services')
               var items = JSON.parse(res);
               if (items) {
                 self.save(items);
+                syncLog.log('  Modifiers Sync Complete : ' + items.length + ' items found', 1);
                 deferred.resolve(items);
               }
               else {
+                syncLog.log('  Modifiers Sync Error : Unknown machine', 1);v
                 deferred.reject('Unknown machine');
               }
             }
@@ -27,10 +29,12 @@ angular.module('itouch.services')
               deferred.resolve();
             }
           } catch (ex) {
+            syncLog.log('  Modifiers Sync Error : No results', 1);
             deferred.reject('No results');
           }
         }, function (err) {
           console.error(err);
+          syncLog.log('  Modifiers Sync Error : Unable to fetch data from the server', 1);
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {

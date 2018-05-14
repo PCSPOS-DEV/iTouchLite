@@ -5,7 +5,11 @@ angular.module('itouch.services')
   .factory('SettingsService', ['$localStorage', '$q', 'Restangular', 'DB', 'DB_CONFIG', function ($localStorage, $q, Restangular, DB, DB_CONFIG) {
     var self = this;
     var settings = $localStorage.settings || {};
+    var syncLog = new debugout();
 
+    self.StartSyncLog = function() {
+      return syncLog;
+    }
     //TODO: remove this once settings page done
     if (!settings.roundFor) {
       settings.roundFor = 'M';
@@ -114,12 +118,15 @@ angular.module('itouch.services')
           console.log('machines fetch done');
           machines = JSON.parse(res);
           DB.addInsertToQueue(DB_CONFIG.tableNames.config.machines, machines);
+          syncLog.log('  Machines Sync Complete', 1);
           deferred.resolve();
         }, function (err) {
-          deferred.reject('Could fetch data from the server');
+          syncLog.log('  Machines Sync Error : Unable to fetch data from the server', 1);
+          deferred.reject('Unable to fetch data from the server');
           console.error(err);
         });
       } else {
+        syncLog.log('  Machines Sync Error : Entity ID is not available', 1);
         deferred.reject('Entity ID is not available');
       }
       return deferred.promise;
