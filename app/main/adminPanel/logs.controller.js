@@ -17,4 +17,8 @@ angular.module('itouch.controllers')
         $state.go('app.syncdetaillogs');
       }
 
+      self.UploadLog = function () {
+        $state.go('app.uploaddetaillogs');
+      }
+
     }]);

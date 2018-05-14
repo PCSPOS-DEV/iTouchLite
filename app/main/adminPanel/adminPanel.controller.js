@@ -29,7 +29,8 @@ angular.module('itouch.controllers')
 
       $scope.$on('$ionicView.afterEnter', function (event, data) {
         $scope.loadingHide();
-        self.changePage(_.first(self.pages));
+        self.changePage(_.last(self.pages));
+        // self.changePage(_.first(self.pages));
         $ionicNavBarDelegate.showBackButton(true);
       });
 

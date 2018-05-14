@@ -290,8 +290,18 @@ angular.module('itouch', [
                 url: '/logs',
                 views: {
                   'menuContent': {
-                    templateUrl: 'main/logs/logsDetail.html',
-                    controller: 'LogsDetailCtrl as ctrl'
+                    templateUrl: 'main/logs/SyncLogsDetail.html',
+                    controller: 'SyncLogsDetailCtrl as ctrl'
+                  }
+                }
+              })
+
+              .state('app.uploaddetaillogs', {
+                url: '/logs',
+                views: {
+                  'menuContent': {
+                    templateUrl: 'main/logs/UploadLogsDetail.html',
+                    controller: 'UploadLogsDetailCtrl as ctrl'
                   }
                 }
               })

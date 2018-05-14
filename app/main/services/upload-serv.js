@@ -6,6 +6,13 @@ angular.module('itouch.services')
       var entityId;
       var macId;
       var enableAutoUpload = true;
+      var uploadLog = new debugout();
+      var DefaultInterval = 2;
+      var autouploadInterval = 2;
+
+      self.StartuploadLog = function() {
+        return uploadLog;
+      }
 
       var onSuccess = function (res) {
         return _.map(DB.fetchAll(res), function (row) {
@@ -16,7 +23,9 @@ angular.module('itouch.services')
       };
 
       var postVoidDocNos = function (data) {
+        console.log(data);
         var config = $localStorage.itouchConfig;
+        console.log(config);
         if (config && config.baseUrl) {
           return Restangular.oneUrl('uplink', config.baseUrl + 'UpdateVoidDocNos').customPOST(
             JSON.stringify(data),
@@ -165,27 +174,31 @@ angular.module('itouch.services')
           return self.getBills().then(function (bills) {
             var promises = [];
             angular.forEach(bills, function (bill) {
-              if (bill.BillDetail != undefined) {
-                angular.forEach(bill.BillDetail, function (ids) {
-                  // ids.ItemId = Math.floor(ids.ItemId);
-                  console.log(ids.ItemId);
-                });
-              }
+              // if (bill.BillDetail != undefined) {
+              //   angular.forEach(bill.BillDetail, function (ids) {
+              //     // ids.ItemId = Math.floor(ids.ItemId);
+              //     console.log(ids.ItemId);
+              //   });
+              // }
               if (typeof (bill.BillHeader) !== 'undefined') {
                 var DocNo = bill.BillHeader.DocNo;
                 bill.BillHeader = [bill.BillHeader];
                 promises.push(post(bill).then(function (res) {
                   console.log(res);
                   if (res === 'success') {
+                    uploadLog.log('Upload Status : setExported DocNo = ' + DocNo, 2);
                     return self.setExported(DocNo);
                   }
                   else {
+                    uploadLog.log('Upload Status : Rejected' + res, 2);
                     return $q.reject(res);
                   }
                 }));
               }
               else {
                 promises.push(postVoidDocNos(bill).then(function (res) {
+                  console.log(res);
+                  uploadLog.log('Upload Status : UpdateVoidDoc = ' + res, 2);
                   console.log('UpdateVoidDocNo : ' + res);
                 }));
               }
@@ -206,12 +219,13 @@ angular.module('itouch.services')
                 }));*/
             });
             return $q.all(promises)
-                    .catch(function (err) {
-                      console.log(err);
-                      return $q.reject('Unable to connect the server');
-                    }).finally(function () {
-                      uploading = false;
-                    });
+              .catch(function (err) {
+                console.log(err);
+                uploadLog.log('Upload Error : Unable to connect the server', 2);
+                return $q.reject('Unable to connect the server');
+              }).finally(function () {
+                uploading = false;
+              });
           });
         } else {
           return $q.resolve();
@@ -223,9 +237,10 @@ angular.module('itouch.services')
         if (enableAutoUpload) {
          //console.log('auto upload started');
           $interval(function () {
+            uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
             console.log('auto upload');
             self.upload();
-          }, 120000);
+          }, ((autouploadInterval*60)*1000));
         }
       };
 

@@ -54,14 +54,20 @@ angular.module('itouch.controllers')
         $scope.$broadcast('refresh-cart');
       });
     };
-
+    uploadLog = UploadService.StartuploadLog();
     var uploadClicked = false;
     $scope.upload = function () {
       if (!uploadClicked) {
         uploadClicked = true;
         UploadService.upload().then(function () {
+          uploadLog.log('Upload Success : Manual Upload', 2);
+          var logs = uploadLog.getLog();
+          console.log(logs);
           Alert.success('Upload success');
         }, function (err) {
+          uploadLog.log('Upload Error : ' + err, 2);
+          var logs = uploadLog.getLog();
+          console.log(logs);
           Alert.error(err);
         }).finally(function () {
           uploadClicked = false;

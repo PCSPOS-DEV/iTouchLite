@@ -9,7 +9,7 @@ angular.module('itouch.services')
       var self = this;
       var entityId;
       var macId;
-      var enableAutoUpload = true;
+      // var enableAutoUpload = true;
       var suspendedDoc = null;
       var bill;
 
@@ -111,15 +111,15 @@ angular.module('itouch.services')
         });
       };
 
-      self.startAutoUpload = function () {
-        if (enableAutoUpload) {
-                // console.log('auto upload started');
-          $interval(function () {
-                    // console.log('upload');
-            self.upload();
-          }, 120000);
-        }
-      };
+      // self.startAutoUpload = function () {
+      //   if (enableAutoUpload) {
+      //           // console.log('auto upload started');
+      //     $interval(function () {
+      //               // console.log('upload');
+      //       self.upload();
+      //     }, 120000);
+      //   }
+      // };
 
       self.fetchSuspendedBills = function () {
         return Restangular.one('GetSuspendHeaders').get().then(function (res) {
