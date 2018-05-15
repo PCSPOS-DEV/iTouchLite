@@ -287,7 +287,7 @@ angular.module('itouch', [
                 }
               })
               .state('app.syncdetaillogs', {
-                url: '/logs',
+                url: '/synclogs',
                 views: {
                   'menuContent': {
                     templateUrl: 'main/logs/SyncLogsDetail.html',
@@ -297,7 +297,7 @@ angular.module('itouch', [
               })
 
               .state('app.uploaddetaillogs', {
-                url: '/logs',
+                url: '/uplogs',
                 views: {
                   'menuContent': {
                     templateUrl: 'main/logs/UploadLogsDetail.html',
