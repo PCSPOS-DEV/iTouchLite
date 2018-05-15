@@ -7,11 +7,18 @@ angular.module('itouch.services')
       var macId;
       var enableAutoUpload = true;
       var uploadLog = new debugout();
-      var DefaultInterval = 2;
       var autouploadInterval = 2;
 
       self.StartuploadLog = function() {
         return uploadLog;
+      }
+
+      self.getAutoUploadInterval = function() {
+        return autouploadInterval;
+      }
+
+      self.setAutoUploadInterval = function (upinterval) {
+        autouploadInterval = upinterval;
       }
 
       var onSuccess = function (res) {
@@ -23,9 +30,9 @@ angular.module('itouch.services')
       };
 
       var postVoidDocNos = function (data) {
-        console.log(data);
+        // console.log(data);
         var config = $localStorage.itouchConfig;
-        console.log(config);
+        // console.log(config);
         if (config && config.baseUrl) {
           return Restangular.oneUrl('uplink', config.baseUrl + 'UpdateVoidDocNos').customPOST(
             JSON.stringify(data),
@@ -92,8 +99,8 @@ angular.module('itouch.services')
           angular.forEach(DB.fetchAll(res), function (header) {
             uploadLog.log('  DocNo : ' + header.DocNo + ', Total : ' + header.SubTotal, 2);
             
-            console.log(header);
-            console.log(header.EntityId);
+            // console.log(header);
+            // console.log(header.EntityId);
             header.EntityId = entityId;
             promises.push($q.all({
               BillHeader: $q.when(header),
@@ -192,7 +199,7 @@ angular.module('itouch.services')
                 var DocNo = bill.BillHeader.DocNo;
                 bill.BillHeader = [bill.BillHeader];
                 promises.push(post(bill).then(function (res) {
-                  console.log(res);
+                  // console.log(res);
                   if (res === 'success') {
                     uploadLog.log('Upload Status : Uploaded DocNo = ' + DocNo, 2);
                     return self.setExported(DocNo);
@@ -205,7 +212,7 @@ angular.module('itouch.services')
               }
               else {
                 promises.push(postVoidDocNos(bill).then(function (res) {
-                  console.log(res);
+                  // console.log(res);
                   uploadLog.log('Upload Status : UpdateVoidDoc = ' + res, 2);
                   console.log('UpdateVoidDocNo : ' + res);
                 }));
@@ -244,11 +251,11 @@ angular.module('itouch.services')
       self.startAutoUpload = function () {
         if (enableAutoUpload) {
          //console.log('auto upload started');
-          $interval(function () {
-            uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
-            uploadLog.log('-----*-----*-----', 2);
+          $interval(function () { 
             console.log('auto upload');
             self.upload();
+            uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
+            uploadLog.log('-----*-----*-----', 2);
           }, ((autouploadInterval*60)*1000));
         }
       };
