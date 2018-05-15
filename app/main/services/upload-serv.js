@@ -85,8 +85,15 @@ angular.module('itouch.services')
           columns: 'IsExported=?',
           data: [false]
         }, null, '10').then(function (res) {
+          uploadLog.log('--*-- Upload Detail Initialized --*--', 2);
+          uploadLog.log('  Number of transactions : ' + res.rows.length, 2);
+          // console.log(res.rows.length);
           var promises = [];
           angular.forEach(DB.fetchAll(res), function (header) {
+            uploadLog.log('  DocNo : ' + header.DocNo + ', Total : ' + header.SubTotal, 2);
+            
+            console.log(header);
+            console.log(header.EntityId);
             header.EntityId = entityId;
             promises.push($q.all({
               BillHeader: $q.when(header),
@@ -173,6 +180,7 @@ angular.module('itouch.services')
           DB.clearQueue();
           return self.getBills().then(function (bills) {
             var promises = [];
+            uploadLog.log('--*-- Upload Detail Completed --*--', 2);
             angular.forEach(bills, function (bill) {
               // if (bill.BillDetail != undefined) {
               //   angular.forEach(bill.BillDetail, function (ids) {
@@ -186,7 +194,7 @@ angular.module('itouch.services')
                 promises.push(post(bill).then(function (res) {
                   console.log(res);
                   if (res === 'success') {
-                    uploadLog.log('Upload Status : setExported DocNo = ' + DocNo, 2);
+                    uploadLog.log('Upload Status : Uploaded DocNo = ' + DocNo, 2);
                     return self.setExported(DocNo);
                   }
                   else {
@@ -238,6 +246,7 @@ angular.module('itouch.services')
          //console.log('auto upload started');
           $interval(function () {
             uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
+            uploadLog.log('-----*-----*-----', 2);
             console.log('auto upload');
             self.upload();
           }, ((autouploadInterval*60)*1000));
