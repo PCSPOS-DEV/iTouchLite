@@ -8,6 +8,8 @@ angular.module('itouch.services')
       var enableAutoUpload = true;
       var uploadLog = new debugout();
       var autouploadInterval = 2;
+      var autoupinterval = ((autouploadInterval*60)*1000);
+      var interval = null;
 
       self.StartuploadLog = function() {
         return uploadLog;
@@ -19,6 +21,11 @@ angular.module('itouch.services')
 
       self.setAutoUploadInterval = function (upinterval) {
         autouploadInterval = upinterval;
+        autoupinterval = ((autouploadInterval*60)*1000);
+        if (angular.isDefined(interval)) {
+          $interval.cancel(interval);
+        }
+        self.startAutoUpload();
       }
 
       var onSuccess = function (res) {
@@ -139,6 +146,7 @@ angular.module('itouch.services')
               },null,'1000')*/
             }));
           });
+          uploadLog.log('--*-- Upload Detail Completed --*--', 2);
 
           promises.push($q.all({
             UpdateVoidDocNo: DB.select(DB_CONFIG.tableNames.bill.header, '*', {
@@ -187,7 +195,7 @@ angular.module('itouch.services')
           DB.clearQueue();
           return self.getBills().then(function (bills) {
             var promises = [];
-            uploadLog.log('--*-- Upload Detail Completed --*--', 2);
+            
             angular.forEach(bills, function (bill) {
               // if (bill.BillDetail != undefined) {
               //   angular.forEach(bill.BillDetail, function (ids) {
@@ -249,17 +257,19 @@ angular.module('itouch.services')
       };
 
       self.startAutoUpload = function () {
-        if (enableAutoUpload) {
-         //console.log('auto upload started');
-          $interval(function () { 
+        console.log(enableAutoUpload);
+        if (enableAutoUpload == true) {
+          interval = $interval(function () { 
             console.log('auto upload');
             self.upload();
-            uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
-            uploadLog.log('-----*-----*-----', 2);
-          }, ((autouploadInterval*60)*1000));
+            setTimeout (function () {
+              uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
+              uploadLog.log('-----*-----*-----', 2);
+            }, 100)
+          }, autoupinterval);
         }
       };
-
+    
       var post = function (data) {
         var config = $localStorage.itouchConfig;
         if (config && config.baseUrl) {

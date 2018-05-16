@@ -35,13 +35,13 @@ angular.module('itouch.controllers')
       });
 
       self.goBack = function () {
-        // var back = $ionicHistory.backView();
-        // console.log(back);
-        // if (back) {
-        //   $ionicHistory.goBack();
-        // } else {
+        var back = $ionicHistory.backView();
+        console.log(back);
+        if (back) {
+          $ionicHistory.goBack();
+        } else {
           $state.go('login');
-        // }
+        }
 
       };
 
