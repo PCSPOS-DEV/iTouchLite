@@ -21,4 +21,8 @@ angular.module('itouch.controllers')
         $state.go('app.uploaddetaillogs');
       }
 
+      self.ShiftLog = function () {
+        $state.go('app.shiftdetaillogs');
+      }
+
     }]);

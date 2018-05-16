@@ -5,6 +5,11 @@ angular.module('itouch.services')
   .factory('ShiftService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', '$localStorage', 'AuthService', 'ControlService', '$filter', 'ItemService',
     function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, $localStorage, AuthService, ControlService, $filter, ItemService) {
       var self = this;
+      var shiftLog = new debugout();
+
+      self.StartShiftLog= function () {
+        return shiftLog;
+      }
 
       self.fetch = function () {
         var deferred = $q.defer();
@@ -136,12 +141,15 @@ angular.module('itouch.services')
                 self.clearCurrent();
                 deferred.resolve();
               }, function (error) {
+                shiftLog.log('Close Shift Status : Error : ' + error, 3);
                 deferred.reject(error);
               });
             } else {
+              shiftLog.log('Close Shift Status : Shift is not valid', 3);
               deferred.reject('Shift is not valid');
             }
           }, function (error) {
+            shiftLog.log('Close Shift Status : Error : ' + error, 3);
             deferred.reject(error);
           });
         }
@@ -179,10 +187,12 @@ angular.module('itouch.services')
                 'createHeader': declareCash(cash, shift.Id)
               });
             } else {
+              shiftLog.log('Declare Cash Status : Shift is not valid', 3);
               return $q.reject('Shift is not valid');
             }
           });
         } else {
+          shiftLog.log('Declare Cash Status : Shift is not valid', 3);
           return $q.reject('Shift is not valid');
         }
       };
@@ -198,10 +208,12 @@ angular.module('itouch.services')
               return DB.update('ShiftStatus', _.omit(shift, 'Id'), { columns: 'Id= ?', data: [shift.Id]});
               // deferred.resolve();
             } else {
+              shiftLog.log('declareCashLater Status : Shift is not valid', 3);
               return $q.reject('Shift is not valid');
             }
           });
         } else {
+          shiftLog.log('declareCashLater Status : Shift is not valid', 3);
           return $q.reject('Shift is not valid');
         }
       };

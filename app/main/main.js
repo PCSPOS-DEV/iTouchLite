@@ -306,6 +306,16 @@ angular.module('itouch', [
                 }
               })
 
+              .state('app.shiftdetaillogs', {
+                url: '/shiftlogs',
+                views: {
+                  'menuContent': {
+                    templateUrl: 'main/logs/ShiftLogsDetail.html',
+                    controller: 'ShiftLogsDetailCtrl as ctrl'
+                  }
+                }
+              })
+
               .state('app.admin', {
                 url: '/admin',
                 views: {
