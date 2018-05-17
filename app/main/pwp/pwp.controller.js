@@ -41,9 +41,14 @@ angular.module('itouch.controllers')
       var addPrice = function (item, discPercent) {
         return ItemService.getPrice(item.Plu, parseInt(item.PriceGroupId)).then(function (data) {
           var Bdisc = data ? data.AlteredPrice : 0;
-          var Adisc = Bdisc - (((Bdisc/100) * discPercent).toFixed(2));
-          // var Adisc = Bdisc - ((discPercent * 0.01) * Bdisc);
-          item.AlteredPrice = (((Bdisc/100) * discPercent).toFixed(2));
+          var cal = (((Bdisc/100) * discPercent).toFixed(3));
+          var s1 = Math.floor(cal);
+          var s2 = (cal*100) - (s1 * 100);
+          var s3 = s2.toFixed(0)/100
+          // console.log(s3);
+          var Adisc = (Bdisc - s3).roundTo(2).toFixed(2);
+          // console.log(Adisc);
+          item.AlteredPrice = (((Bdisc/100) * discPercent).toFixed(3));
           item.Price = Adisc;
           item.SubItemPrice = Adisc;
           item.OrgPrice = data ? data.OrgPrice : 0;  
