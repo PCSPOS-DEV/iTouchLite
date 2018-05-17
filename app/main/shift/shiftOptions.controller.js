@@ -201,7 +201,7 @@ angular.module('itouch.controllers')
       });
 
       $scope.$on('shift-close', function (evt, shift) {
-        console.log(shift);
+        // console.log(shift);
         shiftLog.log('Close Shift Success : ' + shift.Description1 + ' ' + shift.Description2, 3);
         openCashPopUp(shift, dayEnd);
       });

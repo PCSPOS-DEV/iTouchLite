@@ -42,7 +42,6 @@ angular.module('itouch.controllers')
 
       $scope.selectShift = function (shift) {
         $scope.shift = shift;
-        console.log(shift);
         switch ($scope.shiftListType) {
           case 'open':
           shiftLog.log('Shift Open Success : ' + shift.Description1 + ' ' + shift.Description2, 3);
