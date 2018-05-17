@@ -316,6 +316,16 @@ angular.module('itouch', [
                 }
               })
 
+              .state('app.errordetaillogs', {
+                url: '/errorlogs',
+                views: {
+                  'menuContent': {
+                    templateUrl: 'main/logs/ErrorLogsDetail.html',
+                    controller: 'ErrorLogsDetailCtrl as ctrl'
+                  }
+                }
+              })
+
               .state('app.admin', {
                 url: '/admin',
                 views: {

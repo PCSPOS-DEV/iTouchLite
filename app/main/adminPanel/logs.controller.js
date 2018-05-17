@@ -25,4 +25,8 @@ angular.module('itouch.controllers')
         $state.go('app.shiftdetaillogs');
       }
 
+      self.ErrorLog = function () {
+        $state.go('app.errordetaillogs');
+      }
+
     }]);
