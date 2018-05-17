@@ -11,14 +11,23 @@ angular.module('itouch.controllers')
       var ask = 0;
       var shiftLog = ShiftService.StartShiftLog();
       var BDate = moment(angular.copy(ControlService.getDayEndDate())).format('DD-MM-YYYY');
+      var systemDate = new Date();
+      var tDay= new Date();
+      tDay.setDate(systemDate.getDate() + 1); 
 
       $scope.shiftListType = null;
       self.shiftData = shiftData;
 
       var checkBDate = function () {
         if (ControlService.isNewBusinessDate()) {
-          self.openDatePicker(ControlService.getDayEndDate());
-          return false;
+          // console.log((ControlService.getDayEndDate()).format('DD-MM-YYYY'));
+          // console.log(moment(tDay).format('DD-MM-YYYY'));
+          if ((ControlService.getDayEndDate()).format('DD-MM-YYYY') >= moment(tDay).format('DD-MM-YYYY')) {
+            Alert.error('Invalid Business Date.');
+          } else {
+            self.openDatePicker(ControlService.getDayEndDate());
+            return false;
+          }
         } else {
           return true;
         }
@@ -71,12 +80,12 @@ angular.module('itouch.controllers')
       self.openShiftCloseModal = function () {
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
-          if (suspenditem == 0) { // GGWP
+          // if (suspenditem == 0) { // GGWP
             $scope.shiftListType = 'close';
             self.shiftModal.show();
-          } else {
-            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
-          }
+          // } else {
+          //   Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+          // }
         });
 
       };
@@ -215,11 +224,11 @@ angular.module('itouch.controllers')
       $scope.flag = false;
       self.openDayEnd = function() {
         if (ask == 0) { 
-          Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
-            if (res == 1) {
+          // Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
+          //   if (res == 1) {
               shiftclosingReport();
-            }
-          });
+          //   }
+          // });
           ask = 1;
         } else {
           shiftclosingReport();
@@ -294,9 +303,7 @@ angular.module('itouch.controllers')
       /**
        * Opens the Business Date picker
        */
-      var systemDate = new Date();
-      var tDay= new Date();
-      tDay.setDate(systemDate.getDate() + 1); 
+      
       self.openDatePicker = function (currentDate) {
         var datePickerOptions = {
           callback: function (val) {
@@ -307,7 +314,7 @@ angular.module('itouch.controllers')
           /*
           * System Date
           */
-          from: systemDate,
+          from: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
           to: tDay,
           /*
           * Current Date
@@ -315,7 +322,7 @@ angular.module('itouch.controllers')
           // from: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
           // to: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
           showTodayButton: false,
-        };
+        }; 
 
 
         ionicDatePicker.openDatePicker(datePickerOptions);
