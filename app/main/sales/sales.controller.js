@@ -365,7 +365,8 @@ angular.module('itouch.controllers')
        */
       $scope.$on('pwpModal-close', function (modal, pwpitem) {
         // selectLastItem();
-        $scope.cart.selectedItem = pwpitem;
+        console.log($scope.cart.selectedItem);
+        // $scope.cart.selectedItem = pwpitem;
         $scope.showpwpModal = false;
         $scope.qty.value = 1;
         $scope.pwpModal.remove();
