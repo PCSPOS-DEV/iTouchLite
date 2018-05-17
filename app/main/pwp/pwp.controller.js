@@ -91,7 +91,7 @@ angular.module('itouch.controllers')
             return true;
           }
           $timeout(function () {
-            temp += item.Price;
+            temp = temp + parseFloat(item.Price);
             if (temp <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
               $scope.tempSubTotal = temp;
               SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
