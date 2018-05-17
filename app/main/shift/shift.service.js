@@ -47,6 +47,7 @@ angular.module('itouch.services')
         DB.query('SELECT s.*, ss.OpenDateTime, ss.CloseDateTime, OpenUser, CloseUser, DeclareCashLater FROM shifts AS s LEFT OUTER JOIN shiftstatus AS ss ON s.Id = ss.Id WHERE CloseDateTime IS NULL', []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
+          shiftLog.log('Shift getUnOpened : Error : ' + ex.message, 3);
           throw new Error(ex.message);
           deferred.reject(ex.message);
         });
@@ -58,6 +59,7 @@ angular.module('itouch.services')
         DB.query('SELECT s.*, ss.OpenDateTime, ss.CloseDateTime, OpenUser, CloseUser, DeclareCashLater FROM shifts AS s LEFT OUTER JOIN shiftstatus AS ss ON s.Id = ss.Id WHERE CloseDateTime IS NULL AND OpenDateTime IS NOT NULL', []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
+          shiftLog.log('Shift getOpened : Error : ' + ex.message, 3);
           throw new Error(ex.message);
           deferred.reject(ex.message);
         });
@@ -69,6 +71,7 @@ angular.module('itouch.services')
         DB.query('SELECT * FROM shifts WHERE Id = ?', [id]).then(function (data) {
           deferred.resolve(DB.fetch(data));
         }, function (ex) {
+          shiftLog.log('Shift getById : Error : ' + ex.message, 3);
           throw new Error(ex.message);
           deferred.reject(ex.message);
         });
@@ -80,6 +83,7 @@ angular.module('itouch.services')
         DB.query('SELECT * FROM shifts WHERE Id IN(SELECT Id FROM shiftstatus WHERE CloseDateTime IS NOT NULL AND DeclareCashLater)', []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
+          shiftLog.log('Shift getDeclareCashShifts : Error : ' + ex.message, 3);
           throw new Error(ex.message);
           deferred.reject(ex.message);
         });

@@ -8,6 +8,7 @@ angular.module('itouch.controllers')
       $scope.shiftSelectionShown = true;
       $scope.shift = {};
       $scope.title = '';
+      var shiftLog = ShiftService.StartShiftLog();
 
       $scope.$on('modal.shown', function (event, modal) {
         $scope.shiftSelectionShown = true;
@@ -41,8 +42,10 @@ angular.module('itouch.controllers')
 
       $scope.selectShift = function (shift) {
         $scope.shift = shift;
+        console.log(shift);
         switch ($scope.shiftListType) {
           case 'open':
+          shiftLog.log('Shift Open Success : ' + shift.Description1 + ' ' + shift.Description2, 3);
             if (shift.OpenDateTime) {
               Alert.showLoading();
               ShiftService.saveCurrent(shift);
@@ -149,12 +152,15 @@ angular.module('itouch.controllers')
                   //Report.printShiftClosingReport(shift.Id, businessDate);
                   $scope.$emit('shift-close', shift);
                 }, function (err) {
+                  shiftLog.log('Shift closeShift : Error : ' + err, 3);
                   console.log(err);
                 });
               }
             });
           } else {
-            Alert.warning('Unsaved items should be saved before closing the shift');
+            var info = 'Unsaved items should be saved before closing the shift';
+            shiftLog.log('Shift closeShift : Error : ' + info, 3);
+            Alert.warning(info);
           }
         });
 
