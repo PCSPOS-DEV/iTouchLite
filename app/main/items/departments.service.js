@@ -5,6 +5,7 @@
 angular.module('itouch.services')
   .factory('DepartmentService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
     var self = this;
+    errorLog = SettingsService.StartErrorLog();
 
     self.fetch = function () {
       var deferred = $q.defer();
@@ -42,6 +43,7 @@ angular.module('itouch.services')
       DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.item.departments + ' WHERE Code = ?', [code]).then(function (result) {
         deferred.resolve(DB.fetchAll(result));
       }, function (err) {
+        errorLog.log('Departments Service Error : '+ err.message, 4);
         deferred.reject(err.message);
       });
       return deferred.promise;

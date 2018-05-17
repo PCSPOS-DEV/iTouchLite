@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept', 'LocationService', '$ionicScrollDelegate', 'DB', 'DB_CONFIG', 'BillService',
-    function ($scope, PrinterSettings, HistoryService, $q, Reciept, LocationService, $ionicScrollDelegate, DB, DB_CONFIG, BillService) {
+  .controller('BillViewCtrl', ['$scope', 'PrinterSettings', 'HistoryService', '$q', 'Reciept', 'LocationService', '$ionicScrollDelegate', 'DB', 'DB_CONFIG', 'BillService', 'SettingsService',
+    function ($scope, PrinterSettings, HistoryService, $q, Reciept, LocationService, $ionicScrollDelegate, DB, DB_CONFIG, BillService, SettingsService) {
       $scope.settings = {};
       $scope.bill = {
         header: null,
@@ -11,6 +11,8 @@ angular.module('itouch.controllers')
         transactions: null,
         discounts: null
       };
+      errorLog = SettingsService.StartErrorLog();
+      // errorLog.log(''+ err, 4);
       $scope.location = LocationService.currentLocation;
 
       $scope.$on('modal.shown', function (event, modal) {
@@ -72,6 +74,7 @@ angular.module('itouch.controllers')
             var curtSysDateTime = moment().format('DD-MM-YYYY hh:mm:ss a');
             data.header.curtSysDateTime = curtSysDateTime;
           }, function (ex) {
+            errorLog.log('Bill View Error : '+ ex, 4);
             console.log(ex);
           });
         }

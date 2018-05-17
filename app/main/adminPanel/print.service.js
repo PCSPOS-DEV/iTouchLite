@@ -72,7 +72,7 @@ angular.module('itouch.services')
           }, {'eposprint': true});
         } else {
           self.status = 'failed';
-          errorLog.log('Lib Error'+ err, 4);
+          errorLog.log('Lib Error : ' + err, 4);
           deferred.reject('Lib error');
         }
         return deferred.promise;
@@ -368,6 +368,7 @@ angular.module('itouch.services')
           }
         }
         catch (e) {
+          errorLog.log('Printer Service Error : '+ e.message, 4);
           alert(e.message);
         }
       };
