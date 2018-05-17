@@ -7,6 +7,7 @@ angular.module('itouch.controllers')
     function ($scope, SettingsService, $state, SyncService, AppConfig, Restangular, $q, Alert, ionicDatePicker) {
       var self = this;
       self.settings = {};
+      errorLog = SettingsService.StartErrorLog();
 
       $scope.$on('viewOpen', function (event, data) {
         if (data == 'general') {
@@ -110,6 +111,7 @@ angular.module('itouch.controllers')
           }
         }, function (err) {
           console.log(err);
+          errorLog.log('General Setting Error : '+ err, 4);
           return $q.reject(err.statusText);
         });
       };

@@ -2,9 +2,11 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('ImageSetupCtrl', ['$log', '$cordovaImagePicker', 'Alert', '$cordovaFile', '$localStorage', '$rootScope', '$scope',
-    function ($log, $cordovaImagePicker, Alert, $cordovaFile, $localStorage, $rootScope, $scope) {
+  .controller('ImageSetupCtrl', ['$log', '$cordovaImagePicker', 'Alert', '$cordovaFile', '$localStorage', '$rootScope', '$scope', 'SettingsService',
+    function ($log, $cordovaImagePicker, Alert, $cordovaFile, $localStorage, $rootScope, $scope, SettingsService) {
       var self = this;
+      errorLog = SettingsService.StartErrorLog();
+      // errorLog.log(''+ err, 4);
 
       self.images = {};
 
@@ -48,10 +50,12 @@ angular.module('itouch.controllers')
                 $localStorage.images.logo = fileName;
                 $scope.setImages();
               }, function (error) {
+                errorLog.log('Logo Image Setup Error : '+ error, 4);
                 //an error occured
               });
             }
           }, function (error) {
+            errorLog.log('Logo Image Getting Error : '+ error, 4);
             // error getting photos
           });
       };
@@ -80,11 +84,13 @@ angular.module('itouch.controllers')
                 self.images.cart_background = fileName;
                 $localStorage.images.cart_background = fileName;
               }, function (error) {
+                errorLog.log('Cart Image Setup Error : '+ error, 4);
                 //an error occured
               });
 
             }
           }, function (error) {
+            errorLog.log('Cart Image Getting Error : '+ error, 4);
             // error getting photos
           });
       };

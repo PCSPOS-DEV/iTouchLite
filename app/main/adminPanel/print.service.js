@@ -2,9 +2,10 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory('PrintService', ['ErrorService', '$q', '$localStorage', 'Alert',
-    function (ErrorService, $q, $localStorage, Alert) {
+  .factory('PrintService', ['ErrorService', '$q', '$localStorage', 'Alert', 'SettingsService',
+    function (ErrorService, $q, $localStorage, Alert, SettingsService) {
       var self = this;
+      errorLog = SettingsService.StartErrorLog();
 
       var ePosDev = new epson.ePOSDevice();
       self.drawerOpen = false;
@@ -36,6 +37,7 @@ angular.module('itouch.services')
               ePosDev.createDevice('local_printer', ePosDev.DEVICE_TYPE_PRINTER, options, function (deviceObj, errorCode) {
                 if (deviceObj === null) {
                   //Displays an error message if the system fails to retrieve the Printer object
+                  errorLog.log('Printer cannect error. code : '+ errorCode, 4);
                   deferred.reject('connect error. code:' + errorCode);
                   return;
                 }
@@ -63,12 +65,14 @@ angular.module('itouch.services')
             else {
               //Displays error messages
               self.status = 'failed';
+              errorLog.log('Printer Connection Error', 4);
               deferred.reject('connect error');
               Alert.hideLoading();
             }
           }, {'eposprint': true});
         } else {
           self.status = 'failed';
+          errorLog.log('Lib Error'+ err, 4);
           deferred.reject('Lib error');
         }
         return deferred.promise;
