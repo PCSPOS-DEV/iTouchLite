@@ -2,9 +2,9 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService',
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService', 'SettingsService',
    '$timeout', 'Reciept', 'UploadService', 'SuspendService', 
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService, SuspendService) {
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService, SuspendService, SettingsService) {
       var self = this;
       var dayEnd = false;
       var suspenditem = 0;
@@ -14,6 +14,7 @@ angular.module('itouch.controllers')
       var systemDate = new Date();
       var tDay= new Date();
       tDay.setDate(systemDate.getDate() + 1); 
+      errorLog = SettingsService.StartErrorLog();
 
       $scope.shiftListType = null;
       self.shiftData = shiftData;
@@ -171,6 +172,8 @@ angular.module('itouch.controllers')
                 self.shiftModal.hide();
                 showReopenModal();
               }, function (err) {
+                errorLog.log('Popup Error : '+ err, 4);
+                shiftLog.log('Popup Error :' + err, 3);
                 console.log(err);
               });
             } else {
@@ -189,6 +192,7 @@ angular.module('itouch.controllers')
                 }
 
               }, function (err) {
+                errorLog.log('Declare Cash: '+ err, 4);
                 shiftLog.log('Declare Cash Error :' + err, 3);
                 console.log(err);
               });
@@ -294,6 +298,7 @@ angular.module('itouch.controllers')
 
             }, function (err) {
               dayEnd = false;
+              errorLog.log('Shift Closing Error : '+ err, 4);
               console.log(err);
             });
           }, 200);

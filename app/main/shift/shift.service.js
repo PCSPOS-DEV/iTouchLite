@@ -6,6 +6,7 @@ angular.module('itouch.services')
     function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, $localStorage, AuthService, ControlService, $filter, ItemService) {
       var self = this;
       var shiftLog = new debugout();
+      errorLog = SettingsService.StartErrorLog();
 
       self.StartShiftLog= function () {
         return shiftLog;
@@ -22,16 +23,19 @@ angular.module('itouch.services')
               deferred.resolve();
             } else {
               syncLog.log('  Shifts Sync Fail : No results', 1);
+              errorLog.log('Shifts Sync Fail : No results', 4);
               deferred.reject('Unable to fetch Shifts');
             }
 
           }, function (err) {
             throw new Error(err);
             syncLog.log('  Shifts Sync Error : Unable to fetch data from the server', 1);
+            errorLog.log('Shifts Sync Error : Unable to fetch data from the server', 4);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
           syncLog.log('  Shifts Sync Error : ' + ex, 1);
+          errorLog.log('Shifts Sync Error : ' + ex, 4);
           deferred.reject(ex);
         }
 
@@ -49,6 +53,7 @@ angular.module('itouch.services')
         }, function (ex) {
           shiftLog.log('Shift getUnOpened : Error : ' + ex.message, 3);
           throw new Error(ex.message);
+          errorLog.log('Shift Open Error : ' + ex.message, 4);
           deferred.reject(ex.message);
         });
         return deferred.promise;
@@ -59,7 +64,8 @@ angular.module('itouch.services')
         DB.query('SELECT s.*, ss.OpenDateTime, ss.CloseDateTime, OpenUser, CloseUser, DeclareCashLater FROM shifts AS s LEFT OUTER JOIN shiftstatus AS ss ON s.Id = ss.Id WHERE CloseDateTime IS NULL AND OpenDateTime IS NOT NULL', []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
-          shiftLog.log('Shift getOpened : Error : ' + ex.message, 3);
+          shiftLog.log('Shift getOpened Error : ' + ex.message, 3);
+          errorLog.log('Shift Close Error : ' + ex.message, 4);
           throw new Error(ex.message);
           deferred.reject(ex.message);
         });
@@ -72,6 +78,7 @@ angular.module('itouch.services')
           deferred.resolve(DB.fetch(data));
         }, function (ex) {
           shiftLog.log('Shift getById : Error : ' + ex.message, 3);
+          errorLog.log('Shift getById : Error : ' + ex.message, 4);
           throw new Error(ex.message);
           deferred.reject(ex.message);
         });
@@ -84,6 +91,7 @@ angular.module('itouch.services')
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
           shiftLog.log('Shift getDeclareCashShifts : Error : ' + ex.message, 3);
+          errorLog.log('Shift getDeclareCashShifts : Error : ' + ex.message, 4);
           throw new Error(ex.message);
           deferred.reject(ex.message);
         });
@@ -146,14 +154,17 @@ angular.module('itouch.services')
                 deferred.resolve();
               }, function (error) {
                 shiftLog.log('Close Shift Status : Error : ' + error, 3);
+                errorLog.log('Close Shift Status : Error : ' + error, 4);
                 deferred.reject(error);
               });
             } else {
               shiftLog.log('Close Shift Status : Shift is not valid', 3);
+              errorLog.log('Close Shift Status : Shift is not valid', 4);
               deferred.reject('Shift is not valid');
             }
           }, function (error) {
             shiftLog.log('Close Shift Status : Error : ' + error, 3);
+            errorLog.log('Close Shift Status : Error : ' + error, 4);
             deferred.reject(error);
           });
         }
@@ -192,11 +203,13 @@ angular.module('itouch.services')
               });
             } else {
               shiftLog.log('Declare Cash Status : Shift is not valid', 3);
+              errorLog.log('Declare Cash Status : Shift is not valid', 4);
               return $q.reject('Shift is not valid');
             }
           });
         } else {
           shiftLog.log('Declare Cash Status : Shift is not valid', 3);
+          errorLog.log('Declare Cash Status : Shift is not valid', 4);
           return $q.reject('Shift is not valid');
         }
       };
@@ -213,11 +226,13 @@ angular.module('itouch.services')
               // deferred.resolve();
             } else {
               shiftLog.log('declareCashLater Status : Shift is not valid', 3);
+              errorLog.log('declareCashLater Status : Shift is not valid', 4);
               return $q.reject('Shift is not valid');
             }
           });
         } else {
           shiftLog.log('declareCashLater Status : Shift is not valid', 3);
+          errorLog.log('declareCashLater Status : Shift is not valid', 4);
           return $q.reject('Shift is not valid');
         }
       };

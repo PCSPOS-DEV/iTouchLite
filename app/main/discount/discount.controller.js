@@ -41,7 +41,7 @@ angular.module('itouch.controllers')
 
           $scope.setType($scope.type);
         }, function (er) {
-          errorLog.log('Discount Error'+ er, 4);
+          errorLog.log('Discount Error : '+ er, 4);
           console.log(er);
         });
       };
