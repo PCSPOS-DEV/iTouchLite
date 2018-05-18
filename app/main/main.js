@@ -326,6 +326,16 @@ angular.module('itouch', [
                 }
               })
 
+              .state('app.debugdetaillogs', {
+                url: '/debuglogs',
+                views: {
+                  'menuContent': {
+                    templateUrl: 'main/logs/DebugLogsDetail.html',
+                    controller: 'DebugLogsDetailCtrl as ctrl'
+                  }
+                }
+              })
+
               .state('app.admin', {
                 url: '/admin',
                 views: {

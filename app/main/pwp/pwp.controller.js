@@ -324,6 +324,10 @@ angular.module('itouch.controllers')
       };
 
       $scope.close = function () {
+        console.log($scope.tempSubTotal);
+        console.log(temp);
+        // $scope.tempSubTotal = 0;
+        // temp = 0;
         $scope.$emit('pwpModal-close');
       };
 
