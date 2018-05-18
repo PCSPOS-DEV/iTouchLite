@@ -1,7 +1,8 @@
 'use strict';
 angular.module('itouch.services')
-.service('PrintService', function ($log, $q, $localStorage) {
+.service('PrintService', 'SettingsService', function ($log, $q, $localStorage, SettingsService) {
   var self = this;
+  errorLog = SettingsService.StartErrorLog();
 
   var ePosDev = new epson.ePOSDevice();
 
@@ -24,6 +25,7 @@ angular.module('itouch.services')
             if (deviceObj === null) {
                    //Displays an error message if the system fails to retrieve the Printer object
               deferred.reject('connect error. code:' + errorCode);
+              errorLog.log('connect error. code:' + errorCode, 4);
               return;
             }
             printer = deviceObj;
@@ -35,6 +37,7 @@ angular.module('itouch.services')
               } else {
                      //Displays error messages
                 deferred.reject('connect error. code:' + errorCode);
+                errorLog.log('connect error. code:' + errorCode, 4);
               }
             };
           });
@@ -46,6 +49,7 @@ angular.module('itouch.services')
       });
     } else {
       deferred.reject('Lib error');
+      errorLog.log('Lib error', 4);
     }
     return deferred.promise;
   };
@@ -53,6 +57,7 @@ angular.module('itouch.services')
   self.disconnect = function () {
     var deferred = $q.defer();
     ePosDev.deleteDevice(printer, function (errorCode) {
+      errorLog.log('connect error. code:' + errorCode, 4);
       deferred.resolve();
       ePosDev.disconnect();
     });

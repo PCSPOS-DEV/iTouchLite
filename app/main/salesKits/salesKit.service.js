@@ -6,6 +6,7 @@ angular.module('itouch.services')
     function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, ItemService, LocationService, AuthService, $filter, ControlService, TenderService, BillService) {
       var self = this;
       syncLog = SettingsService.StartSyncLog();
+      errorLog = SettingsService.StartErrorLog();
 
       var location = LocationService.currentLocation;
       renameProperty(location, 'PriceLevel', 'PriceLevelId');
@@ -34,6 +35,7 @@ angular.module('itouch.services')
                 deferred.resolve();
               } else {
                 syncLog.log('  SalesKits Sync Fail : Unable to fetch sales kits', 1);
+                errorLog.log('SalesKits Sync Fail : Unable to fetch sales kits', 4);
                 deferred.reject('Unable to fetch sales kits');
               }
             }
@@ -43,10 +45,12 @@ angular.module('itouch.services')
           }, function (err) {
             console.error(err);
             syncLog.log('  SalesKits Sync Error : Unable to fetch data from the server', 1);
+            errorLog.log('SalesKits Sync Error : Unable to fetch data from the server', 4);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
           syncLog.log('  SalesKits Sync Error : ' + ex, 1);
+          errorLog.log('SalesKits Sync Error : ' + ex, 4);
           deferred.reject(ex);
         }
 
@@ -67,6 +71,7 @@ angular.module('itouch.services')
                 self.saveKitByDays(items);
                 deferred.resolve();
               } else {
+                errorLog.log('SalesKits fetchKitByDays Error : Unable to fetch sales kits', 4);
                 deferred.reject('Unable to fetch sales kits');
               }
             }
@@ -75,6 +80,7 @@ angular.module('itouch.services')
             }
           }, function (err) {
             console.error(err);
+            errorLog.log('SalesKits fetchKitByDays Error : Unable to fetch data from the server', 4);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
@@ -98,6 +104,7 @@ angular.module('itouch.services')
                 self.saveKitItems(items);
                 deferred.resolve();
               } else {
+                errorLog.log('SalesKits fetchKitItems Error : Unable to fetch sales kits', 4);
                 deferred.reject('Unable to fetch sales kits');
               }
             }
@@ -106,6 +113,7 @@ angular.module('itouch.services')
             }
           }, function (err) {
             console.error(err);
+            errorLog.log('SalesKits fetchKitItems Error : Unable to fetch data from the server', 4);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
@@ -129,6 +137,7 @@ angular.module('itouch.services')
                 self.saveSalesKitSelections(items);
                 deferred.resolve();
               } else {
+                errorLog.log('SalesKits fetchSalesKitSelections Error : Unable to fetch sales kits', 4);
                 deferred.reject('Unable to fetch sales kits');
               }
             }
@@ -137,6 +146,7 @@ angular.module('itouch.services')
             }
           }, function (err) {
             console.error(err);
+            errorLog.log('SalesKits fetchSalesKitSelections Error : Unable to fetch data from the server', 4);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {

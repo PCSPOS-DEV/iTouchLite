@@ -4,6 +4,7 @@ angular.module('itouch.services')
     function ($log, DB, DB_CONFIG, $q, SettingsService, $cordovaFileTransfer, $localStorage, Alert, KeyBoardService, $cordovaFile) {
       var self = this;
       var entityId;
+      errorLog = SettingsService.StartErrorLog();
 
       self.getImageNames = function () {
         return KeyBoardService.getLayout().then(function (layout) {
@@ -27,6 +28,7 @@ angular.module('itouch.services')
           return $cordovaFileTransfer.download(url, targetPath, options, trustHosts);
         } else {
           return $q.reject('Unable to download file');
+          errorLog.log('Unable to download image file', 5);
         }
       };
 
@@ -58,7 +60,8 @@ angular.module('itouch.services')
 
             });
           } else {
-            return $q.reject('no images in the db');
+            errorLog.log('no images in the db', 5);
+            return $q.reject('no images in the db'); 
           }
         });
         // self.downloadFile('PCSlogo.png');
