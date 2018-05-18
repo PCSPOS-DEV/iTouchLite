@@ -127,7 +127,7 @@ angular.module('itouch.controllers')
             if (item.DiscountId == null) {
               if (item.SubItemPrice >= 0) {
                 item.Price = item.SubItemPrice;
-                item.OrgPrice = item.SubItemPrice;
+                // item.OrgPrice = item.SubItemPrice;
                 item.AlteredPrice = item.SubItemPrice;
                 promise = $q.when(item);
               } else {
@@ -136,7 +136,7 @@ angular.module('itouch.controllers')
             } else {
               if (item.SubItemPrice != 0 && item.DiscountId != null) {
                 item.Price = item.SubItemPrice;
-                item.OrgPrice = item.SubItemPrice;
+                // item.OrgPrice = item.SubItemPrice;
                 item.AlteredPrice = item.SubItemPrice;
                 promise = $q.when(item);
               } else {
@@ -223,8 +223,9 @@ angular.module('itouch.controllers')
             angular.forEach($scope.pwp.selectedItems, function (i) {
               items[i.SubItemId] = ItemService.getById(i.SubItemId, itemT);
             });
+            console.log(items);
             $q.all(items).then(function (data) {
-              // console.log(data);
+              console.log(data);
               var promises  = [];
               $scope.pwp.item.ItemId = $scope.pwp.item.Id;
               $scope.pwp.item.ItemType = 'PWP';
