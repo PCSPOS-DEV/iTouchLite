@@ -194,20 +194,19 @@ angular.module('itouch.services')
           uploading = true;
           DB.clearQueue();
           return self.getBills().then(function (bills) {
-            var promises = [];
-            
+            var promises = [];  
             angular.forEach(bills, function (bill) {
-              // if (bill.BillDetail != undefined) {
-              //   angular.forEach(bill.BillDetail, function (ids) {
-              //     // ids.ItemId = Math.floor(ids.ItemId);
-              //     console.log(ids.ItemId);
-              //   });
-              // }
+              if (bill.BillDetail != undefined) {
+                angular.forEach(bill.BillDetail, function (ids) {
+                  console.log('Before : ' + ids.ItemId);
+                  ids.ItemId = Math.floor(ids.ItemId);
+                  console.log('After : '+ ids.ItemId);
+                });
+              }
               if (typeof (bill.BillHeader) !== 'undefined') {
                 var DocNo = bill.BillHeader.DocNo;
                 bill.BillHeader = [bill.BillHeader];
                 promises.push(post(bill).then(function (res) {
-                  // console.log(res);
                   if (res === 'success') {
                     uploadLog.log('Upload Status : Uploaded DocNo = ' + DocNo, 2);
                     return self.setExported(DocNo);
@@ -220,7 +219,6 @@ angular.module('itouch.services')
               }
               else {
                 promises.push(postVoidDocNos(bill).then(function (res) {
-                  // console.log(res);
                   uploadLog.log('Upload Status : UpdateVoidDoc = ' + res, 2);
                   console.log('UpdateVoidDocNo : ' + res);
                 }));
