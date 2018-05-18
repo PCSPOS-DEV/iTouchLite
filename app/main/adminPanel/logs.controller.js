@@ -29,4 +29,7 @@ angular.module('itouch.controllers')
         $state.go('app.errordetaillogs');
       }
 
+      self.DebugLog = function () {
+        $state.go('app.debugdetaillogs');
+      }
     }]);

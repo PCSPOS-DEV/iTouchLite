@@ -2,9 +2,10 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('PWPCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService', '$log', 'ItemService', '$q', 'DiscountService', 'Alert', '$timeout',
-    function ($scope, ControlService, $ionicPopup, CartItemService, BillService, $log, ItemService, $q, DiscountService, Alert, $timeout) {
-
+  .controller('PWPCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService', '$log', 'ItemService', '$q', 'DiscountService', 'Alert', '$timeout', 'SettingsService',
+    function ($scope, ControlService, $ionicPopup, CartItemService, BillService, $log, ItemService, $q, DiscountService, Alert, $timeout, SettingsService) {
+      debugLog = SettingsService.StartDebugLog();
+      // debugLog.log(': ' + err, 4);
       $scope.title = 'PWP';
       $scope.selectedRow = null;
       //var selectedItem = null;
@@ -39,14 +40,21 @@ angular.module('itouch.controllers')
       };
 
       var addPrice = function (item, discPercent) {
+        debugLog.log('--*-- PWP Discount Start --*-- ', 7);
+        debugLog.log('Item : ' + item, 7);
+        debugLog.log('discPercent : ' + discPercent, 7);
+
         return ItemService.getPrice(item.Plu, parseInt(item.PriceGroupId)).then(function (data) {
           var Bdisc = data ? data.AlteredPrice : 0;
           var cal = (((Bdisc/100) * discPercent).toFixed(3));
           var s1 = Math.floor(cal);
           var s2 = (cal*100) - (s1 * 100);
-          var s3 = s2.toFixed(0)/100
+          var s3 = s2.toFixed(0)/100;
+          debugLog.log('discAmount : ' + s3, 7);
           // console.log(s3);
           var Adisc = (Bdisc - s3).roundTo(2).toFixed(2);
+          debugLog.log('Price After Disc : ' + Adisc, 7);
+          debugLog.log('--*-- PWP Discount End --*-- ', 7);
           // console.log(Adisc);
           item.AlteredPrice = (((Bdisc/100) * discPercent).toFixed(3));
           item.Price = Adisc;
@@ -80,11 +88,16 @@ angular.module('itouch.controllers')
       var tempD = 0;
       var addItem = function (item) {
         if (item) {
+          debugLog.log('--*-- PWP Child Control Start --*-- ', 7);
+          debugLog.log('PWP SubItemMaxQty : '+ item.SubItemMaxQty, 7);
+          debugLog.log('Item Qty: '+ item.Qty, 7);
           if (item.SubItemMaxQty <= item.Qty) {
+            debugLog.log('Case 1: You have selected the maximum children allowed for this item.', 7);
             Alert.warning('You have selected the maximum children allowed for this item.')
             return true;
           }
           if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
+            debugLog.log('Case 2: You have selected the maximum children allowed for this PWP.', 7);
             Alert.warning('You have selected the maximum children allowed for this PWP.');
             tempD = 1;
             
@@ -92,15 +105,20 @@ angular.module('itouch.controllers')
           }
           $timeout(function () {
             temp = temp + parseFloat(item.Price);
+            debugLog.log('Temp Price: '+ temp, 7);
+            debugLog.log('PWP Max Price: '+ $scope.pwp.MaxPrice, 7);
             if (temp <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
               $scope.tempSubTotal = temp;
               SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
             } else {
               if (tempD == 0) {
+                debugLog.log('Case 3: The child total price exceed the limit of maximum price.', 7);
                 Alert.warning('The child total price exceed the limit of maximum price.');
               } else {
                 tempD = 0;
               }
+              debugLog.log('PWP Selected Item: '+ $scope.selectedRow, 7);
+              
               console.log($scope.selectedRow);
               $scope.selectedRow.Qty--;
               $scope.pwp.Qty--;
@@ -111,6 +129,7 @@ angular.module('itouch.controllers')
               // $scope.removeSelected();
               return true;
             }
+            debugLog.log('--*-- PWP Child Control END --*-- ', 7);
           }, 200);
           
           var exItem = _.findWhere($scope.pwp.selectedItems, { SubItemId: item.SubItemId});

@@ -7,6 +7,7 @@ angular.module('itouch.services')
     var settings = $localStorage.settings || {};
     var syncLog = new debugout();
     var errorlog = new debugout();
+    var debuglog = new debugout();
 
     self.StartSyncLog = function() {
       return syncLog;
@@ -14,6 +15,10 @@ angular.module('itouch.services')
 
     self.StartErrorLog = function() {
       return errorlog;
+    }
+
+    self.StartDebugLog = function() {
+      return debuglog;
     }
     //TODO: remove this once settings page done
     if (!settings.roundFor) {
