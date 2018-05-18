@@ -1298,6 +1298,7 @@ angular.module('itouch.controllers')
       $scope.salesFunctions = {
         VoidTop: function (fn) {
           Suspended = false;
+          $scope.flag = true;
           var item = $scope.cart.selectedItem;
           var last = Object.keys($scope.cart.items).length - 1;
           if (item) { 
@@ -1383,7 +1384,8 @@ angular.module('itouch.controllers')
                   });
                 }
               }
-            }       
+            }    
+            $scope.flag = false;   
             $scope.navMenuCtrl();
           } else {
             if (!buttonClicked.voidBill) {
@@ -1450,6 +1452,7 @@ angular.module('itouch.controllers')
 
         },
         QtyPlus: function (fn) {
+          $scope.flag = true;
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
@@ -1467,8 +1470,10 @@ angular.module('itouch.controllers')
               }
             }
           }
+          $scope.flag = false;
         },
         QtyMinus: function (fn) {
+          $scope.flag = true;
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
@@ -1488,6 +1493,7 @@ angular.module('itouch.controllers')
               }
             }
           }
+          $scope.flag = false;
         },
         ItemReverse: function (fn) {
           if (authorityCheck(fn)) {
@@ -1511,11 +1517,13 @@ angular.module('itouch.controllers')
         },
         CallSuspendBill: function (fn) {
           if (!buttonClicked.recallSuspendBillModal) {
+            
             var item = $scope.cart.selectedItem;
             buttonClicked.recallSuspendBillModal = true;
                 //if (authorityCheck(fn)) {
             CartItemService.isEmpty($scope.header.DocNo).then(function (empty) {
               if (empty) {
+                $scope.flag = true;
                 if (authorityCheck(fn)) {
                   Suspended = true;
                   $ionicModal.fromTemplateUrl('main/recallSuspendedBill/recallSuspendedBill.html', {
@@ -1535,7 +1543,7 @@ angular.module('itouch.controllers')
                   refresh();
                   buttonClicked.recallSuspendBillModal = false;
                 }
-
+                $scope.flag = false;
               } else {
                 $scope.flag = true;
                 Alert.showLoading();
@@ -1628,7 +1636,7 @@ angular.module('itouch.controllers')
           }
 
         },
-        FoodModifier: function (fn) {
+        FoodModifier: function (fn) {     
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
@@ -1679,11 +1687,14 @@ angular.module('itouch.controllers')
           }
         },
         ReceiptHistory: function (fn) {
+          $scope.flag = true;
           if (authorityCheck(fn)) {
             $state.go('app.history');
           }
+          $scope.flag = false;
         },
         ItemDetailTop: function (fn) {
+          $scope.flag = true;
           if (authorityCheck(fn)) {
             if ($scope.cart.selectedItem) {
               if ($scope.modals.itemDetails) {
@@ -1692,8 +1703,10 @@ angular.module('itouch.controllers')
               }
             }
           }
+          $scope.flag = false;
         },
         OrderTag: function (fn) {
+          $scope.flag = true;
           if (authorityCheck(fn)) {
             $scope.data.tag = '';
             $ionicPopup.show({
@@ -1725,14 +1738,17 @@ angular.module('itouch.controllers')
               });
             });
           }
+          $scope.flag = false;
         },
         SearchTop: function (fn) {
+          $scope.flag = true;
           if (authorityCheck(fn)) {
             if ($scope.modals.itemSearch) {
               $scope.shownModal = 'itemSearch';
               $scope.modals.itemSearch.show();
             }
           }
+          $scope.flag = false;
         }
       };
       /**
