@@ -36,7 +36,7 @@ angular.module('itouch.controllers')
 
       self.goBack = function () {
         var back = $ionicHistory.backView();
-        console.log(back);
+        // console.log(back);
         if (back) {
           $ionicHistory.goBack();
         } else {

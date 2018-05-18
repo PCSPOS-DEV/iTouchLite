@@ -758,7 +758,7 @@ angular.module('itouch.controllers')
             });
           }
           fetchSelectedItem($scope.selectedItem);
-          $timeout(function () { $scope.bkey = false; Alert.hideLoading();}, 200); // in case of increase the waiting time
+          $timeout(function () { $scope.bkey = false; Alert.hideLoading();}, 20); // in case of increase the waiting time
         }
       };
 
