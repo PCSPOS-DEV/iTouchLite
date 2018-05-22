@@ -9,7 +9,7 @@
     "angular-dynamic-locale": "~0.1.27",
     "angular-translate": "~2.11.0",
     "angular-translate-loader-static-files": "~2.11.0",
-    "localforage": "~1.4.0",
+    "localforage": "^1.7.1",
     "ngstorage": "^0.3.11",
     "restangular": "^1.5.2",
     "angular-order-object-by": "^1.3.0",
@@ -20,7 +20,8 @@
     "jquery": "^3.1.1",
     "angular-bindonce": "^0.3.3",
     "ionic-numberpicker": "^1.1.4",
-    "mobileSelect.js": "https://github.com/onlyhom/mobileSelect.js.git"
+    "mobileSelect.js": "https://github.com/onlyhom/mobileSelect.js.git",
+    "debugout.js": "*"
   },
   "devDependencies": {
     "angular-mocks": "~1.5.0"
