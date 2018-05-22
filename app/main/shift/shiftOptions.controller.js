@@ -2,9 +2,9 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService', 'SettingsService',
+  .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService',
    '$timeout', 'Reciept', 'UploadService', 'SuspendService', 
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService, SuspendService, SettingsService) {
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService, SuspendService) {
       var self = this;
       var dayEnd = false;
       var suspenditem = 0;
@@ -14,15 +14,12 @@ angular.module('itouch.controllers')
       var systemDate = new Date();
       var tDay= new Date();
       tDay.setDate(systemDate.getDate() + 1); 
-      errorLog = SettingsService.StartErrorLog();
 
       $scope.shiftListType = null;
       self.shiftData = shiftData;
 
       var checkBDate = function () {
         if (ControlService.isNewBusinessDate()) {
-          // console.log((ControlService.getDayEndDate()).format('DD-MM-YYYY'));
-          // console.log(moment(tDay).format('DD-MM-YYYY'));
           if ((ControlService.getDayEndDate()).format('DD-MM-YYYY') >= moment(tDay).format('DD-MM-YYYY')) {
             Alert.error('Invalid Business Date.');
           } else {
@@ -172,7 +169,6 @@ angular.module('itouch.controllers')
                 self.shiftModal.hide();
                 showReopenModal();
               }, function (err) {
-                errorLog.log('Popup Error : '+ err, 4);
                 shiftLog.log('Popup Error :' + err, 3);
                 console.log(err);
               });
@@ -192,7 +188,6 @@ angular.module('itouch.controllers')
                 }
 
               }, function (err) {
-                errorLog.log('Declare Cash: '+ err, 4);
                 shiftLog.log('Declare Cash Error :' + err, 3);
                 console.log(err);
               });
@@ -214,7 +209,6 @@ angular.module('itouch.controllers')
       });
 
       $scope.$on('shift-close', function (evt, shift) {
-        // console.log(shift);
         shiftLog.log('Close Shift Success : ' + shift.Description1 + ' ' + shift.Description2, 3);
         openCashPopUp(shift, dayEnd);
       });
@@ -298,7 +292,6 @@ angular.module('itouch.controllers')
 
             }, function (err) {
               dayEnd = false;
-              errorLog.log('Shift Closing Error : '+ err, 4);
               console.log(err);
             });
           }, 200);
@@ -308,7 +301,6 @@ angular.module('itouch.controllers')
       /**
        * Opens the Business Date picker
        */
-      
       self.openDatePicker = function (currentDate) {
         var datePickerOptions = {
           callback: function (val) {
@@ -316,19 +308,11 @@ angular.module('itouch.controllers')
           },
           inputDate: ControlService.getNextBusinessDate().isValid() ? ControlService.getNextBusinessDate().toDate() : new Date(),
           setLabel: 'Set Bu. Date',
-          /*
-          * System Date
-          */
+          // showTodayButton: true,
           from: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
           to: tDay,
-          /*
-          * Current Date
-          */
-          // from: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
-          // to: currentDate && currentDate.isValid() ? currentDate.add(1, 'days').toDate() : moment().toDate(),
           showTodayButton: false,
-        }; 
-
+        };
 
         ionicDatePicker.openDatePicker(datePickerOptions);
       };
