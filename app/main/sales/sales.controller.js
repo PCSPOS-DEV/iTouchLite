@@ -1407,7 +1407,7 @@ angular.module('itouch.controllers')
                 buttonClicked.voidBill = false;
               }
             }
-          }
+          }$scope.flag = false;  
         },
         Discount: function (fn) {
           if (authorityCheck(fn)) {
