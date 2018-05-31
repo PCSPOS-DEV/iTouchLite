@@ -25,29 +25,28 @@ angular.module('itouch.services')
 
     self.getAll = function () {
       PrinterSettings.get().then(function (res) {
-        $log.log(res);
-        Pdata = res;
+        return data = res;
       });
     };
     self.getAll();
 
     self.creatRecieptHeader = function () {
-
+      printer = PrintService.getPrinter();
       printer.addTextAlign(printer.ALIGN_CENTER);
       PrintService.addImage();
       PrintService.addLineBreak();
-      var data = PrinterSettings.fetchData();
+        self.getAll();
       if (data != null) {
         angular.forEach(data.Header, function (row) {
-        if (row.IsBold == false) {
-          printer.addTextStyle(false, false, false);
-          printer.addTextSize(1, 1);
-        } else {
-          printer.addTextStyle(false, false, true);
-          printer.addTextSize(2, 1);
-        }
-        printer.addText(row.Text + '\n');
-      });
+          if (row.IsBold == 'false') {
+            printer.addTextStyle(false, false, false);
+            printer.addTextSize(1, 1);
+          } else {
+            printer.addTextStyle(false, false, true);
+            printer.addTextSize(2, 1);
+          }
+          printer.addText(row.Text + '\n');
+        });
       }
       data = null;
     };

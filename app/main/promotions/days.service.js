@@ -13,7 +13,6 @@ angular.module('itouch.services')
           Restangular.one('GetPromotionDays').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
             var items = JSON.parse(res);
             if (items) {
-              console.log(items);
               self.save(items);
               syncLog.log('  PromotionDays Sync Complete : ' + items.length + ' items found', 1);
               deferred.resolve();

@@ -77,7 +77,6 @@ angular.module('itouch.services')
               if (!_.isUndefined(res)) {
                 var barcodes = JSON.parse(res);
                 if (barcodes) {
-                  console.log(barcodes);
                   self.saveBarcodes(barcodes);
                   syncLog.log('  GetItemBarcode Sync Complete : ' + barcodes.length + ' items found', 1)
                   deferred.resolve();
