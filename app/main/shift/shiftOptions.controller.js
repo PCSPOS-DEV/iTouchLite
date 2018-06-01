@@ -20,7 +20,11 @@ angular.module('itouch.controllers')
 
       var checkBDate = function () {
         if (ControlService.isNewBusinessDate()) {
-          if ((ControlService.getDayEndDate()).format('DD-MM-YYYY') >= moment(tDay).format('DD-MM-YYYY')) {
+          if ((ControlService.getDayEndDate()) == undefined) {
+            self.openDatePicker(ControlService.getDayEndDate());
+            return false;
+          }
+          else if ((ControlService.getDayEndDate()).format('DD-MM-YYYY') <= moment(tDay).format('DD-MM-YYYY')) {
             Alert.error('Invalid Business Date.');
           } else {
             self.openDatePicker(ControlService.getDayEndDate());
@@ -78,12 +82,12 @@ angular.module('itouch.controllers')
       self.openShiftCloseModal = function () {
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
-          // if (suspenditem == 0) { // GGWP
+          if (suspenditem == 0) { // GGWP
             $scope.shiftListType = 'close';
             self.shiftModal.show();
-          // } else {
-          //   Alert.warning('Suspend Item is not empty.', 'ItouchLite');
-          // }
+          } else {
+            Alert.warning('Suspend Item is not empty.', 'ItouchLite');
+          }
         });
 
       };
@@ -222,11 +226,11 @@ angular.module('itouch.controllers')
       $scope.flag = false;
       self.openDayEnd = function() {
         if (ask == 0) { 
-          // Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
-          //   if (res == 1) {
+          Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
+            if (res == 1) {
               shiftclosingReport();
-          //   }
-          // });
+            }
+          });
           ask = 1;
         } else {
           shiftclosingReport();
