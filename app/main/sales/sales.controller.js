@@ -1386,7 +1386,9 @@ angular.module('itouch.controllers')
                 }
               }
             }    
-            $scope.flag = false;   
+            setTimeout (function () {
+              $scope.flag = false;  
+            }, 50)  
             $scope.navMenuCtrl();
           } else {
             if (!buttonClicked.voidBill) {
@@ -1407,7 +1409,10 @@ angular.module('itouch.controllers')
                 buttonClicked.voidBill = false;
               }
             }
-          }$scope.flag = false;  
+            setTimeout (function () {
+              $scope.flag = false;  
+            }, 50)
+          }
         },
         Discount: function (fn) {
           if (authorityCheck(fn)) {
@@ -1471,14 +1476,17 @@ angular.module('itouch.controllers')
               }
             }
           }
-          $scope.flag = false;
+          setTimeout (function () {
+            $scope.flag = false;  
+          }, 50)
         },
         QtyMinus: function (fn) {
-          $scope.flag = true;
+          
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
           } else if (item.SuspendDepDocNo === '') {
+            $scope.flag = true;
             if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
               if (authorityCheck(fn)) {
                 var qty = angular.copy(item.Qty);
@@ -1490,11 +1498,16 @@ angular.module('itouch.controllers')
                   }, function (err) {
                     console.log(err);
                   });
+                } else {
+                  $scope.flag = false;  
                 }
               }
             }
+            setTimeout (function () {
+              $scope.flag = false;  
+            }, 50)
           }
-          $scope.flag = false;
+          
         },
         ItemReverse: function (fn) {
           if (authorityCheck(fn)) {
