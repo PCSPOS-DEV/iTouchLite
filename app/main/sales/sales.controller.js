@@ -365,6 +365,10 @@ angular.module('itouch.controllers')
        * Biding an event to catch modal close call
        */
       $scope.$on('pwpModal-close', function (modal, pwpitem) {
+        // console.log('close');
+        if (pwpitem != null || undefined) {
+          $scope.cart.selectedItem = pwpitem;
+        }
         // selectLastItem();
         console.log($scope.cart.selectedItem);
         // $scope.cart.selectedItem = pwpitem;
@@ -378,6 +382,8 @@ angular.module('itouch.controllers')
        * Biding an event to catch modal close call
        */
       $scope.$on('pwpModal-save', function (modal, pwpitem) {
+        // console.log('save');
+        // console.log(pwpitem);
         $scope.cart.selectedItem = pwpitem;
         $scope.showpwpModal = false;
         $scope.qty.value = 1;

@@ -243,9 +243,9 @@ angular.module('itouch.controllers')
             angular.forEach($scope.pwp.selectedItems, function (i) {
               items[i.SubItemId] = ItemService.getById(i.SubItemId, itemT);
             });
-            console.log(items);
+            // console.log(items);
             $q.all(items).then(function (data) {
-              console.log(data);
+              // console.log(data);
               var promises  = [];
               $scope.pwp.item.ItemId = $scope.pwp.item.Id;
               $scope.pwp.item.ItemType = 'PWP';
