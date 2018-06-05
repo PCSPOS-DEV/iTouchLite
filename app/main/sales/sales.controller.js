@@ -1311,6 +1311,21 @@ angular.module('itouch.controllers')
           if (item) { 
             $scope.DeleteApi(item);
             if (item.ItemType == 'PWI') {
+                if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
+                  Alert.warning('Item Void not allowed.', 'ItouchLite');
+                } else {        
+                  Alert.warning('Item Void not allowed.', 'ItouchLite');// TO DO : ADD reslect option for pwp child
+                  // console.log('fck me');
+                  // BillService.voidSalesKit(item).then(function () {
+                  //   $scope.refreshCart().then(function () {
+                  //     $scope.selectItemWithLineNumber();
+                  //   });
+                  //   $scope.navMenuCtrl();
+                  // }, function (err) {
+                  //   console.log(err);
+                  // });
+                }
+                $scope.flag = false;   
               return;
             } else if (item.ItemType == 'SKT') {
               if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
