@@ -41,7 +41,8 @@ angular.module('itouch.controllers')
 
       var addPrice = function (item, discPercent) {
         debugLog.log('--*-- PWP Discount Start --*-- ', 7);
-        debugLog.log('Item : ' + item, 7);
+        console.log(item);
+        debugLog.log('Item : ' + item.ItemDesc1, 7);
         debugLog.log('discPercent : ' + discPercent, 7);
 
         return ItemService.getPrice(item.Plu, parseInt(item.PriceGroupId)).then(function (data) {
@@ -50,9 +51,9 @@ angular.module('itouch.controllers')
           var s1 = Math.floor(cal);
           var s2 = (cal*100) - (s1 * 100);
           var s3 = s2.toFixed(0)/100;
-          debugLog.log('discAmount : ' + s3, 7);
+          debugLog.log('discAmount : ' + (s1+s3), 7);
           // console.log(s3);
-          var Adisc = (Bdisc - s3).roundTo(2).toFixed(2);
+          var Adisc = (Bdisc - (s1+s3)).roundTo(2).toFixed(2);
           debugLog.log('Price After Disc : ' + Adisc, 7);
           debugLog.log('--*-- PWP Discount End --*-- ', 7);
           // console.log(Adisc);
