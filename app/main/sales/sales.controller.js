@@ -32,6 +32,7 @@ angular.module('itouch.controllers')
       var ApiArray = new Array();
       var TempDeleteItem = null;
       var UpData;
+      var control = 0;
       $scope.salesKits = {
         list: {},
         selectedList: {},
@@ -993,6 +994,7 @@ angular.module('itouch.controllers')
           $state.go('app.tender', {DocNo: $scope.header.DocNo});
         }
       };
+      var updatenewitem = 0 ;
       /**
        * Secondary display Post
        */
@@ -1025,9 +1027,19 @@ angular.module('itouch.controllers')
             } else if (type == 3) { // SKI non-void
               console.log(it);
             } else if (type == 4) { // SKI update
-              if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
-                $scope.PutFunction(Ditem, 1);
-              } 
+              if (updatenewitem == 0) {
+                if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+                  updatenewitem ++;
+                  $scope.PutFunction(Ditem, 1);
+                } 
+              } else if (control == updatenewitem) {
+                updatenewitem = 0;
+              } else {
+                if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+                  updatenewitem ++;
+                  $scope.PostFunction(Ditem, 1);
+                } 
+              }
             // } else if (type == 5) { // F/B Modifier
             //   angular.forEach(it, function(Citem) {
             //     if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
@@ -1330,6 +1342,9 @@ angular.module('itouch.controllers')
           $scope.flag = true;
           var item = $scope.cart.selectedItem;
           var last = Object.keys($scope.cart.items).length - 1;
+          if (last == 0) {
+            $scope.DeleteApi();
+          } 
           if (item) { 
             if (item.ItemType == 'PWI') {
                 if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
@@ -1400,6 +1415,7 @@ angular.module('itouch.controllers')
                                 update: true
                               };
                               TempDeleteItem = item;
+                              control = TempDeleteItem.Qty;
                               $scope.modals.salesKit.show();
                             }
                           }, 500);
@@ -1607,7 +1623,7 @@ angular.module('itouch.controllers')
                 $scope.flag = true;
                 Alert.showLoading();
                 SuspendService.suspend($scope.header.DocNo, Suspended, item.SuspendDepDocNo).then(function () {
-                  console.log($scope.header.DocNo);
+                  // console.log($scope.header.DocNo);
                   Suspended = true; //GGWP
                   $scope.DeleteApi();
                   refresh();

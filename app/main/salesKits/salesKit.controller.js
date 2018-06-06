@@ -340,13 +340,18 @@ angular.module('itouch.controllers')
                   $scope.scrollTo(item.LineNumber);
                   $scope.qty.value = 1;
                   $scope.selectItemWithLineNumber(item.LineNumber);
-                  if (item[0].ItemType == 'SKI') {
-                    console.log('update sk');
-                    $scope.PostApi(item[0], 4);
-                  } else {
-                    console.log('post sk');
-                    $scope.PostApi(item, 1);
-                  }     
+                  angular.forEach(item, function (res) {
+                    console.log('res : ');
+                    if (res.ItemType == 'SKI') {
+                      console.log(res);
+                      console.log('update sk');
+                      $scope.PostApi(res, 4);
+                    } else {
+                      console.log('post sk');
+                      $scope.PostApi(item, 1);
+                    }   
+                  })
+                    
                 });
               }).finally(function () {
                 $scope.$emit('skModalModal-save');
