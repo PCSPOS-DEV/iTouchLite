@@ -1331,7 +1331,6 @@ angular.module('itouch.controllers')
           var item = $scope.cart.selectedItem;
           var last = Object.keys($scope.cart.items).length - 1;
           if (item) { 
-            $scope.DeleteApi(item);
             if (item.ItemType == 'PWI') {
                 if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
                   Alert.warning('Item Void not allowed.', 'ItouchLite');
@@ -1352,7 +1351,8 @@ angular.module('itouch.controllers')
             } else if (item.ItemType == 'SKT') {
               if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
                 Alert.warning('Item Void not allowed.', 'ItouchLite');
-              } else {        
+              } else {     
+                $scope.DeleteApi(item);   
                 BillService.voidSalesKit(item).then(function () {
                   $scope.refreshCart().then(function () {
                     $scope.selectItemWithLineNumber();
@@ -1385,6 +1385,7 @@ angular.module('itouch.controllers')
 
               if (item.ItemType == 'SKI') {
                 if (item.Selectable == 'true') {
+                  $scope.DeleteApi(item);
                   if ($scope.showskModalModal == false) {
                     $scope.showskModalModal = true;
                     CartItemService.findSalesKitParent(item.ParentItemLineNumber).then(function (parentItem) {
@@ -1418,6 +1419,7 @@ angular.module('itouch.controllers')
                   Alert.warning('Item Void not allowed.', 'ItouchLite');
                 }
                 else {
+                  $scope.DeleteApi(item);
                   BillService.voidItem(item).then(function () {
                     $scope.refreshCart().then(function () {
                       $scope.selectItemWithLineNumber();
