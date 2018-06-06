@@ -1007,7 +1007,7 @@ angular.module('itouch.controllers')
               $scope.PutFunction(Ditem);
             } 
           } else {
-            if(type == 1) { // SaleKit
+            if(type == 1) { // SaleKit 
               if ((it[0].ItemType == Ditem.ItemType) && (it[0].ItemId == Ditem.ItemId) && (it[0].LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);
               }
@@ -1022,12 +1022,23 @@ angular.module('itouch.controllers')
                   $scope.PostFunction(Ditem);
                 } 
               })
-            } else if (type == 3) {
+            } else if (type == 3) { // SKI non-void
               console.log(it);
-            } else if (type == 4) {
+            } else if (type == 4) { // SKI update
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PutFunction(Ditem, 1);
               } 
+            } else if (type == 5) { // F/B Modifier
+              console.log('modifier');
+              angular.forEach(it, function(Citem) {
+                console.log(Citem);
+                if (Citem.ItemType == 'MOD') {
+                  $scope.PostFunction(Citem);
+                }
+                // if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
+                //   $scope.PostFunction(Ditem);
+                // } 
+              })
             } else {
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);
@@ -1138,11 +1149,29 @@ angular.module('itouch.controllers')
             $scope.DeleteFunction(item);
           }
         } else {
-          angular.forEach($scope.cart.items, function(Ditem) {
-            $scope.DeleteFunction(Ditem);
-          });
+          $scope.DeleteAllFunction();
+          // angular.forEach($scope.cart.items, function(Ditem) {
+          //   $scope.DeleteFunction(Ditem);
+          // });
         }
       };
+
+      $scope.DeleteAllFunction = function () {
+        $http({
+          method: 'DELETE',
+          url: requestUrl,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: {
+            "machineId": SettingsService.getMachineId()
+          }
+        }).then(function successCallback(response) {
+        console.log('Delete');
+        }, function errorCallback(response) {
+          console.log(response);
+        });
+      }
 
       $scope.DeleteFunction = function (Ditem) {
         $http({
