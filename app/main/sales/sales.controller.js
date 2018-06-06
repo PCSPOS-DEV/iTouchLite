@@ -1157,15 +1157,13 @@ angular.module('itouch.controllers')
       };
 
       $scope.DeleteAllFunction = function () {
+        var MachineId = SettingsService.getMachineId();
         $http({
           method: 'DELETE',
-          url: requestUrl,
+          url: requestUrl + '/' + MachineId,
           headers: {
             'Content-Type': 'application/json'
           },
-          data: {
-            "machineId": SettingsService.getMachineId()
-          }
         }).then(function successCallback(response) {
         console.log('Delete');
         }, function errorCallback(response) {
