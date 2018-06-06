@@ -1016,7 +1016,7 @@ angular.module('itouch.controllers')
                   $scope.PostFunction(Ditem);
                 } 
               })
-            } else if (type == 2) { // PWP
+            } else if (type == 2) { // PWP & F/B Modifier
               angular.forEach(it, function(Citem) {
                 if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
                   $scope.PostFunction(Ditem);
@@ -1028,17 +1028,12 @@ angular.module('itouch.controllers')
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PutFunction(Ditem, 1);
               } 
-            } else if (type == 5) { // F/B Modifier
-              console.log('modifier');
-              angular.forEach(it, function(Citem) {
-                console.log(Citem);
-                if (Citem.ItemType == 'MOD') {
-                  $scope.PostFunction(Citem);
-                }
-                // if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
-                //   $scope.PostFunction(Ditem);
-                // } 
-              })
+            // } else if (type == 5) { // F/B Modifier
+            //   angular.forEach(it, function(Citem) {
+            //     if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
+            //       $scope.PostFunction(Citem);
+            //     } 
+            //   })
             } else {
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);
