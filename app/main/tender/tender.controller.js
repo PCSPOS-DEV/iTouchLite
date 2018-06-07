@@ -203,7 +203,7 @@ angular.module('itouch.controllers')
               angular.forEach(bill, function (item, key) {
                 console.log('item.ItemId : ' + item.ItemId);
                 angular.forEach(sitems, function (fitem, key) {
-                  if (fitem.Id == item.ItemId) {
+                  if (fitem.Id == Math.floor(item.ItemId)) {
                     ItemUOMId = fitem.UOM_Id;
                     console.log('ItemUOMId : ' + ItemUOMId);
                     stockTransactions.push({
@@ -212,7 +212,7 @@ angular.module('itouch.controllers')
                       MachineId: item.MachineId,
                       LineNumber: item.LineNumber,
                       DocNo: $scope.tenderHeader.DocNo,
-                      ItemId: item.ItemId,
+                      ItemId: Math.floor(item.ItemId),
                       SeqNo: 1,
                       DocType: 'SA',
                       StdCost: item.StdCost,
