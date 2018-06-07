@@ -1339,7 +1339,8 @@ angular.module('itouch.controllers')
       $scope.salesFunctions = {
         VoidTop: function (fn) {
           Suspended = false;
-          $scope.flag = true;
+          // $scope.flag = true;
+          Alert.showLoading();
           var item = $scope.cart.selectedItem;
           var last = Object.keys($scope.cart.items).length - 1;
           if (last == 0) {
@@ -1361,7 +1362,7 @@ angular.module('itouch.controllers')
                   //   console.log(err);
                   // });
                 }
-                $scope.flag = false;   
+                $timeout(function () { Alert.hideLoading();}, 20);
               return;
             } else if (item.ItemType == 'SKT') {
               if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
@@ -1447,9 +1448,7 @@ angular.module('itouch.controllers')
                 }
               }
             }    
-            setTimeout (function () {
-              $scope.flag = false;  
-            }, 50)  
+            $timeout(function () { Alert.hideLoading();}, 20);
             $scope.navMenuCtrl();
           } else {
             if (!buttonClicked.voidBill) {
@@ -1470,9 +1469,7 @@ angular.module('itouch.controllers')
                 buttonClicked.voidBill = false;
               }
             }
-            setTimeout (function () {
-              $scope.flag = false;  
-            }, 50)
+            $timeout(function () { Alert.hideLoading();}, 20);
           }
         },
         Discount: function (fn) {
@@ -1519,7 +1516,8 @@ angular.module('itouch.controllers')
 
         },
         QtyPlus: function (fn) {
-          $scope.flag = true;
+          // $scope.flag = true;
+          Alert.showLoading();
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
@@ -1537,9 +1535,7 @@ angular.module('itouch.controllers')
               }
             }
           }
-          setTimeout (function () {
-            $scope.flag = false;  
-          }, 50)
+          $timeout(function () { Alert.hideLoading();}, 20);
         },
         QtyMinus: function (fn) {
           
@@ -1547,7 +1543,8 @@ angular.module('itouch.controllers')
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
           } else if (item.SuspendDepDocNo === '') {
-            $scope.flag = true;
+            // $scope.flag = true;
+            Alert.showLoading();
             if (item && item.ItemType == 'NOR' && !ItemService.isDiscounted(item) && !ItemService.isRefunded(item)) {
               if (authorityCheck(fn)) {
                 var qty = angular.copy(item.Qty);
@@ -1560,13 +1557,12 @@ angular.module('itouch.controllers')
                     console.log(err);
                   });
                 } else {
-                  $scope.flag = false;  
+                  Alert.warning('Minimum Quantity: Action not allowed.')
+                  // $scope.flag = false;  
                 }
               }
             }
-            setTimeout (function () {
-              $scope.flag = false;  
-            }, 50)
+            $timeout(function () { Alert.hideLoading();}, 20);
           }
           
         },
@@ -1936,8 +1932,9 @@ angular.module('itouch.controllers')
           buttonClicked.barcode = true;
           // alert($scope.data.barcode);
           if ($scope.data.barcode && $scope.data.barcode != '') {
+            Alert.showLoading();
             ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
-              selectItem(item);
+                selectItem(item);
             }, function (ex) {
               $cordovaToast.show(ex, 'long', 'top');
               // Alert.warning(ex);
@@ -1945,6 +1942,7 @@ angular.module('itouch.controllers')
               $scope.data.barcode = '';
               buttonClicked.barcode = false;
               document.getElementById('barcodeText').focus();
+              Alert.hideLoading();;
             });
           }
         }

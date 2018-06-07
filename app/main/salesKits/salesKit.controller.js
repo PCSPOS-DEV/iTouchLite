@@ -341,9 +341,7 @@ angular.module('itouch.controllers')
                   $scope.qty.value = 1;
                   $scope.selectItemWithLineNumber(item.LineNumber);
                   angular.forEach(item, function (res) {
-                    console.log('res : ');
                     if (res.ItemType == 'SKI') {
-                      console.log(res);
                       console.log('update sk');
                       $scope.PostApi(res, 4);
                     } else {
