@@ -732,7 +732,7 @@ angular.module('itouch.controllers')
         console.log($scope.bkey);
         $scope.bkey = true;
         console.log($scope.bkey);
-        // Alert.showLoading();
+        Alert.showLoading();
         $scope.data.barcodeMode = false;
         if (item) {
           if (item.Type == 'P') {
@@ -768,7 +768,7 @@ angular.module('itouch.controllers')
           }
           fetchSelectedItem($scope.selectedItem);
           // $timeout(function () { Alert.hideLoading();}, 20);
-          $timeout(function () { $scope.bkey = false;}, 200); // in case of increase the waiting time
+          $timeout(function () { $scope.bkey = false; Alert.hideLoading();}, 50); // in case of increase the waiting time
           
         }
       };
@@ -1933,9 +1933,9 @@ angular.module('itouch.controllers')
         e.preventDefault();
         if (!buttonClicked.barcode) {
           buttonClicked.barcode = true;
+          Alert.showLoading();
           // alert($scope.data.barcode);
           if ($scope.data.barcode && $scope.data.barcode != '') {
-            Alert.showLoading();
             ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
               debugLog.log('Barcode : ' + $scope.data.barcode, 7);
               debugLog.log('Item : ' + item, 7);
@@ -1950,9 +1950,11 @@ angular.module('itouch.controllers')
               $scope.data.barcode = '';
               buttonClicked.barcode = false;
               document.getElementById('barcodeText').focus();
-              $timeout(function () { Alert.hideLoading();}, 10);
             });
+          } else {
+            Alert.warning('Try Again');
           }
+          $timeout(function () { Alert.hideLoading();}, 10);
         }
       };
 
