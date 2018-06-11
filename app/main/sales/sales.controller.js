@@ -729,9 +729,10 @@ angular.module('itouch.controllers')
       $scope.onKeyClick = function (item) {
         // console.time("test");
         $scope.$emit('BlockMenu', false);
-        // console.log($scope.bkey);
+        console.log($scope.bkey);
         $scope.bkey = true;
-        Alert.showLoading();
+        console.log($scope.bkey);
+        // Alert.showLoading();
         $scope.data.barcodeMode = false;
         if (item) {
           if (item.Type == 'P') {
@@ -766,7 +767,9 @@ angular.module('itouch.controllers')
             });
           }
           fetchSelectedItem($scope.selectedItem);
-          $timeout(function () { $scope.bkey = false; Alert.hideLoading();}, 20); // in case of increase the waiting time
+          // $timeout(function () { Alert.hideLoading();}, 20);
+          $timeout(function () { $scope.bkey = false;}, 200); // in case of increase the waiting time
+          
         }
       };
 
@@ -1934,7 +1937,12 @@ angular.module('itouch.controllers')
           if ($scope.data.barcode && $scope.data.barcode != '') {
             Alert.showLoading();
             ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
+              debugLog.log('Barcode : ' + $scope.data.barcode, 7);
+              debugLog.log('Item : ' + item, 7);
+              debugLog.log(item, 7);
+              $timeout(function () {
                 selectItem(item);
+              }, 20);
             }, function (ex) {
               $cordovaToast.show(ex, 'long', 'top');
               // Alert.warning(ex);
@@ -1942,7 +1950,7 @@ angular.module('itouch.controllers')
               $scope.data.barcode = '';
               buttonClicked.barcode = false;
               document.getElementById('barcodeText').focus();
-              Alert.hideLoading();;
+              $timeout(function () { Alert.hideLoading();}, 10);
             });
           }
         }
