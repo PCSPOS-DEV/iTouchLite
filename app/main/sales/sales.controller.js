@@ -944,7 +944,7 @@ angular.module('itouch.controllers')
       var fetchSelectedItem = function (selectedItem) {
         if (selectedItem.SubPLU1Code != '' && selectedItem.SubPLU2Code != '' && selectedItem.SubPLU3Code != '') {
           ItemService.get(selectedItem.PLU, selectedItem.SubPLU1Code, selectedItem.SubPLU2Code, selectedItem.SubPLU3Code).then(function (item) {
-            selectItem(item);
+            $timeout(function () { selectItem(item);}, 100);
           }, function (err) {
             console.log(err.message);
             $scope.refreshCart();
