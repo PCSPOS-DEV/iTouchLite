@@ -7,7 +7,7 @@ angular.module('itouch.services')
       var macId;
       var enableAutoUpload = true;
       var uploadLog = new debugout();
-      var autouploadInterval = 2;
+      var autouploadInterval = 5;
       var autoupinterval = ((autouploadInterval*60)*1000);
       var interval = null;
 
@@ -99,7 +99,7 @@ angular.module('itouch.services')
           columns: 'IsExported=?',
           data: [false]
         }, null, '10').then(function (res) {
-          uploadLog.log('--*-- Upload Detail Initialized --*--', 2);
+          uploadLog.log('--*-- Upload Detail Initialized --*--', 7);
           uploadLog.log('  Number of transactions : ' + res.rows.length, 2);
           // console.log(res.rows.length);
           var promises = [];
@@ -146,7 +146,7 @@ angular.module('itouch.services')
               },null,'1000')*/
             }));
           });
-          uploadLog.log('--*-- Upload Detail Completed --*--', 2);
+          uploadLog.log('--*-- Upload Detail Completed --*--', 7);
 
           promises.push($q.all({
             UpdateVoidDocNo: DB.select(DB_CONFIG.tableNames.bill.header, '*', {
@@ -262,7 +262,10 @@ angular.module('itouch.services')
             self.upload();
             setTimeout (function () {
               uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
-              uploadLog.log('-----*-----*-----', 2);
+              uploadLog.log('-----*-----*-----', 7);
+              var uploadlog = localStorage.getItem('UploadLogs');
+              var logs = uploadLog.getLog();
+              localStorage.setItem('UploadLogs', uploadlog + logs);
             }, 100)
           }, autoupinterval);
         }

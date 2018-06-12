@@ -61,13 +61,20 @@ angular.module('itouch.controllers')
         uploadClicked = true;
         UploadService.upload().then(function () {
           uploadLog.log('Upload Success : Manual Upload', 2);
-          uploadLog.log('-----*-----*-----', 2);
+          uploadLog.log('-----*-----*-----', 7);
           // var logs = uploadLog.getLog();
           // console.log(logs);
+          var uploadlog = localStorage.getItem('UploadLogs');
+          var logs = uploadLog.getLog();
+          localStorage.setItem('UploadLogs', uploadlog + logs);
+          console.log(logs);
           Alert.success('Upload success');
         }, function (err) {
           uploadLog.log('Upload Error : ' + err, 2);
-          uploadLog.log('-----*-----*-----', 2);
+          uploadLog.log('-----*-----*-----', 7);
+          var uploadlog = localStorage.getItem('UploadLogs');
+          var logs = uploadLog.getLog();
+          localStorage.setItem('UploadLogs', uploadlog + logs);
           // var logs = uploadLog.getLog();
           // console.log(logs);
           Alert.error(err);

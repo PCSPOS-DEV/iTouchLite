@@ -2,13 +2,17 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('UploadLogsDetailCtrl', ['$log', 'Alert', '$localStorage', '$scope', '$rootScope', 'UploadService', '$state',
-    function ($log, Alert, $localStorage, $scope, $rootScope, UploadService, $state) {
+  .controller('UploadLogsDetailCtrl', ['$log', 'Alert', '$localStorage', '$scope', '$rootScope', 'UploadService', '$state', '$cordovaEmailComposer',
+    function ($log, Alert, $localStorage, $scope, $rootScope, UploadService, $state, $cordovaEmailComposer) {
       var self = this;
-      uploadLog = UploadService.StartuploadLog();
+      var fs = require('fs');
+      // uploadLog = UploadService.StartuploadLog();
       $scope.upinterval = UploadService.getAutoUploadInterval();
       console.log($scope.upinterval);
-      $scope.newlogs = uploadLog.getLog();
+      var uploadlog = localStorage.getItem('UploadLogs');
+      console.log(uploadlog);
+      $scope.newlogs = uploadlog;
+      // $scope.newlogs = uploadLog.getLog();
       // console.log( $scope.newlogs);
       var refresh = function () {
         try {
@@ -37,5 +41,20 @@ angular.module('itouch.controllers')
         UploadService.setAutoUploadInterval(self.settings.upinterval);
         Alert.success('Updated Auto Upload Interval');
         Alert.hideLoading();
+      }
+
+      self.sendMail = function(){
+        
+        
+        $cordovaEmailComposer.open({// (I even tried cordova.plugins.email.open)
+           to: "pcsposdev@prima.com.sg",
+           subject: "Testing from Ionic",
+           body: "<h1>Hello</h1><br><p><i>Italic</i><p>", 
+           isHtml: true 
+         }).then(function () {
+           console.log('email sent');
+       }).finallly(function () {
+         localStorage.removeItem('UploadLogs');
+       })
       }
     }]);
