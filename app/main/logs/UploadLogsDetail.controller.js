@@ -10,7 +10,7 @@ angular.module('itouch.controllers')
       $scope.upinterval = UploadService.getAutoUploadInterval();
       console.log($scope.upinterval);
       var uploadlog = localStorage.getItem('UploadLogs');
-      console.log(uploadlog);
+      // console.log(uploadlog);
       $scope.newlogs = uploadlog;
       // $scope.newlogs = uploadLog.getLog();
       // console.log( $scope.newlogs);
@@ -43,6 +43,13 @@ angular.module('itouch.controllers')
         Alert.hideLoading();
       }
 
+      
+      // var pdf = new jsPDF('p', 'pt', 'letter'), source  = "Text", margin = {top: 30, botton: 40, left: 30, width: 600};
+      // pdf.setFontSize(12);
+      // pdf.text( uploadlog, 50, 50 );
+     
+      // pdf.save('a4.pdf');
+
       self.sendMail = function(){
         cordova.plugins.email.isAvailable('gmail', function (hasAccount, hasGmail) {});
         
@@ -52,9 +59,13 @@ angular.module('itouch.controllers')
            body: "<h1>Hello</h1>", 
            isHtml: true 
          }).then(function () {
-            Alert.success('Email Successfully sent');
            console.log('email sent');
        });
+       if (navigator.onLine) {
+        Alert.success('Email Sent Successfully');
+      } else {
+        Alert.warning('No active internet connection: email will automatically sent when online');
+      }
        setTimeout(function () {
          localStorage.removeItem('UploadLogs');
        }, 200)
