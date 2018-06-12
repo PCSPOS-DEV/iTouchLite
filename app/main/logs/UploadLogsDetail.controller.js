@@ -5,7 +5,7 @@ angular.module('itouch.controllers')
   .controller('UploadLogsDetailCtrl', ['$log', 'Alert', '$localStorage', '$scope', '$rootScope', 'UploadService', '$state', '$cordovaEmailComposer',
     function ($log, Alert, $localStorage, $scope, $rootScope, UploadService, $state, $cordovaEmailComposer) {
       var self = this;
-      var fs = require('fs');
+
       // uploadLog = UploadService.StartuploadLog();
       $scope.upinterval = UploadService.getAutoUploadInterval();
       console.log($scope.upinterval);
@@ -44,17 +44,20 @@ angular.module('itouch.controllers')
       }
 
       self.sendMail = function(){
-        
+        cordova.plugins.email.isAvailable('gmail', function (hasAccount, hasGmail) {});
         
         $cordovaEmailComposer.open({// (I even tried cordova.plugins.email.open)
            to: "pcsposdev@prima.com.sg",
-           subject: "Testing from Ionic",
-           body: "<h1>Hello</h1><br><p><i>Italic</i><p>", 
+           subject: "Testing Email",
+           body: "<h1>Hello</h1>", 
            isHtml: true 
          }).then(function () {
+            Alert.success('Email Successfully sent');
            console.log('email sent');
-       }).finallly(function () {
+       });
+       setTimeout(function () {
          localStorage.removeItem('UploadLogs');
-       })
+       }, 200)
+       
       }
     }]);

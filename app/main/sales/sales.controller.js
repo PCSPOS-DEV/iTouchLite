@@ -732,7 +732,7 @@ angular.module('itouch.controllers')
         console.log($scope.bkey);
         $scope.bkey = true;
         console.log($scope.bkey);
-        Alert.showLoading();
+        // Alert.showLoading();
         $scope.data.barcodeMode = false;
         if (item) {
           if (item.Type == 'P') {
@@ -768,7 +768,7 @@ angular.module('itouch.controllers')
           }
           fetchSelectedItem($scope.selectedItem);
           // $timeout(function () { Alert.hideLoading();}, 20);
-          $timeout(function () { $scope.bkey = false; Alert.hideLoading();}, 50); // in case of increase the waiting time
+          $timeout(function () { $scope.bkey = false; }, 50); // in case of increase the waiting time
           
         }
       };
