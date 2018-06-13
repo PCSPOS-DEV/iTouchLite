@@ -24,7 +24,8 @@ angular.module('itouch.controllers')
             self.openDatePicker(ControlService.getDayEndDate());
             return false;
           }
-          else if ((ControlService.getDayEndDate()).format('DD-MM-YYYY') >= moment(tDay).format('DD-MM-YYYY')) {
+          else if ((ControlService.getDayEndDate()).format('YYYY-MM-DD') >= moment(tDay).format('YYYY-MM-DD')) {
+            // else if ((ControlService.getDayEndDate()).format('DD-MM-YYYY') >= moment(tDay).format('DD-MM-YYYY')) {
             Alert.error('Invalid Business Date.');
           } else {
             self.openDatePicker(ControlService.getDayEndDate());
