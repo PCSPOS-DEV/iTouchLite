@@ -154,6 +154,7 @@ angular.module('itouch.services')
               data: [true, strEmpty]
             }, null, '1000').then(onSuccess)
           }));
+          uploadLog.log('Upload status : Return promised', 7);
 
           return $q.all(promises);
           // .then(function());
@@ -190,9 +191,11 @@ angular.module('itouch.services')
 
       var uploading = false;
       self.upload = function () {
+        uploadLog.log('Uploading Status : ' + uploading, 2);
         if (!uploading) {
           uploading = true;
           DB.clearQueue();
+          uploadLog.log('Upload Status : clearQueue', 2);
           return self.getBills().then(function (bills) {
             var promises = [];  
             angular.forEach(bills, function (bill) {
@@ -212,7 +215,7 @@ angular.module('itouch.services')
                     return self.setExported(DocNo);
                   }
                   else {
-                    uploadLog.log('Upload Status : Rejected' + res, 2);
+                    uploadLog.log('Upload Status : Rejected' + res, 4);
                     return $q.reject(res);
                   }
                 }));
@@ -242,7 +245,7 @@ angular.module('itouch.services')
             return $q.all(promises)
               .catch(function (err) {
                 console.log(err);
-                uploadLog.log('Upload Error : Unable to connect the server', 2);
+                uploadLog.log('Upload Error : Unable to connect the server', 4);
                 return $q.reject('Unable to connect the server');
               }).finally(function () {
                 uploading = false;

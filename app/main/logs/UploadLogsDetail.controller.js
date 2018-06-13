@@ -85,7 +85,7 @@ angular.module('itouch.controllers')
            to: "pcsposdev@prima.com.sg",
           //  cc: , // email addresses for CC field
           //  bcc: , // email addresses for BCC field
-           attachments: pdfurl,
+           attachments: pdfurl, //TO DO : Auto attachement
            subject: "Upload Log <itouchlite>",
            body: "<h1>Upload Log Attachment</h1>" + "<p>Date : " + systemDate + "</p>", 
            isHtml: true 

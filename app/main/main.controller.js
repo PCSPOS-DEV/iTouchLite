@@ -70,7 +70,7 @@ angular.module('itouch.controllers')
           console.log(logs);
           Alert.success('Upload success');
         }, function (err) {
-          uploadLog.log('Upload Error : ' + err, 2);
+          uploadLog.log('Upload Error : ' + err, 4);
           uploadLog.log('-----*-----*-----', 7);
           var uploadlog = localStorage.getItem('UploadLogs');
           var logs = uploadLog.getLog();
