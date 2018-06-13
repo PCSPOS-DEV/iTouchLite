@@ -43,11 +43,22 @@ angular.module('itouch.controllers')
         Alert.hideLoading();
       }
 
-      
-      // var pdf = new jsPDF('p', 'pt', 'letter'), source  = "Text", margin = {top: 30, botton: 40, left: 30, width: 600};
-      // pdf.setFontSize(12);
-      // pdf.text( uploadlog, 50, 50 );
-     
+      var lines = uploadlog.split('\n');
+      var startline = 0;
+      var lastline = 49
+      var sline = lines.splice(startline,lastline);
+      var first = sline.join('\n');
+      var pdf = new jsPDF('p', 'pt', 'a4'), source  = "Text", margin = {top: 30, botton: 40, left: 30, width: 600};
+      pdf.setFontSize(10);
+      pdf.text( first, 50, 50 );
+      var requirepages = lines.length/50;
+      for (var i = 1; i < requirepages; i++, lastline+50, startline+50) {
+        var sline = lines.splice(startline,lastline);
+        var newdata= sline.join('\n');
+        pdf.addPage();
+        pdf.text( newdata, 50, 50 );
+      }
+      var pdfurl = pdf.output('dataurl');
       // pdf.save('a4.pdf');
 
       self.sendMail = function(){
@@ -55,17 +66,20 @@ angular.module('itouch.controllers')
         
         $cordovaEmailComposer.open({// (I even tried cordova.plugins.email.open)
            to: "pcsposdev@prima.com.sg",
-           subject: "Testing Email",
-           body: "<h1>Hello</h1>", 
+          //  cc: , // email addresses for CC field
+          //  bcc: , // email addresses for BCC field
+           attachments: pdfurl,
+           subject: "Upload Log <itouchlite>",
+           body: "<h1>Upload Log Attachment</h1>", 
            isHtml: true 
          }).then(function () {
            console.log('email sent');
        });
        if (navigator.onLine) {
         Alert.success('Email Sent Successfully');
-      } else {
+        } else {
         Alert.warning('No active internet connection: email will automatically sent when online');
-      }
+        }
        setTimeout(function () {
          localStorage.removeItem('UploadLogs');
        }, 200)
