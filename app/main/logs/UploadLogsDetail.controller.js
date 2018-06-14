@@ -69,13 +69,14 @@ angular.module('itouch.controllers')
         pdf.addPage();
         pdf.text( newdata, 50, 50 );
       }
-      var pdfurl = pdf.output('dataurl'); 
+      var pdfBase64 = pdf.output('datauristring');
       // console.log(pdfurl);
-      pdf.save('a4.pdf');
+      // pdf.save('a4.pdf');
       
       self.deleteManual = function() {
         localStorage.removeItem('UploadLogs');
-        Alert.success('All Upload Log Delete  Successfully');
+        $scope.newlogs = "";
+        Alert.success('All Upload Log Delete Successfully');
       }
 
       self.sendMail = function(){
@@ -85,21 +86,26 @@ angular.module('itouch.controllers')
            to: "pcsposdev@prima.com.sg",
           //  cc: , // email addresses for CC field
           //  bcc: , // email addresses for BCC field
-           attachments: pdfurl, //TO DO : Auto attachement
            subject: "Upload Log <itouchlite>",
-           body: "<h1>Upload Log Attachment</h1>" + "<p>Date : " + systemDate + "</p>", 
-           isHtml: true 
+           body: "<h1>Upload Log Attachment</h1>" + "<p>Date : " + systemDate +"</p>", 
+           isHtml: true, 
+           attachments: [SettingsService.generateAttachment(pdfBase64, "UploadLog.pdf")], //TO DO : Auto attachement
          }).then(function () {
            console.log('email sent');
-       });
-       if (navigator.onLine) {
-        Alert.success('Email Sent Successfully');
+       }).finally(function(){
+        if (navigator.onLine) {
+          Alert.success('Email Sent Successfully');
         } else {
-        Alert.warning('No active internet connection: email will automatically sent when online');
+          Alert.warning('No active internet connection: email will automatically sent when online');
         }
-       setTimeout(function () {
-         localStorage.removeItem('UploadLogs');
-       }, 200)
+        setTimeout(function () {
+          localStorage.removeItem('UploadLogs');
+        }, 200)
+       })
+       
+      //  setTimeout(function () {
+      //    localStorage.removeItem('UploadLogs');
+      //  }, 200)
        
       }
     }]);

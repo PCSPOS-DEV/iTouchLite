@@ -252,6 +252,7 @@ angular.module('itouch.services')
               });
           });
         } else {
+          uploadLog.log('Upload Error : Upload stopped', 4);
           return $q.resolve();
         }
 

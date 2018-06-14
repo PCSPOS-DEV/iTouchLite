@@ -191,5 +191,11 @@ angular.module('itouch.services')
       }
     }
 
+    self.generateAttachment = function(uriString, fileName){
+      var uristringparts = uriString.split(',');
+      uristringparts[0] = "base64:" + fileName + "//";
+      return uristringparts.join("");
+    };
+
     return self;
   }]);
