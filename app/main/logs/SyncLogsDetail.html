@@ -16,6 +16,20 @@
     </div>
     <div class="row">
         <div class="col">
+            <div class="padding">
+              <button class="button button-block button-positive" ng-click="ctrl.sendMail()" ng-disabled="">
+                Send Sync Log
+              </button>
+            </div>
+          </div>
+        <div class="col">
+          <div class="padding">
+            <button class="button button-block button-positive" style="background-color: rgb(224, 52, 52)" ng-click="ctrl.deleteManual()" ng-disabled="">
+              Delete All Sync Log
+            </button>
+          </div>
+        </div>
+        <div class="col">
           <div class="padding">
             <button class="button button-block button-secondary" ng-click="ctrl.Back2Logs()" ng-disabled="">
               Back

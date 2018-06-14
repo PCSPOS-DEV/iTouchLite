@@ -21,7 +21,7 @@ angular.module('itouch.services')
             DB.clearQueue();
             DB.createTables();
             return DB.executeQueue().then(function () {
-              syncLog.log('--*-- Sync Detail Initialized --*--', 1);
+              syncLog.log('--*-- Sync Detail Initialized --*--', 7);
               return $q.all({
                 'Users': AuthService.fetchUsers(),
                 'Layouts': KeyBoardService.fetchLayout(),
@@ -52,20 +52,26 @@ angular.module('itouch.services')
             // FunctionsService.fetch()
               .then(function (values) {
                 return DB.executeQueue().then(function () {
-                  syncLog.log('--*-- Sync Detail Completed --*--', 1);
+                  syncLog.log('--*-- Sync Detail Completed --*--', 7);
                   DenominationsService.addDefault();
                   LocationService.get();
                   return ImageDownloadService.downloadImages().then(function () {
                     console.log('sync done');
                     syncLog.log('Sync Complete', 1);
-                    syncLog.log('-----*-----*-----', 1);
+                    syncLog.log('-----*-----*-----', 7);
+                    var syncLogs = localStorage.getItem('SyncLogs');
+                    var logs = syncLog.getLog();
+                    localStorage.setItem('SyncLogs', syncLogs + logs);
                     // var logs = syncLog.getLog();
                     // console.log(logs);
                   }, function (ex) {
                     console.log('sync error', ex);
-                    syncLog.log('Sync Error : ' + ex, 1);
+                    syncLog.log('Sync Error : ' + ex, 4);
                     syncLog.log('Sync Complete', 1);
-                    syncLog.log('-----*-----*-----', 1);
+                    syncLog.log('-----*-----*-----', 7);
+                    var syncLogs = localStorage.getItem('SyncLogs');
+                    var logs = syncLog.getLog();
+                    localStorage.setItem('SyncLogs', syncLogs + logs);
                     // var logs = syncLog.getLog();
                     // console.log(logs);
                     Alert.error(ex);
@@ -78,17 +84,17 @@ angular.module('itouch.services')
               });
 
             }, function (ex) {
-              syncLog.log('Sync Error : Unable to connect to Server', 1);
+              syncLog.log('Sync Error : Unable to connect to Server', 4);
               Alert.error('Unable to connect to Server');
             });
           }, function (err) {
             Alert.hideLoading();
             console.log(err);
-            syncLog.log('Sync Error : Unable to connect to Server', 1);
+            syncLog.log('Sync Error : Unable to connect to Server', 4);
             Alert.error('Unable to connect to Server');
           });
         } else {
-          syncLog.log('Sync Fail : Base URL not configured', 1);
+          syncLog.log('Sync Fail : Base URL not configured', 4);
           Alert.error('Base URL not configured');
         }
 
