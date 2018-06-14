@@ -29,6 +29,7 @@ angular.module('itouch.controllers')
       var Suspended = false;
       var request = new XMLHttpRequest();
       var requestUrl = AppConfig.getDisplayUrl();
+      console.log(requestUrl);
       var ApiArray = new Array();
       var TempDeleteItem = null;
       var UpData;
@@ -729,10 +730,8 @@ angular.module('itouch.controllers')
       $scope.onKeyClick = function (item) {
         // console.time("test");
         $scope.$emit('BlockMenu', false);
-        console.log($scope.bkey);
         $scope.bkey = true;
-        console.log($scope.bkey);
-        // Alert.showLoading();
+        Alert.showLoading();
         $scope.data.barcodeMode = false;
         if (item) {
           if (item.Type == 'P') {
@@ -767,7 +766,7 @@ angular.module('itouch.controllers')
             });
           }
           fetchSelectedItem($scope.selectedItem);
-          // $timeout(function () { Alert.hideLoading();}, 20);
+          $timeout(function () { Alert.hideLoading();});
           $timeout(function () { $scope.bkey = false; }, 50); // in case of increase the waiting time
           
         }
@@ -957,6 +956,7 @@ angular.module('itouch.controllers')
        * @param item
        */
       $scope.selectItem = function (item) {
+        
         // if(!$scope.cart.selectedItem || !item || item.LineNumber != $scope.cart.selectedItem.LineNumber){
 
         // }

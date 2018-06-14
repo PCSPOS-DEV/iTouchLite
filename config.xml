@@ -73,6 +73,6 @@
     </plugin>
     <plugin name="com.bluefletch.honeywell.captuvo" spec="https://github.com/BlueFletch/cordova-plugin-honeywell-captuvo.git" />
     <plugin name="cordova-plugin-image-picker" spec="https://github.com/wymsee/cordova-imagePicker.git" />
-    <engine name="ios" spec="~4.5.4" />
     <plugin name="cordova-plugin-email-composer" spec="^0.8.15" />
+    <engine name="ios" spec="~4.5.4" />
 </widget>
