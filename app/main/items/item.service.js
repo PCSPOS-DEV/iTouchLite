@@ -23,19 +23,13 @@ angular.module('itouch.services')
       };
 
       self.fetchDate = function () {
-        console.log(fetchedDate);
-        // if (fetchedDate == 0 ) {
-        //   console.log('1');
-        //   Restangular.one('GetItemsByLocations').get({LocationId: SettingsService.getLocationId()}).then(function (res) {
-        //     fetchedDate = JSON.parse(res);
-        //     // console.log(fetchedDate);
-        //     return fetchedDate;
-        //   })
-        // } else {
-          console.log('2');
-          return fetchedDate;
-        // }
-      }
+        return DB.select(DB_CONFIG.tableNames.item.item, '*').then(function (res) {
+          return DB.fetchAll(res);
+        });
+        // DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.item.item + '', []).then(function (result) {
+        //   return DB.fetchAll(result);
+        // })
+      };
       
       self.fetchItems = function () {
         var deferred = $q.defer();

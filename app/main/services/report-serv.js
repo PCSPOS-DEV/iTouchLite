@@ -119,7 +119,7 @@ angular.module('itouch.services')
           PrintService.addTitle('Add Float\n');
           printer.addTextSize(1, 1);
           // console.log(floatAmount);
-          FIA = parseFloat(floatAmount);
+          var FIA = parseFloat(floatAmount);
           if (typeof(FIA) != 'number') { FIA = 0;}
           PrintService.addLine('Amount :', (FIA.toFixed(2)));
           // PrintService.addLine('Amount :', floatAmount + '.00');

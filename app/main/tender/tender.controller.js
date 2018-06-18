@@ -14,6 +14,11 @@ angular.module('itouch.controllers')
       $scope.payTransactions = [];
       var businessDate = ControlService.getBusinessDate(true);
       var sitems = 0;
+      var fditem;
+      var fitems = ItemService.fetchDate().then(function (res) {
+        fditem = res;
+        return fditem;
+      });
       var tenderDiscount = {
         header: null,
         discount: null
@@ -192,20 +197,13 @@ angular.module('itouch.controllers')
                   CurrencyId: 0,
                   IsExported: false
                 });
-              }
-
-              var fitems = ItemService.fetchDate();
-              var fditem;
+              }   
               var ItemUOMId;
               var stockTransactions = [];
-              console.log(sitems);
-              console.log(bill);
               angular.forEach(bill, function (item, key) {
-                console.log('item.ItemId : ' + item.ItemId);
-                angular.forEach(sitems, function (fitem, key) {
+                angular.forEach(fditem, function (fitem, key) {
                   if (fitem.Id == Math.floor(item.ItemId)) {
                     ItemUOMId = fitem.UOM_Id;
-                    console.log('ItemUOMId : ' + ItemUOMId);
                     stockTransactions.push({
                       BusinessDate: businessDate,
                       LocationId: item.LocationId,
