@@ -6,9 +6,10 @@ angular.module('itouch.controllers')
     function ($log, Alert, $localStorage, $scope, $rootScope, UploadService, $state, $cordovaEmailComposer, SettingsService) {
       var self = this;
       var systemDate = new Date();
-      // uploadLog = UploadService.StartuploadLog();
+      TempLog = UploadService.StartuploadLog();
+      // console.log(TempLog.getLog());
       $scope.upinterval = UploadService.getAutoUploadInterval();
-      console.log($scope.upinterval);
+      // console.log($scope.upinterval);
       var uploadlog = localStorage.getItem('UploadLogs');
       // console.log(uploadlog);
       if (uploadlog == null) {
@@ -48,6 +49,8 @@ angular.module('itouch.controllers')
 
       
       var lines = uploadlog.split('\n');
+      $scope.totallines = lines.length;
+      // console.log(lines.length);
       var startline = 0;
       var lastline = 49
       var sline = lines.splice(startline,lastline);
@@ -75,6 +78,8 @@ angular.module('itouch.controllers')
       
       self.deleteManual = function() {
         localStorage.removeItem('UploadLogs');
+        TempLog.clear();
+        $scope.totallines = 0;
         $scope.newlogs = "";
         Alert.success('All Upload Log Delete Successfully');
       }
@@ -100,6 +105,9 @@ angular.module('itouch.controllers')
         }
         setTimeout(function () {
           localStorage.removeItem('UploadLogs');
+          TempLog.clear();
+          $scope.totallines = 0;
+          $scope.newlogs = "";
         }, 200)
        })
        

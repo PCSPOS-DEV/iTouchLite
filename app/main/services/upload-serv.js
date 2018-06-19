@@ -191,6 +191,7 @@ angular.module('itouch.services')
 
       var uploading = false;
       self.upload = function () {
+        uploadLog.clear();
         uploadLog.log('Uploading Status : ' + uploading, 2);
         if (!uploading) {
           uploading = true;

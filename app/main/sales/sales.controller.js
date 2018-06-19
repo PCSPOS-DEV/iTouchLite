@@ -729,6 +729,10 @@ angular.module('itouch.controllers')
       var priceFormShown = false;
       $scope.onKeyClick = function (item) {
         // console.time("test");
+        // $timeout.verifyNoPendingTasks();
+        $timeout(function () { 
+          // $timeout.flush();
+          
         $scope.$emit('BlockMenu', false);
         $scope.bkey = true;
         Alert.showLoading();
@@ -770,6 +774,7 @@ angular.module('itouch.controllers')
           $timeout(function () { $scope.bkey = false; }, 50); // in case of increase the waiting time
           
         }
+      });
       };
 
       var showPriceForm = function () {
