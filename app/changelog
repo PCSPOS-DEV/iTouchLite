@@ -1,0 +1,50 @@
+Ver 0.1 2017-11-21
+    Received source code for YiYiPo
+    Re-initiate Git version control on GitHub
+    Clear dirty format
+
+Ver 1.0 2018-01-31
+    First Major Bug fixes
+    Added mobileselect plugin (not working)
+    Bug fixes for saleskits
+
+Ver 1.1 2018-02-28
+    Minor interface fixes
+    Bug fixes for saleskits & pwp
+    Remove mobileselect plugin
+    Add new Qty input panel
+
+Ver 1.2 2018-03-26
+    Printer setting fixes
+    Minor performance fixes
+    Bug fixes for saleskits & pwp
+    Business Date bug fixes
+
+Ver 1.3 2018-04-17
+    Add support for 2nd display
+    More exception handling
+    Minor performance fixes
+    Bug fixes for saleskits & pwp
+    Bug fixes for shift option
+
+Ver 1.4 2018-05-14
+    Bug fixes for saleskits & pwp
+    New interface for pwp child
+    New Business Date with datetime picker
+    Add more support for 2nd display
+    Bug fixes for shift option
+
+Ver 1.5 2018-06-01 (1.5.2 & 1.5.3)
+    Salekite itemid fix for upload backend
+    Minor performance fixes
+    More support for 2nd display
+    Add logging services
+    Bug fixes for shift option
+
+Ver 1.6 2018-06-20 (SH version)
+    Minor performance fixes
+    More support for 2nd display
+    Update and fix logging services
+    Bug fixes for stockinteraction
+
+Ver 1.7 2018-0

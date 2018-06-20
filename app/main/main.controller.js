@@ -62,7 +62,7 @@ angular.module('itouch.controllers')
         uploadLog.clear();
         UploadService.upload().then(function () {
           uploadLog.log('Upload Success : Manual Upload', 2);
-          uploadLog.log('-----*-----*-----', 7);
+          uploadLog.log('-----*-----', 7);
           var uploadlog = localStorage.getItem('UploadLogs');
           // console.log(uploadlog);
           localStorage.removeItem('UploadLogs');
@@ -72,7 +72,7 @@ angular.module('itouch.controllers')
           Alert.success('Upload success');
         }, function (err) {
           uploadLog.log('Upload Error : ' + err, 4);
-          uploadLog.log('-----*-----*-----', 7);
+          uploadLog.log('-----*-----', 7);
           var uploadlog = localStorage.getItem('UploadLogs');
           var logs = uploadLog.getLog();
           // console.log(uploadlog);
