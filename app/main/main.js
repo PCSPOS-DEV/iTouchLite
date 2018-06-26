@@ -201,6 +201,7 @@ angular.module('itouch', [
                     }
                   }
                 })
+
                 // .state('app.printerSetup', {
                 //     url: '/printer-setup',
                 //     views: {
@@ -286,6 +287,16 @@ angular.module('itouch', [
                   }]
                 }
               })
+              .state('app.configsettings', {
+                url: '/configsetting',
+                views: {
+                  'menuContent': {
+                    templateUrl: 'main/logs/ConfigSetting.html',
+                    controller: 'ConfigSettingCtrl as ctrl'
+                  }
+                }
+              })
+
               .state('app.syncdetaillogs', {
                 url: '/synclogs',
                 views: {

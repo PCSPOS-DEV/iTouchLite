@@ -1,5 +1,5 @@
 /**
- * Created by shalitha on 17/5/16.
+ * Created by Lynn
  */
 angular.module('itouch.controllers')
   .controller('DebugLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state',

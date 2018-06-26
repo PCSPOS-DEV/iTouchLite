@@ -228,8 +228,11 @@ angular.module('itouch.controllers')
       if (adminLoginModal) {
         adminLoginModal.show();
       }
-
     };
+
+    $scope.configSetting = function () {
+      $state.go('app.configsettings');
+    }
 
     $scope.$on('loginlModal-close', function (event, data) {
       if (adminLoginModal) {
