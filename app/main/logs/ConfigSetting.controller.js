@@ -7,6 +7,7 @@ angular.module('itouch.controllers')
       var self = this;
       
       self.connect = function (ip, port) {
+        Alert.showLoading();
         PrintService.connect().then(function () {
           Alert.success('Success');
           self.status = PrintService.isConnected();
@@ -14,6 +15,7 @@ angular.module('itouch.controllers')
           errorLog.log('Printer Setup : '+ err, 4);
           Alert.success(err, 'Error');
         });
+        Alert.hideLoading();
       };
       // console.log( $scope.newlogs);
 
