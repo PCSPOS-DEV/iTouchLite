@@ -2,8 +2,8 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('DebugLogsDetailCtrl', ['$log', 'Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state',
-    function ($log, Alert, $localStorage, $scope, $rootScope, SettingsService, $state) {
+  .controller('DebugLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state',
+    function (Alert, $localStorage, $scope, $rootScope, SettingsService, $state) {
       var self = this;
       debugLog = SettingsService.StartDebugLog();
       $scope.newlogs = debugLog.getLog();

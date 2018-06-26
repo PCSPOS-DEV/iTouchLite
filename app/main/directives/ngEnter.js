@@ -1,10 +1,9 @@
-'use strict';
+
 angular.module('itouch')
 
-  .directive('ngEnter', ['$log', function ($log) {
+  .directive('ngEnter', [function () {
     return function (scope, elements, attrs) {
       elements.bind('keydown keypress', function (event) {
-        // $log.log(event.which);
         if (13 === event.which) {
           // console.log('enter');
           scope.$apply(function () {

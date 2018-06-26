@@ -2,8 +2,8 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory('SuspendService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService', 'Reciept',
-    function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService, Reciept) {
+  .factory('SuspendService', ['DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService', 'Reciept',
+    function (DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService, Reciept) {
       var self = this;
 
       var self = this;
@@ -164,7 +164,7 @@ angular.module('itouch.services')
               return DB.executeQueue();
             }
           } catch (e) {
-            $log.error(e);
+            console.log(e);
             return $q.reject('Unable to recall bill');
           }
 

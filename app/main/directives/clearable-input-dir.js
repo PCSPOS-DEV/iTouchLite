@@ -1,4 +1,4 @@
-'use strict';
+
 angular.module('itouch')
   .provider('ionicInputClearableConfig', function () {
 

@@ -3,10 +3,13 @@
  */
 angular.module('itouch.services')
   .service('Alert', ['$ionicLoading', '$ionicPopup', '$cordovaDialogs', function ($ionicLoading, $ionicPopup, $cordovaDialogs) {
-    this.showLoading = function () {
+    this.showLoading = function (BD) {
+      if (BD == "" || null || undefined) {
+        BD = false;
+      }
       $ionicLoading.show({
         template: '<ion-spinner icon="lines"></ion-spinner>',
-        noBackdrop: false
+        noBackdrop: BD
       });
     };
 

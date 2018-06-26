@@ -5,7 +5,7 @@ angular.module('itouch.services')
 /**
  * This is the Database wrapper module
  */
-  .factory('DB', ['$q', 'DB_CONFIG', 'DB_VIEWS', '$log', function ($q, DB_CONFIG, DB_VIEWS, $log) {
+  .factory('DB', ['$q', 'DB_CONFIG', 'DB_VIEWS', function ($q, DB_CONFIG, DB_VIEWS) {
     var self = this;
     self.db = null;
     /**
@@ -295,7 +295,7 @@ angular.module('itouch.services')
             tx.executeSql(dataSet.query, dataSet.data, function (transaction, result) {
               deferred.resolve(result);
             }, function (transaction, error) {
-              $log.log(error.message + ' in ' + query + ' (params : ' + values.join(', ') + ')');
+              console.log(error.message + ' in ' + query + ' (params : ' + values.join(', ') + ')');
               // throw new Error(error.message + " in " + query + " (params : "+values.join(", ")+")");
               deferred.reject(error.message + ' in ' + query + ' (params : ' + values.join(', ') + ')');
               // return false;

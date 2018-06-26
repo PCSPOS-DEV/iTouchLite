@@ -1,6 +1,6 @@
 
 angular.module('itouch.services')
-.service('TransactService', ['$log', '$q', 'DB', 'DB_CONFIG', 'ItemService', function ($log, $q, DB, DB_CONFIG, ItemService) {
+.service('TransactService', ['$q', 'DB', 'DB_CONFIG', 'ItemService', function ($q, DB, DB_CONFIG, ItemService) {
   var self = this;
 
 

@@ -20,7 +20,6 @@
     "jquery": "^3.1.1",
     "angular-bindonce": "^0.3.3",
     "ionic-numberpicker": "^1.1.4",
-    "mobileSelect.js": "https://github.com/onlyhom/mobileSelect.js.git",
     "debugout.js": "*",
     "jspdf": "^1.4.1"
   },

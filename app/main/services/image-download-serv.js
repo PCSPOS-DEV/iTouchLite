@@ -1,7 +1,7 @@
-'use strict';
+
 angular.module('itouch.services')
-  .service('ImageDownloadService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', '$cordovaFileTransfer', '$localStorage', 'Alert', 'KeyBoardService', '$cordovaFile',
-    function ($log, DB, DB_CONFIG, $q, SettingsService, $cordovaFileTransfer, $localStorage, Alert, KeyBoardService, $cordovaFile) {
+  .service('ImageDownloadService', ['DB', 'DB_CONFIG', '$q', 'SettingsService', '$cordovaFileTransfer', '$localStorage', 'Alert', 'KeyBoardService', '$cordovaFile',
+    function (DB, DB_CONFIG, $q, SettingsService, $cordovaFileTransfer, $localStorage, Alert, KeyBoardService, $cordovaFile) {
       var self = this;
       var entityId;
       errorLog = SettingsService.StartErrorLog();

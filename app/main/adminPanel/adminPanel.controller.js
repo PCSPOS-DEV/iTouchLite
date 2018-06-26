@@ -1,10 +1,9 @@
 /**
  * Created by shalitha on 17/5/16.
  */
-'use strict';
 angular.module('itouch.controllers')
-  .controller('AdminPanelCtrl', ['$log', '$rootScope', '$scope', '$ionicHistory', '$ionicNavBarDelegate', '$state',
-    function ($log, $rootScope, $scope, $ionicHistory, $ionicNavBarDelegate, $state) {
+  .controller('AdminPanelCtrl', [ '$rootScope', '$scope', '$ionicHistory', '$ionicNavBarDelegate', '$state',
+    function ($rootScope, $scope, $ionicHistory, $ionicNavBarDelegate, $state) {
       var self = this;
 
       self.changePage = function (page) {

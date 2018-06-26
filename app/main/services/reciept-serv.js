@@ -1,7 +1,7 @@
-'use strict';
+
 angular.module('itouch.services')
-.service('Reciept', ['$log', 'PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert', 'Restangular', 'DiscountService', 'BillService',
-  function ($log, PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert, Restangular, DiscountService, BillService) {
+.service('Reciept', ['PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert', 'Restangular', 'DiscountService', 'BillService',
+  function (PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert, Restangular, DiscountService, BillService) {
     var self = this;
     var printData = null;
     var printer = PrintService.getPrinter();

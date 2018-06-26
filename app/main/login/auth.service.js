@@ -2,8 +2,8 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.services')
-  .factory('AuthService', ['Restangular', 'DB', '$q', '$ionicPlatform', 'SettingsService', '$localStorage', '$state', 'DB_CONFIG', '$log',
-    function (Restangular, DB, $q, $ionicPlatform, SettingsService, $localStorage, $state, DB_CONFIG, $log) {
+  .factory('AuthService', ['Restangular', 'DB', '$q', '$ionicPlatform', 'SettingsService', '$localStorage', '$state', 'DB_CONFIG',
+    function (Restangular, DB, $q, $ionicPlatform, SettingsService, $localStorage, $state, DB_CONFIG) {
       var self = this;
       var users = [];
       var tempUser = null;
@@ -14,7 +14,7 @@ angular.module('itouch.services')
         var locationId = SettingsService.getLocationId();
         if (locationId) {
           Restangular.one('GetStaffByLocations').get({LocationId: locationId}).then(function (res) {
-            $log.log('users fetch done');
+            console.log('users fetch done');
             users = JSON.parse(res);
             users = _.map(users, function (user, key) {
               user.Password = user.EncPass;

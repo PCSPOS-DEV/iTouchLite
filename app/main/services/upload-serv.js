@@ -1,7 +1,7 @@
-'use strict';
+
 angular.module('itouch.services')
-  .service('UploadService', ['$log', 'DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval',
-    function ($log, DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval) {
+  .service('UploadService', ['DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval',
+    function (DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval) {
       var self = this;
       var entityId;
       var macId;

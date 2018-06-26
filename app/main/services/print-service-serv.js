@@ -1,6 +1,6 @@
-'use strict';
+
 angular.module('itouch.services')
-.service('PrintService', 'SettingsService', function ($log, $q, $localStorage, SettingsService) {
+.service('PrintService', 'SettingsService', function ( $q, $localStorage, SettingsService) {
   var self = this;
   errorLog = SettingsService.StartErrorLog();
 

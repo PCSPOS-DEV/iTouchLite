@@ -2,7 +2,6 @@
  * Created by shalitha on 17/5/16.
  */
 
-'use strict';
 var tableNames = {
   keyboard: {
     layouts: 'KeyboardLayouts',

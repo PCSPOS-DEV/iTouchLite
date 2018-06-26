@@ -1,7 +1,7 @@
 /**
  * Created by shalitha on 18/5/16.
  */
-'use strict';
+
 angular.module('itouch.services')
   .factory('SubPLU1Service', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
     var self = this;

@@ -331,7 +331,7 @@ angular.module('itouch.controllers')
         if (moment(date).isValid()) {
           ControlService.setBusinessDate(moment(date));
         } else {
-          $log.log('date is not valid');
+          console.log('date is not valid');
         }
 
       };

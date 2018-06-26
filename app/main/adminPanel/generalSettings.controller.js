@@ -1,7 +1,6 @@
 /**
  * Created by shalitha on 17/5/16.
  */
-'use strict';
 angular.module('itouch.controllers')
   .controller('GeneralSettingsCtrl', ['$scope', 'SettingsService', '$state', 'SyncService', 'AppConfig', 'Restangular', '$q', 'Alert', 'ionicDatePicker',
     function ($scope, SettingsService, $state, SyncService, AppConfig, Restangular, $q, Alert, ionicDatePicker) {

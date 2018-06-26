@@ -2,8 +2,8 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('PrinterSetupCtrl', ['$log', 'PrintService', 'Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService',
-    function ($log, PrintService, Alert, $localStorage, $scope, $rootScope, SettingsService) {
+  .controller('PrinterSetupCtrl', ['PrintService', 'Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService',
+    function (PrintService, Alert, $localStorage, $scope, $rootScope, SettingsService) {
       var self = this;
       self.status = PrintService.isConnected();
       self.printerSettings = $localStorage.printeSettings;

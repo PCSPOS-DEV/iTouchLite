@@ -1,10 +1,9 @@
 /**
  * Created by shalitha on 17/5/16.
  */
-'use strict';
 angular.module('itouch.controllers')
-  .controller('FunctionsCtrl', ['$log', 'FunctionsService', 'Alert', '$q', 'AuthService', '$scope',
-    function ($log, FunctionsService, Alert, $q, AuthService, $scope) {
+  .controller('FunctionsCtrl', [ 'FunctionsService', 'Alert', '$q', 'AuthService', '$scope',
+    function (FunctionsService, Alert, $q, AuthService, $scope) {
       var self = this;
       self.data = {
         functions: []

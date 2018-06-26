@@ -1,7 +1,7 @@
 /**
  * Created by shalitha on 17/5/16.
  */
-'use strict';
+
 angular.module('itouch.controllers')
   .controller('ItemDetailsCtrl', ['$scope', 'ItemService', function ($scope, ItemService) {
     var self = this;

@@ -2,8 +2,8 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('ImageSetupCtrl', ['$log', '$cordovaImagePicker', 'Alert', '$cordovaFile', '$localStorage', '$rootScope', '$scope', 'SettingsService',
-    function ($log, $cordovaImagePicker, Alert, $cordovaFile, $localStorage, $rootScope, $scope, SettingsService) {
+  .controller('ImageSetupCtrl', [ '$cordovaImagePicker', 'Alert', '$cordovaFile', '$localStorage', '$rootScope', '$scope', 'SettingsService',
+    function ($cordovaImagePicker, Alert, $cordovaFile, $localStorage, $rootScope, $scope, SettingsService) {
       var self = this;
       errorLog = SettingsService.StartErrorLog();
       // errorLog.log(''+ err, 4);

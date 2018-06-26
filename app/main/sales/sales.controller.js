@@ -191,7 +191,8 @@ angular.module('itouch.controllers')
         if (moment(date).isValid()) {
           ControlService.setBusinessDate(moment(date));
         } else {
-          $log.log('date is not valid');
+          Alert.warning('Date is not valid');
+          console.log('date is not valid');
         }
 
       };
@@ -821,7 +822,7 @@ angular.module('itouch.controllers')
           $scope.qty.value = 1;
         }
         SalesKitService.getSalesKit(item.Id, businessDate).then(function (salesKit) {
-          console.log(salesKit);
+          // console.log(salesKit);
           if (salesKit && !salesKit.isEmpty) {
             if ($scope.showskModalModal == false) {
               $scope.showskModalModal = true;
@@ -966,15 +967,17 @@ angular.module('itouch.controllers')
 
         // }
         if (item) {
-
-          $scope.cart.items = _.map($scope.cart.items, function (item) {
-            item.selected = false;
-            return item;
-          });
-          item.selected = true;
-
+          $timeout(function () {
+            $scope.cart.items = _.map($scope.cart.items, function (item) {
+              item.selected = false;
+              return item;
+            });
+            item.selected = true;
+          }, 20);
         }
-        $scope.cart.selectedItem = item;
+        $timeout(function () {
+          $scope.cart.selectedItem = item;
+        }, 20);
       };
 
       /**

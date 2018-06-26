@@ -2,8 +2,8 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('SyncLogsDetailCtrl', ['$log', 'Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state', '$cordovaEmailComposer',
-    function ($log, Alert, $localStorage, $scope, $rootScope, SettingsService, $state, $cordovaEmailComposer) {
+  .controller('SyncLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state', '$cordovaEmailComposer',
+    function (Alert, $localStorage, $scope, $rootScope, SettingsService, $state, $cordovaEmailComposer) {
       var self = this;
       var synclog = localStorage.getItem('SyncLogs');
       console.log(synclog);

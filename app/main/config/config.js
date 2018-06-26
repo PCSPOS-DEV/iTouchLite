@@ -1,7 +1,7 @@
 /**
  * Created by shalitha on 31/5/16.
  */
-'use strict';
+
 angular.module('itouch.config')
   .factory('AppConfig', ['$localStorage', function ($localStorage) {
     if (!$localStorage.itouchConfig) {

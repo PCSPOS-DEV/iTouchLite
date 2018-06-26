@@ -1,7 +1,7 @@
 /**
  * Created by shalitha on 30/5/16.
  */
-'use strict';
+
 angular.module('itouch.services')
   .factory('DenominationsService', ['DB', 'DB_CONFIG', '$q',
     function (DB, DB_CONFIG, $q) {

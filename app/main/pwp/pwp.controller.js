@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('PWPCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService', '$log', 'ItemService', '$q', 'DiscountService', 'Alert', '$timeout', 'SettingsService',
-    function ($scope, ControlService, $ionicPopup, CartItemService, BillService, $log, ItemService, $q, DiscountService, Alert, $timeout, SettingsService) {
+  .controller('PWPCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService','ItemService', '$q', 'DiscountService', 'Alert', '$timeout', 'SettingsService',
+    function ($scope, ControlService, $ionicPopup, CartItemService, BillService,ItemService, $q, DiscountService, Alert, $timeout, SettingsService) {
       debugLog = SettingsService.StartDebugLog();
       // debugLog.log(': ' + err, 4);
       $scope.title = 'PWP';

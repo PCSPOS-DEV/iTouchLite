@@ -1,4 +1,3 @@
-'use strict';
 
 describe('module: main, service: Reciept', function () {
 
