@@ -54,10 +54,14 @@
               </div> 
             </div>
             <div class="row">
-              <div class="col">
-                <button class="button button-positive">Save</button>
-                <a href="#/login" class="button">Cancel</a>
-              </div>
+                <div class="col col-80">
+                    <button class="button button-positive">Save</button>
+                    <a href="#/login" class="button">Cancel</a>
+                </div>
+                <div class="col col-20">
+                    <button class="button button-assertive" type="reset" ng-click="ctrl.clear()">Clear</button>
+                    <button class="button button-assertive" type="reset" ng-click="ctrl.reset()">Reset</button>
+                </div>
             </div>
           </form>
         </div>

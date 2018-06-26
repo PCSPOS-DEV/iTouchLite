@@ -32,6 +32,7 @@ angular.module('itouch.controllers')
       };
 
       var refresh = function () {
+        console.log(AppConfig.getDisplayUrl());
         try {
           self.settings = {
             ent_id: SettingsService.getEntityId(),
@@ -53,53 +54,96 @@ angular.module('itouch.controllers')
       };
       refresh();
 
-      self.save = function () {
+      self.save = function (check) {
+        if (check == false) {
+          Restangular.setBaseUrl('base server url');
+          AppConfig.setBaseUrl('base server url');
+          AppConfig.setOutletServerUrl('outlet server url');
+          AppConfig.setDisplayUrl('display url');
+          SettingsService.setEntityId('');
+          SettingsService.setLocationId('');
+          SettingsService.setMachineId('');
+          SettingsService.setCashId('');
 
-        if (!_.isUndefined(self.settings.url) && !_.isNull(self.settings.url) && !_.isEmpty(self.settings.url)) {
-          checkStatus(self.settings.url).then(function () {
-            Restangular.setBaseUrl(self.settings.url);
-            AppConfig.setBaseUrl(self.settings.url);
-
-            if (_.isUndefined(self.settings.ent_id) || _.isNull(self.settings.ent_id)) {
-              return false;
-            }
-            if (_.isUndefined(self.settings.loc_id) || _.isNull(self.settings.loc_id)) {
-              return false;
-            }
-            if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id)) {
-              return false;
-            }
-            AppConfig.setDisplayUrl(self.settings.displayurl);
-            SettingsService.setEntityId(self.settings.ent_id);
-            SettingsService.setLocationId(self.settings.loc_id);
-            SettingsService.setMachineId(self.settings.mac_id);
-            SettingsService.setCashId(self.settings.cash_id);
-            // SettingsService.setBusinessDate(self.settings.business_date);
-            SettingsService.save();
-
-            SyncService.do().then(function () {
+        } else {
+          if (!_.isUndefined(self.settings.url) && !_.isNull(self.settings.url) && !_.isEmpty(self.settings.url)) {
+            checkStatus(self.settings.url).then(function () {
+              Restangular.setBaseUrl(self.settings.url);
+              AppConfig.setBaseUrl(self.settings.url);
+  
+              if (_.isUndefined(self.settings.ent_id) || _.isNull(self.settings.ent_id)) {
+                return false;
+              }
+              if (_.isUndefined(self.settings.loc_id) || _.isNull(self.settings.loc_id)) {
+                return false;
+              }
+              if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id)) {
+                return false;
+              }
+              if (self.settings.displayurl == ''){
+                self.settings.displayurl = 'display url';
+              }
+              AppConfig.setDisplayUrl(self.settings.displayurl);
               SettingsService.setEntityId(self.settings.ent_id);
               SettingsService.setLocationId(self.settings.loc_id);
               SettingsService.setMachineId(self.settings.mac_id);
+              SettingsService.setCashId(self.settings.cash_id);
+              // SettingsService.setBusinessDate(self.settings.business_date);
               SettingsService.save();
+  
+              SyncService.do().then(function () {
+                SettingsService.setEntityId(self.settings.ent_id);
+                SettingsService.setLocationId(self.settings.loc_id);
+                SettingsService.setMachineId(self.settings.mac_id);
+                SettingsService.save();
+              });
+              return true;
+            }, function () {
+              Alert.warning('Invalid base url entered');
             });
-            return true;
-          }, function () {
-            Alert.warning('Invalid base url entered');
-          });
+          }
+  
+          if (!_.isUndefined(self.settings.outletServerUrl) && !_.isNull(self.settings.outletServerUrl) && !_.isEmpty(self.settings.outletServerUrl)) {
+            checkStatus(self.settings.outletServerUrl).then(function () {
+              AppConfig.setOutletServerUrl(self.settings.outletServerUrl);
+              return true;
+            }, function () {
+              Alert.warning('Invalid outlet server url entered');
+            });
+          }
+  
+          else {
+            Alert.warning('Please insert data');
+          }
         }
-
-        if (!_.isUndefined(self.settings.outletServerUrl) && !_.isNull(self.settings.outletServerUrl) && !_.isEmpty(self.settings.outletServerUrl)) {
-          checkStatus(self.settings.outletServerUrl).then(function () {
-            AppConfig.setOutletServerUrl(self.settings.outletServerUrl);
-            return true;
-          }, function () {
-            Alert.warning('Invalid outlet server url entered');
-          });
-        }
-
-
       };
+
+      self.reset = function () {
+        self.clear();
+        self.save(false);
+      }
+
+      self.clear = function () {
+        try {
+          self.settings = {
+            ent_id: '',
+            loc_id: '',
+            mac_id: '',
+            cash_id: '',
+            business_date: '',
+            displayurl : 'display url',
+            url: 'base url',
+            outletServerUrl: 'outlet server url',
+            business_date: null,
+          };
+        } catch (ex) {
+          self.settings.ent_id = null;
+          self.settings.loc_id = null;
+          self.settings.mac_id = null;
+
+          console.log(ex);
+        }
+      }
 
       var checkStatus = function (url) {
         return Restangular.oneUrl('checkStatus', url + 'test').withHttpConfig({timeout: 3000}).get().then(function (res) {
@@ -110,7 +154,6 @@ angular.module('itouch.controllers')
           }
         }, function (err) {
           console.log(err);
-          errorLog.log('General Setting Error : '+ err, 4);
           return $q.reject(err.statusText);
         });
       };

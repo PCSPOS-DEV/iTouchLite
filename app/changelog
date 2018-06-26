@@ -41,10 +41,12 @@ Ver 1.5 2018-06-01 (1.5.2 & 1.5.3)
     Add logging services
     Bug fixes for shift option
 
-Ver 1.6 2018-06-20 (SH version)
+Ver 1.5.4 2018-06-20 (SH version)
     Minor performance fixes
     More support for 2nd display
     Update and fix logging services
     Bug fixes for stockinteraction
 
-Ver 1.7 2018-0
+Ver 1.6
+    Add clear & reset buttons @ general setting adminal panel
+    Remove $log & use strict
