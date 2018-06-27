@@ -1226,6 +1226,10 @@ angular.module('itouch.controllers')
         return CartItemService.fetchItemsFromDb().then(function (items) {
           $scope.cart.items = items;
           // console.log($scope.cart.items);
+          var last = Object.keys($scope.cart.items).length - 1;
+          if (last <= 0) {
+            $scope.DeleteApi();
+          } 
           
           angular.forEach($scope.cart.items, function(Ditem) {
             // console.log('Ditem');console.log(Ditem);
