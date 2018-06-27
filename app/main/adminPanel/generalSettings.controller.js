@@ -2,11 +2,17 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('GeneralSettingsCtrl', ['$scope', 'SettingsService', '$state', 'SyncService', 'AppConfig', 'Restangular', '$q', 'Alert', 'ionicDatePicker',
-    function ($scope, SettingsService, $state, SyncService, AppConfig, Restangular, $q, Alert, ionicDatePicker) {
+  .controller('GeneralSettingsCtrl', ['$scope', 'SettingsService', '$state', 'SyncService', 'AppConfig', 'Restangular', '$q', 'Alert', 'ionicDatePicker', 'ControlService',
+    function ($scope, SettingsService, $state, SyncService, AppConfig, Restangular, $q, Alert, ionicDatePicker, ControlService) {
       var self = this;
       self.settings = {};
       errorLog = SettingsService.StartErrorLog();
+      var Bdate;
+      if (ControlService.getBusinessDate() == undefined) {
+        Bdate = '';
+      } else {
+        Bdate = ControlService.getBusinessDate().format('YYYY-MM-DD');
+      }
 
       $scope.$on('viewOpen', function (event, data) {
         if (data == 'general') {
@@ -39,7 +45,8 @@ angular.module('itouch.controllers')
             loc_id: SettingsService.getLocationId(),
             mac_id: SettingsService.getMachineId(),
             cash_id: SettingsService.getCashId(),
-            business_date: SettingsService.getBusinessDate(),
+            business_date: Bdate,
+            doc_id : ControlService.getDocId(),
             displayurl : AppConfig.getDisplayUrl(),
             url: AppConfig.getBaseUrl(),
             outletServerUrl: AppConfig.getOutletServerUrl(),
@@ -60,6 +67,7 @@ angular.module('itouch.controllers')
           AppConfig.setBaseUrl('base server url');
           AppConfig.setOutletServerUrl('outlet server url');
           AppConfig.setDisplayUrl('display url');
+          ControlService.saveDocId('R00001');
           SettingsService.setEntityId('');
           SettingsService.setLocationId('');
           SettingsService.setMachineId('');
@@ -80,9 +88,13 @@ angular.module('itouch.controllers')
               if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id)) {
                 return false;
               }
+              if (_.isUndefined(self.settings.doc_id) || _.isNull(self.settings.doc_id)) {
+                return false;
+              }
               if (self.settings.displayurl == ''){
                 self.settings.displayurl = 'display url';
               }
+              ControlService.saveDocId(self.settings.doc_id);
               AppConfig.setDisplayUrl(self.settings.displayurl);
               SettingsService.setEntityId(self.settings.ent_id);
               SettingsService.setLocationId(self.settings.loc_id);

@@ -50,3 +50,6 @@ Ver 1.5.4 2018-06-20 (SH version)
 Ver 1.6
     Add clear & reset buttons @ general setting adminal panel
     Remove $log & use strict
+    Reset document no by dayend
+    Bug fixes for 2nd display
+    Add printer reconnect option in setting menu

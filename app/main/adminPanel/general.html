@@ -18,10 +18,20 @@
                 <span class="input-label">Display URL</span>
                 <input type="text" ng-model="ctrl.settings.displayurl">
               </label>
-              <label class="item item-input item-stacked-label">
-                <span class="input-label">Business Date</span>
-                <input type="text" ng-model="ctrl.settings.business_date" ng-click="setBDate()" readonly>
-              </label>
+              <div class = "row" style = "border-color: #ddd; border-width: 0px 0px 1px; border-style: solid;">
+                <div class = "col-50" >
+                  <label class="item item-input item-stacked-label">
+                    <span class="input-label">Business Date</span>
+                    <input type="text" ng-model="ctrl.settings.business_date" ng-click="setBDate()" readonly>
+                  </label>
+                </div>
+                <div class = "col-50">
+                  <label class="item item-input item-stacked-label">
+                    <span class="input-label">Document No</span>
+                    <input type="text" ng-model="ctrl.settings.doc_id">
+                  </label>
+                </div>
+              </div>
               <!-- <div class = "row"><label class="item item-input item-stacked-label">&nbsp;</label></div> -->
               <div class = "row" style = "border-color: #ddd; border-width: 0px 0px 1px; border-style: solid;">
                 <div class = "col-50" >
