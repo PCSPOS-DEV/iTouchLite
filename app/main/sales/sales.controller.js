@@ -730,7 +730,7 @@ angular.module('itouch.controllers')
       var priceFormShown = false;
       $scope.onKeyClick = function (item) {
         // console.time("test");
-        // $timeout.verifyNoPendingTasks();
+        
         $timeout(function () { 
           // $timeout.flush();
           
@@ -771,11 +771,11 @@ angular.module('itouch.controllers')
             });
           }
           fetchSelectedItem($scope.selectedItem);
-          $timeout(function () { Alert.hideLoading();});
+          $timeout(function () { Alert.hideLoading();},5);
           $timeout(function () { $scope.bkey = false; }, 50); // in case of increase the waiting time
           
         }
-      });
+      },5);
       };
 
       var showPriceForm = function () {
@@ -1038,19 +1038,42 @@ angular.module('itouch.controllers')
             } else if (type == 3) { // SKI non-void
               console.log(it);
             } else if (type == 4) { // SKI update
-              if (updatenewitem == 0) {
+              if (updatenewitem < control) {
                 if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
-                  updatenewitem ++;
-                  $scope.PutFunction(Ditem, 1);
-                } 
-              } else if (control == updatenewitem) {
-                updatenewitem = 0;
+                  if (TempDeleteItem != null && (it.ItemType == TempDeleteItem.ItemType) && (it.ItemId == TempDeleteItem.ItemId)) {
+                    // console.log('401 : update');
+                    it.LineNumber = TempDeleteItem.LineNumber;
+                    $scope.DeleteFunction(TempDeleteItem);
+                    $scope.PostFunction(Ditem, 1);
+                  } else {
+                    // console.log('402 : put');
+                    $scope.PutFunction(Ditem, 1);
+                  }
+                  control = control - it.Qty;            
+                }
               } else {
-                if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
-                  updatenewitem ++;
+                  if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+                  // console.log('43 : post');
                   $scope.PostFunction(Ditem, 1);
                 } 
               }
+              // if (TempDeleteItem != null &&(it.ItemType == TempDeleteItem.ItemType) && (it.ItemId == TempDeleteItem.ItemId)) { 
+              //   console.log("this one " + it.LineNumber);
+              //   it.LineNumber = it.LineNumber - 10;
+              //   $scope.PutFunction(it, 1);} else
+              // if (updatenewitem == 0) {
+              //   if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+              //     updatenewitem ++;
+              //     $scope.PutFunction(Ditem, 1);
+              //   } 
+              // } else if (control == updatenewitem) {
+              //   updatenewitem = 0;
+              // } else {
+              //   if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+              //     updatenewitem ++;
+              //     $scope.PostFunction(Ditem, 1);
+              //   } 
+              // }
             // } else if (type == 5) { // F/B Modifier
             //   angular.forEach(it, function(Citem) {
             //     if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
@@ -1227,7 +1250,7 @@ angular.module('itouch.controllers')
           $scope.cart.items = items;
           // console.log($scope.cart.items);
           var last = Object.keys($scope.cart.items).length - 1;
-          if (last <= 0) {
+          if (last < 0) {
             $scope.DeleteApi();
           } 
           
@@ -1432,6 +1455,7 @@ angular.module('itouch.controllers')
                               };
                               TempDeleteItem = item;
                               control = TempDeleteItem.Qty;
+                              updatenewitem = TempDeleteItem.Qty - 1;
                               $scope.modals.salesKit.show();
                             }
                           }, 500);

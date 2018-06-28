@@ -6,7 +6,7 @@ Ver 0.1 2017-11-21
 Ver 1.0 2018-01-31
     First Major Bug fixes
     Added mobileselect plugin (not working)
-    Bug fixes for saleskits
+    Bug fixes for saleskits & pwp
 
 Ver 1.1 2018-02-28
     Minor interface fixes
@@ -42,14 +42,17 @@ Ver 1.5 2018-06-01 (1.5.2 & 1.5.3)
     Bug fixes for shift option
 
 Ver 1.5.4 2018-06-20 (SH version)
+    More bug fixes for saleskits and pwp
     Minor performance fixes
     More support for 2nd display
     Update and fix logging services
     Bug fixes for stockinteraction
+    Transfer repo from GitHub to BitBucket
 
 Ver 1.6
     Add clear & reset buttons @ general setting adminal panel
     Remove $log & use strict
-    Reset document no by dayend
-    Bug fixes for 2nd display
+    Reset document no by admin panel & auto reaching limit
+    Bug fixes for 2nd display (salekit)
     Add printer reconnect option in setting menu
+    
