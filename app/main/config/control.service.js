@@ -117,6 +117,10 @@ angular.module('itouch.services')
     self.getNextDocId = function () {
       if($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)){
         var newId = parseInt($localStorage.app_config.currentDocId.substring(1, 6));
+        var maxId = 99999;
+        if (newId == maxId) {
+          newId = 0;
+        }
         return 'R' + ('00000' + ++newId).slice(-5);
       } else {
         return 'R00001';

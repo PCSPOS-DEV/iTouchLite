@@ -97,7 +97,7 @@ angular.module('itouch.controllers')
             Alert.warning('You have selected the maximum children allowed for this item.')
             return true;
           }
-          if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
+          else if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
             // debugLog.log('Case 2: You have selected the maximum children allowed for this PWP.', 7);
             Alert.warning('You have selected the maximum children allowed for this PWP.');
             tempD = 1;

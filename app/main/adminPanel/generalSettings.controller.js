@@ -7,12 +7,12 @@ angular.module('itouch.controllers')
       var self = this;
       self.settings = {};
       errorLog = SettingsService.StartErrorLog();
-      var Bdate;
-      if (ControlService.getBusinessDate() == undefined) {
-        Bdate = '';
-      } else {
-        Bdate = ControlService.getBusinessDate().format('YYYY-MM-DD');
-      }
+      // var Bdate;
+      // if (ControlService.getBusinessDate() == undefined) {
+      //   Bdate = '';
+      // } else {
+      //   Bdate = ControlService.getBusinessDate().format('YYYY-MM-DD');
+      // }
 
       $scope.$on('viewOpen', function (event, data) {
         if (data == 'general') {
@@ -45,7 +45,7 @@ angular.module('itouch.controllers')
             loc_id: SettingsService.getLocationId(),
             mac_id: SettingsService.getMachineId(),
             cash_id: SettingsService.getCashId(),
-            business_date: Bdate,
+            business_date: SettingsService.getBusinessDate(),
             doc_id : ControlService.getDocId(),
             displayurl : AppConfig.getDisplayUrl(),
             url: AppConfig.getBaseUrl(),
