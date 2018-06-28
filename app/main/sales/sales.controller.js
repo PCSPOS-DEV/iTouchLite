@@ -1415,7 +1415,7 @@ angular.module('itouch.controllers')
                 }
                 $timeout(function () { Alert.hideLoading();}, 20);
               return;
-            } else if (item.ItemType == 'SKT') {
+            } else if (item.ItemType == 'SKT' || 'PWP') {
               if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
                 Alert.warning('Item Void not allowed.', 'ItouchLite');
               } else {     
