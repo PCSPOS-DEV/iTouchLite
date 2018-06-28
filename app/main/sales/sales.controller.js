@@ -1164,10 +1164,16 @@ angular.module('itouch.controllers')
        */
       var delpwp = 0;
       $scope.DeleteApi = function (item) {
-        // console.log(item);
         if (item) {
-          if (item.ItemType == "SKT" ) { // SaleKit
+          if (item.ItemType == "SKT" || item.ItemType == 'NOR' ) { // SaleKit + Normal
             angular.forEach($scope.cart.items, function(Ditem) {
+              if (Ditem.ItemType == 'MOD') {
+                angular.forEach($scope.cart.items, function(Pitem) {
+                  if (Ditem.ParentItemLineNumber == item.LineNumber && Pitem.ParentItemLineNumber == Ditem.LineNumber) {
+                    $scope.DeleteFunction(Pitem);
+                  }
+                })
+              }
               if (Ditem.ParentItemLineNumber == item.LineNumber) {
                 $scope.DeleteFunction(Ditem);
               }
@@ -1178,6 +1184,13 @@ angular.module('itouch.controllers')
             delpwp = 1;
             if (delpwp == 1) {
               angular.forEach($scope.cart.items, function(Ditem) {
+                if (Ditem.ItemType == 'MOD') {
+                  angular.forEach($scope.cart.items, function(Pitem) {
+                    if (Ditem.ParentItemLineNumber == item.LineNumber && Pitem.ParentItemLineNumber == Ditem.LineNumber) {
+                      $scope.DeleteFunction(Pitem);
+                    }
+                  })
+                }
                 if (Ditem.ParentItemLineNumber == item.LineNumber) {
                   $scope.DeleteFunction(Ditem);
                 }
@@ -1385,12 +1398,12 @@ angular.module('itouch.controllers')
             $scope.DeleteApi();
           } 
           if (item) { 
+            // console.log(item.ItemType);
             if (item.ItemType == 'PWI') {
                 if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
                   Alert.warning('Item Void not allowed.', 'ItouchLite');
                 } else {        
                   Alert.warning('Item Void not allowed.', 'ItouchLite');// TO DO : ADD reslect option for pwp child
-                  // console.log('fck me');
                   // BillService.voidSalesKit(item).then(function () {
                   //   $scope.refreshCart().then(function () {
                   //     $scope.selectItemWithLineNumber();
