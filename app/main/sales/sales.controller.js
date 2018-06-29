@@ -967,17 +967,13 @@ angular.module('itouch.controllers')
 
         // }
         if (item) {
-          $timeout(function () {
             $scope.cart.items = _.map($scope.cart.items, function (item) {
               item.selected = false;
               return item;
             });
             item.selected = true;
-          }, 20);
         }
-        $timeout(function () {
           $scope.cart.selectedItem = item;
-        }, 20);
       };
 
       /**

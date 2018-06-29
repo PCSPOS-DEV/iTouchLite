@@ -60,6 +60,7 @@ angular.module('itouch.services')
                     syncLog.log('Sync Complete', 1);
                     syncLog.log('-----*-----*-----', 7);
                     var syncLogs = localStorage.getItem('SyncLogs');
+                    localStorage.removeItem('SyncLogs');
                     var logs = syncLog.getLog();
                     localStorage.setItem('SyncLogs', syncLogs + logs);
                     // var logs = syncLog.getLog();
@@ -70,6 +71,7 @@ angular.module('itouch.services')
                     syncLog.log('Sync Complete', 1);
                     syncLog.log('-----*-----*-----', 7);
                     var syncLogs = localStorage.getItem('SyncLogs');
+                    localStorage.removeItem('SyncLogs');
                     var logs = syncLog.getLog();
                     localStorage.setItem('SyncLogs', syncLogs + logs);
                     // var logs = syncLog.getLog();

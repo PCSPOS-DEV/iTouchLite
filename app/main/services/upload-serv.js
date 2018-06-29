@@ -104,7 +104,7 @@ angular.module('itouch.services')
           // console.log(res.rows.length);
           var promises = [];
           angular.forEach(DB.fetchAll(res), function (header) {
-            uploadLog.log('  DocNo : ' + header.DocNo + ', Total : ' + header.SubTotal, 2);
+            uploadLog.log('  DocNo : ' + header.DocNo + ', Total : ' + Math.floor(header.SubTotal), 2);
             
             // console.log(header);
             // console.log(header.EntityId);
