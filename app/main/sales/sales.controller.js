@@ -1002,7 +1002,9 @@ angular.module('itouch.controllers')
 
       $scope.openTenderForm = function () {
         if (!_.isEmpty($scope.cart.items)) {
-          $state.go('app.tender', {DocNo: $scope.header.DocNo});
+          $timeout(function () {
+            $state.go('app.tender', {DocNo: $scope.header.DocNo});
+          }, 50);
         }
       };
       var updatenewitem = 0 ;
@@ -1167,14 +1169,16 @@ angular.module('itouch.controllers')
         if (item) {
           if (item.ItemType == "SKT" || item.ItemType == 'NOR' ) { // SaleKit + Normal
             angular.forEach($scope.cart.items, function(Ditem) {
+              console.log(Ditem.ItemType );
               if (Ditem.ItemType == 'MOD') {
                 angular.forEach($scope.cart.items, function(Pitem) {
-                  if (Ditem.ParentItemLineNumber == item.LineNumber && Pitem.ParentItemLineNumber == Ditem.LineNumber) {
+                    if (Pitem.LineNumber == Ditem.ParentItemLineNumber) {
+                    $scope.DeleteFunction(Ditem);
                     $scope.DeleteFunction(Pitem);
                   }
                 })
               }
-              if (Ditem.ParentItemLineNumber == item.LineNumber) {
+              else if (Ditem.ParentItemLineNumber == item.LineNumber) {
                 $scope.DeleteFunction(Ditem);
               }
             });
@@ -1186,12 +1190,13 @@ angular.module('itouch.controllers')
               angular.forEach($scope.cart.items, function(Ditem) {
                 if (Ditem.ItemType == 'MOD') {
                   angular.forEach($scope.cart.items, function(Pitem) {
-                    if (Ditem.ParentItemLineNumber == item.LineNumber && Pitem.ParentItemLineNumber == Ditem.LineNumber) {
+                      if (Pitem.LineNumber == Ditem.ParentItemLineNumber) {
+                      $scope.DeleteFunction(Ditem);
                       $scope.DeleteFunction(Pitem);
                     }
                   })
                 }
-                if (Ditem.ParentItemLineNumber == item.LineNumber) {
+                else if (Ditem.ParentItemLineNumber == item.LineNumber) {
                   $scope.DeleteFunction(Ditem);
                 }
               });
@@ -1415,7 +1420,7 @@ angular.module('itouch.controllers')
                 }
                 $timeout(function () { Alert.hideLoading();}, 20);
               return;
-            } else if (item.ItemType == 'SKT' || 'PWP') {
+            } else if (item.ItemType == 'SKT' || item.ItemType == 'PWP') {
               if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
                 Alert.warning('Item Void not allowed.', 'ItouchLite');
               } else {     
