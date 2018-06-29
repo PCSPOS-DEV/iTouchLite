@@ -1988,8 +1988,9 @@ angular.module('itouch.controllers')
         if (!buttonClicked.barcode) {
           buttonClicked.barcode = true;
           Alert.showLoading();
-          // alert($scope.data.barcode);
-          if ($scope.data.barcode && $scope.data.barcode != '') {
+          // console.log($scope.data.barcode);
+          if ($scope.data.barcode && $scope.data.barcode != '' && $scope.data.barcode != undefined) {
+            // console.log('pass');
             ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
               debugLog.log('Barcode : ' + $scope.data.barcode, 7);
               debugLog.log('Item : ' + item, 7);
@@ -2006,6 +2007,7 @@ angular.module('itouch.controllers')
               document.getElementById('barcodeText').focus();
             });
           } else {
+            // console.log('fail');
             Alert.warning('Try Again');
           }
           $timeout(function () { Alert.hideLoading();}, 10);
