@@ -4,7 +4,7 @@
 angular.module('itouch.controllers')
   .controller('PWPCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService','ItemService', '$q', 'DiscountService', 'Alert', '$timeout', 'SettingsService',
     function ($scope, ControlService, $ionicPopup, CartItemService, BillService,ItemService, $q, DiscountService, Alert, $timeout, SettingsService) {
-      debugLog = SettingsService.StartDebugLog();
+      // debugLog = SettingsService.StartDebugLog();
       // debugLog.log(': ' + err, 4);
       $scope.title = 'PWP';
       $scope.selectedRow = null;
@@ -55,7 +55,7 @@ angular.module('itouch.controllers')
           // console.log(s3);
           var Adisc = (Bdisc - (s1+s3)).roundTo(2).toFixed(2);
           // debugLog.log('Price After Disc : ' + Adisc, 7);
-          debugLog.log('--*-- PWP Discount End --*-- ', 7);
+          // debugLog.log('--*-- PWP Discount End --*-- ', 7);
           // console.log(Adisc);
           item.AlteredPrice = (((Bdisc/100) * discPercent).toFixed(3));
           item.Price = Adisc;
@@ -179,19 +179,20 @@ angular.module('itouch.controllers')
       };
 
       $scope.removeSelected = function () {
-        if ($scope.selectedRow && $scope.selectedRow.Qty > 0) {
-          console.log();
-          $scope.selectedRow.Qty--;
-          $scope.pwp.Qty--;
-          $scope.tempSubTotal -= $scope.selectedRow.Price;
-          temp -= $scope.selectedRow.Price;
-          if ($scope.tempSubTotal == 0) {
-            temp = 0;
+        $timeout(function () {
+          if ($scope.selectedRow && $scope.selectedRow.Qty != null && $scope.selectedRow.Qty > 0) {
+            $scope.selectedRow.Qty--;
+            $scope.pwp.Qty--;
+            $scope.tempSubTotal -= $scope.selectedRow.Price;
+            temp -= $scope.selectedRow.Price;
+            if ($scope.tempSubTotal == 0) {
+              temp = 0;
+            }
+            if ($scope.selectedRow.Qty == 0) {
+              $scope.clearSelected(true);
+            }
           }
-          if ($scope.selectedRow.Qty == 0) {
-            $scope.clearSelected(true);
-          }
-        }
+        }, 20);
       };
 
       $scope.clearSelected = function (flag) {
@@ -346,8 +347,8 @@ angular.module('itouch.controllers')
       $scope.close = function () {
         console.log($scope.tempSubTotal);
         console.log(temp);
-        // $scope.tempSubTotal = 0;
-        // temp = 0;
+        $scope.tempSubTotal = 0;
+        temp = 0;
         $scope.$emit('pwpModal-close');
       };
 
