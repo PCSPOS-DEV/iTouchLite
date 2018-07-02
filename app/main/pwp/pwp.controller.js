@@ -180,7 +180,7 @@ angular.module('itouch.controllers')
 
       $scope.removeSelected = function () {
         $timeout(function () {
-          if ($scope.selectedRow && $scope.selectedRow.Qty != null && $scope.selectedRow.Qty > 0) {
+          if ($scope.selectedRow && $scope.selectedRow != null && $scope.selectedRow != undefined && $scope.selectedRow != '' && $scope.selectedRow.Qty > 0) {
             $scope.selectedRow.Qty--;
             $scope.pwp.Qty--;
             $scope.tempSubTotal -= $scope.selectedRow.Price;

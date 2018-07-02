@@ -53,6 +53,7 @@ Ver 1.6
     Add clear & reset buttons @ general setting adminal panel
     Remove $log & use strict
     Reset document no by admin panel & auto reaching limit
-    Bug fixes for 2nd display (salekit, modifier)
+    Bug fixes for 2nd display (salekit, modifier) & pwp
     Add printer reconnect option in setting menu
     Add support for pwp child item's modifier
+    Bug fixes for tally issue

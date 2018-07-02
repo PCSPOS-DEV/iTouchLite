@@ -2,8 +2,8 @@
  * Created by Lynn
  */
 angular.module('itouch.controllers')
-  .controller('ConfigSettingCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'PrintService', '$state',
-    function (Alert, $localStorage, $scope, $rootScope, PrintService, $state) {
+  .controller('ConfigSettingCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'PrintService', '$state', '$ionicHistory',
+    function (Alert, $localStorage, $scope, $rootScope, PrintService, $state, $ionicHistory) {
       var self = this;
       
       self.connect = function (ip, port) {
@@ -19,9 +19,15 @@ angular.module('itouch.controllers')
       };
       // console.log( $scope.newlogs);
 
-      // self.Back2Home= function () {
-      //   $state.go('app.admin');
-      // }
+      self.Back = function () {
+        var back = $ionicHistory.backView();
+        // console.log(back);
+        if (back) {
+          $ionicHistory.goBack();
+        } else {
+          $state.go('login');
+        }
+      }
       
 
     }]);
