@@ -1,0 +1,41 @@
+Tools
+    Generator-M-Ionic v1.10.1     All in one generator for rock-solid Ionic apps**: develop, prototype, build, test and deliver high quality apps with Yeoman, Gulp, Bower, Angular, Cordova and Ionic.
+    Yeoman                        Client-side scaffolding tool for modern webapps
+    Gulp                          Streaming build system in front-end web development
+    Bower                         Package manager for the web development
+    Browsersync                   Livereload in the browser and on the device
+    Angularjs                     App structure & logic (angular-ui-router) for advanced routing
+    Ionic                         Mobile UI
+    Cordova                       CLI for accessing phone APIs and building the app (ngCordova) connecting Angular with Cordova
+    Sass                          style for UI (CSS preprocessor)
+    ESLint                        linting for JavaScript and JSON style checks
+    Karma                         Unit test
+    Jasmine                       Writing Unit & integradtion test
+    Protractor                    Running and writing integration tests
+
+Library
+    CryptoJSv3                    standard and secure cryptographic algorithms implemented in JavaScript using best practices and patterns.
+    epos-2.3.0                    SDK for Epson TM-Intelligent Printer
+
+Plugins (Bower)
+    Debugout                      Recording logs
+    Ionic-datepicker              Ionic datepicker
+    Ionic-numberpicker            Ionic numberpicker
+    Ionic-super-popup             Ionic Pop up UI handler
+    jquery                        Cross-platform JavaScript library designed to simplify the client-side scripting of HTML
+    jspdf                         Covert data to PDF format
+    JSON                          Lightweight data-interchange format.
+    localForage                   Asynchronous Storage Library for JavaScript
+    lodash                        JavaScript library which provides utility functions for common programming tasks using the functional programming paradigm.
+    moment                        lightweight JavaScript date library for parsing, validating, manipulating, and formatting dates.
+    ng-rollbar                    custom error handling for angular
+    ngCordova                     AngularJS wrappers for the most popular Cordova and PhoneGap plugins(take a picture, scan a barcode, upload a file, turn on your flashlight, get your current location, and much more with just a few lines of code.)
+    ngstorage                     Web Storage working in the Angular Way. Contains two services: $localStorage and $sessionStorage
+    restangular                   AngularJS service that simplifies common GET, POST, DELETE, and UPDATE requests with a minimum of client code
+    underscore                    JavaScript library that provides a whole mess of useful functional programming helpers without extending any built-in objects
+
+Plugin (Cordova)
+    cordova-plugin-email-composer Email composer
+    cordova-plugin-image-picker   Mobile Image picker
+
+
