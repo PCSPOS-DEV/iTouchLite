@@ -28,7 +28,7 @@ angular.module('itouch.controllers')
       var businessDate = ControlService.getBusinessDate(true);
       var Suspended = false;
       var request = new XMLHttpRequest();
-      var requestUrl = AppConfig.getDisplayUrl();
+      var requestUrl = AppConfig.getDisplayUrl() + '/Item';
       console.log(requestUrl);
       var ApiArray = new Array();
       var TempDeleteItem = null;
@@ -614,7 +614,7 @@ angular.module('itouch.controllers')
           $scope.qty.uvalue = 0;
           numpadValue = '';
           temp = 0;
-        } else if (temp.length >= 2){
+        } else if (temp.length >= 2) {
           var del = temp.substr(0, temp.length - 1);
           $scope.qty.uvalue = del;
           numpadValue = del;
@@ -725,57 +725,57 @@ angular.module('itouch.controllers')
        * Manages the sales item click event
        * @param item
        */
-      
+
       $scope.bkey = false;
       var priceFormShown = false;
       $scope.onKeyClick = function (item) {
         // console.time("test");
-        
-        $timeout(function () { 
-          // $timeout.flush();
-          
-        $scope.$emit('BlockMenu', false);
-        $scope.bkey = true;
-        Alert.showLoading();
-        $scope.data.barcodeMode = false;
-        if (item) {
-          if (item.Type == 'P') {
-            $scope.keyboard.activeKeys = getActiveKeys(item.SubPage);
-            return false;
-          }
 
-          $scope.selectedItem = angular.copy(item);
-          if (item.SubPLU1Code == '') {
-            $scope.SubPLUList = [];
-            SubPLU1Service.getAvailable(item.PLU).then(function (data) {
-              $scope.SubPLUList = data;
-              $scope.modalData = {title: 'SubPLU 1 ' + item.PLU, subPLU: 1};
-              submitted = false;
-              $scope.subPLUModal.show();
-            });
-          } else if (item.SubPLU2Code == '') {
-            $scope.SubPLUList = [];
-            SubPLU2Service.getAvailable(item.PLU).then(function (data) {
-              $scope.SubPLUList = data;
-              $scope.modalData = {title: 'SubPLU 2 ' + item.PLU, subPLU: 2};
-              submitted = false;
-              $scope.subPLUModal.show();
-            });
-          } else if (item.SubPLU3Code == '') {
-            $scope.SubPLUList = [];
-            ItemService.getAvailable(item.PLU).then(function (data) {
-              $scope.SubPLUList = data;
-              $scope.modalData = {title: 'SubPLU 3 ' + item.PLU, subPLU: 3};
-              submitted = false;
-              $scope.subPLUModal.show();
-            });
+        $timeout(function () {
+          // $timeout.flush();
+
+          $scope.$emit('BlockMenu', false);
+          $scope.bkey = true;
+          Alert.showLoading();
+          $scope.data.barcodeMode = false;
+          if (item) {
+            if (item.Type == 'P') {
+              $scope.keyboard.activeKeys = getActiveKeys(item.SubPage);
+              return false;
+            }
+
+            $scope.selectedItem = angular.copy(item);
+            if (item.SubPLU1Code == '') {
+              $scope.SubPLUList = [];
+              SubPLU1Service.getAvailable(item.PLU).then(function (data) {
+                $scope.SubPLUList = data;
+                $scope.modalData = {title: 'SubPLU 1 ' + item.PLU, subPLU: 1};
+                submitted = false;
+                $scope.subPLUModal.show();
+              });
+            } else if (item.SubPLU2Code == '') {
+              $scope.SubPLUList = [];
+              SubPLU2Service.getAvailable(item.PLU).then(function (data) {
+                $scope.SubPLUList = data;
+                $scope.modalData = {title: 'SubPLU 2 ' + item.PLU, subPLU: 2};
+                submitted = false;
+                $scope.subPLUModal.show();
+              });
+            } else if (item.SubPLU3Code == '') {
+              $scope.SubPLUList = [];
+              ItemService.getAvailable(item.PLU).then(function (data) {
+                $scope.SubPLUList = data;
+                $scope.modalData = {title: 'SubPLU 3 ' + item.PLU, subPLU: 3};
+                submitted = false;
+                $scope.subPLUModal.show();
+              });
+            }
+            fetchSelectedItem($scope.selectedItem);
+            $timeout(function () { Alert.hideLoading();}, 5);
+            $timeout(function () { $scope.bkey = false; }, 50); // in case of increase the waiting time
+
           }
-          fetchSelectedItem($scope.selectedItem);
-          $timeout(function () { Alert.hideLoading();},5);
-          $timeout(function () { $scope.bkey = false; }, 50); // in case of increase the waiting time
-          
-        }
-      },5);
+        }, 5);
       };
 
       var showPriceForm = function () {
@@ -913,7 +913,7 @@ angular.module('itouch.controllers')
                         $scope.pwpModal.show();
                       });
                     }
-                  } else if (pwp == true) {   
+                  } else if (pwp == true) {
                     $scope.$emit('BlockMenu', true);
                   } else {
                     CartItemService.addItemToCart($scope.header.DocNo, item).then(function (it) {
@@ -962,18 +962,18 @@ angular.module('itouch.controllers')
        * @param item
        */
       $scope.selectItem = function (item) {
-        
+
         // if(!$scope.cart.selectedItem || !item || item.LineNumber != $scope.cart.selectedItem.LineNumber){
 
         // }
         if (item) {
-            $scope.cart.items = _.map($scope.cart.items, function (item) {
-              item.selected = false;
-              return item;
-            });
-            item.selected = true;
+          $scope.cart.items = _.map($scope.cart.items, function (item) {
+            item.selected = false;
+            return item;
+          });
+          item.selected = true;
         }
-          $scope.cart.selectedItem = item;
+        $scope.cart.selectedItem = item;
       };
 
       /**
@@ -1011,28 +1011,28 @@ angular.module('itouch.controllers')
         // console.log('it');console.log(it);
         // console.log('type');console.log(type);
         // console.log('$scope.cart.items');console.log($scope.cart.items);
-        var DitemArray = new Array;;
-        angular.forEach($scope.cart.items, function(Ditem) {
+        var DitemArray = new Array;
+        angular.forEach($scope.cart.items, function (Ditem) {
           if (it.update == 1) {
             if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
               $scope.PutFunction(Ditem);
-            } 
+            }
           } else {
-            if(type == 1) { // SaleKit 
+            if (type == 1) { // SaleKit
               if ((it[0].ItemType == Ditem.ItemType) && (it[0].ItemId == Ditem.ItemId) && (it[0].LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);
               }
-              angular.forEach(it[0].selectedList, function(Citem) {
+              angular.forEach(it[0].selectedList, function (Citem) {
                 if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
                   $scope.PostFunction(Ditem);
-                } 
-              })
+                }
+              });
             } else if (type == 2) { // PWP & F/B Modifier
-              angular.forEach(it, function(Citem) {
+              angular.forEach(it, function (Citem) {
                 if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
                   $scope.PostFunction(Ditem);
-                } 
-              })
+                }
+              });
             } else if (type == 3) { // SKI non-void
               console.log(it);
             } else if (type == 4) { // SKI update
@@ -1047,15 +1047,15 @@ angular.module('itouch.controllers')
                     // console.log('402 : put');
                     $scope.PutFunction(Ditem, 1);
                   }
-                  control = control - it.Qty;            
+                  control = control - it.Qty;
                 }
               } else {
-                  if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
+                if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                   // console.log('43 : post');
                   $scope.PostFunction(Ditem, 1);
-                } 
+                }
               }
-              // if (TempDeleteItem != null &&(it.ItemType == TempDeleteItem.ItemType) && (it.ItemId == TempDeleteItem.ItemId)) { 
+              // if (TempDeleteItem != null &&(it.ItemType == TempDeleteItem.ItemType) && (it.ItemId == TempDeleteItem.ItemId)) {
               //   console.log("this one " + it.LineNumber);
               //   it.LineNumber = it.LineNumber - 10;
               //   $scope.PutFunction(it, 1);} else
@@ -1063,25 +1063,25 @@ angular.module('itouch.controllers')
               //   if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
               //     updatenewitem ++;
               //     $scope.PutFunction(Ditem, 1);
-              //   } 
+              //   }
               // } else if (control == updatenewitem) {
               //   updatenewitem = 0;
               // } else {
               //   if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
               //     updatenewitem ++;
               //     $scope.PostFunction(Ditem, 1);
-              //   } 
+              //   }
               // }
             // } else if (type == 5) { // F/B Modifier
             //   angular.forEach(it, function(Citem) {
             //     if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
             //       $scope.PostFunction(Citem);
-            //     } 
+            //     }
             //   })
             } else {
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);
-              } 
+              }
             }
           }
         });
@@ -1098,29 +1098,29 @@ angular.module('itouch.controllers')
             'Content-Type': 'application/json'
           },
           data: {
-            "itemDescription": Nitem.Desc1,
-            "itemQuantity": Nitem.Qty,
-            "itemTotal": Nitem.Total,
-            "itemDiscount": Nitem.Discount + Nitem.Tax5DiscAmount || Nitem.DiscAmount + Nitem.Tax5DiscAmount ,
-            "itemOrgPrice": Nitem.OrgPrice,
-            "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.sssZ"),
-            "machineId": Nitem.MachineId,
-            "locationId": Nitem.LocationId,
-            "docNo": Nitem.DocNo,
-            "itemType": Nitem.ItemType,
-            "itemId" : Math.floor(Nitem.ItemId),
-            "lineNumber" : Nitem.LineNumber,
-            "parentItemLineNumber" : Nitem.ParentItemLineNumber
+            'itemDescription': Nitem.Desc1,
+            'itemQuantity': Nitem.Qty,
+            'itemTotal': Nitem.Total,
+            'itemDiscount': Nitem.Discount + Nitem.Tax5DiscAmount || Nitem.DiscAmount + Nitem.Tax5DiscAmount,
+            'itemOrgPrice': Nitem.OrgPrice,
+            'itemOrderedDateTime': moment(Nitem.OrderedDateTime).format('YYYY-MM-DDTHH:mm:ss.sssZ'),
+            'machineId': Nitem.MachineId,
+            'locationId': Nitem.LocationId,
+            'docNo': Nitem.DocNo,
+            'itemType': Nitem.ItemType,
+            'itemId': Math.floor(Nitem.ItemId),
+            'lineNumber': Nitem.LineNumber,
+            'parentItemLineNumber': Nitem.ParentItemLineNumber
           }
-        }).then(function successCallback(response) {
+        }).then(function successCallback (response) {
           console.log('Post');
-        }, function errorCallback(response) {
+        }, function errorCallback (response) {
           console.log(response);
         });
-      }
+      };
 
       $scope.PutFunction = function (Nitem, upf) {
-        // console.log('put');  
+        // console.log('put');
         if (TempDeleteItem != null && upf == 1) {
           PrevItemId = Math.floor(TempDeleteItem.ItemId);
           TempDeleteItem = null;
@@ -1134,27 +1134,27 @@ angular.module('itouch.controllers')
             'Content-Type': 'application/json'
           },
           data: {
-            "itemDescription": Nitem.Desc1,
-            "itemQuantity": Nitem.Qty,
-            "itemTotal": Nitem.Total,
-            "itemDiscount": Nitem.Discount + Nitem.Tax5DiscAmount || Nitem.DiscAmount + Nitem.Tax5DiscAmount,
-            "itemOrgPrice": Nitem.OrgPrice,
-            "itemOrderedDateTime": moment(Nitem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.sssZ"),
-            "machineId": Nitem.MachineId,
-            "locationId": Nitem.LocationId,
-            "docNo": Nitem.DocNo,
-            "itemType": Nitem.ItemType,
-            "itemId" : Math.floor(Nitem.ItemId),
-            "previousItemId" : PrevItemId,
-            "lineNumber" : Nitem.LineNumber,
-            "parentItemLineNumber" : Nitem.ParentItemLineNumber
+            'itemDescription': Nitem.Desc1,
+            'itemQuantity': Nitem.Qty,
+            'itemTotal': Nitem.Total,
+            'itemDiscount': Nitem.Discount + Nitem.Tax5DiscAmount || Nitem.DiscAmount + Nitem.Tax5DiscAmount,
+            'itemOrgPrice': Nitem.OrgPrice,
+            'itemOrderedDateTime': moment(Nitem.OrderedDateTime).format('YYYY-MM-DDTHH:mm:ss.sssZ'),
+            'machineId': Nitem.MachineId,
+            'locationId': Nitem.LocationId,
+            'docNo': Nitem.DocNo,
+            'itemType': Nitem.ItemType,
+            'itemId': Math.floor(Nitem.ItemId),
+            'previousItemId': PrevItemId,
+            'lineNumber': Nitem.LineNumber,
+            'parentItemLineNumber': Nitem.ParentItemLineNumber
           }
-        }).then(function successCallback(response) {
+        }).then(function successCallback (response) {
           console.log('Update');
-        }, function errorCallback(response) {
+        }, function errorCallback (response) {
           console.log(response);
         });
-      }
+      };
 
 
       /**
@@ -1163,34 +1163,34 @@ angular.module('itouch.controllers')
       var delpwp = 0;
       $scope.DeleteApi = function (item) {
         if (item) {
-          if (item.ItemType == "SKT" || item.ItemType == 'NOR' ) { // SaleKit + Normal
-            angular.forEach($scope.cart.items, function(Ditem) {
+          if (item.ItemType == 'SKT' || item.ItemType == 'NOR' ) { // SaleKit + Normal
+            angular.forEach($scope.cart.items, function (Ditem) {
               console.log(Ditem.ItemType );
               if (Ditem.ItemType == 'MOD') {
-                angular.forEach($scope.cart.items, function(Pitem) {
-                    if (Pitem.LineNumber == Ditem.ParentItemLineNumber) {
+                angular.forEach($scope.cart.items, function (Pitem) {
+                  if (Pitem.LineNumber == Ditem.ParentItemLineNumber) {
                     $scope.DeleteFunction(Ditem);
                     $scope.DeleteFunction(Pitem);
                   }
-                })
+                });
               }
               else if (Ditem.ParentItemLineNumber == item.LineNumber) {
                 $scope.DeleteFunction(Ditem);
               }
             });
             $scope.DeleteFunction(item);
-          } else if (item.ItemType == 'PWP') { 
+          } else if (item.ItemType == 'PWP') {
             $scope.DeleteFunction(item);
             delpwp = 1;
             if (delpwp == 1) {
-              angular.forEach($scope.cart.items, function(Ditem) {
+              angular.forEach($scope.cart.items, function (Ditem) {
                 if (Ditem.ItemType == 'MOD') {
-                  angular.forEach($scope.cart.items, function(Pitem) {
-                      if (Pitem.LineNumber == Ditem.ParentItemLineNumber) {
+                  angular.forEach($scope.cart.items, function (Pitem) {
+                    if (Pitem.LineNumber == Ditem.ParentItemLineNumber) {
                       $scope.DeleteFunction(Ditem);
                       $scope.DeleteFunction(Pitem);
                     }
-                  })
+                  });
                 }
                 else if (Ditem.ParentItemLineNumber == item.LineNumber) {
                   $scope.DeleteFunction(Ditem);
@@ -1198,7 +1198,7 @@ angular.module('itouch.controllers')
               });
             }
             delpwp = 0;
-          } else if (item.ItemType == 'SKI') { 
+          } else if (item.ItemType == 'SKI') {
             console.log('Not Delete');
           } else {
             $scope.DeleteFunction(item);
@@ -1219,12 +1219,12 @@ angular.module('itouch.controllers')
           headers: {
             'Content-Type': 'application/json'
           },
-        }).then(function successCallback(response) {
-        console.log('Delete');
-        }, function errorCallback(response) {
+        }).then(function successCallback (response) {
+          console.log('Delete');
+        }, function errorCallback (response) {
           console.log(response);
         });
-      }
+      };
 
       $scope.DeleteFunction = function (Ditem) {
         $http({
@@ -1234,26 +1234,26 @@ angular.module('itouch.controllers')
             'Content-Type': 'application/json'
           },
           data: {
-            "itemDescription": Ditem.Desc1,
-            "itemQuantity": Ditem.Qty,
-            "itemTotal": Ditem.Total,
-            "itemDiscount": Ditem.Discount + Ditem.Tax5DiscAmount,
-            "itemOrgPrice": Ditem.OrgPrice,
-            "itemOrderedDateTime": moment(Ditem.OrderedDateTime).format("YYYY-MM-DDTHH:mm:ss.sssZ"),
-            "machineId": Ditem.MachineId,
-            "locationId": Ditem.LocationId,
-            "docNo": Ditem.DocNo,
-            "itemType": Ditem.ItemType,
-            "itemId" : Math.floor(Ditem.ItemId),
-            "lineNumber" : Ditem.LineNumber,
-            "parentItemLineNumber" : Ditem.ParentItemLineNumber
+            'itemDescription': Ditem.Desc1,
+            'itemQuantity': Ditem.Qty,
+            'itemTotal': Ditem.Total,
+            'itemDiscount': Ditem.Discount + Ditem.Tax5DiscAmount,
+            'itemOrgPrice': Ditem.OrgPrice,
+            'itemOrderedDateTime': moment(Ditem.OrderedDateTime).format('YYYY-MM-DDTHH:mm:ss.sssZ'),
+            'machineId': Ditem.MachineId,
+            'locationId': Ditem.LocationId,
+            'docNo': Ditem.DocNo,
+            'itemType': Ditem.ItemType,
+            'itemId': Math.floor(Ditem.ItemId),
+            'lineNumber': Ditem.LineNumber,
+            'parentItemLineNumber': Ditem.ParentItemLineNumber
           }
-        }).then(function successCallback(response) {
-        console.log('Delete');
-        }, function errorCallback(response) {
+        }).then(function successCallback (response) {
+          console.log('Delete');
+        }, function errorCallback (response) {
           console.log(response);
         });
-      }
+      };
 
       /**
        * Refreshes the cart data from it's service
@@ -1266,9 +1266,9 @@ angular.module('itouch.controllers')
           var last = Object.keys($scope.cart.items).length - 1;
           if (last < 0) {
             $scope.DeleteApi();
-          } 
-          
-          angular.forEach($scope.cart.items, function(Ditem) {
+          }
+
+          angular.forEach($scope.cart.items, function (Ditem) {
             // console.log('Ditem');console.log(Ditem);
             if (susp == 1) {
               $scope.PostFunction(Ditem);
@@ -1276,8 +1276,8 @@ angular.module('itouch.controllers')
               $scope.PutFunction(Ditem);
             }
           });
-          
-  
+
+
           $scope.cart.isEmpty = _.isEmpty(items);
           $scope.cart.summery = CartItemService.getSummery();
           $scope.navMenuCtrl();
@@ -1382,7 +1382,7 @@ angular.module('itouch.controllers')
             $scope.$emit('BlockMenu', true);
           }
         }, 200);
-      }
+      };
       /**
        * Contains the list of functions for sales
        * @type {{VoidTop: $scope.salesFunctions.VoidTop}}
@@ -1397,14 +1397,14 @@ angular.module('itouch.controllers')
           var last = Object.keys($scope.cart.items).length - 1;
           if (last == 0) {
             $scope.DeleteApi();
-          } 
-          if (item) { 
+          }
+          if (item) {
             // console.log(item.ItemType);
             if (item.ItemType == 'PWI') {
-                if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
-                  Alert.warning('Item Void not allowed.', 'ItouchLite');
-                } else {        
-                  Alert.warning('Item Void not allowed.', 'ItouchLite');// TO DO : ADD reslect option for pwp child
+              if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
+                Alert.warning('Item Void not allowed.', 'ItouchLite');
+              } else {
+                Alert.warning('Item Void not allowed.', 'ItouchLite');// TO DO : ADD reslect option for pwp child
                   // BillService.voidSalesKit(item).then(function () {
                   //   $scope.refreshCart().then(function () {
                   //     $scope.selectItemWithLineNumber();
@@ -1413,14 +1413,14 @@ angular.module('itouch.controllers')
                   // }, function (err) {
                   //   console.log(err);
                   // });
-                }
-                $timeout(function () { Alert.hideLoading();}, 20);
+              }
+              $timeout(function () { Alert.hideLoading();}, 20);
               return;
             } else if (item.ItemType == 'SKT' || item.ItemType == 'PWP') {
               if (item.SuspendDepDocNo != '' && item.SuspendDepDocNo != null) {
                 Alert.warning('Item Void not allowed.', 'ItouchLite');
-              } else {     
-                $scope.DeleteApi(item);   
+              } else {
+                $scope.DeleteApi(item);
                 BillService.voidSalesKit(item).then(function () {
                   $scope.refreshCart().then(function () {
                     $scope.selectItemWithLineNumber();
@@ -1500,7 +1500,7 @@ angular.module('itouch.controllers')
                   });
                 }
               }
-            }    
+            }
             $timeout(function () { Alert.hideLoading();}, 20);
             $scope.navMenuCtrl();
           } else {
@@ -1591,7 +1591,7 @@ angular.module('itouch.controllers')
           $timeout(function () { Alert.hideLoading();}, 20);
         },
         QtyMinus: function (fn) {
-          
+
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');
@@ -1610,14 +1610,14 @@ angular.module('itouch.controllers')
                     console.log(err);
                   });
                 } else {
-                  Alert.warning('Minimum Quantity: Action not allowed.')
-                  // $scope.flag = false;  
+                  Alert.warning('Minimum Quantity: Action not allowed.');
+                  // $scope.flag = false;
                 }
               }
             }
             $timeout(function () { Alert.hideLoading();}, 20);
           }
-          
+
         },
         ItemReverse: function (fn) {
           if (authorityCheck(fn)) {
@@ -1641,7 +1641,7 @@ angular.module('itouch.controllers')
         },
         CallSuspendBill: function (fn) {
           if (!buttonClicked.recallSuspendBillModal) {
-            
+
             var item = $scope.cart.selectedItem;
             buttonClicked.recallSuspendBillModal = true;
                 //if (authorityCheck(fn)) {
@@ -1760,7 +1760,7 @@ angular.module('itouch.controllers')
           }
 
         },
-        FoodModifier: function (fn) {     
+        FoodModifier: function (fn) {
           var item = $scope.cart.selectedItem;
           if (Suspended == true && item.SuspendDepDocNo !== '') {
             Alert.warning('Suspended Order: Action not allowed.');

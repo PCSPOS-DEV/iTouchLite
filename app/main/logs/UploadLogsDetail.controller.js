@@ -33,7 +33,7 @@ angular.module('itouch.controllers')
       self.Back2Logs = function () {
         $state.go('app.admin');
       }
-      
+
       self.modifyUpload = function () {
         Alert.showLoading();
         if (_.isUndefined(self.settings.upinterval) || _.isNull(self.settings.upinterval) || self.settings.upinterval < 1 || typeof(self.settings.upinterval) != 'number') {
@@ -47,7 +47,7 @@ angular.module('itouch.controllers')
         Alert.hideLoading();
       }
 
-      
+
       var lines = uploadlog.split('\n');
       $scope.totallines = lines.length;
       // console.log(lines.length);
@@ -75,7 +75,8 @@ angular.module('itouch.controllers')
       var pdfBase64 = pdf.output('datauristring');
       // console.log(pdfurl);
       // pdf.save('a4.pdf');
-      
+      console.log(SettingsService.generateAttachment(pdfBase64, "UploadLog.pdf"));
+
       self.deleteManual = function() {
         localStorage.removeItem('UploadLogs');
         TempLog.clear();
@@ -86,14 +87,14 @@ angular.module('itouch.controllers')
 
       self.sendMail = function(){
         cordova.plugins.email.isAvailable('gmail', function (hasAccount, hasGmail) {});
-        
+
         $cordovaEmailComposer.open({// (I even tried cordova.plugins.email.open)
            to: "pcsposdev@prima.com.sg",
           //  cc: , // email addresses for CC field
           //  bcc: , // email addresses for BCC field
            subject: "Upload Log <itouchlite>",
-           body: "<h1>Upload Log Attachment</h1>" + "<p>Date : " + systemDate +"</p>", 
-           isHtml: true, 
+           body: "<h1>Upload Log Attachment</h1>" + "<p>Date : " + systemDate +"</p>",
+           isHtml: true,
            attachments: [SettingsService.generateAttachment(pdfBase64, "UploadLog.pdf")], //TO DO : Auto attachement
          }).then(function () {
            console.log('email sent');
@@ -110,10 +111,10 @@ angular.module('itouch.controllers')
           $scope.newlogs = "";
         }, 200)
        })
-       
+
       //  setTimeout(function () {
       //    localStorage.removeItem('UploadLogs');
       //  }, 200)
-       
+
       }
     }]);

@@ -90,7 +90,7 @@ angular.module('itouch.services')
      * @returns {Date}
        */
     self.getNextBusinessDate = function () {
-      if(self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())){
+      if (self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())) {
         return self.getBusinessDate().add(1, 'days');
       } else {
         return (self.getDayEndDate() ? self.getDayEndDate().add(1, 'days') : moment());
@@ -103,7 +103,7 @@ angular.module('itouch.services')
      * @returns {Date}
      */
     self.isNewBusinessDate = function () {
-      if(self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())){
+      if (self.getBusinessDate() && moment([1950, 0, 1]).diff(self.getBusinessDate())) {
         return false;
       } else {
         return true;
@@ -115,7 +115,7 @@ angular.module('itouch.services')
      * @returns {string}
        */
     self.getNextDocId = function () {
-      if($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)){
+      if ($localStorage.app_config.currentDocId && _.isString($localStorage.app_config.currentDocId)) {
         var newId = parseInt($localStorage.app_config.currentDocId.substring(1, 6));
         var maxId = 99999;
         if (newId == maxId) {
