@@ -1,7 +1,8 @@
 {
   "extends": "eslint:recommended",
   "globals": {
-    "_": false
+    "_": false,
+    "moment": false
   },
   "env": {
     "node": true
@@ -9,7 +10,7 @@
   "rules": {
     // overrides from 'recommended'
     "comma-dangle": 0,
-    "no-console": 0,
+    "no-console": [0, {"properties": "always"}],
 
     // strict
     // "strict": [2, "global"],
@@ -28,7 +29,7 @@
     "no-spaced-func": 2,
     "comma-spacing": [1, {"before": false, "after": true}],
     "no-multiple-empty-lines": [2, {"max": 2}],
-    "camelcase": [1, {"properties": "always"}],
+    "camelcase": [0, {"properties": "always"}],
 
     // coding style
     "curly": 2,
