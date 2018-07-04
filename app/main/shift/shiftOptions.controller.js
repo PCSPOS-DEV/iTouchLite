@@ -3,17 +3,28 @@
  */
 angular.module('itouch.controllers')
   .controller('ShiftOptionsCtrl', ['$scope', 'ShiftService', '$ionicModal', '$ionicPopup', '$state', 'Alert', '$q', '$ionicHistory', 'CartItemService', 'Report', 'BillService', 'shiftData', '$cordovaDialogs', 'ionicDatePicker', 'ControlService',
-   '$timeout', 'Reciept', 'UploadService', 'SuspendService', 
-    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService, $timeout, Reciept, UploadService, SuspendService) {
+    '$timeout', 'Reciept', 'UploadService', 'SuspendService', 'SettingsService', 'AppConfig', '$http',
+    function ($scope, ShiftService, $ionicModal, $ionicPopup, $state, Alert, $q, $ionicHistory, CartItemService, Report, BillService, shiftData, $cordovaDialogs, ionicDatePicker, ControlService,
+      $timeout, Reciept, UploadService, SuspendService, SettingsService, AppConfig, $http) {
       var self = this;
       var dayEnd = false;
       var suspenditem = 0;
       var ask = 0;
-      var shiftLog = ShiftService.StartShiftLog();
       var BDate = moment(angular.copy(ControlService.getDayEndDate())).format('DD-MM-YYYY');
       var systemDate = new Date();
-      var tDay= new Date();
-      tDay.setDate(systemDate.getDate() + 1); 
+      var tDay = new Date();
+      tDay.setDate(systemDate.getDate() + 1);
+
+      var synclog = localStorage.getItem('SyncLogs');
+      var EntityId = SettingsService.getEntityId();
+      var MachineId = SettingsService.getMachineId();
+      var LocationId = SettingsService.getLocationId();
+      var businessDate = angular.copy(ControlService.getBusinessDate());
+      var fileName = (moment(businessDate).format('YYYYMMDD') + '-' + LocationId + '-' + MachineId);
+      var logFile = SettingsService.generateAttachment(synclog, fileName + '.txt');
+      var requestUrl = AppConfig.getDisplayUrl() + '/EventLog?entityId=' + EntityId + '&logType=0';
+      console.log(requestUrl);
+      console.log(fileName);
 
       $scope.shiftListType = null;
       self.shiftData = shiftData;
@@ -71,11 +82,9 @@ angular.module('itouch.controllers')
 
       self.openShiftOpenModal = function () {
         if (checkBDate()) {
-          shiftLog.log('New Business Date (' + BDate + ')', 3);
           $scope.shiftListType = 'open';
           self.shiftModal.show();
         } else {
-          shiftLog.log('Open Shift Warning : Choose business date first', 3);
           Alert.warning('Choose business date first!');
         }
       };
@@ -99,7 +108,6 @@ angular.module('itouch.controllers')
             dayEnd = false;
             ShiftService.clearCurrent();
             showReopenModal();
-            shiftLog.log('Shift Exit : Success', 3);
           }
         });
       };
@@ -107,6 +115,10 @@ angular.module('itouch.controllers')
       self.openDeclareCash = function () {
         $scope.shiftListType = 'declareCash';
         self.shiftModal.show();
+      };
+
+      self.postlog = function () {
+        $scope.PostLog();
       };
 
       var showReopenModal = function () {
@@ -136,11 +148,10 @@ angular.module('itouch.controllers')
               type: 'button-positive',
               onTap: function (e) {
                 if ($scope.data.cash && !_.isNaN($scope.data.cash)) {
-                  shiftLog.log('Declare Cash Info : Entered value (' + $scope.data.cash + ')', 3);
                   return $scope.data.cash;
                 } else {
                   e.preventDefault();
-                  shiftLog.log('Declare Cash Error : Entered value is invalid!', 3);
+
                   Alert.warning('Entered value is invalid!');
                 }
               }
@@ -174,26 +185,23 @@ angular.module('itouch.controllers')
                 self.shiftModal.hide();
                 showReopenModal();
               }, function (err) {
-                shiftLog.log('Popup Error :' + err, 3);
                 console.log(err);
               });
             } else {
               ShiftService.declareCash(cash, shift.Id).then(function (DocNo) {
-                if(cash && !_.isNaN(cash)){
-                self.shiftModal.hide();
-                Report.printDeclareCash(shift, cash);
-                refreshData();
+                if (cash && !_.isNaN(cash)) {
+                  self.shiftModal.hide();
+                  Report.printDeclareCash(shift, cash);
+                  refreshData();
 
-                Report.printShiftClosingReport(shift.Id);
+                  Report.printShiftClosingReport(shift.Id);
 
-                showReopenModal();
+                  showReopenModal();
                 } else {
-                  shiftLog.log('Declare Cash Error : Entered value is invalid!', 3);
                   Alert.warning('Entered value is invalid!');
                 }
 
               }, function (err) {
-                shiftLog.log('Declare Cash Error :' + err, 3);
                 console.log(err);
               });
             }
@@ -214,7 +222,6 @@ angular.module('itouch.controllers')
       });
 
       $scope.$on('shift-close', function (evt, shift) {
-        shiftLog.log('Close Shift Success : ' + shift.Description1 + ' ' + shift.Description2, 3);
         openCashPopUp(shift, dayEnd);
       });
 
@@ -224,20 +231,20 @@ angular.module('itouch.controllers')
         // }
       });
 
-      $scope.flag = false;
-      self.openDayEnd = function() {
-        if (ask == 0) { 
-          Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
-            if (res == 1) {
-              shiftclosingReport();
-            }
-          });
-          ask = 1;
-        } else {
-          shiftclosingReport();
-        }
-        
-      }
+      $scope.PostLog = function () {
+        $http({
+          method: 'POST',
+          url: requestUrl,
+          contentType: false,
+          processData: false,
+          data: logFile,
+        }).then(function successCallback (response) {
+          console.log(response);
+          console.log('Post');
+        }, function errorCallback (response) {
+          console.log(response);
+        });
+      };
 
       var shiftclosingReport = function () {
         $scope.flag = true;
@@ -248,18 +255,16 @@ angular.module('itouch.controllers')
         }).then(function (data) {
           if (!data.cartEmpty) {
             // if(!dayEnd) {
-              dayEnd = true;
-              shiftLog.log('Day End Error : Unsaved items should be saved before day end', 3);
-              Alert.warning('Unsaved items should be saved before day end');
+            dayEnd = true;
+            Alert.warning('Unsaved items should be saved before day end');
             // }
             return true;
           }
 
           if (data.declare.length > 0) {
             // if(!dayEnd){
-              dayEnd = true;
-              shiftLog.log('Day End Error : Declare Cash before day end', 3);
-              Alert.warning('Declare Cash before day end');
+            dayEnd = true;
+            Alert.warning('Declare Cash before day end');
             // }
 
             // self.openDeclareCash();
@@ -268,15 +273,14 @@ angular.module('itouch.controllers')
 
           if (data.opened.length > 0) {
             // if(!dayEnd){
-              shiftLog.log('Day End Error : Close shifts before day end', 3);
-              Alert.warning('Close shifts before day end');
-              dayEnd = true;
+            Alert.warning('Close shifts before day end');
+            dayEnd = true;
             // }
 
             // self.openShiftCloseModal();
             return true;
           }
-          var businessDate = angular.copy(ControlService.getBusinessDate());
+
           $timeout(function () {
             Report.printShiftClosingReport(null, businessDate);
           }, 100);
@@ -284,8 +288,7 @@ angular.module('itouch.controllers')
             ShiftService.dayEnd().then(function () {
               dayEnd = false;
               $scope.$emit('shift-changed');
-              shiftLog.log('Day End Success : Busineess Date ('+ moment(businessDate).format('DD-MM-YYYY') + ')', 3);
-              shiftLog.log('-----*-----*-----', 3);
+              // $scope.PostLog();
               Alert.success('Day end completed');
               $ionicHistory.nextViewOptions({
                 disableAnimate: false,
@@ -301,7 +304,34 @@ angular.module('itouch.controllers')
             });
           }, 200);
         });
-      }
+      };
+
+      $scope.flag = false;
+      self.openDayEnd = function () {
+        if (ask == 0) {
+          Alert.showConfirm('Are you sure you want to day end closing ?', 'Day End Close?', function (res) {
+            if (res == 1) {
+              shiftclosingReport();
+            }
+          });
+          ask = 1;
+        } else {
+          shiftclosingReport();
+        }
+
+      };
+
+      /**
+       * Saves the Business Date set by the user
+       * @param date
+       */
+      var setBusinessDate = function (date) {
+        if (moment(date).isValid()) {
+          ControlService.setBusinessDate(moment(date));
+        } else {
+          console.log('date is not valid');
+        }
+      };
 
       /**
        * Opens the Business Date picker
@@ -320,20 +350,6 @@ angular.module('itouch.controllers')
         };
 
         ionicDatePicker.openDatePicker(datePickerOptions);
-      };
-
-
-      /**
-       * Saves the Business Date set by the user
-       * @param date
-       */
-      var setBusinessDate = function (date) {
-        if (moment(date).isValid()) {
-          ControlService.setBusinessDate(moment(date));
-        } else {
-          console.log('date is not valid');
-        }
-
       };
 
       self.test = function () {
