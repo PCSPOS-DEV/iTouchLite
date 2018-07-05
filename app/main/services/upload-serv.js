@@ -8,25 +8,25 @@ angular.module('itouch.services')
       var enableAutoUpload = true;
       var uploadLog = new debugout();
       var autouploadInterval = 5;
-      var autoupinterval = ((autouploadInterval*60)*1000);
+      var autoupinterval = ((autouploadInterval * 60) * 1000);
       var interval = null;
 
-      self.StartuploadLog = function() {
+      self.StartuploadLog = function () {
         return uploadLog;
-      }
+      };
 
-      self.getAutoUploadInterval = function() {
+      self.getAutoUploadInterval = function () {
         return autouploadInterval;
-      }
+      };
 
       self.setAutoUploadInterval = function (upinterval) {
         autouploadInterval = upinterval;
-        autoupinterval = ((autouploadInterval*60)*1000);
+        autoupinterval = ((autouploadInterval * 60) * 1000);
         if (angular.isDefined(interval)) {
           $interval.cancel(interval);
         }
         self.startAutoUpload();
-      }
+      };
 
       var onSuccess = function (res) {
         return _.map(DB.fetchAll(res), function (row) {
@@ -105,7 +105,7 @@ angular.module('itouch.services')
           var promises = [];
           angular.forEach(DB.fetchAll(res), function (header) {
             uploadLog.log('  DocNo : ' + header.DocNo + ', Total : ' + Math.floor(header.SubTotal), 2);
-            
+
             // console.log(header);
             // console.log(header.EntityId);
             header.EntityId = entityId;
@@ -134,8 +134,7 @@ angular.module('itouch.services')
               StockTransactions: DB.selectGroupBy(DB_CONFIG.tableNames.bill.stockTransactions, ' LocationId,MachineId,BusinessDate, DocNo, ItemId, SeqNo, DocType, SUM(Qty) AS Qty,  BaseUOMId,AVG(StdCost) AS StdCost  ', {
                 columns: 'IsExported=? AND DocNo=?',
                 data: [false, header.DocNo]
-              }, 'LocationId,MachineId,BusinessDate, DocNo, ItemId, SeqNo, DocType, BaseUOMId').then(onSuccess)
-              ,
+              }, 'LocationId,MachineId,BusinessDate, DocNo, ItemId, SeqNo, DocType, BaseUOMId').then(onSuccess),
               VoidItems: DB.select(DB_CONFIG.tableNames.bill.voidItems, '*', {
                 columns: 'IsExported=? AND DocNo=?',
                 data: [false, header.DocNo]
@@ -201,20 +200,20 @@ angular.module('itouch.services')
           DB.clearQueue();
           uploadLog.log('Upload Status : clearQueue', 2);
           return self.getBills().then(function (bills) {
-            var promises = [];  
+            var promises = [];
             angular.forEach(bills, function (bill) {
               if (bill.BillDetail != undefined) {
-              // Headerkey = (({SubTotal, DiscAmount, Tax1Amount, Tax1DiscAmount, Tax2Amount, Tax2DiscAmount, Tax3Amount, Tax3DiscAmount, Tax4Amount, Tax4DiscAmount, Tax5Amount, Tax5DiscAmount}) => 
+              // Headerkey = (({SubTotal, DiscAmount, Tax1Amount, Tax1DiscAmount, Tax2Amount, Tax2DiscAmount, Tax3Amount, Tax3DiscAmount, Tax4Amount, Tax4DiscAmount, Tax5Amount, Tax5DiscAmount}) =>
               // ({SubTotal, DiscAmount, Tax1Amount, Tax1DiscAmount, Tax2Amount, Tax2DiscAmount, Tax3Amount, Tax3DiscAmount, Tax4Amount, Tax4DiscAmount, Tax5Amount, Tax5DiscAmount}))(bill.BillHeader);
-              Headertotal = (bill.BillHeader.SubTotal + bill.BillHeader.Tax1Amount + bill.BillHeader.Tax2Amount + bill.BillHeader.Tax3Amount + bill.BillHeader.Tax4Amount + bill.BillHeader.Tax5Amount) -
+                Headertotal = (bill.BillHeader.SubTotal + bill.BillHeader.Tax1Amount + bill.BillHeader.Tax2Amount + bill.BillHeader.Tax3Amount + bill.BillHeader.Tax4Amount + bill.BillHeader.Tax5Amount) -
               (bill.BillHeader.DiscAmount + bill.BillHeader.Tax1DiscAmount + bill.BillHeader.Tax2DiscAmount + bill.BillHeader.Tax3DiscAmount + bill.BillHeader.Tax4DiscAmount + bill.BillHeader.Tax5DiscAmount);
                 angular.forEach(bill.BillDetail, function (ids) {
                   console.log('Before : ' + ids.ItemId);
                   ids.ItemId = Math.floor(ids.ItemId);
-                  console.log('After : '+ ids.ItemId);
-                  Object.keys(keyw).map(function(a){
+                  console.log('After : ' + ids.ItemId);
+                  Object.keys(keyw).map(function (a) {
                     keyw [a] += ids [a];
-                  })
+                  });
                   Detailtotal = (keyw.SubTotal + keyw.Tax1Amount + keyw.Tax2Amount + keyw.Tax3Amount + keyw.Tax4Amount + keyw.Tax5Amount) -
                   (keyw.DiscAmount + keyw.Tax1DiscAmount + keyw.Tax2DiscAmount + keyw.Tax3DiscAmount + keyw.Tax4DiscAmount + keyw.Tax5DiscAmount);
                 });
@@ -257,7 +256,7 @@ angular.module('itouch.services')
                   console.log('UpdateVoidDocNo : ' + res);
                 }));
               }
-              keyw = {'SubTotal': 0, 'DiscAmount': 0, 'Tax1Amount': 0, 'Tax1DiscAmount': 0, 'Tax2Amount': 0, 'Tax2DiscAmount': 0, 'Tax3Amount': 0, 'Tax3DiscAmount': 0, 'Tax4Amount': 0, 'Tax4DiscAmount': 0, 'Tax5Amount': 0, 'Tax5DiscAmount': 0,};
+              keyw = {'SubTotal': 0, 'DiscAmount': 0, 'Tax1Amount': 0, 'Tax1DiscAmount': 0, 'Tax2Amount': 0, 'Tax2DiscAmount': 0, 'Tax3Amount': 0, 'Tax3DiscAmount': 0, 'Tax4Amount': 0, 'Tax4DiscAmount': 0, 'Tax5Amount': 0, 'Tax5DiscAmount': 0, };
               // Headerkey = {};
                 /*
                 console.log("uploading bill");
@@ -293,20 +292,20 @@ angular.module('itouch.services')
       self.startAutoUpload = function () {
         console.log(enableAutoUpload);
         if (enableAutoUpload == true) {
-          interval = $interval(function () { 
+          interval = $interval(function () {
             console.log('auto upload');
             self.upload();
-            setTimeout (function () {
+            setTimeout(function () {
               uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
               uploadLog.log('-----*-----*-----', 7);
               var uploadlog = localStorage.getItem('UploadLogs');
               var logs = uploadLog.getLog();
               localStorage.setItem('UploadLogs', uploadlog + logs);
-            }, 100)
+            }, 100);
           }, autoupinterval);
         }
       };
-    
+
       var post = function (data) {
         var config = $localStorage.itouchConfig;
         if (config && config.baseUrl) {

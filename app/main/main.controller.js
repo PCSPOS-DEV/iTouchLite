@@ -68,6 +68,9 @@ angular.module('itouch.controllers')
           localStorage.removeItem('UploadLogs');
           var logs = uploadLog.getLog();
           // console.log(logs);
+          if (uploadlog == null) {
+            uploadlog = '';
+          }
           localStorage.setItem('UploadLogs', uploadlog + logs);
           Alert.success('Upload success');
         }, function (err) {
@@ -78,6 +81,9 @@ angular.module('itouch.controllers')
           // console.log(uploadlog);
           localStorage.removeItem('UploadLogs');
           // console.log(logs);
+          if (uploadlog == null) {
+            uploadlog = '';
+          }
           localStorage.setItem('UploadLogs', uploadlog + logs);
           Alert.error(err);
         }).finally(function () {
@@ -115,9 +121,9 @@ angular.module('itouch.controllers')
      * @returns String
      */
     $scope.print = function (object, attribute, level, trimFrom) {
+      var name = attribute + currentUser.DescriptionLevel;
       currentUser = AuthService.currentUser();
       if (currentUser) {
-        var name = attribute + currentUser.DescriptionLevel;
         if (level) {
           name += level;
         }
@@ -232,7 +238,7 @@ angular.module('itouch.controllers')
 
     $scope.configSetting = function () {
       $state.go('app.configsettings');
-    }
+    };
 
     $scope.$on('loginlModal-close', function (event, data) {
       if (adminLoginModal) {
