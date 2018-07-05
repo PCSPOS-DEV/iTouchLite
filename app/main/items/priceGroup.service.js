@@ -21,7 +21,7 @@ angular.module('itouch.services')
       try {
         Restangular.one('GetItemPriceByPriceGroupLevel').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
           try {
-            var items = JSON.parse(res);
+            items = JSON.parse(res);
           } catch (ex) {
             syncLog.log('  PriceGroups Sync Fail : No results', 1);
             deferred.reject('No results');

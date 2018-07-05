@@ -2,11 +2,12 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory('ItemService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'LocationService', 'PriceGroupService',
-    function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, LocationService, PriceGroupService) {
+  .factory('ItemService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'LocationService', 'PriceGroupService', 'LogService',
+    function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, LocationService, PriceGroupService, LogService) {
       var self = this;
       var fetchedDate = 0;
-      errorLog = SettingsService.StartErrorLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       var location = LocationService.currentLocation;
       if (!location) {
@@ -30,17 +31,18 @@ angular.module('itouch.services')
         //   return DB.fetchAll(result);
         // })
       };
-      
+
       self.fetchItems = function () {
         var deferred = $q.defer();
         try {
           Restangular.one('GetItemsByLocations').get({LocationId: SettingsService.getLocationId()}).then(function (res) {
             try {
-              var items = JSON.parse(res);
+              items = JSON.parse(res);
               fetchedDate = items;
-              syncLog.log('  GetItemsByLocations Sync Complete : ' + items.length + ' items found', 1)
+              syncLog.log('  GetItemsByLocations Sync Complete : ' + items.length + ' items found', 1);
             } catch (ex) {
               syncLog.log('  GetItemsByLocations Sync Fail : No results', 1);
+              errorLog.log('GetItemsByLocations Sync Fail : No results');
               deferred.reject('No results');
             }
             if (items) {
@@ -48,18 +50,21 @@ angular.module('itouch.services')
               deferred.resolve();
             } else {
               syncLog.log('  GetItemsByLocations Sync Error : Unknown machine', 1);
+              errorLog.log('GetItemsByLocations Sync Error : Unknown machine');
               deferred.reject('Unknown machine');
             }
           }, function (err) {
             console.error(err);
             syncLog.log('  GetItemsByLocations Sync Error : Unable to fetch data from the server', 1);
+            errorLog.log('GetItemsByLocations Sync Error : Unable to fetch data from the server');
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
           syncLog.log('  GetItemsByLocations Sync Fail : ' + ex, 1);
+          errorLog.log('GetItemsByLocations Sync Fail : ' + ex);
           deferred.reject(ex);
         }
-
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -72,11 +77,13 @@ angular.module('itouch.services')
                 var barcodes = JSON.parse(res);
                 if (barcodes) {
                   self.saveBarcodes(barcodes);
-                  syncLog.log('  GetItemBarcode Sync Complete : ' + barcodes.length + ' items found', 1)
+                  syncLog.log('  GetItemBarcode Sync Complete : ' + barcodes.length + ' items found', 1);
+                  eventLog.log('GetItemBarcode Sync Complete : ' + barcodes.length + ' items found');
                   deferred.resolve();
                 }
                 else {
                   syncLog.log('  GetItemBarcode Sync Error : Unknown machine', 1);
+                  errorLog.log('GetItemBarcode Sync Error : Unknown machine');
                   deferred.reject('Unknown machine');
                 }
               }
@@ -85,19 +92,22 @@ angular.module('itouch.services')
               }
             } catch (ex) {
               syncLog.log('  GetItemBarcode Sync Fail : No results', 1);
+              errorLog.log('GetItemBarcode Sync Fail : No results');
               deferred.reject('No results');
             }
 
           }, function (err) {
             console.error(err);
             syncLog.log('  GetItemBarcode Sync Error : Unable to fetch data from the server', 1);
+            errorLog.log('GetItemBarcode Sync Error : Unable to fetch data from the server');
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
           syncLog.log('  GetItemBarcode Sync Fail : ' + ex, 1);
+          errorLog.log('GetItemBarcode Sync Fail : ' + ex);
           deferred.reject(ex);
         }
-
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -106,8 +116,10 @@ angular.module('itouch.services')
         DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.item.item + '', []).then(function (result) {
           deferred.resolve(DB.fetchAll(result));
         }, function (err) {
+          errorLog.log('getItems Error : ' + err);
           deferred.reject(err.message);
         });
+        LogService.SaveLog();
         return deferred.promise;
       };
       self.save = function (items) {
@@ -136,24 +148,25 @@ angular.module('itouch.services')
                 _.extend(item, data);
                 deferred.resolve(item);
               }, function (err) {
-                errorLog.log('Item Error : '+ err.message, 4);
-                throw new Error(err.message);
+                errorLog.log('Item Error : ' + err.message);
                 deferred.reject(err.message);
+                throw new Error(err.message);
               });
             } else {
-              errorLog.log('Item Status : Item not found', 4);
+              errorLog.log('Item Status : Item not found');
               deferred.reject('Item not found');
             }
           }, function (err) {
-            errorLog.log('Item Error : '+ err.message, 4);
-            throw new Error(err.message);
+            errorLog.log('Item Error : ' + err.message);
             deferred.reject(err.message);
+            throw new Error(err.message);
           });
         } else {
-          errorLog.log('Item Error : Invalid location', 4);
-          throw new Error('Invalid location');
+          errorLog.log('Item Error : Invalid location');
           deferred.reject('Invalid location');
+          throw new Error('Invalid location');
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -181,7 +194,7 @@ angular.module('itouch.services')
                 // item.PriceLevelId  = data ? data.PriceLevelId : 0;
                 deferred.resolve(item);
               }, function (err) {
-                errorLog.log('Item GetBy ID Error : '+ err.message, 4);
+                errorLog.log('Item GetBy ID Error : ' + err.message, 4);
                 console.log(err.message);
                 deferred.reject(err.message);
               });
@@ -191,15 +204,16 @@ angular.module('itouch.services')
               deferred.reject('Item not found');
             }
           }, function (err) {
-            errorLog.log('Item GetBy ID Error : '+ err.message, 4);
+            errorLog.log('Item GetBy ID Error : ' + err.message, 4);
             console.log(err.message);
             deferred.reject(err.message);
           });
         } else {
           errorLog.log('Item GetBy ID Error : Invalid location', 4);
-          throw new Error('Invalid location');
           deferred.reject('Invalid location');
+          throw new Error('Invalid location');
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -288,7 +302,7 @@ angular.module('itouch.services')
                 }
                 deferred.resolve(item);
               }, function (err) {
-                errorLog.log('Item GetBy Barcode Error : '+ err.message, 4);
+                errorLog.log('Item GetBy Barcode Error : ' + err.message, 4);
                 console.log(err.message);
                 deferred.reject(err.message);
               });
@@ -298,7 +312,7 @@ angular.module('itouch.services')
               deferred.reject('Item not found');
             }
           }, function (err) {
-            errorLog.log('Item GetBy Barcode Error : '+ err.message, 4);
+            errorLog.log('Item GetBy Barcode Error : ' + err.message, 4);
             console.log(err.message);
             deferred.reject(err.message);
           });
@@ -306,6 +320,7 @@ angular.module('itouch.services')
           errorLog.log('Item GetBy Barcode Error : Invalid location', 4);
           deferred.reject('Invalid location');
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -332,20 +347,21 @@ angular.module('itouch.services')
             });
             deferred.resolve(items);
           }, function (err) {
-            errorLog.log('Item GetBy Text Error : '+ err.message, 4);
+            errorLog.log('Item GetBy Text Error : ' + err.message, 4);
             deferred.reject(err.message);
           });
         } else {
           errorLog.log('Item GetBy Text Error : Invalid location', 4);
           deferred.reject('Invalid location');
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
       var strid, pinid, idlen;
       self.getItemById = function (id) {
         var itype = typeof id;
-        if (itype == 'number'){
+        if (itype == 'number') {
           strid = Math.floor(id);
         }
         // else {
@@ -374,13 +390,14 @@ angular.module('itouch.services')
             }
             deferred.resolve(item);
           }, function (err) {
-            errorLog.log('Item GetBy ID Error : '+ err.message, 4);
+            errorLog.log('Item GetBy ID Error : ' + err.message, 4);
             deferred.reject(err.message);
           });
         } else {
           errorLog.log('Item GetBy ID Error : Invalid location', 4);
           deferred.reject('Invalid location');
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
