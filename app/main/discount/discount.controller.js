@@ -2,9 +2,10 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('DiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert', 'SettingsService',
-    function ($scope, DiscountService, $ionicPopup, Alert, SettingsService) {
-      errorLog = SettingsService.StartErrorLog();
+  .controller('DiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert', 'LogService',
+    function ($scope, DiscountService, $ionicPopup, Alert, LogService) {
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       // errorLog.log(''+ err, 4);
       var discountsSet = {
         type1: [],
@@ -41,7 +42,7 @@ angular.module('itouch.controllers')
 
           $scope.setType($scope.type);
         }, function (er) {
-          errorLog.log('Discount Error : '+ er, 4);
+          errorLog.log('Discount Error : ' + er, 4);
           console.log(er);
         });
       };
@@ -104,7 +105,7 @@ angular.module('itouch.controllers')
             // CartItemService.setDiscountedItem(item.ItemId, item.ItemType, item, item.LineNumber);
             $scope.$emit('refresh-cart');
           }, function (err) {
-            errorLog.log('Save Discount Error : '+ err, 4);
+            errorLog.log('Save Discount Error : ' + err, 4);
             Alert.error(err);
           }).finally(function () {
               //submitted = false;

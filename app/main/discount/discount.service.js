@@ -2,14 +2,17 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory('DiscountService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', '$filter', 'ItemService', 'ControlService', 'RoundingService', 'LocationService', 'BillService',
-    function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, $filter, ItemService, ControlService, RoundingService, LocationService, BillService) {
+  .factory('DiscountService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', '$filter', 'ItemService', 'ControlService', 'RoundingService', 'LocationService', 'BillService', 'LogService',
+    function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, $filter, ItemService, ControlService, RoundingService, LocationService, BillService, LogService) {
       var self = this;
       var tenderDiscounts = {
         header: null,
         items: {},
         discounts: []
       };
+
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       /*Yi Yi Po*/
       var tempTenderDiscounts = {};
       var tempValidTenderDiscounts = [];
@@ -59,6 +62,7 @@ angular.module('itouch.services')
                   deferred.resolve();
                 } else {
                   syncLog.log('  Discounts Sync Error : Unknown machine', 1);
+                  errorLog.log('Discounts Sync Error : Unknown machine');
                   deferred.reject('Unknown machine');
                 }
               }
@@ -68,18 +72,22 @@ angular.module('itouch.services')
               }
             } catch (ex) {
               syncLog.log('  Discounts Sync Error : No results', 1);
+              errorLog.log('Discounts Sync Error : No results');
               deferred.reject('No results');
             }
 
           }, function (err) {
             console.error(err);
             syncLog.log('  Discounts Sync Error : Unable to fetch data from the server', 1);
+            errorLog.log('  Discounts Sync Error : Unable to fetch data from the server', 1);
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
           syncLog.log('  Discounts Sync Error : ' + ex, 1);
+          errorLog.log('Discounts Sync Error : ' + ex);
           deferred.reject(ex);
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -100,6 +108,7 @@ angular.module('itouch.services')
                   deferred.resolve();
                 } else {
                   syncLog.log('  DiscountsFor Sync Error : Unknown machine', 1);
+                  errorLog.log('DiscountsFor Sync Error : Unknown machine');
                   deferred.reject('Unknown machine');
                 }
               }
@@ -109,17 +118,21 @@ angular.module('itouch.services')
               }
             } catch (ex) {
               syncLog.log('  DiscountsFor Sync Error : No results', 1);
+              errorLog.log('DiscountsFor Sync Error : No results');
               deferred.reject('No results');
             }
           }, function (err) {
             console.error(err);
             syncLog.log('  DiscountsFor Sync Error : Unable to fetch data from the server', 1);
+            errorLog.log('DiscountsFor Sync Error : Unable to fetch data from the server');
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
           syncLog.log('  DiscountsFor Sync Error : ' + ex, 1);
+          errorLog.log('DiscountsFor Sync Error : ' + ex);
           deferred.reject(ex);
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -166,19 +179,25 @@ angular.module('itouch.services')
             self.getPrice(item.Plu, item.PriceGroupId).then(function (data) {
               item.Price = data ? data.Price : 0;
               item.PriceLevelId = data ? data.PriceLevelId : 0;
+              eventLog.log('getById Data Retrieved');
               deferred.resolve(item);
             }, function (err) {
               deferred.reject(err.message);
+              errorLog.log('getById Error : ' + err.message);
               throw new Error(err.message);
             });
           }, function (err) {
             deferred.reject(err.message);
+            errorLog.log('getById Error : ' + err.message);
             throw new Error(err.message);
           });
         } else {
           deferred.reject('Invalid location');
+          errorLog.log('Invalid location');
+          LogService.SaveLog();
           throw new Error('Invalid location');
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -188,6 +207,8 @@ angular.module('itouch.services')
         return DB.query(q, [id]).then(function (result) {
           var discount = DB.fetch(result);
           renameProperty(discount, 'Id', 'DiscountId');
+          eventLog.log('getDiscountById Data Retrieved' + discount);
+          LogService.SaveLog();
           return discount;
         });
       };
@@ -198,7 +219,9 @@ angular.module('itouch.services')
         var errors = [];
         angular.forEach(reqFields, function (attribute) {
           if (_.isUndefined(item[attribute])) {
+            errorLog.log('saveItemDiscount : Field ' + attribute + ' cannot be empty');
             errors.push('Field ' + attribute + ' cannot be empty');
+            LogService.SaveLog();
           }
         });
 
@@ -206,6 +229,8 @@ angular.module('itouch.services')
           DB.addInsertToQueue(DB_CONFIG.tableNames.discounts.tempBillDiscounts, item);
           return true;
         } else {
+          errorLog.log('saveItemDiscount : error ' + errors);
+          LogService.SaveLog();
           console.log(errors);
           return false;
         }
@@ -227,8 +252,6 @@ angular.module('itouch.services')
         }
         else
         {
-          console.log('RND');
-          console.log(item);
           DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.tempDetail, _.pick(item, 'SubTotal', 'Tax5Amount', 'DiscAmount', 'Tax5DiscAmount'), {columns: 'ItemId=? AND LineNumber=?', data: [item.ItemId, item.LineNumber]});
         }
       };
@@ -380,6 +403,8 @@ angular.module('itouch.services')
             });
           });
         } else {
+          errorLog.log('saveTempDiscountItem : Not eligible for this discount amount');
+          LogService.SaveLog();
           return $q.reject('Not eligible for this discount amount');
         }
 
