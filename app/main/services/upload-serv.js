@@ -300,6 +300,9 @@ angular.module('itouch.services')
               uploadLog.log('-----*-----*-----', 7);
               var uploadlog = localStorage.getItem('UploadLogs');
               var logs = uploadLog.getLog();
+              if (uploadlog == null) {
+                uploadlog = '';
+              }
               localStorage.setItem('UploadLogs', uploadlog + logs);
             }, 100);
           }, autoupinterval);

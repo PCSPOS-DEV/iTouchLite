@@ -1,5 +1,5 @@
 /**
- * Created by shalitha on 17/5/16.
+ * Created by Lynn on 5th June 2018.
  */
 angular.module('itouch.controllers')
   .controller('UploadLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'UploadService', '$state', '$cordovaEmailComposer', 'SettingsService',
@@ -46,6 +46,12 @@ angular.module('itouch.controllers')
 
       var lines = uploadlog.split('\n');
       $scope.totallines = lines.length;
+      if ($scope.totallines >= 1000) {
+        LogService.sendUploadLog();
+        localStorage.removeItem('UploadLogs');
+        $scope.newlogs = '';
+        $scope.totallines = 0;
+      }
       // console.log(lines.length);
       var startline = 0;
       var lastline = 49;
