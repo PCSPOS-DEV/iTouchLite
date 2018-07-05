@@ -48,7 +48,7 @@ String.prototype.toDate = function () {
     if (values.length >= 3) {
       d = new Date(parseInt(values[0]), parseInt(values[1]) - 1, parseInt(values[2]));
     }
-  } catch (ex) {}
+  } catch (ex) {console.log(ex);}
   return d;
 };
 

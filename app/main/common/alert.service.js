@@ -4,7 +4,7 @@
 angular.module('itouch.services')
   .service('Alert', ['$ionicLoading', '$ionicPopup', '$cordovaDialogs', function ($ionicLoading, $ionicPopup, $cordovaDialogs) {
     this.showLoading = function (BD) {
-      if (BD == "" || null || undefined) {
+      if (BD == '' || null || undefined) {
         BD = false;
       }
       $ionicLoading.show({

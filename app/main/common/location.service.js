@@ -6,13 +6,14 @@ angular.module('itouch.services')
     var self = this;
     self.currentLocation = $localStorage.location;
     syncLog = SettingsService.StartSyncLog();
+    var items;
 
     self.fetch = function () {
       var deferred = $q.defer();
       try {
         Restangular.one('GetLocations').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
           try {
-            var items = JSON.parse(res);
+            items = JSON.parse(res);
           } catch (ex) {
             deferred.reject('No results');
             syncLog.log('  Locations Sync Fail : No results', 1);

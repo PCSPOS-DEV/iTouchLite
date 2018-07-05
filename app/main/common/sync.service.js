@@ -152,7 +152,7 @@ angular.module('itouch.services')
       };
 
       var checkStatus = function (url) {
-        var url = AppConfig.getBaseUrl();
+        url = AppConfig.getBaseUrl();
         if (url) {
           return Restangular.oneUrl('checkStatus', url + 'test').withHttpConfig({timeout: 3000}).get().then(function (res) {
             if (res == 'true' || res == true) {

@@ -4,15 +4,16 @@
 angular.module('itouch.services')
   .factory('PrinterSettings', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG) {
     var self = this;
-    var Pdata = {}; 
+    var Pdata = {};
     self.currentLocation = $localStorage.location;
+    var items;
 
     self.fetch = function () {
       var deferred = $q.defer();
       try {
         Restangular.one('GetPrinterSettings').get({LocationId: SettingsService.getLocationId()}).then(function (res) {
           try {
-            var items = JSON.parse(res);
+            items = JSON.parse(res);
             angular.forEach(items, function (item) {
               if (!Pdata[item.Type]) {
                 Pdata[item.Type] = {};
@@ -51,7 +52,7 @@ angular.module('itouch.services')
 
     self.fetchData = function () {
       return Pdata;
-    }
+    };
 
     self.get = function () {
       return DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.config.printerSettings).then(function (result) {
