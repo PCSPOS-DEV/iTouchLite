@@ -21,7 +21,7 @@ angular.module('itouch.services')
                 deferred.resolve(items);
               }
               else {
-                syncLog.log('  Modifiers Sync Error : Unknown machine', 1);v
+                syncLog.log('  Modifiers Sync Error : Unknown machine', 1);
                 deferred.reject('Unknown machine');
               }
             }

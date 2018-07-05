@@ -2,10 +2,12 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory('DaysService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular',
-    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular) {
+  .factory('DaysService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', 'LogService',
+    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, LogService) {
       var self = this;
       syncLog = SettingsService.StartSyncLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       self.fetch = function () {
         var deferred = $q.defer();
@@ -18,19 +20,23 @@ angular.module('itouch.services')
               deferred.resolve();
             } else {
               syncLog.log('  PromotionDays Sync Error : Unable to fetch Promotion days', 1);
+              eventLog.log('PromotionDays Sync Error : Unable to fetch Promotion days');
               deferred.reject('Unable to fetch Promotion days');
             }
 
           }, function (err) {
-            throw new Error(err);
             syncLog.log('  PromotionDays Sync Error : Unable to fetch data from the server', 1);
+            eventLog.log('PromotionDays Sync Error : Unable to fetch data from the server');
             deferred.reject('Unable to fetch data from the server');
+            throw new Error(err);
+
           });
         } catch (ex) {
           syncLog.log('  PromotionDays Sync Error : ' + ex, 1);
+          eventLog.log('PromotionDays Sync Error : ' + ex);
           deferred.reject(ex);
         }
-
+        LogService.SaveLog();
         return deferred.promise;
       };
 

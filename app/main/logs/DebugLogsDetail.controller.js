@@ -11,7 +11,7 @@ angular.module('itouch.controllers')
 
       self.Back2Logs = function () {
         $state.go('app.admin');
-      }
-      
+      };
+
 
     }]);

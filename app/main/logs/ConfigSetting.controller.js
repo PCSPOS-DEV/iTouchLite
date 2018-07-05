@@ -5,14 +5,14 @@ angular.module('itouch.controllers')
   .controller('ConfigSettingCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'PrintService', '$state', '$ionicHistory',
     function (Alert, $localStorage, $scope, $rootScope, PrintService, $state, $ionicHistory) {
       var self = this;
-      
+
       self.connect = function (ip, port) {
         Alert.showLoading();
         PrintService.connect().then(function () {
           Alert.success('Success');
           self.status = PrintService.isConnected();
         }, function (err) {
-          errorLog.log('Printer Setup : '+ err, 4);
+          errorLog.log('Printer Setup : ' + err, 4);
           Alert.success(err, 'Error');
         });
         Alert.hideLoading();
@@ -27,7 +27,7 @@ angular.module('itouch.controllers')
         } else {
           $state.go('login');
         }
-      }
-      
+      };
+
 
     }]);
