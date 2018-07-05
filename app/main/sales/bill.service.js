@@ -418,7 +418,7 @@ angular.module('itouch.services')
           });
         });
 
-        return def.promise;
+        // return def.promise;
       };
 
       self.updateSalesKitItem = function (item, itemId) {
@@ -446,7 +446,7 @@ angular.module('itouch.services')
           });
         });
 
-        return def.promise;
+        // return def.promise;
       };
 
       self.saveBill = function (billHeader, billDetails, stockTransactions, payTransactions, payTransactionsOverTender) {
@@ -872,9 +872,9 @@ angular.module('itouch.services')
           'ParentItemLineNumber', 'PriceLevelId', 'Price', 'Qty', 'DepAmount', 'Tax1Option', 'Tax2Option', 'Tax3Option',
           'Tax4Option', 'Tax5Option', 'Tax1Perc', 'Tax2Perc', 'Tax3Perc', 'Tax4Perc', 'Tax5Perc', 'NoDiscount', 'MultiDiscount', 'PriceChanged', 'Taxable', 'BelowCost', 'Comm'];
 
-
+        var errors = [];
         if (skitem) {
-          var errors = [];
+
 
           angular.forEach(required, function (attribute) {
             if (_.isUndefined(skitem[attribute]) || skitem[attribute] == null) {

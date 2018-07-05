@@ -347,9 +347,9 @@ angular.module('itouch.controllers')
                     } else {
                       console.log('post sk');
                       $scope.PostApi(item, 1);
-                    }   
-                  })
-                    
+                    }
+                  });
+
                 });
               }).finally(function () {
                 $scope.$emit('skModalModal-save');

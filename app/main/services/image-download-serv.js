@@ -27,8 +27,9 @@ angular.module('itouch.services')
           var trustHosts = true;
           return $cordovaFileTransfer.download(url, targetPath, options, trustHosts);
         } else {
-          return $q.reject('Unable to download file');
           errorLog.log('Unable to download image file', 5);
+          return $q.reject('Unable to download file');
+
         }
       };
 
@@ -61,7 +62,7 @@ angular.module('itouch.services')
             });
           } else {
             errorLog.log('no images in the db', 5);
-            return $q.reject('no images in the db'); 
+            return $q.reject('no images in the db');
           }
         });
         // self.downloadFile('PCSlogo.png');

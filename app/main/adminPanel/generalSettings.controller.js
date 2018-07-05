@@ -46,8 +46,8 @@ angular.module('itouch.controllers')
             mac_id: SettingsService.getMachineId(),
             cash_id: SettingsService.getCashId(),
             business_date: SettingsService.getBusinessDate(),
-            doc_id : ControlService.getDocId(),
-            displayurl : AppConfig.getDisplayUrl(),
+            doc_id: ControlService.getDocId(),
+            displayurl: AppConfig.getDisplayUrl(),
             url: AppConfig.getBaseUrl(),
             outletServerUrl: AppConfig.getOutletServerUrl(),
           };
@@ -78,7 +78,7 @@ angular.module('itouch.controllers')
             checkStatus(self.settings.url).then(function () {
               Restangular.setBaseUrl(self.settings.url);
               AppConfig.setBaseUrl(self.settings.url);
-  
+
               if (_.isUndefined(self.settings.ent_id) || _.isNull(self.settings.ent_id)) {
                 return false;
               }
@@ -91,7 +91,7 @@ angular.module('itouch.controllers')
               if (_.isUndefined(self.settings.doc_id) || _.isNull(self.settings.doc_id)) {
                 return false;
               }
-              if (self.settings.displayurl == ''){
+              if (self.settings.displayurl == '') {
                 self.settings.displayurl = 'display url';
               }
               ControlService.saveDocId(self.settings.doc_id);
@@ -102,7 +102,7 @@ angular.module('itouch.controllers')
               SettingsService.setCashId(self.settings.cash_id);
               // SettingsService.setBusinessDate(self.settings.business_date);
               SettingsService.save();
-  
+
               SyncService.do().then(function () {
                 SettingsService.setEntityId(self.settings.ent_id);
                 SettingsService.setLocationId(self.settings.loc_id);
@@ -114,7 +114,7 @@ angular.module('itouch.controllers')
               Alert.warning('Invalid base url entered');
             });
           }
-  
+
           if (!_.isUndefined(self.settings.outletServerUrl) && !_.isNull(self.settings.outletServerUrl) && !_.isEmpty(self.settings.outletServerUrl)) {
             checkStatus(self.settings.outletServerUrl).then(function () {
               AppConfig.setOutletServerUrl(self.settings.outletServerUrl);
@@ -123,7 +123,7 @@ angular.module('itouch.controllers')
               Alert.warning('Invalid outlet server url entered');
             });
           }
-  
+
           else {
             Alert.warning('Please insert data');
           }
@@ -133,7 +133,7 @@ angular.module('itouch.controllers')
       self.reset = function () {
         self.clear();
         self.save(false);
-      }
+      };
 
       self.clear = function () {
         try {
@@ -143,10 +143,10 @@ angular.module('itouch.controllers')
             mac_id: '',
             cash_id: '',
             business_date: '',
-            displayurl : 'display url',
+            displayurl: 'display url',
             url: 'base url',
             outletServerUrl: 'outlet server url',
-            business_date: null,
+            // business_date: null,
           };
         } catch (ex) {
           self.settings.ent_id = null;
@@ -155,7 +155,7 @@ angular.module('itouch.controllers')
 
           console.log(ex);
         }
-      }
+      };
 
       var checkStatus = function (url) {
         return Restangular.oneUrl('checkStatus', url + 'test').withHttpConfig({timeout: 3000}).get().then(function (res) {

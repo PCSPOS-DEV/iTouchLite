@@ -28,7 +28,7 @@ angular.module('itouch.controllers')
           Alert.success('Success');
           self.status = PrintService.isConnected();
         }, function (err) {
-          errorLog.log('Printer Setup : '+ err, 4);
+          errorLog.log('Printer Setup : ' + err, 4);
           Alert.success(err, 'Error');
         });
       };

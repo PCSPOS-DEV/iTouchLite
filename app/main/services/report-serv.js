@@ -35,7 +35,7 @@ angular.module('itouch.services')
       printer.addTextAlign(printer.ALIGN_CENTER);
       PrintService.addImage();
       PrintService.addLineBreak();
-        self.getAll();
+      self.getAll();
       if (data != null) {
         angular.forEach(data.Header, function (row) {
           if (row.IsBold == 'false') {

@@ -23,6 +23,7 @@ angular.module('itouch.services')
     var data = [businessDate];
 
     if (_.isUndefined(mode) || _.isNull(mode)) {
+      // console.log(mode);
     }
     else {
       q += ' AND DocType IN (' + mode + ') ';
@@ -114,7 +115,7 @@ angular.module('itouch.services')
       void: getHeaderDetailsForMode(shiftId, '\'VD\'', null, businessDate),
       abort: getHeaderDetailsForMode(shiftId, '\'AV\'', null, businessDate),
       float: getHeaderDetailsForMode(shiftId, '\'RA\'', null, businessDate),
-      float: getHeaderDetailsForMode(shiftId, '\'RA\'', null, businessDate),
+      // float: getHeaderDetailsForMode(shiftId, '\'RA\'', null, businessDate),
       payout: getHeaderDetailsForMode(shiftId, '\'PO\'', null, businessDate),
       receiveIn: getHeaderDetailsForMode(shiftId, '\'RI\'', null, businessDate),
       cashDeclared: getHeaderDetailsForMode(shiftId, '\'CD\'', null, businessDate),

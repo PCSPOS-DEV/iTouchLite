@@ -37,7 +37,7 @@ angular.module('itouch.services')
               ePosDev.createDevice('local_printer', ePosDev.DEVICE_TYPE_PRINTER, options, function (deviceObj, errorCode) {
                 if (deviceObj === null) {
                   //Displays an error message if the system fails to retrieve the Printer object
-                  errorLog.log('Printer cannect error. code : '+ errorCode, 4);
+                  errorLog.log('Printer cannect error. code : ' + errorCode, 4);
                   deferred.reject('connect error. code:' + errorCode);
                   return;
                 }
@@ -368,7 +368,7 @@ angular.module('itouch.services')
           }
         }
         catch (e) {
-          errorLog.log('Printer Service Error : '+ e.message, 4);
+          errorLog.log('Printer Service Error : ' + e.message, 4);
           alert(e.message);
         }
       };

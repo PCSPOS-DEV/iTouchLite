@@ -147,14 +147,14 @@ angular.module('itouch.services')
             deferred.resolve(pwp);
           } else {
             // Alert.error('Expire promotion period');
-            console.log ('Expire promotion period');
+            console.log('Expire promotion period');
             var expire = 'expire';
-            
+
             deferred.resolve(pwp, expire);
           }
         } else {
           type = 0;
-            if (type == 0) {
+          if (type == 0) {
             deferred.resolve(pwp);
           }
         }
