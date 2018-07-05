@@ -7,6 +7,7 @@
         <div class="list">
           <label class="item item-input item-stacked-label" style="padding: 2px; height: 600px; ">
             <div class="col">
+                <pre style="font-size: 12px">{{totallines}}</pre>
                 <pre style="font-size: 12px">{{newlogs}}</pre>
             </div>
           </label>
@@ -15,13 +16,13 @@
       </div>
     </div>
     <div class="row">
-        <!-- <div class="col">
+        <div class="col">
             <div class="padding">
               <button class="button button-block button-positive" ng-click="ctrl.sendMail()" ng-disabled="">
                 Send Sync Log
               </button>
             </div>
-          </div> -->
+          </div>
         <div class="col">
           <div class="padding">
             <button class="button button-block button-positive" style="background-color: rgb(224, 52, 52)" ng-click="ctrl.deleteManual()" ng-disabled="">

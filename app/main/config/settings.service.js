@@ -9,17 +9,17 @@ angular.module('itouch.services')
     var errorlog = new debugout();
     var debuglog = new debugout();
 
-    self.StartSyncLog = function() {
+    self.StartSyncLog = function () {
       return syncLog;
-    }
+    };
 
-    self.StartErrorLog = function() {
+    self.StartErrorLog = function () {
       return errorlog;
-    }
+    };
 
-    self.StartDebugLog = function() {
+    self.StartDebugLog = function () {
       return debuglog;
-    }
+    };
     //TODO: remove this once settings page done
     if (!settings.roundFor) {
       settings.roundFor = 'M';
@@ -186,15 +186,15 @@ angular.module('itouch.services')
         return (_.isNumber(settings.business_date)) ? moment(settings.business_date).format('DD-MMM-YYYY') : settings.business_date;
         // return settings.business_date;
       }
-      else{
+      else {
         return null;
       }
-    }
+    };
 
-    self.generateAttachment = function(uriString, fileName){
+    self.generateAttachment = function (uriString, fileName) {
       var uristringparts = uriString.split(',');
-      uristringparts[0] = "base64:" + fileName + "//";
-      return uristringparts.join("");
+      uristringparts[0] = 'base64:' + fileName + '//';
+      return uristringparts.join('');
     };
 
     return self;

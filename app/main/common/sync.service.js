@@ -62,6 +62,9 @@ angular.module('itouch.services')
                     var syncLogs = localStorage.getItem('SyncLogs');
                     localStorage.removeItem('SyncLogs');
                     var logs = syncLog.getLog();
+                    if (syncLogs == null) {
+                      syncLogs = '';
+                    }
                     localStorage.setItem('SyncLogs', syncLogs + logs);
                     // var logs = syncLog.getLog();
                     // console.log(logs);
@@ -73,6 +76,9 @@ angular.module('itouch.services')
                     var syncLogs = localStorage.getItem('SyncLogs');
                     localStorage.removeItem('SyncLogs');
                     var logs = syncLog.getLog();
+                    if (syncLogs == null) {
+                      syncLogs = '';
+                    }
                     localStorage.setItem('SyncLogs', syncLogs + logs);
                     // var logs = syncLog.getLog();
                     // console.log(logs);
