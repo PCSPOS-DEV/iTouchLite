@@ -2,8 +2,8 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory('DiscountService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'LocationService', 'BillService', '$filter', 'ItemService', 'ControlService', 'RoundingService', 'LocationService', 'BillService',
-    function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, LocationService, BillService, $filter, ItemService, ControlService, RoundingService, LocationService, BillService) {
+  .factory('DiscountService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', '$filter', 'ItemService', 'ControlService', 'RoundingService', 'LocationService', 'BillService',
+    function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, $filter, ItemService, ControlService, RoundingService, LocationService, BillService) {
       var self = this;
       var tenderDiscounts = {
         header: null,
@@ -168,16 +168,16 @@ angular.module('itouch.services')
               item.PriceLevelId = data ? data.PriceLevelId : 0;
               deferred.resolve(item);
             }, function (err) {
-              throw new Error(err.message);
               deferred.reject(err.message);
+              throw new Error(err.message);
             });
           }, function (err) {
-            throw new Error(err.message);
             deferred.reject(err.message);
+            throw new Error(err.message);
           });
         } else {
-          throw new Error('Invalid location');
           deferred.reject('Invalid location');
+          throw new Error('Invalid location');
         }
         return deferred.promise;
       };
@@ -273,15 +273,16 @@ angular.module('itouch.services')
           if (item.Taxable == 'true') {
             var totalTax = ((item.Total - totalDiscount) / (100 + item.Tax5Perc) * item.Tax5Perc).roundTo(2);
             var currentTax = (item.Tax5Amount - item.Tax5DiscAmount);
+            var differentDiscountTax;
             if (currentTax < totalTax)
              {
-              var differentDiscountTax = (totalTax - currentTax);
+              differentDiscountTax = (totalTax - currentTax);
               item.Tax5DiscAmount -= differentDiscountTax;
               item.DiscAmount += differentDiscountTax;
             }
             else if (currentTax > totalTax)
              {
-              var differentDiscountTax = (currentTax - totalTax);
+              differentDiscountTax = (currentTax - totalTax);
               item.Tax5DiscAmount += differentDiscountTax;
               item.DiscAmount -= differentDiscountTax;
             }
@@ -890,8 +891,8 @@ angular.module('itouch.services')
             DB.clearQueue();
             return BillService.updateHeaderTotals(DocNo);
           }, function (ex) {
-            return ex;
             console.log(ex);
+            return ex;
           });
 
         } else {

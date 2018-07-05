@@ -13,7 +13,7 @@ angular.module('itouch.services')
       var eng = 0;
       var getSeqNo = function (itemId, lineNumber, leng) {
         return DB.max(self.table, 'SeqNo', { columns: 'ItemId = ? AND LineNumber = ?', data: [itemId, lineNumber] }).then(function (ln) {
-          if(eng >= leng){
+          if (eng >= leng) {
             eng = 0;
           }
           eng =  eng + 1;

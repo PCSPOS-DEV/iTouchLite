@@ -121,7 +121,7 @@ angular.module('itouch.services')
         if (newId == maxId) {
           newId = 0;
         }
-        return 'R' + ('00000' + ++newId).slice(-5);
+        return 'R' + ('00000' + (++newId)).slice(-5);
       } else {
         return 'R00001';
       }
