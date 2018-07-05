@@ -8,7 +8,6 @@ angular.module('itouch.controllers')
       $scope.shiftSelectionShown = true;
       $scope.shift = {};
       $scope.title = '';
-      var shiftLog = ShiftService.StartShiftLog();
 
       $scope.$on('modal.shown', function (event, modal) {
         $scope.shiftSelectionShown = true;
@@ -19,18 +18,22 @@ angular.module('itouch.controllers')
             case 'open':
               $scope.title = 'Open Shift';
               promise = ShiftService.getUnOpened();
+              // eventLog.log('Open Shift : Complete');
               break;
             case 'close':
               $scope.title = 'Close Shift';
               promise = ShiftService.getOpened();
+              eventLog.log('Close Shift : Complete');
               break;
             case 'declareCash':
               $scope.title = 'Declare Cash';
               promise = ShiftService.getDeclareCashShifts();
+              eventLog.log('Declare Cash : Complete');
               break;
             default:
               $scope.title = 'Exit Shift';
               promise = ShiftService.getOpened();
+              eventLog.log('Exit Shift : Complete');
               break;
           }
           promise.then(function (shifts) {
@@ -44,8 +47,8 @@ angular.module('itouch.controllers')
         $scope.shift = shift;
         switch ($scope.shiftListType) {
           case 'open':
-          shiftLog.log('Shift Open Success : ' + shift.Description1 + ' ' + shift.Description2, 3);
             if (shift.OpenDateTime) {
+              eventLog.log('Shift Open Success : ' + shift.Description1 + ' ' + shift.Description2, 3);
               Alert.showLoading();
               ShiftService.saveCurrent(shift);
               $scope.$emit('shift-changed');
@@ -151,14 +154,14 @@ angular.module('itouch.controllers')
                   //Report.printShiftClosingReport(shift.Id, businessDate);
                   $scope.$emit('shift-close', shift);
                 }, function (err) {
-                  shiftLog.log('Shift closeShift : Error : ' + err, 3);
+                  errorLog.log('Shift closeShift : Error : ' + err, 3);
                   console.log(err);
                 });
               }
             });
           } else {
             var info = 'Unsaved items should be saved before closing the shift';
-            shiftLog.log('Shift closeShift : Error : ' + info, 3);
+            errorLog.log('Shift closeShift : Error : ' + info, 3);
             Alert.warning(info);
           }
         });

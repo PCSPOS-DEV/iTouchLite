@@ -2,15 +2,11 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory('ShiftService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', '$localStorage', 'AuthService', 'ControlService', '$filter', 'ItemService',
-    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, $localStorage, AuthService, ControlService, $filter, ItemService) {
+  .factory('ShiftService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', '$localStorage', 'AuthService', 'ControlService', '$filter', 'ItemService', 'LogService',
+    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, $localStorage, AuthService, ControlService, $filter, ItemService, LogService) {
       var self = this;
-      var shiftLog = new debugout();
-      errorLog = SettingsService.StartErrorLog();
-
-      self.StartShiftLog= function () {
-        return shiftLog;
-      }
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       self.fetch = function () {
         var deferred = $q.defer();
@@ -28,10 +24,10 @@ angular.module('itouch.services')
             }
 
           }, function (err) {
-            throw new Error(err);
             syncLog.log('  Shifts Sync Error : Unable to fetch data from the server', 1);
             errorLog.log('Shifts Sync Error : Unable to fetch data from the server', 4);
             deferred.reject('Unable to fetch data from the server');
+            throw new Error(err);
           });
         } catch (ex) {
           syncLog.log('  Shifts Sync Error : ' + ex, 1);
@@ -51,11 +47,11 @@ angular.module('itouch.services')
         DB.query('SELECT s.*, ss.OpenDateTime, ss.CloseDateTime, OpenUser, CloseUser, DeclareCashLater FROM shifts AS s LEFT OUTER JOIN shiftstatus AS ss ON s.Id = ss.Id WHERE CloseDateTime IS NULL', []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
-          shiftLog.log('Shift getUnOpened : Error : ' + ex.message, 3);
-          throw new Error(ex.message);
           errorLog.log('Shift Open Error : ' + ex.message, 4);
           deferred.reject(ex.message);
+          throw new Error(ex.message);
         });
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -64,11 +60,11 @@ angular.module('itouch.services')
         DB.query('SELECT s.*, ss.OpenDateTime, ss.CloseDateTime, OpenUser, CloseUser, DeclareCashLater FROM shifts AS s LEFT OUTER JOIN shiftstatus AS ss ON s.Id = ss.Id WHERE CloseDateTime IS NULL AND OpenDateTime IS NOT NULL', []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
-          shiftLog.log('Shift getOpened Error : ' + ex.message, 3);
           errorLog.log('Shift Close Error : ' + ex.message, 4);
-          throw new Error(ex.message);
           deferred.reject(ex.message);
+          throw new Error(ex.message);
         });
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -77,11 +73,11 @@ angular.module('itouch.services')
         DB.query('SELECT * FROM shifts WHERE Id = ?', [id]).then(function (data) {
           deferred.resolve(DB.fetch(data));
         }, function (ex) {
-          shiftLog.log('Shift getById : Error : ' + ex.message, 3);
           errorLog.log('Shift getById : Error : ' + ex.message, 4);
-          throw new Error(ex.message);
           deferred.reject(ex.message);
+          throw new Error(ex.message);
         });
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -90,10 +86,9 @@ angular.module('itouch.services')
         DB.query('SELECT * FROM shifts WHERE Id IN(SELECT Id FROM shiftstatus WHERE CloseDateTime IS NOT NULL AND DeclareCashLater)', []).then(function (data) {
           deferred.resolve(DB.fetchAll(data));
         }, function (ex) {
-          shiftLog.log('Shift getDeclareCashShifts : Error : ' + ex.message, 3);
           errorLog.log('Shift getDeclareCashShifts : Error : ' + ex.message, 4);
-          throw new Error(ex.message);
           deferred.reject(ex.message);
+          throw new Error(ex.message);
         });
         return deferred.promise;
       };
@@ -153,17 +148,14 @@ angular.module('itouch.services')
                 self.clearCurrent();
                 deferred.resolve();
               }, function (error) {
-                shiftLog.log('Close Shift Status : Error : ' + error, 3);
                 errorLog.log('Close Shift Status : Error : ' + error, 4);
                 deferred.reject(error);
               });
             } else {
-              shiftLog.log('Close Shift Status : Shift is not valid', 3);
               errorLog.log('Close Shift Status : Shift is not valid', 4);
               deferred.reject('Shift is not valid');
             }
           }, function (error) {
-            shiftLog.log('Close Shift Status : Error : ' + error, 3);
             errorLog.log('Close Shift Status : Error : ' + error, 4);
             deferred.reject(error);
           });
@@ -202,13 +194,11 @@ angular.module('itouch.services')
                 'createHeader': declareCash(cash, shift.Id)
               });
             } else {
-              shiftLog.log('Declare Cash Status : Shift is not valid', 3);
               errorLog.log('Declare Cash Status : Shift is not valid', 4);
               return $q.reject('Shift is not valid');
             }
           });
         } else {
-          shiftLog.log('Declare Cash Status : Shift is not valid', 3);
           errorLog.log('Declare Cash Status : Shift is not valid', 4);
           return $q.reject('Shift is not valid');
         }
@@ -225,13 +215,11 @@ angular.module('itouch.services')
               return DB.update('ShiftStatus', _.omit(shift, 'Id'), { columns: 'Id= ?', data: [shift.Id]});
               // deferred.resolve();
             } else {
-              shiftLog.log('declareCashLater Status : Shift is not valid', 3);
               errorLog.log('declareCashLater Status : Shift is not valid', 4);
               return $q.reject('Shift is not valid');
             }
           });
         } else {
-          shiftLog.log('declareCashLater Status : Shift is not valid', 3);
           errorLog.log('declareCashLater Status : Shift is not valid', 4);
           return $q.reject('Shift is not valid');
         }

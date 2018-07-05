@@ -225,6 +225,7 @@ angular.module('itouch.controllers')
       };
 
       $scope.$on('shift-changed', function (event, data) {
+        eventLog.log('shift-changed');
         console.log('shift-changed from sales');
         refresh();
       });

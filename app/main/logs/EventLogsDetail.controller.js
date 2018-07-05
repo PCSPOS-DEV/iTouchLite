@@ -55,6 +55,7 @@ angular.module('itouch.controllers')
 
     self.deleteManual = function () {
       localStorage.removeItem('EventLogs');
+      eventLog.clear();
       $scope.newlogs = '';
       $scope.totallines = 0;
       Alert.success('All Event Log Delete  Successfully');
@@ -76,7 +77,7 @@ angular.module('itouch.controllers')
         Alert.success('Email Sent Successfully');
         setTimeout(function () {
           localStorage.removeItem('EventLogs');
-          TempLog.clear();
+          eventLog.clear();
           $scope.totallines = 0;
           $scope.newlogs = '';
         }, 200);
