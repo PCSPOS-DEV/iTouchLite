@@ -6,20 +6,20 @@ code.google.com/p/crypto-js/wiki/License
 */
 (function (undefined) {
     // Shortcuts
-    var C = CryptoJS;
-    var C_lib = C.lib;
-    var Base = C_lib.Base;
-    var X32WordArray = C_lib.WordArray;
+  var C = CryptoJS;
+  var C_lib = C.lib;
+  var Base = C_lib.Base;
+  var X32WordArray = C_lib.WordArray;
 
     /**
      * x64 namespace.
      */
-    var C_x64 = C.x64 = {};
+  var C_x64 = C.x64 = {};
 
     /**
      * A 64-bit word.
      */
-    var X64Word = C_x64.Word = Base.extend({
+  var X64Word = C_x64.Word = Base.extend({
         /**
          * Initializes a newly created 64-bit word.
          *
@@ -30,10 +30,10 @@ code.google.com/p/crypto-js/wiki/License
          *
          *     var x64Word = CryptoJS.x64.Word.create(0x00010203, 0x04050607);
          */
-        init: function (high, low) {
-            this.high = high;
-            this.low = low;
-        }
+    init: function (high, low) {
+      this.high = high;
+      this.low = low;
+    }
 
         /**
          * Bitwise NOTs this word.
@@ -199,7 +199,7 @@ code.google.com/p/crypto-js/wiki/License
 
             // return X64Word.create(high, low);
         // }
-    });
+  });
 
     /**
      * An array of 64-bit words.
@@ -207,7 +207,7 @@ code.google.com/p/crypto-js/wiki/License
      * @property {Array} words The array of CryptoJS.x64.Word objects.
      * @property {number} sigBytes The number of significant bytes in this word array.
      */
-    var X64WordArray = C_x64.WordArray = Base.extend({
+  var X64WordArray = C_x64.WordArray = Base.extend({
         /**
          * Initializes a newly created word array.
          *
@@ -228,15 +228,15 @@ code.google.com/p/crypto-js/wiki/License
          *         CryptoJS.x64.Word.create(0x18191a1b, 0x1c1d1e1f)
          *     ], 10);
          */
-        init: function (words, sigBytes) {
-            words = this.words = words || [];
+    init: function (words, sigBytes) {
+      words = this.words = words || [];
 
-            if (sigBytes != undefined) {
-                this.sigBytes = sigBytes;
-            } else {
-                this.sigBytes = words.length * 8;
-            }
-        },
+      if (sigBytes != undefined) {
+        this.sigBytes = sigBytes;
+      } else {
+        this.sigBytes = words.length * 8;
+      }
+    },
 
         /**
          * Converts this 64-bit word array to a 32-bit word array.
@@ -247,21 +247,21 @@ code.google.com/p/crypto-js/wiki/License
          *
          *     var x32WordArray = x64WordArray.toX32();
          */
-        toX32: function () {
+    toX32: function () {
             // Shortcuts
-            var x64Words = this.words;
-            var x64WordsLength = x64Words.length;
+      var x64Words = this.words;
+      var x64WordsLength = x64Words.length;
 
             // Convert
-            var x32Words = [];
-            for (var i = 0; i < x64WordsLength; i++) {
-                var x64Word = x64Words[i];
-                x32Words.push(x64Word.high);
-                x32Words.push(x64Word.low);
-            }
+      var x32Words = [];
+      for (var i = 0; i < x64WordsLength; i++) {
+        var x64Word = x64Words[i];
+        x32Words.push(x64Word.high);
+        x32Words.push(x64Word.low);
+      }
 
-            return X32WordArray.create(x32Words, this.sigBytes);
-        },
+      return X32WordArray.create(x32Words, this.sigBytes);
+    },
 
         /**
          * Creates a copy of this word array.
@@ -272,19 +272,19 @@ code.google.com/p/crypto-js/wiki/License
          *
          *     var clone = x64WordArray.clone();
          */
-        clone: function () {
-            var clone = Base.clone.call(this);
+    clone: function () {
+      var clone = Base.clone.call(this);
 
             // Clone "words" array
-            var words = clone.words = this.words.slice(0);
+      var words = clone.words = this.words.slice(0);
 
             // Clone each X64Word object
-            var wordsLength = words.length;
-            for (var i = 0; i < wordsLength; i++) {
-                words[i] = words[i].clone();
-            }
+      var wordsLength = words.length;
+      for (var i = 0; i < wordsLength; i++) {
+        words[i] = words[i].clone();
+      }
 
-            return clone;
-        }
-    });
-}());
+      return clone;
+    }
+  });
+})();

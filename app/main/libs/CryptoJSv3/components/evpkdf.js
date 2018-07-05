@@ -6,18 +6,18 @@ code.google.com/p/crypto-js/wiki/License
 */
 (function () {
     // Shortcuts
-    var C = CryptoJS;
-    var C_lib = C.lib;
-    var Base = C_lib.Base;
-    var WordArray = C_lib.WordArray;
-    var C_algo = C.algo;
-    var MD5 = C_algo.MD5;
+  var C = CryptoJS;
+  var C_lib = C.lib;
+  var Base = C_lib.Base;
+  var WordArray = C_lib.WordArray;
+  var C_algo = C.algo;
+  var MD5 = C_algo.MD5;
 
     /**
      * This key derivation function is meant to conform with EVP_BytesToKey.
      * www.openssl.org/docs/crypto/EVP_BytesToKey.html
      */
-    var EvpKDF = C_algo.EvpKDF = Base.extend({
+  var EvpKDF = C_algo.EvpKDF = Base.extend({
         /**
          * Configuration options.
          *
@@ -25,11 +25,11 @@ code.google.com/p/crypto-js/wiki/License
          * @property {Hasher} hasher The hash algorithm to use. Default: MD5
          * @property {number} iterations The number of iterations to perform. Default: 1
          */
-        cfg: Base.extend({
-            keySize: 128/32,
-            hasher: MD5,
-            iterations: 1
-        }),
+    cfg: Base.extend({
+      keySize: 128 / 32,
+      hasher: MD5,
+      iterations: 1
+    }),
 
         /**
          * Initializes a newly created key derivation function.
@@ -42,9 +42,9 @@ code.google.com/p/crypto-js/wiki/License
          *     var kdf = CryptoJS.algo.EvpKDF.create({ keySize: 8 });
          *     var kdf = CryptoJS.algo.EvpKDF.create({ keySize: 8, iterations: 1000 });
          */
-        init: function (cfg) {
-            this.cfg = this.cfg.extend(cfg);
-        },
+    init: function (cfg) {
+      this.cfg = this.cfg.extend(cfg);
+    },
 
         /**
          * Derives a key from a password.
@@ -58,42 +58,42 @@ code.google.com/p/crypto-js/wiki/License
          *
          *     var key = kdf.compute(password, salt);
          */
-        compute: function (password, salt) {
+    compute: function (password, salt) {
             // Shortcut
-            var cfg = this.cfg;
+      var cfg = this.cfg;
 
             // Init hasher
-            var hasher = cfg.hasher.create();
+      var hasher = cfg.hasher.create();
 
             // Initial values
-            var derivedKey = WordArray.create();
+      var derivedKey = WordArray.create();
 
             // Shortcuts
-            var derivedKeyWords = derivedKey.words;
-            var keySize = cfg.keySize;
-            var iterations = cfg.iterations;
+      var derivedKeyWords = derivedKey.words;
+      var keySize = cfg.keySize;
+      var iterations = cfg.iterations;
 
             // Generate key
-            while (derivedKeyWords.length < keySize) {
-                if (block) {
-                    hasher.update(block);
-                }
-                var block = hasher.update(password).finalize(salt);
-                hasher.reset();
+      while (derivedKeyWords.length < keySize) {
+        if (block) {
+          hasher.update(block);
+        }
+        var block = hasher.update(password).finalize(salt);
+        hasher.reset();
 
                 // Iterations
-                for (var i = 1; i < iterations; i++) {
-                    block = hasher.finalize(block);
-                    hasher.reset();
-                }
-
-                derivedKey.concat(block);
-            }
-            derivedKey.sigBytes = keySize * 4;
-
-            return derivedKey;
+        for (var i = 1; i < iterations; i++) {
+          block = hasher.finalize(block);
+          hasher.reset();
         }
-    });
+
+        derivedKey.concat(block);
+      }
+      derivedKey.sigBytes = keySize * 4;
+
+      return derivedKey;
+    }
+  });
 
     /**
      * Derives a key from a password.
@@ -112,7 +112,7 @@ code.google.com/p/crypto-js/wiki/License
      *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8 });
      *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8, iterations: 1000 });
      */
-    C.EvpKDF = function (password, salt, cfg) {
-        return EvpKDF.create(cfg).compute(password, salt);
-    };
-}());
+  C.EvpKDF = function (password, salt, cfg) {
+    return EvpKDF.create(cfg).compute(password, salt);
+  };
+})();

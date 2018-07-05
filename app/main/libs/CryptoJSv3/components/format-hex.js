@@ -6,14 +6,14 @@ code.google.com/p/crypto-js/wiki/License
 */
 (function (undefined) {
     // Shortcuts
-    var C = CryptoJS;
-    var C_lib = C.lib;
-    var CipherParams = C_lib.CipherParams;
-    var C_enc = C.enc;
-    var Hex = C_enc.Hex;
-    var C_format = C.format;
+  var C = CryptoJS;
+  var C_lib = C.lib;
+  var CipherParams = C_lib.CipherParams;
+  var C_enc = C.enc;
+  var Hex = C_enc.Hex;
+  var C_format = C.format;
 
-    var HexFormatter = C_format.Hex = {
+  var HexFormatter = C_format.Hex = {
         /**
          * Converts the ciphertext of a cipher params object to a hexadecimally encoded string.
          *
@@ -27,9 +27,9 @@ code.google.com/p/crypto-js/wiki/License
          *
          *     var hexString = CryptoJS.format.Hex.stringify(cipherParams);
          */
-        stringify: function (cipherParams) {
-            return cipherParams.ciphertext.toString(Hex);
-        },
+    stringify: function (cipherParams) {
+      return cipherParams.ciphertext.toString(Hex);
+    },
 
         /**
          * Converts a hexadecimally encoded ciphertext string to a cipher params object.
@@ -44,9 +44,9 @@ code.google.com/p/crypto-js/wiki/License
          *
          *     var cipherParams = CryptoJS.format.Hex.parse(hexString);
          */
-        parse: function (input) {
-            var ciphertext = Hex.parse(input);
-            return CipherParams.create({ ciphertext: ciphertext });
-        }
-    };
-}());
+    parse: function (input) {
+      var ciphertext = Hex.parse(input);
+      return CipherParams.create({ ciphertext: ciphertext });
+    }
+  };
+})();
