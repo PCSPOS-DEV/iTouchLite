@@ -2,12 +2,13 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('SyncLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state', '$cordovaEmailComposer',
-    function (Alert, $localStorage, $scope, $rootScope, SettingsService, $state, $cordovaEmailComposer) {
+  .controller('SyncLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state', '$cordovaEmailComposer', 'LogService',
+    function (Alert, $localStorage, $scope, $rootScope, SettingsService, $state, $cordovaEmailComposer, LogService) {
       var self = this;
       var synclog = localStorage.getItem('SyncLogs');
-      console.log(synclog);
+      // console.log(synclog);
       var systemDate = new Date();
+      var fileName = LogService.GetFileName();
       // console.log(uploadlog);
       if (synclog == null) {
         synclog = 'no Data';
@@ -15,7 +16,13 @@ angular.module('itouch.controllers')
       $scope.newlogs = synclog;
       var lines = synclog.split('\n');
       $scope.totallines = lines.length;
-      console.log(lines);
+      if ($scope.totallines >= 1000) {
+        LogService.sendSyncLog();
+        localStorage.removeItem('SyncLogs');
+        $scope.newlogs = '';
+        $scope.totallines = 0;
+      }
+      // console.log(lines);
       var startline = 0;
       var lastline = 49;
       var sline = lines.splice(startline, lastline);
@@ -32,12 +39,12 @@ angular.module('itouch.controllers')
       pdf.setFontSize(10);
       pdf.text( first, 50, 110 );
 
-      console.log(lines.length);
+      // console.log(lines.length);
       var requirepages = lines.length / 50;
-      console.log('rp : ' + requirepages);
+      // console.log('rp : ' + requirepages);
 
       for (var i = 1; i < requirepages; i++, lastline + 50, startline + 50) {
-        console.log('run? ');
+        // console.log('run? ');
         sline = lines.splice(startline, lastline);
         var newdata = sline.join('\n');
         pdf.addPage();
@@ -45,7 +52,7 @@ angular.module('itouch.controllers')
       }
       var pdfBase64 = pdf.output('datauristring');
       // console.log(pdfurl);
-      pdf.save('a4.pdf');
+      // pdf.save('a4.pdf');
 
       self.deleteManual = function () {
         localStorage.removeItem('SyncLogs');
@@ -62,7 +69,7 @@ angular.module('itouch.controllers')
           to: 'pcsposdev@prima.com.sg',
           //  cc: , // email addresses for CC field
           //  bcc: , // email addresses for BCC field
-          attachments: [SettingsService.generateAttachment(pdfBase64, 'UploadLog.pdf')],
+          attachments: [SettingsService.generateAttachment(pdfBase64, fileName + '.pdf')],
           subject: 'Sync Log <itouchlite>',
           body: '<h1>Sync Log Attachment</h1>' + '<p>Date : ' + systemDate + '</p>',
           isHtml: true
