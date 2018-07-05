@@ -317,12 +317,12 @@ angular.module('itouch', [
                 }
               })
 
-              .state('app.shiftdetaillogs', {
+              .state('app.eventdetaillogs', {
                 url: '/shiftlogs',
                 views: {
                   'menuContent': {
-                    templateUrl: 'main/logs/ShiftLogsDetail.html',
-                    controller: 'ShiftLogsDetailCtrl as ctrl'
+                    templateUrl: 'main/logs/EventLogsDetail.html',
+                    controller: 'EventLogsDetailCtrl as ctrl'
                   }
                 }
               })
