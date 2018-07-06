@@ -25,7 +25,9 @@ angular.module('itouch.services')
 
     self.getAll = function () {
       PrinterSettings.get().then(function (res) {
-        return data = res;
+        data = res;
+        return data;
+        // return data = res;
       });
     };
     self.getAll();

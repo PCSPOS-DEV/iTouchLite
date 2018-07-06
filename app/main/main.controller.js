@@ -1,11 +1,13 @@
 
 angular.module('itouch.controllers')
-.controller('AppCtrl', ['SyncService', '$scope', '$ionicLoading', 'LocationService', 'Logger', '$localStorage', 'AuthService', '$state', '$ionicHistory', 'Alert', 'CartItemService', '$cordovaKeyboard', 'UploadService', '$ionicModal',
-  function (SyncService, $scope, $ionicLoading, LocationService, Logger, $localStorage, AuthService, $state, $ionicHistory, Alert, CartItemService, $cordovaKeyboard, UploadService, $ionicModal) {
+.controller('AppCtrl', ['SyncService', '$scope', '$ionicLoading', 'LocationService', 'Logger', '$localStorage', 'AuthService', '$state', '$ionicHistory', 'Alert', 'CartItemService', '$cordovaKeyboard', 'UploadService', '$ionicModal', 'LogService',
+  function (SyncService, $scope, $ionicLoading, LocationService, Logger, $localStorage, AuthService, $state, $ionicHistory, Alert, CartItemService, $cordovaKeyboard, UploadService, $ionicModal, LogService) {
     var currentUser = AuthService.currentUser();
-
+    eventLog = LogService.StartEventLog();
+    errorLog = LogService.StartErrorLog();
     $scope.loadLogo = function () {
       try {
+        eventLog.log('setImages loadLogo Start: ');
         if ($localStorage && $localStorage.images) {
           var image = new Image();
           image.style.width = '100px';
@@ -23,12 +25,15 @@ angular.module('itouch.controllers')
               context.drawImage(image, 0, 0);
             }
           };
+          eventLog.log('setImages loadLogo Complete : ');
         }
 
       }
       catch (e) {
         alert(e.message);
+        errorLog.log('setImages loadLogo Error : ' + e.message);
       }
+      LogService.SaveLog();
     };
 
     $scope.setImages = function () {
@@ -57,6 +62,7 @@ angular.module('itouch.controllers')
     uploadLog = UploadService.StartuploadLog();
     var uploadClicked = false;
     $scope.upload = function () {
+      eventLog.log('Upload Start: ');
       if (!uploadClicked) {
         uploadClicked = true;
         uploadLog.clear();
@@ -71,9 +77,11 @@ angular.module('itouch.controllers')
           if (uploadlog == null) {
             uploadlog = '';
           }
+          eventLog.log('Upload Complete: ');
           localStorage.setItem('UploadLogs', uploadlog + logs);
           Alert.success('Upload success');
         }, function (err) {
+          errorLog.log('Upload Error : ' + err, 4);
           uploadLog.log('Upload Error : ' + err, 4);
           uploadLog.log('-----*-----', 7);
           var uploadlog = localStorage.getItem('UploadLogs');
@@ -90,6 +98,7 @@ angular.module('itouch.controllers')
           uploadClicked = false;
         });
       }
+      LogService.SaveLog();
     };
 
     $scope.loadingShow = function () {
@@ -164,15 +173,19 @@ angular.module('itouch.controllers')
 
     $scope.logout = function () {
       Alert.showConfirm('Are you sure?', 'Logout', function (res) {
+        eventLog.log('Logout Start: ');
         if (res == 1) {
           CartItemService.isEmpty().then(function (empty) {
             if (!empty) {
+              eventLog.log('Logout Cancel : Cart is not empty');
               Alert.warning('Cart is not empty!');
             } else {
+              eventLog.log('Logout Complete: ');
               $scope.go('login', true);
             }
           });
         }
+        LogService.SaveLog();
       });
     };
 
