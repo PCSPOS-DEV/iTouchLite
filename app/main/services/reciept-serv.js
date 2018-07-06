@@ -1,11 +1,14 @@
 
 angular.module('itouch.services')
-.service('Reciept', ['PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert', 'Restangular', 'DiscountService', 'BillService',
-  function (PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert, Restangular, DiscountService, BillService) {
+.service('Reciept', ['PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert', 'Restangular', 'DiscountService', 'BillService', 'LogService',
+  function (PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert, Restangular, DiscountService, BillService, LogService) {
     var self = this;
     var printData = null;
     var printer = PrintService.getPrinter();
     var location = LocationService.currentLocation;
+    var items;
+    eventLog = LogService.StartEventLog();
+    errorLog = LogService.StartErrorLog();
   // console.log(location);
 
     self.formatDate = function (dateVal) {
@@ -41,6 +44,7 @@ angular.module('itouch.services')
     self.getAll = function () {
       PrinterSettings.get().then(function (res) {
         printData = res;
+        eventLog.log('Printer Data : Retrieved');
       });
     };
     self.getAll();
@@ -244,16 +248,20 @@ angular.module('itouch.services')
                 printer.send();
               } else {
                 console.log('bill not available');
+                errorLog.log('bill not available');
               }
             });
           }
 
         } catch (e) {
           console.log(e);
+          errorLog.log('Receipt Error' + e);
         }
       } else {
         Alert.success('printer not connected', 'Error');
+        errorLog.log('printer not connected');
       }
+      LogService.SaveLog();
     };
 
     self.printVoid = function (DocNo) {
@@ -277,15 +285,19 @@ angular.module('itouch.services')
               printer.send();
             } else {
               console.log('bill not available');
+              errorLog.log('void bill not available');
             }
           });
 
         } catch (e) {
+          errorLog.log('Void Receipt Error' + e);
           console.log(e);
         }
       } else {
         Alert.success('printer not connected', 'Error');
+        errorLog.log('printer not connected');
       }
+      LogService.SaveLog();
     };
 
     self.printAbort = function (DocNo) {
@@ -308,16 +320,20 @@ angular.module('itouch.services')
 
               printer.send();
             } else {
+              errorLog.log('abort bill not available');
               console.log('bill not available');
             }
           });
 
         } catch (e) {
+          errorLog.log('Abort Receipt Error' + e);
           console.log(e);
         }
       } else {
         Alert.success('printer not connected', 'Error');
+        errorLog.log('printer not connected');
       }
+      LogService.SaveLog();
     };
 
     self.printSignal = function () {
@@ -326,11 +342,14 @@ angular.module('itouch.services')
           printer = PrintService.getPrinter();
           printer.send();
         } catch (e) {
+          errorLog.log('printSignal Error' + e);
           console.log(e);
         }
       } else {
+        errorLog.log('printer not connected');
         Alert.success('printer not connected', 'Error');
       }
+      LogService.SaveLog();
     };
 
     self.getBillHeader = function (DocNo) {
@@ -445,6 +464,7 @@ angular.module('itouch.services')
           return data;
         });
       }, function (ex) {
+        errorLog.log('fetchData error : ' + ex);
         console.log(ex);
       });
     };
@@ -471,9 +491,11 @@ angular.module('itouch.services')
 
           // printer.send();
         } else {
+          errorLog.log('bill not available');
           console.log('bill not available');
         }
       });
+      LogService.SaveLog();
     };
 
     var prepBody = function (header, items) {
@@ -665,13 +687,13 @@ angular.module('itouch.services')
           var bills = JSON.parse(res);
           var header = ItemService.calculateTotal( _.first(bills.DBSuspendBillHeader));
           if (bill == undefined) {
-            var items = bills.DBSuspendBillDetail;
+            items = bills.DBSuspendBillDetail;
           }
           else {
-            var items = bill.SuspendBillFilter;
+            items = bill.SuspendBillFilter;
             angular.forEach(bill.SuspendBillDetail, function (value, key) {
               if (value.SuspendDepDocNo == '' && value.ItemType != 'RND') {
-                console.log(value);
+                // console.log(value);
                 bill.SuspendBillFilter.push(value);
               }
             });
@@ -698,6 +720,7 @@ angular.module('itouch.services')
             };
           }
           else {
+            errorLog.log('Unable to fetch suspended bills');
             return $q.reject('Unable to fetch suspended bills');
           }
         } catch (e) {
@@ -714,6 +737,7 @@ angular.module('itouch.services')
           return data;
         });
       }, function (ex) {
+        errorLog.log('fetch suspended bills ' + ex);
         console.log(ex);
       });
     };
@@ -742,18 +766,22 @@ angular.module('itouch.services')
 
                 printer.send();
               } else {
+                errorLog.log('bill not available');
                 console.log('bill not available');
               }
             });
           }
 
         } catch (e) {
+          errorLog.log('printSuspend Error' + e);
           console.log(e);
         }
       }
       else {
+        errorLog.log('printer not connected', 'Error');
         Alert.success('printer not connected', 'Error');
       }
+      LogService.SaveLog();
     };
   /*--*/
 

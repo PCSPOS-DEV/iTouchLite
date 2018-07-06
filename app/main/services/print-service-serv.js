@@ -1,9 +1,9 @@
 
 angular.module('itouch.services')
-.service('PrintService', 'SettingsService', function ( $q, $localStorage, SettingsService) {
+.service('PrintService', 'LogService', function ( $q, $localStorage, LogService) {
   var self = this;
-  errorLog = SettingsService.StartErrorLog();
-
+  eventLog = LogService.StartEventLog();
+  errorLog = LogService.StartErrorLog();
   var ePosDev = new epson.ePOSDevice();
 
   var printer = null;
@@ -25,7 +25,7 @@ angular.module('itouch.services')
             if (deviceObj === null) {
                    //Displays an error message if the system fails to retrieve the Printer object
               deferred.reject('connect error. code:' + errorCode);
-              errorLog.log('connect error. code:' + errorCode, 4);
+              errorLog.log('connect error. code:' + errorCode);
               return;
             }
             printer = deviceObj;
@@ -33,34 +33,38 @@ angular.module('itouch.services')
             printer.onreceive = function (response) {
               if (response.success) {
                      //Displays the successful print message
+                deferred.reject('printer connection : Success');
                 deferred.resolve();
               } else {
                      //Displays error messages
                 deferred.reject('connect error. code:' + errorCode);
-                errorLog.log('connect error. code:' + errorCode, 4);
+                errorLog.log('connect error. code:' + errorCode);
               }
             };
           });
         }
         else {
              //Displays error messages
+          errorLog.log('connect error. code:' + resultConnect);
           deferred.reject(resultConnect);
         }
       });
     } else {
       deferred.reject('Lib error');
-      errorLog.log('Lib error', 4);
+      errorLog.log('Lib error');
     }
+    LogService.SaveLog();
     return deferred.promise;
   };
 
   self.disconnect = function () {
     var deferred = $q.defer();
     ePosDev.deleteDevice(printer, function (errorCode) {
-      errorLog.log('connect error. code:' + errorCode, 4);
+      errorLog.log('connect error. code:' + errorCode);
       deferred.resolve();
       ePosDev.disconnect();
     });
+    LogService.SaveLog();
     return deferred.promise;
   };
 

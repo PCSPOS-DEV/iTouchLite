@@ -1,10 +1,11 @@
 
 angular.module('itouch.services')
-  .service('ImageDownloadService', ['DB', 'DB_CONFIG', '$q', 'SettingsService', '$cordovaFileTransfer', '$localStorage', 'Alert', 'KeyBoardService', '$cordovaFile',
-    function (DB, DB_CONFIG, $q, SettingsService, $cordovaFileTransfer, $localStorage, Alert, KeyBoardService, $cordovaFile) {
+  .service('ImageDownloadService', ['DB', 'DB_CONFIG', '$q', 'SettingsService', '$cordovaFileTransfer', '$localStorage', 'Alert', 'KeyBoardService', '$cordovaFile', 'LogService',
+    function (DB, DB_CONFIG, $q, SettingsService, $cordovaFileTransfer, $localStorage, Alert, KeyBoardService, $cordovaFile, LogService) {
       var self = this;
       var entityId;
-      errorLog = SettingsService.StartErrorLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       self.getImageNames = function () {
         return KeyBoardService.getLayout().then(function (layout) {
@@ -18,6 +19,7 @@ angular.module('itouch.services')
       };
 
       self.downloadFile = function (imageName) {
+        eventLog.log('Download file : Start');
         var config = $localStorage.itouchConfig;
         var name = imageName.substr(imageName.lastIndexOf('/') + 1);
         var url = config.baseUrl + 'DownloadImage?ImageName=' + name;
@@ -25,15 +27,18 @@ angular.module('itouch.services')
         if (config.baseUrl && window.cordova && name) {
           var targetPath = cordova.file.dataDirectory + 'userImages/' + name;
           var trustHosts = true;
+          eventLog.log('Download file : Finish');
           return $cordovaFileTransfer.download(url, targetPath, options, trustHosts);
         } else {
-          errorLog.log('Unable to download image file', 5);
+          errorLog.log('Unable to download image file');
           return $q.reject('Unable to download file');
 
         }
       };
 
       self.downloadImages = function () {
+        eventLog.log('Download image');
+        LogService.SaveLog();
         return self.getImageNames().then(function (images) {
           if (window.cordova && images && images.length > 0) {
             var promises = [];
@@ -62,6 +67,7 @@ angular.module('itouch.services')
             });
           } else {
             errorLog.log('no images in the db', 5);
+            LogService.SaveLog();
             return $q.reject('no images in the db');
           }
         });
