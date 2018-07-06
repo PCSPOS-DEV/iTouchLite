@@ -2,8 +2,10 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('VoidBillCtrl', ['$scope', 'VoidBillService', 'ControlService', 'Reciept', 'Alert', '$ionicModal', '$timeout', 'BillService',
-    function ($scope, VoidBillService, ControlService, Reciept, Alert, $ionicModal, $timeout, BillService) {
+  .controller('VoidBillCtrl', ['$scope', 'VoidBillService', 'ControlService', 'Reciept', 'Alert', '$ionicModal', '$timeout', 'BillService', 'LogService',
+    function ($scope, VoidBillService, ControlService, Reciept, Alert, $ionicModal, $timeout, BillService, LogService) {
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       var self = this;
       self.data = {
         bills: [],
@@ -37,6 +39,7 @@ angular.module('itouch.controllers')
         if (bill) {
           Alert.showConfirm('Are you sure?', 'Void bill', function (res) {
             if (res == 1) {
+              eventLog.log('voidBill Start: ');
               BillService.voidOldBill();
               VoidBillService.voidBill(bill.DocNo).then(function (DocNo) {
                 $scope.$emit('initBill');
@@ -45,26 +48,30 @@ angular.module('itouch.controllers')
                 Reciept.printVoid(DocNo);
                 Reciept.openDrawer();
               }, function (ex) {
+                // eventLog.log('setImages loadLogo Start: ');
                 console.log(ex);
               });
+              eventLog.log('voidBill Complete: ');
             }
           });
         } else {
           Alert.warning('Please select an item to void');
         }
-
+        LogService.SaveLog();
       };
 
       self.onItemTap = function (bill) {
         if (bill) {
+          eventLog.log('voidBill onItemTap : Start ');
           self.data.bills = _.map(self.data.bills, function (item) {
             item.active = false;
             return item;
           });
           bill.active = true;
           self.data.selectedItem = bill;
+          eventLog.log('voidBill onItemTap : Finish ');
         }
-
+        LogService.SaveLog();
       };
 
       self.view = function () {
@@ -96,8 +103,9 @@ angular.module('itouch.controllers')
       };
 
       $scope.$on('bill.modal.close', function () {
+        errorLog.log('Bill Detail Model Close');
         self.modal.hide();
       });
 
-
+      LogService.SaveLog();
     }]);

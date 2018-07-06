@@ -26,6 +26,7 @@ angular.module('itouch.controllers')
       var refresh = function () {
         if ($scope.selectedItem) {
           PrinterSettings.get().then(function (data) {
+            errorLog.log('Bill Detail Retrieved');
             $scope.settings = data;
           });
 
@@ -33,11 +34,14 @@ angular.module('itouch.controllers')
             // console.log(data);
             data.header.Title = '';
             switch (data.header.DocType) {
+
               case 'AV':
                 data.header.Title = 'Abort';
+                errorLog.log('Bill Detail Type : Abort');
                 break;
               case 'VD':
                 data.header.Title = 'Transaction Void ' + data.header.SalesDocNo;
+                errorLog.log('Bill Detail Type : Transaction Void');
                 break;
             }
             var subTotal = 0;
@@ -79,7 +83,7 @@ angular.module('itouch.controllers')
             console.log(ex);
           });
         }
-
+        LogService.SaveLog();
       };
 
       $scope.printReciept = function (DocNo) {
