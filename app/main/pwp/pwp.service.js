@@ -2,10 +2,12 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-.factory('PWPService', ['LocationService', 'DB', 'DB_CONFIG', '$q', '$localStorage', 'Restangular', 'SettingsService', 'ControlService', 'Alert',
-  function (LocationService, DB, DB_CONFIG, $q, $localStorage, Restangular, SettingsService, ControlService, Alert, PWPCtrl) {
+.factory('PWPService', ['LocationService', 'DB', 'DB_CONFIG', '$q', '$localStorage', 'Restangular', 'SettingsService', 'ControlService', 'Alert', 'LogService',
+  function (LocationService, DB, DB_CONFIG, $q, $localStorage, Restangular, SettingsService, ControlService, Alert, LogService) {
     var self = this;
     var type = 0;
+    eventLog = LogService.StartEventLog();
+    errorLog = LogService.StartErrorLog();
     self.fetchItemsByPWP = function () {
       var deferred = $q.defer();
       Restangular.one('GetItemsByPwp').get({EntityId: SettingsService.getEntityId()}).then(function (res) {
@@ -19,6 +21,7 @@ angular.module('itouch.services')
             }
             else {
               syncLog.log('  ItemsByPWP Sync Error : Unknown machine', 1);
+              errorLog.log('ItemsByPWP Sync Error : Unknown machine');
               deferred.reject('Unknown machine');
             }
           }
@@ -28,14 +31,16 @@ angular.module('itouch.services')
           }
         } catch (ex) {
           syncLog.log('  ItemsByPWP Sync Error : No results', 1);
+          errorLog.log('ItemsByPWP Sync Error : No results');
           deferred.reject('No results');
         }
       }, function (err) {
         console.error(err);
         syncLog.log('  ItemsByPWP Sync Error : Unable to fetch data from the server', 1);
+        errorLog.log('ItemsByPWP Sync Error : Unable to fetch data from the server');
         deferred.reject('Unable to fetch data from the server');
       });
-
+      LogService.SaveLog();
       return deferred.promise;
     };
 
@@ -54,6 +59,7 @@ angular.module('itouch.services')
               deferred.resolve();
             } else {
               syncLog.log('  PWP Sync Error : Unknown machine', 1);
+              errorLog.log('PWP Sync Error : Unknown machine');
               deferred.reject('Unknown machine');
             }
           }
@@ -64,14 +70,16 @@ angular.module('itouch.services')
           }
         } catch (ex) {
           syncLog.log('  PWP Sync Error : No results', 1);
+          errorLog.log('PWP Sync Error : No results');
           deferred.reject('No results');
         }
       }, function (err) {
         console.error(err);
         syncLog.log('  PWP Sync Error : Unable to fetch data from the server', 1);
+        errorLog.log('PWP Sync Error : Unable to fetch data from the server');
         deferred.reject('Unable to fetch data from the server');
       });
-
+      LogService.SaveLog();
       return deferred.promise;
     };
 
@@ -110,6 +118,7 @@ angular.module('itouch.services')
           console.log('RToDate : ' + RToDate);
           console.log('businessDate : ' + businessDate);
           if (RFromDate <= businessDate && businessDate <= RToDate) {
+            eventLog.log('Pass Promotion Date ');
             var MaxItemsPerReceipt = resultSet[0].MaxNoOfItemsPerReceipt;
             pwp = _.pick(_.first(resultSet), ['Id', 'Code', 'Description1', 'Description2', 'FromDate', 'ToDate', 'Quantity', 'ItemId', 'MaxQuantity', 'MaxPrice', 'PriceLevelId']);
             if (qty > MaxItemsPerReceipt && MaxItemsPerReceipt < 0) {
@@ -144,8 +153,10 @@ angular.module('itouch.services')
               item.SubItemMaxQty = item.SubItemMaxQty * applicableQty;
               return item;
             });
+            eventLog.log('selectItem PWP Done ');
             deferred.resolve(pwp);
           } else {
+            eventLog.log('Fail Promotion Date ');
             // Alert.error('Expire promotion period');
             console.log('Expire promotion period');
             var expire = 'expire';
@@ -160,6 +171,7 @@ angular.module('itouch.services')
         }
 
       }, function (err) {
+        errorLog.log('getPWP Error : ' +  err.message);
         deferred.reject(err.message);
       });
       return deferred.promise;

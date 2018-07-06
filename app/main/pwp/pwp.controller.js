@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('PWPCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService','ItemService', '$q', 'DiscountService', 'Alert', '$timeout', 'SettingsService',
-    function ($scope, ControlService, $ionicPopup, CartItemService, BillService,ItemService, $q, DiscountService, Alert, $timeout, SettingsService) {
+  .controller('PWPCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService', 'ItemService', '$q', 'DiscountService', 'Alert', '$timeout', 'SettingsService',
+    function ($scope, ControlService, $ionicPopup, CartItemService, BillService, ItemService, $q, DiscountService, Alert, $timeout, SettingsService) {
       // debugLog = SettingsService.StartDebugLog();
       // debugLog.log(': ' + err, 4);
       $scope.title = 'PWP';
@@ -47,20 +47,20 @@ angular.module('itouch.controllers')
 
         return ItemService.getPrice(item.Plu, parseInt(item.PriceGroupId)).then(function (data) {
           var Bdisc = data ? data.AlteredPrice : 0;
-          var cal = (((Bdisc/100) * discPercent).toFixed(3));
+          var cal = (((Bdisc / 100) * discPercent).toFixed(3));
           var s1 = Math.floor(cal);
-          var s2 = (cal*100) - (s1 * 100);
-          var s3 = s2.toFixed(0)/100;
+          var s2 = (cal * 100) - (s1 * 100);
+          var s3 = s2.toFixed(0) / 100;
           // debugLog.log('discAmount : ' + (s1+s3), 7);
           // console.log(s3);
-          var Adisc = (Bdisc - (s1+s3)).roundTo(2).toFixed(2);
+          var Adisc = (Bdisc - (s1 + s3)).roundTo(2).toFixed(2);
           // debugLog.log('Price After Disc : ' + Adisc, 7);
           // debugLog.log('--*-- PWP Discount End --*-- ', 7);
           // console.log(Adisc);
-          item.AlteredPrice = (((Bdisc/100) * discPercent).toFixed(3));
+          item.AlteredPrice = (((Bdisc / 100) * discPercent).toFixed(3));
           item.Price = Adisc;
           item.SubItemPrice = Adisc;
-          item.OrgPrice = data ? data.OrgPrice : 0;  
+          item.OrgPrice = data ? data.OrgPrice : 0;
           item.StdCost = data ? data.StdCost : 0;
           item.PriceLevelId  = data ? data.PriceLevelId : 0;
           return item;
@@ -78,7 +78,7 @@ angular.module('itouch.controllers')
         $scope.selectedRow = item;
       };
 
-      $scope.addSelected = function () { 
+      $scope.addSelected = function () {
         $scope.disableP = true;
         addItem($scope.selectedRow);
         $timeout(function () {
@@ -94,14 +94,14 @@ angular.module('itouch.controllers')
           // debugLog.log('Item Qty: '+ item.Qty, 7);
           if (item.SubItemMaxQty <= item.Qty) {
             // debugLog.log('Case 1: You have selected the maximum children allowed for this item.', 7);
-            Alert.warning('You have selected the maximum children allowed for this item.')
+            Alert.warning('You have selected the maximum children allowed for this item.');
             return true;
           }
           else if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
             // debugLog.log('Case 2: You have selected the maximum children allowed for this PWP.', 7);
             Alert.warning('You have selected the maximum children allowed for this PWP.');
             tempD = 1;
-            
+
             return true;
           }
           $timeout(function () {
@@ -119,7 +119,7 @@ angular.module('itouch.controllers')
                 tempD = 0;
               }
               // debugLog.log('PWP Selected Item: '+ $scope.selectedRow, 7);
-              
+
               console.log($scope.selectedRow);
               $scope.selectedRow.Qty--;
               $scope.pwp.Qty--;
@@ -132,7 +132,7 @@ angular.module('itouch.controllers')
             }
             // debugLog.log('--*-- PWP Child Control END --*-- ', 7);
           }, 200);
-          
+
           var exItem = _.findWhere($scope.pwp.selectedItems, { SubItemId: item.SubItemId});
           if (exItem) {
             if (exItem && item.SubItemMaxQty > exItem.Qty) {
@@ -160,7 +160,7 @@ angular.module('itouch.controllers')
                 item.AlteredPrice = item.SubItemPrice;
                 promise = $q.when(item);
               } else {
-                DiscountService.getDiscountById(item.DiscountId).then(function(dis){
+                DiscountService.getDiscountById(item.DiscountId).then(function (dis) {
                   addPrice(item, dis.Percentage);
                 });
                 promise = $q.when(item);
@@ -202,7 +202,7 @@ angular.module('itouch.controllers')
               Alert.warning('No selected item to clear.');
               return true;
             }
-            SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice; 
+            SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
             temp = temp - SubItemTotalPrice;
             $scope.tempSubTotal = $scope.tempSubTotal - SubItemTotalPrice;
           }
@@ -301,7 +301,7 @@ angular.module('itouch.controllers')
                     });
                   }).finally(function () {
                     $scope.$emit('pwpModal-close', res[0]);
-                  })
+                  });
                 } else {
                   $scope.refreshCart().then(function () {
                     $scope.PostApi(res, 2);
