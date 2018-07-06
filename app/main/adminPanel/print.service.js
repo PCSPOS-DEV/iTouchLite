@@ -26,7 +26,7 @@ angular.module('itouch.services')
         if (ePosDev && _.isObject(ePosDev)) {
           Alert.showLoading();
           console.log('printer connecting');
-          eventLog.log('connecting');
+          eventLog.log('printer connecting');
           ePosDev.connect($localStorage.printeSettings.ipAddress, $localStorage.printeSettings.port, function (resultConnect) {
             var deviceId = 'local_printer';
             var options = {'crypto': false, 'buffer': false};
@@ -34,7 +34,7 @@ angular.module('itouch.services')
             if ((resultConnect == 'OK') || (resultConnect == 'SSL_CONNECT_OK')) {
               self.status = 'connected';
               console.log('printer connected');
-              eventLog.log('connected');
+              eventLog.log('printer connected');
               //Retrieves the Printer object
               console.log('creating device');
               eventLog.log('creating device');

@@ -929,7 +929,7 @@ angular.module('itouch.controllers')
                         $scope.selectItemWithLineNumber(it.LineNumber);
                         $scope.PostApi(it);
                       });
-                      eventLog.log('selectItem Normal Done ');
+                      eventLog.log('--*-- selectItem Normal Done --*-- ');
                     }, function (ex) {
                       errorLog.log('selectItem Normal Error ' + ex);
                       console.log(ex);
@@ -1394,7 +1394,7 @@ angular.module('itouch.controllers')
               $scope.selectItem(null);
             }
           }
-          eventLog.log('selectItemWithLineNumber : Done');
+          eventLog.log('--*-- selectItemWithLineNumber : Done --*--');
         }
       };
 
@@ -1762,8 +1762,8 @@ angular.module('itouch.controllers')
           if (authorityCheck(fn)) {
             Suspended = false;
             if (_.size($scope.cart.items) > 0) {
-              Alert.showConfirm('This will remove all the items', 'Abort?', function (res) {
-                if (res == 1) {
+              Alert.showConfirm('This will remove all the items', 'Abort?', function (res) { //
+                if (res == 1) { //
                   eventLog.log('AbortFunction : Start');
                   $scope.flag = true;
                   BillService.getTempHeader($scope.header.DocNo).then(function (header) {
@@ -1807,9 +1807,9 @@ angular.module('itouch.controllers')
                     });
 
                   });
-                }
-                eventLog.log('AbortFunction : Done');
-              });
+                  eventLog.log('AbortFunction : Done');
+                } //
+              }); //
             } else {
               eventLog.log('AbortFunction : Void');
               Alert.warning('No items in the cart!');
@@ -1923,7 +1923,7 @@ angular.module('itouch.controllers')
                 }
               ]
             }).then(function (tag) {
-              console.log(tag);
+              // console.log(tag);
               BillService.setOrderTag($scope.header.DocNo, tag).then(function () {
                 refresh();
               }, function (ex) {

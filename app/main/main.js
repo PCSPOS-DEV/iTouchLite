@@ -15,7 +15,7 @@ angular.module('itouch', [
   'itouch.services'
     // TODO: load other modules selected during generation
 ])
-    .run(['$ionicPlatform', 'DB', 'PrintService', 'Alert', 'UploadService', function ($ionicPlatform, DB, PrintService, Alert, UploadService) {
+    .run(['$ionicPlatform', 'DB', 'PrintService', 'Alert', 'UploadService', 'LogService', function ($ionicPlatform, DB, PrintService, Alert, UploadService, LogService) {
       // console.error = Rollbar.error;
       // console.warn = Rollbar.warning;
       // console.info = Rollbar.info;
@@ -23,7 +23,8 @@ angular.module('itouch', [
 
 // Duplicated use of Rollbar.info for console.log since an equivalent does not exist
 //       console.log = Rollbar.info;
-
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       PrintService.setIPAddress('192.168.1.204');
       PrintService.setPort('8008');
       // PrintService.connect('192.168.1.205', '8008').then(function(){
@@ -121,9 +122,12 @@ angular.module('itouch', [
                             Alert.warning('Paper roll is about to be depleted');
                           });
                           console.log('printer connected');
+                          eventLog.log('printer connected');
                           return true;
                         }, function (ex) {
                           console.log('Cant connect to printer', ex);
+                          eventLog.log('Cant connect to printer', ex);
+                          errorLog.log('Cant connect to printer', ex);
                             // Alert.error("Unable to connect to the printer");
                             // return $q.resolve();
                         });

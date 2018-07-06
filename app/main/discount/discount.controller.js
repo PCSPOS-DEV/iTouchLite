@@ -75,6 +75,7 @@ angular.module('itouch.controllers')
                       //don't allow the user to close unless he enters wifi password
                       e.preventDefault();
                     } else {
+                      eventLog.log('Discount Amount : ' + $scope.data.amount);
                       return $scope.data.amount;
                     }
                   }
