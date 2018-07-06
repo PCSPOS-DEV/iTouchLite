@@ -2,11 +2,12 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory('SalesKitService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', 'ItemService', 'LocationService', 'AuthService', '$filter', 'ControlService', 'TenderService', 'BillService',
-    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, ItemService, LocationService, AuthService, $filter, ControlService, TenderService, BillService) {
+  .factory('SalesKitService', ['ErrorService', 'DB', 'DB_CONFIG', 'SettingsService', '$q', 'Restangular', 'ItemService', 'LocationService', 'AuthService', '$filter', 'ControlService', 'TenderService', 'BillService', 'LogService',
+    function (ErrorService, DB, DB_CONFIG, SettingsService, $q, Restangular, ItemService, LocationService, AuthService, $filter, ControlService, TenderService, BillService, LogService) {
       var self = this;
       syncLog = SettingsService.StartSyncLog();
-      errorLog = SettingsService.StartErrorLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       var location = LocationService.currentLocation;
       renameProperty(location, 'PriceLevel', 'PriceLevelId');
@@ -35,7 +36,7 @@ angular.module('itouch.services')
                 deferred.resolve();
               } else {
                 syncLog.log('  SalesKits Sync Fail : Unable to fetch sales kits', 1);
-                errorLog.log('SalesKits Sync Fail : Unable to fetch sales kits', 4);
+                errorLog.log('SalesKits Sync Fail : Unable to fetch sales kits');
                 deferred.reject('Unable to fetch sales kits');
               }
             }
@@ -45,15 +46,15 @@ angular.module('itouch.services')
           }, function (err) {
             console.error(err);
             syncLog.log('  SalesKits Sync Error : Unable to fetch data from the server', 1);
-            errorLog.log('SalesKits Sync Error : Unable to fetch data from the server', 4);
+            errorLog.log('SalesKits Sync Error : Unable to fetch data from the server');
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
           syncLog.log('  SalesKits Sync Error : ' + ex, 1);
-          errorLog.log('SalesKits Sync Error : ' + ex, 4);
+          errorLog.log('SalesKits Sync Error : ' + ex);
           deferred.reject(ex);
         }
-
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -85,8 +86,9 @@ angular.module('itouch.services')
           });
         } catch (ex) {
           deferred.reject(ex);
+          errorLog.log('SalesKits fetchKitByDays Error' + ex);
         }
-
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -104,7 +106,7 @@ angular.module('itouch.services')
                 self.saveKitItems(items);
                 deferred.resolve();
               } else {
-                errorLog.log('SalesKits fetchKitItems Error : Unable to fetch sales kits', 4);
+                errorLog.log('SalesKits fetchKitItems Error : Unable to fetch sales kits');
                 deferred.reject('Unable to fetch sales kits');
               }
             }
@@ -113,13 +115,14 @@ angular.module('itouch.services')
             }
           }, function (err) {
             console.error(err);
-            errorLog.log('SalesKits fetchKitItems Error : Unable to fetch data from the server', 4);
+            errorLog.log('SalesKits fetchKitItems Error : Unable to fetch data from the server');
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
+          errorLog.log('SalesKits fetchKitItems Error' + ex);
           deferred.reject(ex);
         }
-
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -137,7 +140,7 @@ angular.module('itouch.services')
                 self.saveSalesKitSelections(items);
                 deferred.resolve();
               } else {
-                errorLog.log('SalesKits fetchSalesKitSelections Error : Unable to fetch sales kits', 4);
+                errorLog.log('SalesKits fetchSalesKitSelections Error : Unable to fetch sales kits');
                 deferred.reject('Unable to fetch sales kits');
               }
             }
@@ -146,13 +149,14 @@ angular.module('itouch.services')
             }
           }, function (err) {
             console.error(err);
-            errorLog.log('SalesKits fetchSalesKitSelections Error : Unable to fetch data from the server', 4);
+            errorLog.log('SalesKits fetchSalesKitSelections Error : Unable to fetch data from the server');
             deferred.reject('Unable to fetch data from the server');
           });
         } catch (ex) {
           deferred.reject(ex);
+          errorLog.log('SalesKits fetchSalesKitSelections Error' + ex);
         }
-
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -361,8 +365,10 @@ angular.module('itouch.services')
 
         }, function (err) {
           deferred.reject(err.message);
+          errorLog.log('SalesKits getSalesKitWithId Error : ' + err);
           throw new Error(ex.message);
         });
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -407,12 +413,14 @@ angular.module('itouch.services')
               });
             });
           } else {
+            errorLog.log('validateSalesKit Error Nothing selected');
             errors.push('Nothing selected');
           }
         } else {
+          errorLog.log('validateSalesKit Item not found');
           errors.push('Item not found');
         }
-
+        LogService.SaveLog();
         return errors;
       };
 
@@ -476,17 +484,20 @@ angular.module('itouch.services')
             DB.executeQueue().then(function () {
               console.log('saved');
             }, function (err) {
+              errorLog.log('addSalesKit error' + err);
               console.error(err);
             });
           } else {
             ErrorService.add(errors);
             console.log(errors);
+            errorLog.log('addSalesKit Invalid item');
             throw new Error('Invalid item');
           }
         }, function (err) {
+          errorLog.log('addSalesKit error' + err);
           console.log(err);
         });
-
+        LogService.SaveLog();
       };
 
       self.getCurrentChildItems = function (parentItemLineNumber) {

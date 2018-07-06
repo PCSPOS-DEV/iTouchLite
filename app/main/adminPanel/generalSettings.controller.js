@@ -2,11 +2,12 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('GeneralSettingsCtrl', ['$scope', 'SettingsService', '$state', 'SyncService', 'AppConfig', 'Restangular', '$q', 'Alert', 'ionicDatePicker', 'ControlService',
-    function ($scope, SettingsService, $state, SyncService, AppConfig, Restangular, $q, Alert, ionicDatePicker, ControlService) {
+  .controller('GeneralSettingsCtrl', ['$scope', 'SettingsService', '$state', 'SyncService', 'AppConfig', 'Restangular', '$q', 'Alert', 'ionicDatePicker', 'ControlService', 'LogService',
+    function ($scope, SettingsService, $state, SyncService, AppConfig, Restangular, $q, Alert, ionicDatePicker, ControlService, LogService) {
       var self = this;
       self.settings = {};
-      errorLog = SettingsService.StartErrorLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       // var Bdate;
       // if (ControlService.getBusinessDate() == undefined) {
       //   Bdate = '';
@@ -111,6 +112,7 @@ angular.module('itouch.controllers')
               });
               return true;
             }, function () {
+              errorLog.log('GeneralSettingsCtrl Invalid base url entered');
               Alert.warning('Invalid base url entered');
             });
           }
@@ -120,14 +122,17 @@ angular.module('itouch.controllers')
               AppConfig.setOutletServerUrl(self.settings.outletServerUrl);
               return true;
             }, function () {
+              errorLog.log('GeneralSettingsCtrl Invalid outlet server url entered');
               Alert.warning('Invalid outlet server url entered');
             });
           }
 
           else {
+            errorLog.log('GeneralSettingsCtrl Please insert data');
             Alert.warning('Please insert data');
           }
         }
+        LogService.SaveLog();
       };
 
       self.reset = function () {
@@ -149,6 +154,7 @@ angular.module('itouch.controllers')
             // business_date: null,
           };
         } catch (ex) {
+          errorLog.log('GeneralSettingsCtrl ex' + ex);
           self.settings.ent_id = null;
           self.settings.loc_id = null;
           self.settings.mac_id = null;
@@ -162,10 +168,12 @@ angular.module('itouch.controllers')
           if (res == 'true' || res == true) {
             return true;
           } else {
+            errorLog.log('GeneralSettingsCtrl Invalid Service');
             return $q.reject('Invalid service');
           }
         }, function (err) {
           console.log(err);
+          errorLog.log('GeneralSettingsCtrl' + err.statusText);
           return $q.reject(err.statusText);
         });
       };

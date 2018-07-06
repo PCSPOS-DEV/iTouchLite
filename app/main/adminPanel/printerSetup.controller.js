@@ -2,12 +2,13 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('PrinterSetupCtrl', ['PrintService', 'Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService',
-    function (PrintService, Alert, $localStorage, $scope, $rootScope, SettingsService) {
+  .controller('PrinterSetupCtrl', ['PrintService', 'Alert', '$localStorage', '$scope', '$rootScope', 'LogService',
+    function (PrintService, Alert, $localStorage, $scope, $rootScope, LogService) {
       var self = this;
       self.status = PrintService.isConnected();
       self.printerSettings = $localStorage.printeSettings;
-      errorLog = SettingsService.StartErrorLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       // errorLog.log(''+ err, 4);
 
       $rootScope.$on('viewOpen', function (event, data) {
@@ -26,6 +27,7 @@ angular.module('itouch.controllers')
 
         PrintService.connect().then(function () {
           Alert.success('Success');
+          errorLog.log('Printer Setup : Success' );
           self.status = PrintService.isConnected();
         }, function (err) {
           errorLog.log('Printer Setup : ' + err, 4);

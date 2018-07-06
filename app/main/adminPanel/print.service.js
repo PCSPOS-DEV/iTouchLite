@@ -2,10 +2,11 @@
  * Created by shalitha on 27/6/16.
  */
 angular.module('itouch.services')
-  .factory('PrintService', ['ErrorService', '$q', '$localStorage', 'Alert', 'SettingsService',
-    function (ErrorService, $q, $localStorage, Alert, SettingsService) {
+  .factory('PrintService', ['ErrorService', '$q', '$localStorage', 'Alert', 'LogService',
+    function (ErrorService, $q, $localStorage, Alert, LogService) {
       var self = this;
-      errorLog = SettingsService.StartErrorLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       var ePosDev = new epson.ePOSDevice();
       self.drawerOpen = false;
@@ -24,23 +25,27 @@ angular.module('itouch.services')
         self.status = 'connecting';
         if (ePosDev && _.isObject(ePosDev)) {
           Alert.showLoading();
-          console.log('connecting');
+          console.log('printer connecting');
+          eventLog.log('connecting');
           ePosDev.connect($localStorage.printeSettings.ipAddress, $localStorage.printeSettings.port, function (resultConnect) {
             var deviceId = 'local_printer';
             var options = {'crypto': false, 'buffer': false};
 
             if ((resultConnect == 'OK') || (resultConnect == 'SSL_CONNECT_OK')) {
               self.status = 'connected';
-              console.log('connected');
+              console.log('printer connected');
+              eventLog.log('connected');
               //Retrieves the Printer object
               console.log('creating device');
+              eventLog.log('creating device');
               ePosDev.createDevice('local_printer', ePosDev.DEVICE_TYPE_PRINTER, options, function (deviceObj, errorCode) {
                 if (deviceObj === null) {
                   //Displays an error message if the system fails to retrieve the Printer object
-                  errorLog.log('Printer cannect error. code : ' + errorCode, 4);
+                  errorLog.log('Printer cannect error. code : ' + errorCode);
                   deferred.reject('connect error. code:' + errorCode);
                   return;
                 }
+                eventLog.log('device created');
                 console.log('device created');
                 self.status = 'created';
                 printer = deviceObj;
@@ -65,16 +70,17 @@ angular.module('itouch.services')
             else {
               //Displays error messages
               self.status = 'failed';
-              errorLog.log('Printer Connection Error', 4);
+              errorLog.log('Printer Connection Error');
               deferred.reject('connect error');
               Alert.hideLoading();
             }
           }, {'eposprint': true});
         } else {
           self.status = 'failed';
-          errorLog.log('Lib Error : ' + err, 4);
+          errorLog.log('Lib Error : ' + err);
           deferred.reject('Lib error');
         }
+        LogService.SaveLog();
         return deferred.promise;
       };
 
@@ -368,10 +374,10 @@ angular.module('itouch.services')
           }
         }
         catch (e) {
-          errorLog.log('Printer Service Error : ' + e.message, 4);
+          errorLog.log('Printer Service Error : ' + e.message);
           alert(e.message);
         }
       };
-
+      LogService.SaveLog();
       return self;
     }]);

@@ -1,7 +1,7 @@
 
 angular.module('itouch.services')
-.service('Report', ['PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert', 'TransactService',
-  function (PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert, TransactService) {
+.service('Report', ['PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert', 'TransactService', 'LogService',
+  function (PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert, TransactService, LogService) {
     var self = this;
     var Pdata = null;
     var printer = PrintService.getPrinter();
@@ -12,6 +12,9 @@ angular.module('itouch.services')
     var machine = null;
     var now = null;
     var user = null;
+
+    eventLog = LogService.StartEventLog();
+    errorLog = LogService.StartErrorLog();
 
     var setParameters = function () {
       printer = PrintService.getPrinter();
@@ -26,6 +29,7 @@ angular.module('itouch.services')
     self.getAll = function () {
       PrinterSettings.get().then(function (res) {
         data = res;
+        eventLog.log('Printer Data : Retrieved');
         return data;
         // return data = res;
       });
@@ -107,6 +111,7 @@ angular.module('itouch.services')
         }
       } else {
         Alert.success('printer not connected', 'Error');
+        errorLog.log('printer not connected');
       }
     };
 
@@ -132,11 +137,14 @@ angular.module('itouch.services')
 
           printer.send();
         } catch (e) {
+          errorLog.log('printAddFloat error ' + e);
           console.log(e);
         }
       } else {
         Alert.success('printer not connected', 'Error');
+        errorLog.log('printer not connected');
       }
+      LogService.SaveLog();
     };
 
     self.printDeclareCash = function (shift, amount) {
@@ -156,11 +164,14 @@ angular.module('itouch.services')
 
           printer.send();
         } catch (e) {
+          errorLog.log('printDeclareCash error ' + e);
           console.log(e);
         }
       } else {
         Alert.success('printer not connected', 'Error');
+        errorLog.log('printer not connected');
       }
+      LogService.SaveLog();
     };
 
 
@@ -200,9 +211,6 @@ angular.module('itouch.services')
           }
 
         });
-
-        console.log(items);
-
         return items;
       });
     };
@@ -414,14 +422,18 @@ angular.module('itouch.services')
             printer.send();
           } catch (e) {
             console.log(e);
+            errorLog.log('printShiftClosingReport' + e);
           }
         } else {
           Alert.success('printer not connected', 'Error');
+          errorLog.log('printer not connected');
         }
 
       }, function (ex) {
         console.log(ex);
+        errorLog.log('printShiftClosingReport Error :' + ex);
       });
+      LogService.SaveLog();
     };
     // self.printShiftClosingReport(0);
 

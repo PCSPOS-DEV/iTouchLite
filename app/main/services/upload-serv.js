@@ -321,9 +321,6 @@ angular.module('itouch.services')
             }
           );
         }
-
       };
-
-
       return self;
     }]);

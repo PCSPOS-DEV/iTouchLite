@@ -2,10 +2,11 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('ImageSetupCtrl', [ '$cordovaImagePicker', 'Alert', '$cordovaFile', '$localStorage', '$rootScope', '$scope', 'SettingsService',
-    function ($cordovaImagePicker, Alert, $cordovaFile, $localStorage, $rootScope, $scope, SettingsService) {
+  .controller('ImageSetupCtrl', [ '$cordovaImagePicker', 'Alert', '$cordovaFile', '$localStorage', '$rootScope', '$scope', 'LogService',
+    function ($cordovaImagePicker, Alert, $cordovaFile, $localStorage, $rootScope, $scope, LogService) {
       var self = this;
-      errorLog = SettingsService.StartErrorLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       // errorLog.log(''+ err, 4);
 
       self.images = {};
@@ -50,14 +51,15 @@ angular.module('itouch.controllers')
                 $localStorage.images.logo = fileName;
                 $scope.setImages();
               }, function (error) {
-                errorLog.log('Logo Image Setup Error : ' + error, 4);
+                errorLog.log('Logo Image Setup Error : ' + error);
                 //an error occured
               });
             }
           }, function (error) {
-            errorLog.log('Logo Image Getting Error : ' + error, 4);
+            errorLog.log('Logo Image Getting Error : ' + error);
             // error getting photos
           });
+        LogService.SaveLog();
       };
 
       self.removeLogo = function () {
@@ -84,15 +86,16 @@ angular.module('itouch.controllers')
                 self.images.cart_background = fileName;
                 $localStorage.images.cart_background = fileName;
               }, function (error) {
-                errorLog.log('Cart Image Setup Error : ' + error, 4);
+                errorLog.log('Cart Image Setup Error : ' + error);
                 //an error occured
               });
 
             }
           }, function (error) {
-            errorLog.log('Cart Image Getting Error : ' + error, 4);
+            errorLog.log('Cart Image Getting Error : ' + error);
             // error getting photos
           });
+        LogService.SaveLog();
       };
 
       self.removeCartBack = function () {

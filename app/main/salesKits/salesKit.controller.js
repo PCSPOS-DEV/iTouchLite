@@ -2,8 +2,8 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('SalesKitCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService', 'Alert', '$ionicScrollDelegate', '$q',
-    function ($scope, ControlService, $ionicPopup, CartItemService, BillService, Alert, $ionicScrollDelegate, $q) {
+  .controller('SalesKitCtrl', ['$scope', 'ControlService', '$ionicPopup', 'CartItemService', 'BillService', 'Alert', '$ionicScrollDelegate', '$q', 'LogService',
+    function ($scope, ControlService, $ionicPopup, CartItemService, BillService, Alert, $ionicScrollDelegate, $q, LogService) {
 
       $scope.title = 'Sales Kits';
       $scope.selectedRow = null;
@@ -14,6 +14,9 @@ angular.module('itouch.controllers')
       var customQty = 0;
       var oldCustomQty = 0;
       var kit1 = 0;
+
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       var full = function () {
         /*
@@ -313,7 +316,7 @@ angular.module('itouch.controllers')
               // var oldItem = $scope.cart.selectedItem;
               // console.log(oldItem);
               voidProm = BillService.voidItem(oldItem);
-              var item = angular.copy(selectedItem);
+              item = angular.copy(selectedItem);
               angular.forEach($scope.salesKits.selectedList, function (item) {
                 item.LineNumber = oldItem.LineNumber;
                 item.DocNo = oldItem.DocNo;
