@@ -2,8 +2,10 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('TenderDiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert', 'BillService',
-    function ($scope, DiscountService, $ionicPopup, Alert, BillService) {
+  .controller('TenderDiscountCtrl', ['$scope', 'DiscountService', '$ionicPopup', 'Alert', 'BillService', 'LogService',
+    function ($scope, DiscountService, $ionicPopup, Alert, BillService, LogService) {
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       var discountsSet = {
         type1: [],
         type2: []
@@ -30,6 +32,7 @@ angular.module('itouch.controllers')
         discountsSet.type1 = [];
         discountsSet.type2 = [];
         DiscountService.get().then(function (dis) {
+          eventLog.log('Data retrieved from DiscountService');
           angular.forEach(dis, function (item) {
             if (item.DiscountType == '1') {
               discountsSet.type1.push(item);
@@ -40,8 +43,10 @@ angular.module('itouch.controllers')
 
           $scope.setType($scope.type);
         }, function (er) {
+          errorLog.log('TenderDiscount Error : ' + er);
           console.log(er);
         });
+        LogService.SaveLog();
       };
 
 
@@ -53,8 +58,10 @@ angular.module('itouch.controllers')
 
       $scope.selectDiscount = function (discount) {
         //if(discount && submitted == false){
+        eventLog.log('Tender Discount : Start');
         if (discount) {
           if (discount.DiscountType == 1 && discount.Amount == 0) {
+            eventLog.log('Tender Discount : 1st option');
             $scope.data = {};
             // An elaborate, custom popup
             var myPopup = $ionicPopup.show({
@@ -88,10 +95,12 @@ angular.module('itouch.controllers')
                 //submitted = false;
             });
           } else {
+            eventLog.log('Tender Discount : 2nd option');
             saveDiscount(discount, parseFloat(discount.Amount));
           }
+          eventLog.log('Tender Discount : Complete');
         }
-
+        LogService.SaveLog();
       };
 
       var saveDiscount = function (discount, amount) {
@@ -100,7 +109,7 @@ angular.module('itouch.controllers')
           amount = parseFloat(amount);
           BillService.getTempItems($scope.tenderHeader.DocNo).then(function (billItems) {
             DiscountService.prepareTenderDiscount($scope.tenderHeader, angular.copy(billItems), discount, amount).then(function () {
-
+              eventLog.log('Tender Discount : saveDiscount');
             }, function (ex) {
               Alert.warning(ex);
             }).finally(function () {

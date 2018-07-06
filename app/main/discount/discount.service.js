@@ -254,6 +254,7 @@ angular.module('itouch.services')
         {
           DB.addUpdateToQueue(DB_CONFIG.tableNames.bill.tempDetail, _.pick(item, 'SubTotal', 'Tax5Amount', 'DiscAmount', 'Tax5DiscAmount'), {columns: 'ItemId=? AND LineNumber=?', data: [item.ItemId, item.LineNumber]});
         }
+        eventLog.log('updateTempBillDetail Complete');
       };
 
 
@@ -895,6 +896,7 @@ angular.module('itouch.services')
       /*---*/
 
       self.saveTenderDiscount = function (DocNo) {
+        eventLog.log('Tender saveTenderDiscount Start');
         // var deferred = $q.defer();
         // console.log(tenderDiscounts);
         if (tenderDiscounts.discounts.length > 0) {
@@ -917,13 +919,13 @@ angular.module('itouch.services')
             return BillService.updateHeaderTotals(DocNo);
           }, function (ex) {
             console.log(ex);
+            errorLog.log('Tender saveTenderDiscount Error' + ex);
             return ex;
           });
 
         } else {
           return $q.resolve();
         }
-
       };
 
       self.clearTenderDiscounts = function () {
