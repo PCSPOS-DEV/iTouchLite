@@ -41,6 +41,7 @@ angular.module('itouch.controllers')
       var refresh = function () {
         console.log(AppConfig.getDisplayUrl());
         try {
+          console.log(SettingsService.getBusinessDate());
           self.settings = {
             ent_id: SettingsService.getEntityId(),
             loc_id: SettingsService.getLocationId(),
@@ -64,73 +65,80 @@ angular.module('itouch.controllers')
 
       self.save = function (check) {
         if (check == false) {
-          Restangular.setBaseUrl('base server url');
-          AppConfig.setBaseUrl('base server url');
-          AppConfig.setOutletServerUrl('outlet server url');
-          AppConfig.setDisplayUrl('display url');
-          ControlService.saveDocId('R00001');
-          SettingsService.setEntityId('');
-          SettingsService.setLocationId('');
-          SettingsService.setMachineId('');
-          SettingsService.setCashId('');
-
+          Alert.showConfirm('Are you sure you want to reset setting?', 'Reset Setting', function (res) { //
+            if (res == 1) { //
+              Restangular.setBaseUrl('http://172.16.110.114:89/iTouchLiteSyncServices/iTouchLiteSyncService.svc/');
+              AppConfig.setBaseUrl('http://172.16.110.114:89/iTouchLiteSyncServices/iTouchLiteSyncService.svc/');
+              AppConfig.setOutletServerUrl('http://172.16.110.114:89/iTouchLiteSyncServices/iTouchLiteSyncService.svc/');
+              AppConfig.setDisplayUrl('http://172.16.110.99:999/api');
+              ControlService.saveDocId('R00001');
+              SettingsService.getBusinessDate(null);
+              SettingsService.setEntityId('');
+              SettingsService.setLocationId('');
+              SettingsService.setMachineId('');
+              SettingsService.setCashId('');
+            } //
+          }); //
         } else {
-          if (!_.isUndefined(self.settings.url) && !_.isNull(self.settings.url) && !_.isEmpty(self.settings.url)) {
-            checkStatus(self.settings.url).then(function () {
-              Restangular.setBaseUrl(self.settings.url);
-              AppConfig.setBaseUrl(self.settings.url);
-
-              if (_.isUndefined(self.settings.ent_id) || _.isNull(self.settings.ent_id)) {
-                return false;
-              }
-              if (_.isUndefined(self.settings.loc_id) || _.isNull(self.settings.loc_id)) {
-                return false;
-              }
-              if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id)) {
-                return false;
-              }
-              if (_.isUndefined(self.settings.doc_id) || _.isNull(self.settings.doc_id)) {
-                return false;
-              }
-              if (self.settings.displayurl == '') {
-                self.settings.displayurl = 'display url';
-              }
-              ControlService.saveDocId(self.settings.doc_id);
-              AppConfig.setDisplayUrl(self.settings.displayurl);
-              SettingsService.setEntityId(self.settings.ent_id);
-              SettingsService.setLocationId(self.settings.loc_id);
-              SettingsService.setMachineId(self.settings.mac_id);
-              SettingsService.setCashId(self.settings.cash_id);
+          Alert.showConfirm('Are you sure you want to save setting?', 'Save Setting', function (res) { //
+            if (res == 1) { //
+              if (!_.isUndefined(self.settings.url) && !_.isNull(self.settings.url) && !_.isEmpty(self.settings.url)) {
+                checkStatus(self.settings.url).then(function () {
+                  Restangular.setBaseUrl(self.settings.url);
+                  AppConfig.setBaseUrl(self.settings.url);
+                  if (_.isUndefined(self.settings.ent_id) || _.isNull(self.settings.ent_id)) {
+                    return false;
+                  }
+                  if (_.isUndefined(self.settings.loc_id) || _.isNull(self.settings.loc_id)) {
+                    return false;
+                  }
+                  if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id)) {
+                    return false;
+                  }
+                  if (_.isUndefined(self.settings.doc_id) || _.isNull(self.settings.doc_id)) {
+                    return false;
+                  }
+                  if (self.settings.displayurl == '') {
+                    self.settings.displayurl = 'display url';
+                  }
+                  ControlService.saveDocId(self.settings.doc_id);
+                  AppConfig.setDisplayUrl(self.settings.displayurl);
+                  SettingsService.setEntityId(self.settings.ent_id);
+                  SettingsService.setLocationId(self.settings.loc_id);
+                  SettingsService.setMachineId(self.settings.mac_id);
+                  SettingsService.setCashId(self.settings.cash_id);
               // SettingsService.setBusinessDate(self.settings.business_date);
-              SettingsService.save();
+                  SettingsService.save();
 
-              SyncService.do().then(function () {
-                SettingsService.setEntityId(self.settings.ent_id);
-                SettingsService.setLocationId(self.settings.loc_id);
-                SettingsService.setMachineId(self.settings.mac_id);
-                SettingsService.save();
-              });
-              return true;
-            }, function () {
-              errorLog.log('GeneralSettingsCtrl Invalid base url entered');
-              Alert.warning('Invalid base url entered');
-            });
-          }
+                  SyncService.do().then(function () {
+                    SettingsService.setEntityId(self.settings.ent_id);
+                    SettingsService.setLocationId(self.settings.loc_id);
+                    SettingsService.setMachineId(self.settings.mac_id);
+                    SettingsService.save();
+                  });
+                  return true;
+                }, function () {
+                  errorLog.log('GeneralSettingsCtrl Invalid base url entered');
+                  Alert.warning('Invalid base url entered');
+                });
+              }
 
-          if (!_.isUndefined(self.settings.outletServerUrl) && !_.isNull(self.settings.outletServerUrl) && !_.isEmpty(self.settings.outletServerUrl)) {
-            checkStatus(self.settings.outletServerUrl).then(function () {
-              AppConfig.setOutletServerUrl(self.settings.outletServerUrl);
-              return true;
-            }, function () {
-              errorLog.log('GeneralSettingsCtrl Invalid outlet server url entered');
-              Alert.warning('Invalid outlet server url entered');
-            });
-          }
+              if (!_.isUndefined(self.settings.outletServerUrl) && !_.isNull(self.settings.outletServerUrl) && !_.isEmpty(self.settings.outletServerUrl)) {
+                checkStatus(self.settings.outletServerUrl).then(function () {
+                  AppConfig.setOutletServerUrl(self.settings.outletServerUrl);
+                  return true;
+                }, function () {
+                  errorLog.log('GeneralSettingsCtrl Invalid outlet server url entered');
+                  Alert.warning('Invalid outlet server url entered');
+                });
+              }
 
-          else {
-            errorLog.log('GeneralSettingsCtrl Please insert data');
-            Alert.warning('Please insert data');
-          }
+              else {
+                errorLog.log('GeneralSettingsCtrl Please insert data');
+                Alert.warning('Please insert data');
+              }
+            } //
+          }); //
         }
         LogService.SaveLog();
       };
