@@ -2,11 +2,13 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('HistoryCtrl', ['$scope', 'HistoryService', 'BillService', 'CartItemService', 'PrinterSettings', '$ionicModal', 'Reciept', 'ControlService', '$ionicScrollDelegate',
-    function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept, ControlService, $ionicScrollDelegate) {
+  .controller('HistoryCtrl', ['$scope', 'HistoryService', 'BillService', 'CartItemService', 'PrinterSettings', '$ionicModal', 'Reciept', 'ControlService', '$ionicScrollDelegate', 'LogService',
+    function ($scope, HistoryService, BillService, CartItemService, PrinterSettings, $ionicModal, Reciept, ControlService, $ionicScrollDelegate, LogService) {
       $scope.items = [];
       $scope.selectedItem = null;
       $scope.search = { text: '' };
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       $scope.$on('$ionicView.beforeEnter', function (event, data) {
         $scope.search.text = '';
@@ -15,6 +17,7 @@ angular.module('itouch.controllers')
       });
 
       var refresh = function () {
+        eventLog.log('ReceiptHistory : Start');
         var bDate = ControlService.getBusinessDate(true);
         HistoryService.getAll(bDate).then(function (items) {
           $scope.items = _.values(items);
@@ -35,6 +38,8 @@ angular.module('itouch.controllers')
           });
 
         });
+        eventLog.log('ReceiptHistory : Done');
+        LogService.SaveLog();
       };
 
       /**

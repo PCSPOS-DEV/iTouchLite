@@ -2,16 +2,16 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory('SuspendService', ['DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService', 'Reciept',
-    function (DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService, Reciept) {
-      var self = this;
-
+  .factory('SuspendService', ['DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval', 'TempBillHeaderService', 'TempBillDetailService', 'TempBillDiscountsService', 'BillService', 'ControlService', 'Reciept', 'LogService',
+    function (DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval, TempBillHeaderService, TempBillDetailService, TempBillDiscountsService, BillService, ControlService, Reciept, LogService) {
       var self = this;
       var entityId;
       var macId;
       // var enableAutoUpload = true;
       var suspendedDoc = null;
       var bill;
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
 
       var onSuccess = function (res) {
         return _.map(DB.fetchAll(res), function (row) {
@@ -25,13 +25,13 @@ angular.module('itouch.services')
         var config = $localStorage.itouchConfig;
         if (config && config.baseUrl) {
           return Restangular.oneUrl('uplink', config.baseUrl + 'UpdateSuspendBill').customPOST(
-                    JSON.stringify(data),
-                    '', {},
+            JSON.stringify(data),
+            '', {},
             {
-                        // Authorization:'Basic ' + client,
+              // Authorization:'Basic ' + client,
               'Content-Type': 'application/x-www-form-urlencoded'
             }
-                );
+          );
         }
 
       };
@@ -98,14 +98,14 @@ angular.module('itouch.services')
             } else if (suspended == false && suspendedDepDocNo !== '') {
               console.log('Null suspend');
             } else {
-                Reciept.printSuspend(res, bill);
+              Reciept.printSuspend(res, bill);
             }
             return self.removeBill(header.DocNo);
-                    /*if (res == 'success') {
-                        return self.removeBill(header.DocNo);
-                    } else {
-                        return $q.reject(res);
-                    }*/
+              /*if (res == 'success') {
+                  return self.removeBill(header.DocNo);
+              } else {
+                  return $q.reject(res);
+              }*/
           });
 
         });
@@ -167,11 +167,8 @@ angular.module('itouch.services')
             console.log(e);
             return $q.reject('Unable to recall bill');
           }
-
-
         });
       };
-
       return self;
     }
   ]);

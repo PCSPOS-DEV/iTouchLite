@@ -165,6 +165,7 @@ angular.module('itouch.services')
       };
 
       self.getSalesKit = function (itemId, BusinessDate) {
+        // eventLog.log('Retrieve Salekit Data Start ');
         var salesKit;
         var q = 'SELECT *, sk.Id AS SaleKitItemsId FROM ' + DB_CONFIG.tableNames.salesKit.salesKitItems + ' AS sk  INNER JOIN ' +
           DB_CONFIG.tableNames.item.item + ' AS i ON i.Id = sk.ItemId  WHERE sk.SalesKitId = ?';
@@ -289,6 +290,7 @@ angular.module('itouch.services')
             }
           });
         }, function (err) {
+          errorLog.log('SalesKits getSalesKit Error : ' + err.message);
           return $q.reject(err.message);
         });
       };
