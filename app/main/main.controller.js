@@ -132,8 +132,9 @@ angular.module('itouch.controllers')
     $scope.print = function (object, attribute, level, trimFrom) {
       // eventLog.log('Print Keyboard : Start ');
       currentUser = AuthService.currentUser();
-      var name = attribute + currentUser.DescriptionLevel;
+      var name;
       if (currentUser) {
+        name = attribute + currentUser.DescriptionLevel;
         if (level) {
           name += level;
         }

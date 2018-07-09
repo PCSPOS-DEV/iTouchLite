@@ -64,6 +64,7 @@ angular.module('itouch.controllers')
       refresh();
 
       self.save = function (check) {
+        Alert.showLoading();
         if (check == false) {
           Alert.showConfirm('Are you sure you want to reset setting?', 'Reset Setting', function (res) { //
             if (res == 1) { //
@@ -140,6 +141,7 @@ angular.module('itouch.controllers')
             } //
           }); //
         }
+        Alert.hideLoading();
         LogService.SaveLog();
       };
 
@@ -155,11 +157,11 @@ angular.module('itouch.controllers')
             loc_id: '',
             mac_id: '',
             cash_id: '',
-            business_date: '',
-            displayurl: 'display url',
-            url: 'base url',
-            outletServerUrl: 'outlet server url',
-            // business_date: null,
+            // business_date: '',
+            displayurl: AppConfig.getDisplayUrl(),
+            url: AppConfig.getBaseUrl(),
+            outletServerUrl: AppConfig.getOutletServerUrl(),
+            business_date: null
           };
         } catch (ex) {
           errorLog.log('GeneralSettingsCtrl ex' + ex);
