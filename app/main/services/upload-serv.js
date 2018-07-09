@@ -2,26 +2,29 @@
 angular.module('itouch.services')
   .service('UploadService', ['DB', 'DB_CONFIG', '$q', 'SettingsService', 'Restangular', '$localStorage', '$interval',
     function (DB, DB_CONFIG, $q, SettingsService, Restangular, $localStorage, $interval) {
+      if (!$localStorage.interval) {
+        $localStorage.interval = {
+          autouploadInterval: 5
+        };
+      }
       var self = this;
       var entityId;
       var macId;
       var enableAutoUpload = true;
       var uploadLog = new debugout();
-      var autouploadInterval = 5;
-      var autoupinterval = ((autouploadInterval * 60) * 1000);
+      var autoupinterval = (($localStorage.interval.autouploadInterval * 60) * 1000);
       var interval = null;
-
       self.StartuploadLog = function () {
         return uploadLog;
       };
 
       self.getAutoUploadInterval = function () {
-        return autouploadInterval;
+        return $localStorage.interval.autouploadInterval;
       };
 
       self.setAutoUploadInterval = function (upinterval) {
-        autouploadInterval = upinterval;
-        autoupinterval = ((autouploadInterval * 60) * 1000);
+        $localStorage.interval.autouploadInterval = upinterval;
+        autoupinterval = (($localStorage.interval.autouploadInterval * 60) * 1000);
         if (angular.isDefined(interval)) {
           $interval.cancel(interval);
         }
@@ -296,7 +299,7 @@ angular.module('itouch.services')
             console.log('auto upload');
             self.upload();
             setTimeout(function () {
-              uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + autouploadInterval + ' mins', 2);
+              uploadLog.log('Upload Success : Auto Upload, Upload Interval : ' + $localStorage.interval.autouploadInterval + ' mins', 2);
               uploadLog.log('-----*-----*-----', 7);
               var uploadlog = localStorage.getItem('UploadLogs');
               var logs = uploadLog.getLog();
