@@ -539,7 +539,8 @@ angular.module('itouch.services')
           where = { columns: ' DocNo=? ', data: [DocNo] };
         }
         return DB.select(DB_CONFIG.tableNames.bill.tempHeader, '*', where).then(function (rs) {
-          return bill.header = DB.fetch(rs);
+          bill.header = DB.fetch(rs);
+          return bill.header;
         });
       };
 
@@ -1054,6 +1055,9 @@ angular.module('itouch.services')
                 'LineNumber', 'ItemType', 'ParentItemId', 'ShiftId', 'CashierId', 'StaffId', 'OrgPrice', 'AlteredPrice', 'Price', 'Qty', 'DiscAmount', 'SubTotal', 'SeqNo' ])),
               DB.delete(DB_CONFIG.tableNames.discounts.tempBillDiscounts, { columns: 'ItemId=? AND LineNumber=?', data: [item.ItemId, item.LineNumber] })
             ];
+            if (item.ItemType == 'PWP') {
+              self.voidItem(item);
+            }
             angular.forEach(data.items, function (salesKitItem) {
               var deferred = $q.defer();
 
