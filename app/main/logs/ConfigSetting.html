@@ -1,42 +1,45 @@
+<ion-view view-title="" can-swipe-back="false">
+  <ion-content class="padding home" scroll="false">
+    <div class="row" ng-controller="ConfigSettingCtrl as ctrl">
+      <div class="col" style="margin-left: 10%; margin-top: 1%; max-width: 80%">
+        <div class="card">
 
-<div class="row" ng-controller="ConfigSettingCtrl as ctrl">
-  <div class="col" style="margin-left: 10%; margin-top: 5%; max-width: 80%">
-    <div class="card">
+          <div class="item item-text-wrap" style="padding: top 20px;">
+            <ion-scroll class="cart" zooming="false" direction="y" style="height: 550px;"  delegate-handle="cart">
+            <div class="list">
+              <div class="selected-items">
 
-      <div class="item item-text-wrap" style="padding: top 20px;">
-        <ion-scroll class="cart" zooming="false" direction="y" style="height: 5550px;"  delegate-handle="cart">
-        <div class="list">
-          <div class="selected-items">
+                <div class = "row" style = "border-color: #ddd; border-width: 0px 0px 1px; border-style: solid;">
+                  <div class = "col-80" >
+                    <label class="item item-input item-stacked-label" >
+                      <span class="input-label">Printer</span>
+                    </label>
+                  </div>
+                  <div class = "col-20">
+                    <label class="item item-input item-stacked-label">
+                      <button class="button button-block button-positive" ng-click="ctrl.connect()">
+                        Connect
+                      </button>
+                    </label>
+                  </div>
+                </div>
 
-            <div class = "row" style = "border-color: #ddd; border-width: 0px 0px 1px; border-style: solid;">
-              <div class = "col-80" >
-                <label class="item item-input item-stacked-label" >
-                  <span class="input-label">Printer</span>
-                </label>
-              </div>
-              <div class = "col-20">
-                <label class="item item-input item-stacked-label">
-                  <button class="button button-block button-positive" ng-click="ctrl.connect()">
-                    Connect
-                  </button>
-                </label>
               </div>
             </div>
+            </ion-scroll>
+          </div>
 
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="padding">
+              <button class="button button-block button-secondary" ng-click="ctrl.Back()" ng-disabled="">
+                Back
+              </button>
+            </div>
           </div>
         </div>
-        </ion-scroll>
-      </div>
-
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="padding">
-          <button class="button button-block button-secondary" ng-click="ctrl.Back()" ng-disabled="">
-            Back
-          </button>
-        </div>
       </div>
     </div>
-  </div>
-</div>
+  </ion-content>
+</ion-view>
