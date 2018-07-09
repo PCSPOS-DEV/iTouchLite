@@ -112,7 +112,7 @@ angular.module('itouch.controllers')
               $scope.tempSubTotal = temp;
               SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
             } else {
-              if (tempD == 0) {
+              if (tempD == 0 && temp > $scope.pwp.MaxPrice && $scope.pwp.MaxPrice != 0) {
                 // debugLog.log('Case 3: The child total price exceed the limit of maximum price.', 7);
                 Alert.warning('The child total price exceed the limit of maximum price.');
               } else {
