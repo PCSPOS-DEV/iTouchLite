@@ -207,7 +207,7 @@ angular.module('itouch.services')
         return DB.query(q, [id]).then(function (result) {
           var discount = DB.fetch(result);
           renameProperty(discount, 'Id', 'DiscountId');
-          eventLog.log('getDiscountById Data Retrieved' + discount);
+          eventLog.log('getDiscountById Data Retrieved');
           LogService.SaveLog();
           return discount;
         });

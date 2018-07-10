@@ -47,7 +47,7 @@ angular.module('itouch.services')
       };
 
       self.PostFunction = function (LogsData, LogType) {
-        console.log(LogsData);console.log(LogType);
+        // console.log(LogsData);console.log(LogType);
         $http({
           method: 'POST',
           url: requestUrl,

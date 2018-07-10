@@ -2061,7 +2061,7 @@ angular.module('itouch.controllers')
       $scope.barcodeSubmit = function (e) {
         e.preventDefault();
         if (!buttonClicked.barcode) {
-          eventLog.log('Barcode : Start');
+          eventLog.log('Read Barcode : Start');
           buttonClicked.barcode = true;
           Alert.showLoading();
           eventLog.log('Barcode : ' + $scope.data.barcode);
@@ -2083,10 +2083,11 @@ angular.module('itouch.controllers')
             });
           } else {
             // console.log('fail');
+            $scope.data.barcode = '';
             eventLog.log('Barcode : Try Again');
             Alert.warning('Try Again');
           }
-          eventLog.log('Barcode : Start');
+          eventLog.log('Read Barcode : Done');
           $timeout(function () { Alert.hideLoading();}, 10);
         }
       };

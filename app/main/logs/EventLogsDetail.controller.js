@@ -6,7 +6,7 @@ angular.module('itouch.controllers')
   function (Alert, $localStorage, $scope, $rootScope, SettingsService, $state, $cordovaEmailComposer, LogService) {
     var self = this;
     var eventlog = localStorage.getItem('EventLogs');
-    console.log(eventlog);
+    // console.log(eventlog);
     var systemDate = new Date();
       // console.log(uploadlog);
     if (eventlog == null) {

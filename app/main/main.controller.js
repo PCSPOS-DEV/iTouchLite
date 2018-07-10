@@ -7,7 +7,7 @@ angular.module('itouch.controllers')
     errorLog = LogService.StartErrorLog();
     $scope.loadLogo = function () {
       try {
-        eventLog.log('setImages loadLogo Start: ');
+        eventLog.log('setImages loadLogo Start ');
         if ($localStorage && $localStorage.images) {
           var image = new Image();
           image.style.width = '100px';
@@ -25,7 +25,7 @@ angular.module('itouch.controllers')
               context.drawImage(image, 0, 0);
             }
           };
-          eventLog.log('setImages loadLogo Complete : ');
+          eventLog.log('setImages loadLogo Complete');
         }
 
       }

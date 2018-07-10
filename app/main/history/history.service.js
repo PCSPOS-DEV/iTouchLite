@@ -9,7 +9,7 @@ angular.module('itouch.services')
       errorLog = LogService.StartErrorLog();
 
       self.getAll = function (bDate) {
-        eventLog.log('retriev history data : start');
+        eventLog.log('Retrieve history data : start');
         return DB.query('SELECT ' +
           'h.DocNo, h.DocType, h.SubTotal, h.DiscAmount, h.Tax1Amount, h.Tax2Amount, h.Tax3Amount, h.Tax4Amount, h.Tax5Amount, ' +
           'h.Tax1DiscAmount, h.Tax2DiscAmount, h.Tax3DiscAmount, h.Tax4DiscAmount, h.Tax5DiscAmount, ' +
@@ -47,7 +47,7 @@ angular.module('itouch.services')
             // item = ItemService.calculateTotal(item);
             // bills[item.DocNo].items.push(item);
             });
-            eventLog.log('retriev history data : complete');
+            eventLog.log('Retrieve history data : complete');
             return bills;
 
           });
