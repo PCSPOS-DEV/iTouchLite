@@ -2,8 +2,8 @@
  * Created by Lynn on 5th June 2018.
  */
 angular.module('itouch.controllers')
-  .controller('UploadLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'UploadService', '$state', '$cordovaEmailComposer', 'SettingsService',
-    function (Alert, $localStorage, $scope, $rootScope, UploadService, $state, $cordovaEmailComposer, SettingsService) {
+  .controller('UploadLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'UploadService', '$state', '$cordovaEmailComposer', 'SettingsService', '$ionicScrollDelegate',
+    function (Alert, $localStorage, $scope, $rootScope, UploadService, $state, $cordovaEmailComposer, SettingsService, $ionicScrollDelegate) {
       var self = this;
       var systemDate = new Date();
       TempLog = UploadService.StartuploadLog();
@@ -26,6 +26,14 @@ angular.module('itouch.controllers')
         }
       };
       refresh();
+
+      self.scrollTop = function () {
+        $ionicScrollDelegate.scrollTop();
+      };
+
+      self.scrollDown = function () {
+        $ionicScrollDelegate.scrollBottom();
+      };
 
       self.Back2Logs = function () {
         $state.go('app.admin');

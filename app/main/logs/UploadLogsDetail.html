@@ -1,6 +1,20 @@
 
 <div class="row" ng-controller="UploadLogsDetailCtrl as ctrl">
-  <div class="col" style="margin-left: 10%; max-width: 80%">
+  <div class="col-10">
+    <div class="col" style="margin-left: 2%; max-width: 80%;  padding-left: 20px">
+    <div class="col-5" style="padding-top: 250px;">
+        <div class="padding">
+          <button class="button button-block button-positive" ng-click = "ctrl.scrollTop()">^</button>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="padding">
+          <button class="button button-block button-positive" ng-click = "ctrl.scrollDown()">v</button>
+        </div>
+    </div>
+    </div>
+  </div>
+  <div class="col-80" style="max-width: 80%">
     <div class="card">
       <div class="item item-text-wrap">
         <ion-scroll class="cart" zooming="false" direction="y" style="height: 520px"  delegate-handle="cart">
@@ -21,7 +35,7 @@
           <input type="number" ng-model="ctrl.settings.upinterval">
         </label>
         </div>
-        <div class="col-40" style="padding-right: 10px">
+        <div class="col" style="padding-right: 10px">
           <button class="button button-block button-positive" ng-click="ctrl.modifyUpload()" ng-disabled="">
             Config
           </button>
@@ -29,28 +43,28 @@
       </div>
     </div>
     <div class="row">
-        <div class="col">
-            <div class="padding">
-              <button class="button button-block button-positive" ng-click="ctrl.sendMail()" ng-disabled="">
-                Send Upload Log
-              </button>
-            </div>
-          </div>
-        <div class="col">
-          <div class="padding">
-            <button class="button button-block button-positive" style="background-color: rgb(224, 52, 52)" ng-click="ctrl.deleteManual()" ng-disabled="">
-              Delete All Upload Log
-            </button>
-          </div>
-        </div>
-        <div class="col">
-          <div class="padding">
-            <button class="button button-block button-secondary" ng-click="ctrl.Back2Logs()" ng-disabled="">
-              Back
-            </button>
-          </div>
+      <div class="col">
+        <div class="padding">
+          <button class="button button-block button-positive" ng-click="ctrl.sendMail()" ng-disabled="">
+            Send Upload Log
+          </button>
         </div>
       </div>
+      <div class="col">
+        <div class="padding">
+          <button class="button button-block button-positive" style="background-color: rgb(224, 52, 52)" ng-click="ctrl.deleteManual()" ng-disabled="">
+            Delete All Upload Log
+          </button>
+        </div>
+      </div>
+      <div class="col">
+        <div class="padding">
+          <button class="button button-block button-secondary" ng-click="ctrl.Back2Logs()" ng-disabled="">
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 </div>

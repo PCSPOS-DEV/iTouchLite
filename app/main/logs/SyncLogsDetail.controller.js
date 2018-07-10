@@ -2,8 +2,8 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('SyncLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state', '$cordovaEmailComposer', 'LogService',
-    function (Alert, $localStorage, $scope, $rootScope, SettingsService, $state, $cordovaEmailComposer, LogService) {
+  .controller('SyncLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'SettingsService', '$state', '$cordovaEmailComposer', 'LogService', '$ionicScrollDelegate',
+    function (Alert, $localStorage, $scope, $rootScope, SettingsService, $state, $cordovaEmailComposer, LogService, $ionicScrollDelegate) {
       var self = this;
       var synclog = localStorage.getItem('SyncLogs');
       // console.log(synclog);
@@ -85,6 +85,14 @@ angular.module('itouch.controllers')
           Alert.error(response);
         });
 
+      };
+
+      self.scrollTop = function () {
+        $ionicScrollDelegate.scrollTop();
+      };
+
+      self.scrollDown = function () {
+        $ionicScrollDelegate.scrollBottom();
       };
 
       self.Back2Logs = function () {
