@@ -1042,7 +1042,7 @@ angular.module('itouch.controllers')
                   $scope.PostFunction(Ditem);
                 }
               });
-            } else if (type == 2) { // PWP & F/B Modifier
+            } else if (type == 2) { // PWP
               angular.forEach(it, function (Citem) {
                 if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
                   $scope.PostFunction(Ditem);
@@ -1053,15 +1053,15 @@ angular.module('itouch.controllers')
             } else if (type == 4) { // SKI update
               if (updatenewitem < control) {
                 if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
-                  if (TempDeleteItem != null && (it.ItemType == TempDeleteItem.ItemType) && (it.ItemId == TempDeleteItem.ItemId)) {
+                  // if (TempDeleteItem != null && (it.ItemType == TempDeleteItem.ItemType) && (it.ItemId == TempDeleteItem.ItemId)) {
                     // console.log('401 : update');
-                    it.LineNumber = TempDeleteItem.LineNumber;
-                    $scope.DeleteFunction(TempDeleteItem);
-                    $scope.PostFunction(Ditem, 1);
-                  } else {
+                  it.LineNumber = TempDeleteItem.LineNumber;
+                  $scope.DeleteFunction(TempDeleteItem);
+                  $scope.PostFunction(Ditem, 1);
+                  // } else {
                     // console.log('402 : put');
-                    $scope.PutFunction(Ditem, 1);
-                  }
+                  //   $scope.PutFunction(Ditem, 1);
+                  // }
                   control = control - it.Qty;
                 }
               } else {
@@ -1087,12 +1087,15 @@ angular.module('itouch.controllers')
               //     $scope.PostFunction(Ditem, 1);
               //   }
               // }
-            // } else if (type == 5) { // F/B Modifier
-            //   angular.forEach(it, function(Citem) {
-            //     if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
-            //       $scope.PostFunction(Citem);
-            //     }
-            //   })
+            } else if (type == 5) { // F/B Modifier
+              angular.forEach(it, function (Citem) {
+                if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
+                  $scope.DeleteApi(Ditem);
+                  setTimeout(function () {
+                    $scope.PostFunction(Ditem);
+                  }, 50);
+                }
+              });
             } else {
               if ((it.ItemType == Ditem.ItemType) && (it.ItemId == Ditem.ItemId) && (it.LineNumber == Ditem.LineNumber)) {
                 $scope.PostFunction(Ditem);
@@ -1144,6 +1147,8 @@ angular.module('itouch.controllers')
         } else {
           PrevItemId = Math.floor(Nitem.ItemId);
         }
+        Qty = Nitem.Qty;
+        DiscAmount = Nitem.Discount = Nitem.DiscAmount;
         $http({
           method: 'PUT',
           url: requestUrl,
@@ -1152,9 +1157,9 @@ angular.module('itouch.controllers')
           },
           data: {
             'itemDescription': Nitem.Desc1,
-            'itemQuantity': Nitem.Qty,
+            'itemQuantity': Qty,
             'itemTotal': Nitem.Total,
-            'itemDiscount': Nitem.Discount + Nitem.Tax5DiscAmount || Nitem.DiscAmount + Nitem.Tax5DiscAmount,
+            'itemDiscount': DiscAmount + Nitem.Tax5DiscAmount,
             'itemOrgPrice': Nitem.OrgPrice,
             'itemOrderedDateTime': moment(Nitem.OrderedDateTime).format('YYYY-MM-DDTHH:mm:ss.sssZ'),
             'machineId': Nitem.MachineId,
@@ -1168,13 +1173,13 @@ angular.module('itouch.controllers')
           }
         }).then(function successCallback (response) {
           eventLog.log('2nd Display: Update Success');
-          console.log('Update');
+          console.log('Update : ' + Nitem.Desc1);
+          console.log(response);
         }, function errorCallback (response) {
           errorLog.log('2nd Display Update Fail : ' + response.status + ' ' + response.statusText);
           console.log(response);
         });
       };
-
 
       /**
        * Secondary display Delete
@@ -1184,8 +1189,7 @@ angular.module('itouch.controllers')
         if (item) {
           if (item.ItemType == 'SKT' || item.ItemType == 'NOR' ) { // SaleKit + Normal
             angular.forEach($scope.cart.items, function (Ditem) {
-              console.log(Ditem.ItemType );
-              if (Ditem.ItemType == 'MOD') {
+              if (Ditem.ItemType == 'MOD' && Ditem.ParentItemLineNumber == item.LineNumber) {
                 angular.forEach($scope.cart.items, function (Pitem) {
                   if (Pitem.LineNumber == Ditem.ParentItemLineNumber) {
                     $scope.DeleteFunction(Ditem);
@@ -1195,9 +1199,10 @@ angular.module('itouch.controllers')
               }
               else if (Ditem.ParentItemLineNumber == item.LineNumber) {
                 $scope.DeleteFunction(Ditem);
+              } else {
+                $scope.DeleteFunction(item);
               }
             });
-            $scope.DeleteFunction(item);
           } else if (item.ItemType == 'PWP') {
             $scope.DeleteFunction(item);
             delpwp = 1;
@@ -1421,10 +1426,10 @@ angular.module('itouch.controllers')
           // $scope.flag = true;
           Alert.showLoading();
           var item = $scope.cart.selectedItem;
-          var last = Object.keys($scope.cart.items).length - 1;
-          if (last == 0) {
-            $scope.DeleteApi();
-          }
+          // var last = Object.keys($scope.cart.items).length - 1;
+          // if (last == 0) {
+          //   $scope.DeleteApi();
+          // }
           if (item) {
             // console.log(item.ItemType);
             if (item.ItemType == 'PWI') {
@@ -1456,7 +1461,7 @@ angular.module('itouch.controllers')
                   });
                   $scope.navMenuCtrl();
                 }, function (err) {
-                  errortLog.log('VoidTop SKT & PWP Error : ' + err);
+                  errorLog.log('VoidTop SKT & PWP Error : ' + err);
                   console.log(err);
                 });
               }
@@ -1506,7 +1511,7 @@ angular.module('itouch.controllers')
 
                         }
                       }, function (ex) {
-                        errortLog.log('VoidTop SKI Error : ' + ex);
+                        errorLog.log('VoidTop SKI Error : ' + ex);
                         console.log(ex);
                       });
                     });
@@ -2066,21 +2071,26 @@ angular.module('itouch.controllers')
           Alert.showLoading();
           eventLog.log('Barcode : ' + $scope.data.barcode);
           if ($scope.data.barcode && $scope.data.barcode != '' && $scope.data.barcode != undefined) {
-            // console.log('pass');
-            ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
-              eventLog.log('Barcode : ' + $scope.data.barcode, 7);
-              eventLog.log(item, 7);
-              $timeout(function () {
-                selectItem(item);
-              }, 20);
-            }, function (ex) {
-              $cordovaToast.show(ex, 'long', 'top');
-              // Alert.warning(ex);
-            }).finally(function () {
+            if ($scope.data.barcode == undefined) {
               $scope.data.barcode = '';
-              buttonClicked.barcode = false;
-              document.getElementById('barcodeText').focus();
-            });
+              eventLog.log('Barcode : Undefined');
+              Alert.warning('Try Again : 2');
+            } else {
+              ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
+                eventLog.log('Barcode : ' + $scope.data.barcode, 7);
+                eventLog.log(item, 7);
+                $timeout(function () {
+                  selectItem(item);
+                }, 20);
+              }, function (ex) {
+                $cordovaToast.show(ex, 'long', 'top');
+                // Alert.warning(ex);
+              }).finally(function () {
+                $scope.data.barcode = '';
+                buttonClicked.barcode = false;
+                document.getElementById('barcodeText').focus();
+              });
+            }
           } else {
             // console.log('fail');
             $scope.data.barcode = '';
