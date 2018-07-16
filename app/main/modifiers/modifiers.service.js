@@ -2,8 +2,10 @@
  * Created by shalitha on 18/5/16.
  */
 angular.module('itouch.services')
-  .factory('ModifierService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'CartItemService', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, CartItemService) {
+  .factory('ModifierService', ['Restangular', 'SettingsService', '$q', '$localStorage', 'DB', 'DB_CONFIG', 'CartItemService', 'LogService', function (Restangular, SettingsService, $q, $localStorage, DB, DB_CONFIG, CartItemService, LogService) {
     var self = this;
+    eventLog = LogService.StartEventLog();
+    errorLog = LogService.StartErrorLog();
 
     self.TYPE_FOOD = 'F';
     self.TYPE_DRINK = 'B';
@@ -22,6 +24,7 @@ angular.module('itouch.services')
               }
               else {
                 syncLog.log('  Modifiers Sync Error : Unknown machine', 1);
+                errorLog.log('Modifiers Sync Error : Unknown machine');
                 deferred.reject('Unknown machine');
               }
             }
@@ -30,14 +33,17 @@ angular.module('itouch.services')
             }
           } catch (ex) {
             syncLog.log('  Modifiers Sync Error : No results', 1);
+            errorLog.log('Modifiers Sync Error : No results');
             deferred.reject('No results');
           }
         }, function (err) {
           console.error(err);
           syncLog.log('  Modifiers Sync Error : Unable to fetch data from the server', 1);
+          errorLog.log('Modifiers Sync Error : Unable to fetch data from the server');
           deferred.reject('Unable to fetch data from the server');
         });
       } catch (ex) {
+        errorLog.log('modifier fetch exception : ' + ex);
         deferred.reject(ex);
       }
 
@@ -53,6 +59,7 @@ angular.module('itouch.services')
       DB.query(q, [type || 'F']).then(function (result) {
         deferred.resolve(DB.fetchAll(result));
       }, function (err) {
+        errorLog.log('modifier get : ' + err.message);
         deferred.reject(err.message);
       });
       return deferred.promise;
@@ -71,6 +78,7 @@ angular.module('itouch.services')
       DB.query(q, [plu, page, key]).then(function (result) {
         deferred.resolve(DB.fetchAll(result));
       }, function (err) {
+        errorLog.log('modifier getSubPlu : ' + err.message);
         deferred.reject(err.message);
       });
       return deferred.promise;

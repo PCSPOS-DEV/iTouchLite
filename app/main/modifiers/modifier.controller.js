@@ -2,8 +2,10 @@
  * Created by shalitha on 3/6/16.
  */
 angular.module('itouch.controllers')
-  .controller('ModifierCtrl', ['$scope', 'ModifierService', 'BillService', 'ItemService', 'CartItemService', '$q',
-    function ($scope, ModifierService, BillService, ItemService, CartItemService, $q) {
+  .controller('ModifierCtrl', ['$scope', 'ModifierService', 'BillService', 'ItemService', 'CartItemService', '$q', 'LogService',
+    function ($scope, ModifierService, BillService, ItemService, CartItemService, $q, LogService) {
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       var self = this;
       self.pages = {};
       self.selectedPage = null;
@@ -51,6 +53,7 @@ angular.module('itouch.controllers')
             });
             self.selectPage(self.pages[_.first(_.keys(self.pages))]);
           }, function (err) {
+            errorLog.log('modifier refresh : ' + err.message);
             console.log(err);
           });
         }
@@ -87,6 +90,7 @@ angular.module('itouch.controllers')
                 }
               }
             }, function (err) {
+              errorLog.log('modifier selectItem : ' + err.message);
               console.log(err);
             });
           } else {
@@ -116,6 +120,7 @@ angular.module('itouch.controllers')
 
             }
           }, function (err) {
+            errorLog.log('modifier selectSubPlu : ' + err.message);
             console.log(err);
           });
         }
@@ -129,12 +134,13 @@ angular.module('itouch.controllers')
 
             // setTimeout(function () {
             $scope.refreshCart().then(function () {
-              $scope.PostApi(res, 2);
+              $scope.PostApi(res, 5);
             });
             setTimeout(function () {
               $scope.$emit('modifier.modal.close');
             }, 20);
           }, function (err) {
+            errorLog.log('modifier save : ' + err.message);
             console.log(err);
           });
         }
