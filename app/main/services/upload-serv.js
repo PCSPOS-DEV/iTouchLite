@@ -101,7 +101,7 @@ angular.module('itouch.services')
         return DB.select(DB_CONFIG.tableNames.bill.header, '*', {
           columns: 'IsExported=?',
           data: [false]
-        }, null, '10').then(function (res) {
+        }, null, '20').then(function (res) {
           uploadLog.log('--*-- Upload Detail Initialized --*--', 7);
           uploadLog.log('  Number of transactions : ' + res.rows.length, 2);
           // console.log(res.rows.length);
