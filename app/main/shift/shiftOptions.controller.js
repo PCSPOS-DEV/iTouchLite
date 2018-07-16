@@ -20,12 +20,15 @@ angular.module('itouch.controllers')
 
       var checkBDate = function () {
         if (ControlService.isNewBusinessDate()) {
+          eventLog.log('checkBDate : Start');
           if ((ControlService.getDayEndDate()) == undefined) {
             self.openDatePicker(ControlService.getDayEndDate());
+            eventLog.log('BDate :' + ControlService.getDayEndDate());
             return false;
           }
           else if ((ControlService.getDayEndDate()).format('YYYY-MM-DD') >= moment(tDay).format('YYYY-MM-DD')) {
             // else if ((ControlService.getDayEndDate()).format('DD-MM-YYYY') >= moment(tDay).format('DD-MM-YYYY')) {
+            eventLog.log('Invalid Business Date.');
             Alert.error('Invalid Business Date.');
           } else {
             self.openDatePicker(ControlService.getDayEndDate());
@@ -85,8 +88,8 @@ angular.module('itouch.controllers')
         SuspendService.fetchSuspendedBills().then(function (data) {
           suspenditem = parseInt(data.length);
           if (suspenditem == 0) { // GGWP
-          $scope.shiftListType = 'close';
-          self.shiftModal.show();
+            $scope.shiftListType = 'close';
+            self.shiftModal.show();
           } else {
             Alert.warning('Suspend Item is not empty.', 'ItouchLite');
           }
@@ -317,7 +320,7 @@ angular.module('itouch.controllers')
        */
       var setBusinessDate = function (date) {
         if (moment(date).isValid()) {
-          eventLog.log('Saves the Business Date : ' + date);
+          eventLog.log('Set Business Date : ' + moment(date).format('YYYY-MM-DD'));
           ControlService.setBusinessDate(moment(date));
         } else {
           errorLog.log('date is not valid');
