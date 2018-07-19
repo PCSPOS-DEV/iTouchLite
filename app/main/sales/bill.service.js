@@ -2,9 +2,11 @@
  * Created by shalitha on 30/5/16.
  */
 angular.module('itouch.services')
-  .factory('BillService', ['LocationService', 'ControlService', '$localStorage', 'ErrorService', 'DB', 'DB_CONFIG', 'TenderService', 'SettingsService', '$filter', 'AuthService', '$q', 'ShiftService', 'TempBillDetailService', 'VoidItemsService', 'TempBillDiscountsService', 'TempBillHeaderService', 'TaxService', 'RoundingService',
-    function (LocationService, ControlService, $localStorage, ErrorService, DB, DB_CONFIG, TenderService, SettingsService, $filter, AuthService, $q, ShiftService, TempBillDetailService, VoidItemsService, TempBillDiscountsService, TempBillHeaderService, TaxService, RoundingService) {
+  .factory('BillService', ['LocationService', 'ControlService', '$localStorage', 'ErrorService', 'DB', 'DB_CONFIG', 'TenderService', 'SettingsService', '$filter', 'AuthService', '$q', 'ShiftService', 'TempBillDetailService', 'VoidItemsService', 'TempBillDiscountsService', 'TempBillHeaderService', 'TaxService', 'RoundingService', 'LogService',
+    function (LocationService, ControlService, $localStorage, ErrorService, DB, DB_CONFIG, TenderService, SettingsService, $filter, AuthService, $q, ShiftService, TempBillDetailService, VoidItemsService, TempBillDiscountsService, TempBillHeaderService, TaxService, RoundingService, LogService) {
       var self = this;
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       var bill = {
         header: null,
         items: [],
@@ -326,6 +328,7 @@ angular.module('itouch.services')
             return (ln - (ln % 100)) + 100;
           }
         }, function (ex) {
+          errorLog.log('loadLineNewNumber Error : ' + ex);
           console.log(ex);
         });
       };
@@ -353,6 +356,7 @@ angular.module('itouch.services')
           });
         } else {
           ErrorService.add(errors);
+          errorLog.log('addItem Error : ' + errors);
           def.reject('Invalid Item');
         }
         return def.promise;
@@ -373,6 +377,7 @@ angular.module('itouch.services')
         } else {
           ErrorService.add(errors);
           console.log(errors);
+          errorLog.log('updateItem Error : ' + errors);
           def.reject('invalid item ' + item.ItemId);
         }
 
@@ -405,6 +410,7 @@ angular.module('itouch.services')
             } else {
               $q.reject('invalid item ' + sKItem.ItemId);
               ErrorService.add(errors);
+              errorLog.log('addSalesKitItem Error : ' + errors);
               console.log(errors);
             }
           });
@@ -470,7 +476,7 @@ angular.module('itouch.services')
           return item;
         });
 
-
+        eventLog.log('saveBill getTempBill Start');
         self.getTempBill(bill.header.DocNo).then(function (bill) {
           bill.header.IsExported = false;
           bill.header.DocType = billHeader.DocType || 'SA';
@@ -484,8 +490,8 @@ angular.module('itouch.services')
             item.IsExported = false;
             return item;
           });
-
           DB.clearQueue();
+          eventLog.log('getTempBill ClearDB');
           billHeader.IsExported = false;
           billHeader.ShiftId  = ShiftService.getCurrentId();
           //billHeader.SysDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -500,6 +506,7 @@ angular.module('itouch.services')
           if (payTransactionsOverTender) {
             DB.addInsertToQueue(DB_CONFIG.tableNames.bill.payTransactionsOverTender, payTransactionsOverTender);
           }
+          eventLog.log('getTempBill Insert Data to DB');
 
           DB.executeQueue().then(function () {
             clearTempBillHeader();
@@ -507,12 +514,15 @@ angular.module('itouch.services')
             clearTempDicounts();
             DB.clearQueue();
             ControlService.counterDocId(bill.header.DocNo);
+            eventLog.log('getTempBill executeQueueDB');
             deferred.resolve();
           }, function (err) {
+            errorLog.log('getTempBill executeQueueDB error :' + err);
             deferred.reject(err);
           });
         }, function (err) {
           console.log(err);
+          errorLog.log('SaveBill error :' + err);
           deferred.reject(err);
         });
 
@@ -524,6 +534,7 @@ angular.module('itouch.services')
           var bill = DB.fetchAll(result);
           return bill;
         }, function (error) {
+          errorLog.log('getCurrentBill error :' + error.message);
           throw new Error(error.message);
         });
       };
@@ -838,7 +849,7 @@ angular.module('itouch.services')
         } else {
           errors.push('Item not found');
         }
-
+        errorLog.log('validateBill Error : ' + errors);
         return errors;
       };
 
@@ -859,7 +870,7 @@ angular.module('itouch.services')
         } else {
           errors.push('Item not found');
         }
-
+        errorLog.log('validateStockTransaction Error : ' + errors);
         return errors;
       };
 
@@ -896,7 +907,7 @@ angular.module('itouch.services')
         } else {
           errors.push('Item not found');
         }
-
+        errorLog.log('validateSalesKit Error : ' + errors);
         return errors;
       };
 
@@ -1503,6 +1514,7 @@ angular.module('itouch.services')
               });
 
             }, function (err) {
+              errorLog.log('updateHeaderTotals Error : ' + err);
               console.log(err);
             });
 
@@ -1706,6 +1718,7 @@ angular.module('itouch.services')
               });
 
             }, function (err) {
+              errorLog.log('updateHeaderTotalsForDiscountItem Error : ' + err);
               console.log(err);
             });
 

@@ -359,6 +359,7 @@ angular.module('itouch.controllers')
           $scope.cart.selectedItem = pwpitem;
         }
         // selectLastItem();
+        eventLog.log('pwp model closed ');
         console.log($scope.cart.selectedItem);
         // $scope.cart.selectedItem = pwpitem;
         $scope.showpwpModal = false;
@@ -373,6 +374,7 @@ angular.module('itouch.controllers')
       $scope.$on('pwpModal-save', function (modal, pwpitem) {
         // console.log('save');
         // console.log(pwpitem);
+        eventLog.log('pwp model saved ');
         $scope.cart.selectedItem = pwpitem;
         $scope.showpwpModal = false;
         $scope.qty.value = 1;
@@ -1147,6 +1149,7 @@ angular.module('itouch.controllers')
         } else {
           PrevItemId = Math.floor(Nitem.ItemId);
         }
+        console.log(PrevItemId);
         Qty = Nitem.Qty;
         DiscAmount = Nitem.Discount = Nitem.DiscAmount;
         $http({
