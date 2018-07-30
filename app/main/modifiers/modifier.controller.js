@@ -134,7 +134,7 @@ angular.module('itouch.controllers')
             angular.forEach(self.removeList, function (removeMod) {
               removeMod.Discount = removeMod.DiscAmount;
               // console.log('gg1');
-              $scope.DeleteFunction(removeMod);
+              setTimeout(function () { $scope.DeleteFunction(removeMod); }, 10);
             } );
             // setTimeout(function () {
             $scope.refreshCart().then(function () {

@@ -1093,10 +1093,10 @@ angular.module('itouch.controllers')
               angular.forEach(it, function (Citem) {
                 if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
                   // console.log('gg2');
-                  $scope.DeleteApi(Ditem);
+                  setTimeout(function () { $scope.DeleteApi(Ditem); }, 10);
                   setTimeout(function () {
                     $scope.PostFunction(Ditem);
-                  }, 300);
+                  }, 200);
                 }
               });
             } else {
