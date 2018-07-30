@@ -455,6 +455,16 @@ angular.module('itouch.services')
         // return def.promise;
       };
 
+      self.fetchBillData = function () {
+        DB.select(DB_CONFIG.tableNames.discounts.billDiscounts, '*').then(function (res) {
+          var datas = DB.fetchAll(res);
+          return datas;
+        });
+        // DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.item.item + '', []).then(function (result) {
+        //   return DB.fetchAll(result);
+        // })
+      };
+
       self.saveBill = function (billHeader, billDetails, stockTransactions, payTransactions, payTransactionsOverTender) {
         var deferred = $q.defer();
         if (!stockTransactions) {
