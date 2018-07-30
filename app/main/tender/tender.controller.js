@@ -144,6 +144,7 @@ angular.module('itouch.controllers')
               item.SubTotal = item.SubTotal.roundTo(2);
               return item;
             });
+            eventLog.log('Tender Bill : ');eventLog.log(bill);
             var item = _.first(bill);
             var total = $scope.tenderHeader.Total;
             var roundedTotal = parseFloat($scope.tenderHeader.TotalRounded);
@@ -237,6 +238,7 @@ angular.module('itouch.controllers')
                     }
                   });
                 });
+                eventLog.log('Tender stockTransactions Detail');
                 var header = _.omit($scope.tenderHeader, ['TaxAmount', 'Total', 'TenderTotal', 'TotalRounded']);
 
                 // var total = 0;
@@ -270,13 +272,13 @@ angular.module('itouch.controllers')
                       //ChangeAmount: 0,
                       IsExported: false
                     };
-
-
                   }
+                  eventLog.log('Tender OverTenderAmount Detail');
                 }
 
                 if ($scope.header.isSuspended) {
                   var outletUrl = AppConfig.getOutletServerUrl();
+                  eventLog.log('Tender $scope.header.isSuspended');
                 //  $scope.header.SuspendDocNo
                   if (outletUrl) {
                     Restangular.oneUrl('DeleteSuspendBill', outletUrl + 'DeleteSuspendBill').get({ SuspendDocNo: $scope.header.SuspendDocNo }).then(function (res) {
@@ -288,10 +290,13 @@ angular.module('itouch.controllers')
                     });
                   }
 
+                } else {
+                  eventLog.log('Tender $scope.header.isSuspended False');
                 }
                 DiscountService.saveTenderDiscount($scope.tenderHeader.DocNo).then(function () {
 
                   BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
+                    eventLog.log('counterDocId : ' + $scope.tenderHeader.DocNo);
                     ControlService.counterDocId($scope.tenderHeader.DocNo);
                     BillService.initHeader();
                     payTransactions = [];
@@ -302,7 +307,12 @@ angular.module('itouch.controllers')
                     if (tenderType.OpenDrawer == 'true') {
                       Reciept.openDrawer();
                     }
-                    Reciept.print(header.DocNo);
+                    // console.log(tenderType.TotalPrintReceipt);
+                    for (var i = 1; i < tenderType.TotalPrintReceipt; i++) { // TotalPrintReceipt Control
+                      eventLog.log('print receipt ');
+                      Reciept.print(header.DocNo);
+                    }
+                    // Reciept.print(header.DocNo);
 
 
                     if (changeAmount > 0 && tenderType.Cash == 'true') {
@@ -315,6 +325,7 @@ angular.module('itouch.controllers')
                       disableAnimate: false,
                       disableBack: true
                     });
+                    eventLog.log('initBill & refresh-cart ');
 
                     $rootScope.$emit('initBill');
                     $rootScope.$emit('refresh-cart', true);
