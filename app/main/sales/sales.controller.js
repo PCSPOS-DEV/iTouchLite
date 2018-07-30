@@ -1092,10 +1092,11 @@ angular.module('itouch.controllers')
             } else if (type == 5) { // F/B Modifier
               angular.forEach(it, function (Citem) {
                 if ((Citem.ItemType == Ditem.ItemType) && (Citem.ItemId == Ditem.ItemId) && (Citem.LineNumber == Ditem.LineNumber)) {
+                  // console.log('gg2');
                   $scope.DeleteApi(Ditem);
                   setTimeout(function () {
                     $scope.PostFunction(Ditem);
-                  }, 50);
+                  }, 300);
                 }
               });
             } else {
@@ -1149,7 +1150,7 @@ angular.module('itouch.controllers')
         } else {
           PrevItemId = Math.floor(Nitem.ItemId);
         }
-        console.log(PrevItemId);
+        // console.log(PrevItemId);
         Qty = Nitem.Qty;
         DiscAmount = Nitem.Discount = Nitem.DiscAmount;
         $http({

@@ -131,7 +131,11 @@ angular.module('itouch.controllers')
         var parentItem = $scope.cart.selectedItem;
         if (parentItem && self.cart.length > 0) {
           ModifierService.add(parentItem.DocNo, parentItem.LineNumber, angular.copy(self.cart)).then(function (res) {
-
+            angular.forEach(self.removeList, function (removeMod) {
+              removeMod.Discount = removeMod.DiscAmount;
+              // console.log('gg1');
+              $scope.DeleteFunction(removeMod);
+            } );
             // setTimeout(function () {
             $scope.refreshCart().then(function () {
               $scope.PostApi(res, 5);
