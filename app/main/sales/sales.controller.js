@@ -931,7 +931,7 @@ angular.module('itouch.controllers')
                         $scope.selectItemWithLineNumber(it.LineNumber);
                         $scope.PostApi(it);
                       });
-                      eventLog.log('--*-- selectItem Normal Done --*-- ');
+                      eventLog.log('selectItem Normal Done');
                     }, function (ex) {
                       errorLog.log('selectItem Normal Error ' + ex);
                       console.log(ex);
@@ -1403,7 +1403,7 @@ angular.module('itouch.controllers')
               $scope.selectItem(null);
             }
           }
-          eventLog.log('--*-- selectItemWithLineNumber : Done --*--');
+          eventLog.log('selectItemWithLineNumber : Done');
         }
       };
 

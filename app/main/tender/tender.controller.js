@@ -38,6 +38,7 @@ angular.module('itouch.controllers')
 
       $scope.$on('$ionicView.beforeEnter', function (event, data) {
         submitted = false;
+        console.log(submitted);
         DiscountService.clearTempTenderDiscounts();
         initBill();
         syncItem();
@@ -131,8 +132,9 @@ angular.module('itouch.controllers')
        */
       var seq = 0;
       $scope.selectTenderType = function (tenderType, value) {
-        eventLog.log('Tender Operation Start');
+        eventLog.log('--*-----*-- Tender Operation Start for : ' + $stateParams.DocNo + ' --*-----*--');
         try {
+          console.log(submitted);
           if (!submitted) {
             var overTender = false;
 
@@ -293,11 +295,17 @@ angular.module('itouch.controllers')
                 } else {
                   eventLog.log('Tender $scope.header.isSuspended False');
                 }
+                eventLog.log('DocNo : ' + $scope.tenderHeader.DocNo);
+                // console.log('DocNo : ' + $scope.tenderHeader.DocNo); // Test GG for Decrese Doc No
+                // tempID = parseInt(1 + $scope.tenderHeader.DocNo.substring(1, 6)) ;
+                // MDocNo = 'R' + ('R' + (tempID - 1)).substring(2, 7);
+                // console.log('MDocNo : ' + MDocNo);
                 DiscountService.saveTenderDiscount($scope.tenderHeader.DocNo).then(function () {
 
                   BillService.saveBill(header, bill, stockTransactions, payTransactions, overTender).then(function () {
-                    eventLog.log('counterDocId : ' + $scope.tenderHeader.DocNo);
-                    ControlService.counterDocId($scope.tenderHeader.DocNo);
+                    setTimeout(function () {
+                      ControlService.counterDocId($scope.tenderHeader.DocNo);
+                    }, 50);
                     BillService.initHeader();
                     payTransactions = [];
                     overTender = [];
@@ -393,10 +401,16 @@ angular.module('itouch.controllers')
             eventLog.log('--*-- Tender Operation Complete --*--');
             $scope.$emit('BlockMenu', true);
           } else {
-            eventLog.log('--*-- Tender Operation Fail :' + submitted + '--*--');
+            tempID = parseInt(1 + $scope.tenderHeader.DocNo.substring(1, 6)) ;
+            $scope.tenderHeader.DocNo = 'R' + ('R' + (tempID + 1)).substring(2, 7);
+            eventLog.log('--*-- Tender Operation Fail : ' + submitted + '--*--');
+            errorLog.log('--*-- Tender Operation Fail : ' + submitted + '--*--');
           }
         } catch (err) {
-          eventLog.log('--*-- Tender Operation Error :' + err + '--*--');
+          // tempID = parseInt(1 + $scope.tenderHeader.DocNo.substring(1, 6)) ;
+          // $scope.tenderHeader.DocNo = 'R' + ('R' + (tempID - 1)).substring(2, 7);
+          eventLog.log('--*-- Tender Operation Error : @ DocNo' + $scope.tenderHeader.DocNo + 'Error : ' + err + '--*--');
+          errorLog.log('--*-- Tender Operation Error : @ DocNo' + $scope.tenderHeader.DocNo + 'Error : ' + err + '--*--');
         }
         LogService.SaveLog();
       };

@@ -148,11 +148,12 @@ angular.module('itouch.services')
     };
 
     self.counterDocId = function (DocNo) {
-      eventLog.log('counterDocId : DocNo' + DocNo);
+      eventLog.log('Current counterDocId : DocNo' + DocNo);
       self.saveDocId(DocNo);
       var nextId = self.getNextDocId();
       //console.log(self.getDocId());
       self.saveDocId(nextId);
+      eventLog.log('Next counterDocId : DocNo' + nextId);
       //console.log(nextId);
     };
 
