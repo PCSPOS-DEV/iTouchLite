@@ -351,16 +351,6 @@ angular.module('itouch', [
                 }
               })
 
-              .state('app.billdiscounts', {
-                url: '/billdiscounts',
-                views: {
-                  'menuContent': {
-                    templateUrl: 'main/DB_browser/BillDiscounts.html',
-                    controller: 'BillDiscountsCtrl as ctrl'
-                  }
-                }
-              })
-
               .state('app.admin', {
                 url: '/admin',
                 views: {

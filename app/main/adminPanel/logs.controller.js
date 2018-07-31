@@ -32,8 +32,4 @@ angular.module('itouch.controllers')
       self.DebugLog = function () {
         $state.go('app.debugdetaillogs');
       };
-
-      self.BillDiscount = function () {
-        $state.go('app.billdiscounts');
-      };
     }]);
