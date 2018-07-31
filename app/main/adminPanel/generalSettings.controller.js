@@ -60,6 +60,7 @@ angular.module('itouch.controllers')
           self.settings.mac_id = null;
 
           console.log(ex);
+          errorLog.log('GeneralSettingsCtrl Refresh Exception : ' + ex);
         }
       };
       refresh();
@@ -141,7 +142,7 @@ angular.module('itouch.controllers')
 
       self.reset = function () {
         ask = 1;
-        Alert.showConfirm('Are you sure you want to reset setting?', 'Reset Setting', function (res) { //
+        Alert.showConfirm('Are you sure you want to reset setting? Recommendation: Reset only after upload data & day end. ', 'Reset Setting', function (res) { //
           if (res == 1) { //
             self.clear();
             Restangular.setBaseUrl('http://172.16.110.114:89/iTouchLiteSyncServices/iTouchLiteSyncService.svc/');

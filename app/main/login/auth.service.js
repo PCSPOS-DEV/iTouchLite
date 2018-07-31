@@ -2,10 +2,11 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.services')
-  .factory('AuthService', ['Restangular', 'DB', '$q', '$ionicPlatform', 'SettingsService', '$localStorage', '$state', 'DB_CONFIG',
-    function (Restangular, DB, $q, $ionicPlatform, SettingsService, $localStorage, $state, DB_CONFIG) {
+  .factory('AuthService', ['Restangular', 'DB', '$q', '$ionicPlatform', 'SettingsService', '$localStorage', '$state', 'DB_CONFIG', 'ControlService', 'AppConfig',
+    function (Restangular, DB, $q, $ionicPlatform, SettingsService, $localStorage, $state, DB_CONFIG, ControlService, AppConfig) {
       var self = this;
       var users = [];
+      var Pass = true;
       var tempUser = null;
       syncLog = SettingsService.StartSyncLog();
 
@@ -39,7 +40,8 @@ angular.module('itouch.services')
         var deferred = $q.defer();
         DB.query('SELECT * FROM ' + DB_CONFIG.tableNames.auth.staff + ' WHERE Code = ? LIMIT 1', [username]).then(function (rs) {
           var user = DB.fetch(rs);
-          if (user) {
+          self.checkSetting();
+          if (user && Pass == true) {
             if (user.Password === CryptoJS.SHA1(password).toString(CryptoJS.enc.Base64)) {
               if (!temp) {
                 $localStorage.user = user;
@@ -57,6 +59,33 @@ angular.module('itouch.services')
         });
 
         return deferred.promise;
+      };
+
+      self.settings = {
+        ent_id: SettingsService.getEntityId(),
+        loc_id: SettingsService.getLocationId(),
+        mac_id: SettingsService.getMachineId(),
+        cash_id: SettingsService.getCashId(),
+        business_date: SettingsService.getBusinessDate(),
+        doc_id: ControlService.getDocId(),
+        displayurl: AppConfig.getDisplayUrl(),
+        url: AppConfig.getBaseUrl(),
+        outletServerUrl: AppConfig.getOutletServerUrl(),
+      };
+
+      self.checkSetting = function () {
+        if (_.isUndefined(self.settings.ent_id) || _.isNull(self.settings.ent_id)) {
+          Pass = false;
+        }
+        if (_.isUndefined(self.settings.loc_id) || _.isNull(self.settings.loc_id)) {
+          Pass = false;
+        }
+        if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id)) {
+          Pass = false;
+        }
+        if (_.isUndefined(self.settings.doc_id) || _.isNull(self.settings.doc_id)) {
+          Pass = false;
+        }
       };
 
       self.logout = function () {

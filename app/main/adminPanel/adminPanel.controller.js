@@ -2,9 +2,10 @@
  * Created by shalitha on 17/5/16.
  */
 angular.module('itouch.controllers')
-  .controller('AdminPanelCtrl', [ '$rootScope', '$scope', '$ionicHistory', '$ionicNavBarDelegate', '$state',
-    function ($rootScope, $scope, $ionicHistory, $ionicNavBarDelegate, $state) {
+  .controller('AdminPanelCtrl', [ '$rootScope', '$scope', '$ionicHistory', '$ionicNavBarDelegate', '$state', 'AuthService',
+    function ($rootScope, $scope, $ionicHistory, $ionicNavBarDelegate, $state, AuthService) {
       var self = this;
+      var Pass = true;
 
       self.changePage = function (page) {
         // $scope.loadingShow();
@@ -34,9 +35,10 @@ angular.module('itouch.controllers')
       });
 
       self.goBack = function () {
+        AuthService.checkSetting();
         var back = $ionicHistory.backView();
         // console.log(back);
-        if (back) {
+        if (back && Pass == true) {
           $ionicHistory.goBack();
         } else {
           $state.go('login');
