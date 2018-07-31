@@ -58,4 +58,13 @@ Ver 1.6 2018-07-02
     Add support for pwp child item's modifier
     Bug fixes for tally issue
 
-Ver 1.?
+Ver 1.7 2018-07-17
+    Admin panel general & log bug fixes and UI enhancement
+    PWP bug fixes
+    More log detail
+    Epson JS SDK Update
+    increase upload numbers from 10 -> 20
+    Support modifier for all itemtypes
+    Bug fixes for 2nd display (salekit, modifier) & pwp
+
+Ver 1.8
