@@ -2,8 +2,8 @@
  * Created by Lynn on 5th June 2018.
  */
 angular.module('itouch.controllers')
-  .controller('UploadLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'UploadService', '$state', '$cordovaEmailComposer', 'SettingsService', '$ionicScrollDelegate',
-    function (Alert, $localStorage, $scope, $rootScope, UploadService, $state, $cordovaEmailComposer, SettingsService, $ionicScrollDelegate) {
+  .controller('UploadLogsDetailCtrl', ['Alert', '$localStorage', '$scope', '$rootScope', 'UploadService', '$state', '$cordovaEmailComposer', 'SettingsService', '$ionicScrollDelegate', 'LogService',
+    function (Alert, $localStorage, $scope, $rootScope, UploadService, $state, $cordovaEmailComposer, SettingsService, $ionicScrollDelegate, LogService) {
       var self = this;
       var systemDate = new Date();
       TempLog = UploadService.StartuploadLog();
@@ -114,7 +114,7 @@ angular.module('itouch.controllers')
             $scope.newlogs = '';
           }, 200);
         }, function errorCallback (response) {
-          Alert.error(response);
+          Alert.error('Fail to send the email please check internet connection and try again. ');
         });
       };
     }]);

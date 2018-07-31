@@ -3,15 +3,17 @@
  */
 angular.module('itouch.services')
 
-  .service('SyncService', ['$q', 'AuthService', 'KeyBoardService', 'Alert', 'DB', 'ItemService', 'SubPLU1Service',
+  .service('SyncService', ['$q', 'AuthService', 'KeyBoardService', 'Alert', 'DB', 'ItemService', 'SubPLU1Service', 'LogService',
     'SubPLU2Service', 'SubPLU3Service', 'PriceGroupService', 'LocationService', 'FileService', 'TenderService',
     'FunctionsService', 'SalesKitService', 'DaysService', 'ShiftService', 'DiscountService', 'ReasonService', 'PrinterSettings',
     'PWPService', 'ModifierService', 'DepartmentService', 'SettingsService', 'BillService', 'DenominationsService', 'ImageDownloadService', 'Restangular', 'AppConfig',
-    function ($q, AuthService, KeyBoardService, Alert, DB, ItemService, SubPLU1Service, SubPLU2Service, SubPLU3Service,
+    function ($q, AuthService, KeyBoardService, Alert, DB, ItemService, SubPLU1Service, LogService, SubPLU2Service, SubPLU3Service,
               PriceGroupService, LocationService, FileService, TenderService, FunctionsService, SalesKitService, DaysService,
               ShiftService, DiscountService, ReasonService, PrinterSettings, PWPService, ModifierService, DepartmentService, SettingsService, BillService, DenominationsService, ImageDownloadService, Restangular, AppConfig) {
       var self = this;
       syncLog = SettingsService.StartSyncLog();
+      eventLog = LogService.StartEventLog();
+      errorLog = LogService.StartErrorLog();
       self.do = function () {
         Alert.showLoading();
         var url = AppConfig.getBaseUrl();
@@ -22,6 +24,7 @@ angular.module('itouch.services')
             DB.createTables();
             return DB.executeQueue().then(function () {
               syncLog.log('--*-- Sync Detail Initialized --*--', 7);
+              eventLog.log('--*-- Sync Detail Initialized --*--');
               return $q.all({
                 'Users': AuthService.fetchUsers(),
                 'Layouts': KeyBoardService.fetchLayout(),
@@ -53,6 +56,7 @@ angular.module('itouch.services')
               .then(function (values) {
                 return DB.executeQueue().then(function () {
                   syncLog.log('--*-- Sync Detail Completed --*--', 7);
+                  eventLog.log('--*-- Sync Detail Completed --*--');
                   DenominationsService.addDefault();
                   LocationService.get();
                   return ImageDownloadService.downloadImages().then(function () {
@@ -71,6 +75,7 @@ angular.module('itouch.services')
                   }, function (ex) {
                     console.log('sync error', ex);
                     syncLog.log('Sync Error : ' + ex, 4);
+                    errorLog.log('Sync Error : ' + ex);
                     syncLog.log('Sync Complete', 1);
                     syncLog.log('-----*-----*-----', 7);
                     var syncLogs = localStorage.getItem('SyncLogs');
@@ -87,21 +92,26 @@ angular.module('itouch.services')
                     Alert.hideLoading();
                   });
                 }, function (err) {
+                  errorLog.log('Sync Error : ' + err);
                   Alert.hideLoading();
                 });
               });
 
             }, function (ex) {
+              errorLog.log('Sync Error : ' + ex);
               syncLog.log('Sync Error : Unable to connect to Server', 4);
               Alert.error('Unable to connect to Server');
             });
           }, function (err) {
+            errorLog.log('Sync Error : ' + err);
             Alert.hideLoading();
             console.log(err);
+            errorLog.log('Sync Error : Unable to connect to Server');
             syncLog.log('Sync Error : Unable to connect to Server', 4);
             Alert.error('Unable to connect to Server');
           });
         } else {
+          errorLog.log('Sync Fail : Base URL not configured', 4);
           syncLog.log('Sync Fail : Base URL not configured', 4);
           Alert.error('Base URL not configured');
         }
@@ -160,15 +170,18 @@ angular.module('itouch.services')
               return true;
             } else {
               syncLog.log('Sync Fail : Invalid service', 1);
+              errorLog.log('Sync Fail : Invalid service');
               return $q.reject('Invalid service');
             }
           }, function (err) {
             console.log(err);
             syncLog.log('Sync Error : ' + err.statusText, 1);
+            errorLog.log('Sync Error : ' + err.statusText);
             return $q.reject(err.statusText);
           });
         } else {
           syncLog.log('Sync Fail : Base URL not configured', 1);
+          errorLog.log('Sync Fail : Base URL not configured');
           return $q.reject('Base URL not configured');
         }
       };
