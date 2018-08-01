@@ -74,17 +74,22 @@ angular.module('itouch.services')
       };
 
       self.checkSetting = function () {
-        if (_.isUndefined(self.settings.ent_id) || _.isNull(self.settings.ent_id)) {
-          Pass = false;
+        if (!_.isUndefined(self.settings.url) && !_.isNull(self.settings.url) && !_.isEmpty(self.settings.url) &&
+        !_.isUndefined(self.settings.outletServerUrl) && !_.isNull(self.settings.outletServerUrl) && !_.isEmpty(self.settings.outletServerUrl)) {
+          Pass = true;
         }
-        if (_.isUndefined(self.settings.loc_id) || _.isNull(self.settings.loc_id)) {
-          Pass = false;
-        }
-        if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id)) {
-          Pass = false;
-        }
-        if (_.isUndefined(self.settings.doc_id) || _.isNull(self.settings.doc_id)) {
-          Pass = false;
+        else {
+          if (_.isUndefined(self.settings.ent_id) || _.isNull(self.settings.ent_id) || _.isEmpty(self.settings.ent_id)) {
+            Pass = false;
+          } else if (_.isUndefined(self.settings.loc_id) || _.isNull(self.settings.loc_id) || _.isEmpty(self.settings.loc_id) ) {
+            Pass = false;
+          } else if (_.isUndefined(self.settings.mac_id) || _.isNull(self.settings.mac_id) || _.isEmpty(self.settings.mac_id) ) {
+            Pass = false;
+          } else if (_.isUndefined(self.settings.doc_id) || _.isNull(self.settings.doc_id) || _.isEmpty(self.settings.doc_id)) {
+            Pass = false;
+          } else {
+            Pass = true;
+          }
         }
       };
 

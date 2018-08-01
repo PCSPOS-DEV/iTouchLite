@@ -132,7 +132,8 @@ angular.module('itouch.controllers')
        */
       var seq = 0;
       $scope.selectTenderType = function (tenderType, value) {
-        eventLog.log('--*-----*-- Tender Operation Start for : ' + $stateParams.DocNo + ' --*-----*--');
+        Alert.showLoading();
+        eventLog.log('---*-----*--- Tender Operation Start for : ' + $stateParams.DocNo + ' ---*-----*----');
         try {
           console.log(submitted);
           if (!submitted) {
@@ -146,7 +147,7 @@ angular.module('itouch.controllers')
               item.SubTotal = item.SubTotal.roundTo(2);
               return item;
             });
-            eventLog.log('Tender Bill : ');eventLog.log(bill);
+            // eventLog.log('Tender Bill : ');eventLog.log(bill);
             var item = _.first(bill);
             var total = $scope.tenderHeader.Total;
             var roundedTotal = parseFloat($scope.tenderHeader.TotalRounded);
@@ -315,9 +316,9 @@ angular.module('itouch.controllers')
                     if (tenderType.OpenDrawer == 'true') {
                       Reciept.openDrawer();
                     }
-                    // console.log(tenderType.TotalPrintReceipt);
-                    for (var i = 1; i < tenderType.TotalPrintReceipt; i++) { // TotalPrintReceipt Control
-                      eventLog.log('print receipt ');
+                    eventLog.log('TotalPrintReceipt : ' + tenderType.TotalPrintReceipt);
+                    for (var i = 0; i < tenderType.TotalPrintReceipt; i++) { // TotalPrintReceipt Control
+                      eventLog.log('Print Tender Receipt : #' + (i + 1));
                       Reciept.print(header.DocNo);
                     }
                     // Reciept.print(header.DocNo);
@@ -398,7 +399,7 @@ angular.module('itouch.controllers')
             }
             seq++;
             $scope.numpadClear();
-            eventLog.log('--*-- Tender Operation Complete --*--');
+            eventLog.log('----*-----*--- Tender Operation Complete ----*-----*---');
             $scope.$emit('BlockMenu', true);
           } else {
             tempID = parseInt(1 + $scope.tenderHeader.DocNo.substring(1, 6)) ;
@@ -409,9 +410,12 @@ angular.module('itouch.controllers')
         } catch (err) {
           // tempID = parseInt(1 + $scope.tenderHeader.DocNo.substring(1, 6)) ;
           // $scope.tenderHeader.DocNo = 'R' + ('R' + (tempID - 1)).substring(2, 7);
-          eventLog.log('--*-- Tender Operation Error : @ DocNo' + $scope.tenderHeader.DocNo + 'Error : ' + err + '--*--');
-          errorLog.log('--*-- Tender Operation Error : @ DocNo' + $scope.tenderHeader.DocNo + 'Error : ' + err + '--*--');
+          eventLog.log('--*-- Tender Operation Error : @ DocNo ' + $scope.tenderHeader.DocNo + ' Error : ' + err + ' --*--');
+          errorLog.log('--*-- Tender Operation Error : @ DocNo ' + $scope.tenderHeader.DocNo + ' Error : ' + err + ' --*--');
         }
+        setTimeout(function () {
+          Alert.hideLoading();
+        }, 50);
         LogService.SaveLog();
       };
 
