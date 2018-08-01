@@ -1,12 +1,27 @@
 
 <div class="row" ng-controller="DebugLogsDetailCtrl as ctrl">
-  <div class="col" style="margin-left: 10%; max-width: 80%">
+  <div class="col-10">
+    <div class="col" style="margin-left: 2%; max-width: 80%;  padding-left: 20px">
+    <div class="col-5" style="padding-top: 250px;">
+        <div class="padding">
+          <button class="button button-block button-positive" ng-click = "ctrl.scrollTop()">▲</button>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="padding">
+          <button class="button button-block button-positive" ng-click = "ctrl.scrollDown()">▼</button>
+        </div>
+    </div>
+    </div>
+  </div>
+  <div class="col-80" style="max-width: 80%">
     <div class="card">
       <div class="item item-text-wrap">
         <ion-scroll class="cart" zooming="false" direction="y" style="height: 600px"  delegate-handle="cart">
         <div class="list">
           <label class="item item-input item-stacked-label" style="padding: 2px; height: 600px; ">
             <div class="col">
+                <pre style="font-size: 12px">{{totallines}}</pre>
                 <pre style="font-size: 12px">{{newlogs}}</pre>
             </div>
           </label>
@@ -15,6 +30,20 @@
       </div>
     </div>
     <div class="row">
+        <div class="col">
+            <div class="padding">
+              <button class="button button-block button-positive" ng-click="ctrl.sendMail()" ng-disabled="">
+                Send Log
+              </button>
+            </div>
+          </div>
+        <div class="col">
+          <div class="padding">
+            <button class="button button-block button-positive" style="background-color: rgb(224, 52, 52)" ng-click="ctrl.deleteManual()" ng-disabled="">
+              Delete All Log
+            </button>
+          </div>
+        </div>
         <div class="col">
           <div class="padding">
             <button class="button button-block button-secondary" ng-click="ctrl.Back2Logs()" ng-disabled="">
@@ -26,3 +55,4 @@
     </div>
   </div>
 </div>
+
