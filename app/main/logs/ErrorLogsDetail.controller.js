@@ -18,7 +18,7 @@ angular.module('itouch.controllers')
       $scope.totallines = lines.length;
       if ($scope.totallines >= 10000) {
         LogService.sendErrorLog();
-        localStorage.removeItem('ErrorLogs');
+        // localStorage.removeItem('ErrorLogs');
         $scope.newlogs = '';
         $scope.totallines = 0;
       }

@@ -10,6 +10,7 @@ angular.module('itouch.services')
       uploadLog = UploadService.StartuploadLog();
       var errorLog = new debugout();
       var eventLog = new debugout();
+      var debugLog = new debugout();
 
       var EntityId = SettingsService.getEntityId();
       var MachineId = SettingsService.getMachineId();
@@ -39,11 +40,17 @@ angular.module('itouch.services')
       var uploaddata = uploadlog.split('\n');
       var PUploadLog = uploaddata.join('|');
 
+      var debugLogs = localStorage.getItem('DebugLogs');
+      if (debugLogs == null) { debugLogs = 'no Data'; }
+      var debugdata = debugLogs.split('\n');
+      var PDebugLog = debugdata.join('|');
+
       self.PostLogData = function () {
         self.PostFunction(PErrorLog, 0);
         self.PostFunction(PEventLog, 1);
         self.PostFunction(PSyncLog, 2);
         self.PostFunction(PUploadLog, 3);
+        // self.PostFunction(PUploadLog, 3);
       };
 
       self.PostFunction = function (LogsData, LogType) {
@@ -75,6 +82,7 @@ angular.module('itouch.services')
             localStorage.removeItem('UploadLogs');
             uploadLog.clear();
           }
+          localStorage.removeItem('DebugLogs');
           console.log(response);
           console.log('Post');
         }, function errorCallback (response) {
@@ -92,6 +100,10 @@ angular.module('itouch.services')
 
       self.StartEventLog = function () {
         return eventLog;
+      };
+
+      self.StartDebugLog = function () {
+        return debugLog;
       };
 
       self.sendErrorLog = function () {
@@ -113,6 +125,7 @@ angular.module('itouch.services')
       self.SaveLog = function () {
         self.SaveEventLog();
         self.SaveErrorLog();
+        self.SaveDebugLog();
       };
 
       self.SaveEventLog = function () {
@@ -139,6 +152,15 @@ angular.module('itouch.services')
         localStorage.setItem('ErrorLogs', Errorlog + logs);
         // Errorlog = localStorage.getItem('ErrorLogs');
         // console.log('Errorlog: M');console.log(Errorlog);
+      };
+
+      self.SaveDebugLog = function () {
+        var debugLogs = localStorage.getItem('DebugLogs');
+        localStorage.removeItem('DebugLogs');
+        var logs = debugLog.getLog();
+        debugLog.clear();
+        if (debugLogs == null) {debugLogs = '';}
+        localStorage.setItem('DebugLogs', debugLogs + logs);
       };
 
 

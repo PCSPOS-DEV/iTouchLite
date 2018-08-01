@@ -56,7 +56,7 @@ angular.module('itouch.controllers')
       $scope.totallines = lines.length;
       if ($scope.totallines >= 10000) {
         LogService.sendUploadLog();
-        localStorage.removeItem('UploadLogs');
+        // localStorage.removeItem('UploadLogs');
         $scope.newlogs = '';
         $scope.totallines = 0;
       }
