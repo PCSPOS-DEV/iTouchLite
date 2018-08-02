@@ -849,7 +849,7 @@ angular.module('itouch.services')
         } else {
           errors.push('Item not found');
         }
-        errorLog.log('validateBill Error : ' + errors);
+        // errorLog.log('validateBill Error : ' + errors);
         return errors;
       };
 

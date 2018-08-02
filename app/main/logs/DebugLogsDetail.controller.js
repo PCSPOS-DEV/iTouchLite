@@ -56,7 +56,7 @@ angular.module('itouch.controllers')
         localStorage.removeItem('DebugLogs');
         $scope.newlogs = '';
         $scope.totallines = 0;
-        Alert.success('All Error Log Delete  Successfully');
+        Alert.success('All Log Delete Successfully');
       };
 
       var sent = 0;

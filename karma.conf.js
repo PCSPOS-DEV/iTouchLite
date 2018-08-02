@@ -30,7 +30,9 @@ module.exports = function (config) {
       // test
       'test/karma/**/*.js',
       // templates
-      'app/**/templates/*.html'
+      'app/**/templates/*.html',
+
+      'app/libs/CrytoJSv3/**/*.js'
     ]),
 
     // list of files to exclude
@@ -69,7 +71,7 @@ module.exports = function (config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['Safari'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits

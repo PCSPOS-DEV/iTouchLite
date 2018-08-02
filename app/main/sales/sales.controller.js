@@ -1019,7 +1019,7 @@ angular.module('itouch.controllers')
         if (!_.isEmpty($scope.cart.items)) {
           $timeout(function () {
             $state.go('app.tender', {DocNo: $scope.header.DocNo});
-          }, 50);
+          });
         }
       };
       var updatenewitem = 0 ;

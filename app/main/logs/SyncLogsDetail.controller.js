@@ -58,7 +58,7 @@ angular.module('itouch.controllers')
         localStorage.removeItem('SyncLogs');
         $scope.newlogs = '';
         $scope.totallines = 0;
-        Alert.success('All Sync Log Delete  Successfully');
+        Alert.success('All Sync Log Delete Successfully');
       };
 
       var sent = 0;

@@ -58,7 +58,7 @@ angular.module('itouch.controllers')
       eventLog.clear();
       $scope.newlogs = '';
       $scope.totallines = 0;
-      Alert.success('All Event Log Delete  Successfully');
+      Alert.success('All Event Log Delete Successfully');
     };
 
     var sent = 0;

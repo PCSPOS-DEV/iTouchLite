@@ -59,7 +59,7 @@ angular.module('itouch.logger', [])
 var output = function (debug, data, errorId) {
   if (debug) {
     console.log('exception', data);
-    window.alert('Error: ' + data.message);
+    window.alert('Error_: ' + data.message);
 
     // DB.insert(DB_CONFIG.tableNames.common.errorLog, data);
   } else {
