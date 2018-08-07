@@ -15,10 +15,12 @@ angular.module('itouch.controllers')
       var businessDate = ControlService.getBusinessDate(true);
       var sitems = 0;
       var fditem;
+      var self = this;
       var fitems = ItemService.fetchDate().then(function (res) {
         fditem = res;
         return fditem;
       });
+      var initBillProcess = false;
       var tenderDiscount = {
         header: null,
         discount: null
@@ -83,7 +85,9 @@ angular.module('itouch.controllers')
               });
             }
           }).then(function () {
+            initBillProcess = true;
             eventLog.log('Tender initBill Complete');
+
           });
         } catch (ex) {
           errorLog.log('Tender initBill Error : ' + ex);
@@ -130,9 +134,10 @@ angular.module('itouch.controllers')
        * Handles the tenderType click event
        * @param tenderType
        */
-      var seq = 0;
-      $scope.selectTenderType = function (tenderType, value) {
+      self.TenderProcess = function (tenderType, value) {
         Alert.showLoading();
+        console.log('ggwp');console.log(tenderType);
+        eventLog.log('--*-- Tender Type : ' + tenderType.Description1 + ' value : ' +  value);
         eventLog.log('---*-----*--- Tender Operation Start for : ' + $stateParams.DocNo + ' ---*-----*----');
         try {
           console.log(submitted);
@@ -338,6 +343,7 @@ angular.module('itouch.controllers')
 
                     $rootScope.$emit('initBill');
                     $rootScope.$emit('refresh-cart', true);
+                    initBillProcess = false;
                     $state.go('app.sales', {}, {reload: true});
 
                   }, function (err) {
@@ -402,21 +408,36 @@ angular.module('itouch.controllers')
             eventLog.log('----*-----*--- Tender Operation Complete ----*-----*---');
             $scope.$emit('BlockMenu', true);
           } else {
-            tempID = parseInt(1 + $scope.tenderHeader.DocNo.substring(1, 6)) ;
-            $scope.tenderHeader.DocNo = 'R' + ('R' + (tempID + 1)).substring(2, 7);
+
             eventLog.log('--*-- Tender Operation Fail : ' + submitted + '--*--');
             errorLog.log('--*-- Tender Operation Fail : ' + submitted + '--*--');
           }
         } catch (err) {
           // tempID = parseInt(1 + $scope.tenderHeader.DocNo.substring(1, 6)) ;
           // $scope.tenderHeader.DocNo = 'R' + ('R' + (tempID - 1)).substring(2, 7);
+
           eventLog.log('--*-- Tender Operation Error : @ DocNo ' + $scope.tenderHeader.DocNo + ' Error : ' + err + ' --*--');
           errorLog.log('--*-- Tender Operation Error : @ DocNo ' + $scope.tenderHeader.DocNo + ' Error : ' + err + ' --*--');
+          errorLog.log('--*-- Tender Type : ' + tenderType + ' value : ' +  value);
         }
         setTimeout(function () {
           Alert.hideLoading();
         }, 50);
         LogService.SaveLog();
+      };
+
+      var seq = 0;
+      $scope.selectTenderType = function (tenderType, value) {
+        if (initBillProcess == true) {
+          self.TenderProcess(tenderType, value);
+        } else {
+          initBill();
+          syncItem();
+          setTimeout(function () {
+            self.TenderProcess(tenderType, value);
+          }, 50);
+        }
+
       };
 
       /**
@@ -572,6 +593,7 @@ angular.module('itouch.controllers')
         /*Yi Yi Po(25-07-2017)*/
         DiscountService.clearTempTenderDiscounts();
         /*---*/
+        initBillProcess = false;
         $state.go('app.sales', {}, {reload: true});
       };
 

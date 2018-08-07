@@ -347,7 +347,7 @@ angular.module('itouch.services')
         }
       } else {
         errorLog.log('printer not connected');
-        Alert.success('printer not connected', 'Error');
+
       }
       LogService.SaveLog();
     };
