@@ -127,19 +127,31 @@ angular.module('itouch.services')
        */
     self.fetchAll = function (result) {
       var output = [];
-
-      for (var i = 0; i < result.rows.length; i++) {
-        output.push(result.rows.item(i));
+      try {
+        if (result == null) {
+          return null;
+        } else {
+          for (var i = 0; i < result.rows.length; i++) {
+            output.push(result.rows.item(i));
+          }
+          return output;
+        }
+      } catch (err ) {
+        errorLog.log('DB fetchAll error : ' + err);
       }
-
-      return output;
     };
 
     self.fetch = function (result) {
-      if (result.rows.length > 0) {
-        return result.rows.item(0);
-      } else {
-        return null;
+      try {
+        if (result == null) {
+          return null;
+        } else if (result.rows.length > 0) {
+          return result.rows.item(0);
+        } else {
+          return null;
+        }
+      } catch (err ) {
+        errorLog.log('DB fetch error : ' + err);
       }
     };
 

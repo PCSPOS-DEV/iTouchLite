@@ -19,7 +19,7 @@ angular.module('itouch.services')
       };
 
       self.downloadFile = function (imageName) {
-        eventLog.log('Download file : Start');
+        // eventLog.log('Download file : Start');
         var config = $localStorage.itouchConfig;
         var name = imageName.substr(imageName.lastIndexOf('/') + 1);
         var url = config.baseUrl + 'DownloadImage?ImageName=' + name;
@@ -27,7 +27,7 @@ angular.module('itouch.services')
         if (config.baseUrl && window.cordova && name) {
           var targetPath = cordova.file.dataDirectory + 'userImages/' + name;
           var trustHosts = true;
-          eventLog.log('Download file : Finish');
+          // eventLog.log('Download file : Finish');
           return $cordovaFileTransfer.download(url, targetPath, options, trustHosts);
         } else {
           errorLog.log('Unable to download image file');
