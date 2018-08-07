@@ -2068,59 +2068,48 @@ angular.module('itouch.controllers')
         }
       });
 
-      var BCtimeout = false;
-      var BCodeprocess = function () {
-        BCtimeout = true;
-        var Sbarcode = $scope.data.barcode;
+      $scope.barcodeSubmit = function (e) {
+        e.preventDefault();
         debugLog.log('Barcode barcodeSubmit Mode : ' + buttonClicked.barcode);
         if (!buttonClicked.barcode) {
           debugLog.log('--*-- Read Barcode : Start --*--');
           buttonClicked.barcode = true;
-          debugLog.log('Barcode : ' + Sbarcode);
-          if (Sbarcode && Sbarcode != '') {
-            ItemService.getItemByBarcode(Sbarcode).then(function (item) {
-              debugLog.log('Barcode : ' + Sbarcode);
-              debugLog.log('Item Desc : ' + item.Description1);
-              $timeout(function () {
-                selectItem(item);
-              }, 20);
-            }, function (ex) {
-              debugLog.log('Barcode Error : ' + ex);
-              $cordovaToast.show(ex, 'long', 'top');
-              // Alert.warning(ex);
-            }).finally(function () {
-              Sbarcode = '';
+          Alert.showLoading();
+          debugLog.log('Barcode : ' + $scope.data.barcode);
+          if ($scope.data.barcode && $scope.data.barcode != '' && $scope.data.barcode != undefined) {
+            if ($scope.data.barcode == undefined) {
               $scope.data.barcode = '';
-              buttonClicked.barcode = false;
-            });
+              debugLog.log('Barcode : Undefined');
+              Alert.warning('Try Again : 2');
+            } else {
+              ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
+                debugLog.log('Barcode : ' + $scope.data.barcode);
+                debugLog.log('Item Desc' + item.Description1);
+                $timeout(function () {
+                  selectItem(item);
+                }, 20);
+              }, function (ex) {
+                debugLog.log('Barcode Error : ' + ex);
+                $cordovaToast.show(ex, 'long', 'top');
+                // Alert.warning(ex);
+              }).finally(function () {
+                $scope.data.barcode = '';
+                buttonClicked.barcode = false;
+                document.getElementById('barcodeText').focus();
+              });
+            }
           } else {
             // console.log('fail');
-            debugLog.log('Barcode : (' + Sbarcode + ') Try Again');
-            Alert.warning('Barcode : (' + Sbarcode + ') Try Again');
-            Sbarcode = '';
             $scope.data.barcode = '';
             buttonClicked.barcode = false;
+            document.getElementById('barcodeText').focus();
+            debugLog.log('Barcode : Try Again');
+            Alert.warning('Try Again');
           }
           debugLog.log('--*-- Read Barcode : Complete --*--');
-          // BCtimeout = false;
-          $timeout(function () { BCtimeout = false;}, 200);
+          LogService.SaveLog();
+          $timeout(function () { Alert.hideLoading();}, 10);
         }
-      };
-      $scope.barcodeSubmit = function (e) {
-        Alert.showLoading();
-        e.preventDefault();
-        if (BCtimeout == false) {
-          debugLog.log('Barcode BCtimeout = false');
-          BCodeprocess();
-        } else {
-          $timeout(function () { BCtimeout = false;}, 200);
-          debugLog.log('Barcode BCtimeout = true');
-        }
-
-        $timeout(function () { Alert.hideLoading();}, 10);
-        $timeout(function () { $scope.data.Submit = true;});
-
-        LogService.SaveLog();
       };
 
       $scope.onBarcodeModeChange = function () {
@@ -2129,24 +2118,22 @@ angular.module('itouch.controllers')
       };
 
       $scope.onBarcodeTextBlur = function () {
-        console.log('data.barcodeMode : ' + $scope.data.barcodeMode);
-        debugLog.log('data.barcodeMode : ' + $scope.data.barcodeMode);
+        console.log('BarcodeMode : ' + $scope.data.barcodeMode);
+        debugLog.log('BarcodeMode : ' + $scope.data.barcodeMode);
         if ($scope.data.barcodeMode) {
           $scope.data.barcode = '';
           $timeout(function () {
-            debugLog.log('BarcodeMode : ON');
+            debugLog.log('BarcodeMode : Focus');
             document.getElementById('barcodeText').focus();
           }, 500);
         } else {
           $timeout(function () {
-            debugLog.log('BarcodeMode : OFF');
+            debugLog.log('BarcodeMode : Blur');
             document.getElementById('barcodeText').blur();
           }, 500);
         }
         LogService.SaveLog();
       };
-
-
 
       $scope.$on('CartCheck', function () {
         if (_.isEmpty($scope.cart.items)) {
