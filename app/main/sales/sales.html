@@ -1,7 +1,7 @@
 <ion-view view-title="iTouch NX Lite" class="sales" hide-back-button="true" can-swipe-back="false">
   <ion-content scroll="false">
     <form action="" ng-submit="barcodeSubmit($event)" >
-      <input type="number" ng-model="data.barcode"  ng-blur="onBarcodeTextBlur()" ng-disabled="!data.barcodeMode" id="barcodeText" />
+      <input type="number" ng-model="data.barcode"  ng-blur="onBarcodeTextBlur()" ng-disabled="(!data.barcodeMode || !data.Submit)" id="barcodeText" />
       <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
 
     </form>
@@ -115,6 +115,26 @@
               Barcode
               <label class="toggle toggle-assertive">
                 <input type="checkbox" ng-model="data.barcodeMode" ng-change="onBarcodeModeChange()">
+                <div class="track">
+                  <div class="handle"></div>
+                </div>
+              </label>
+            </li>
+          </div>
+        </div>
+        <div class="row qty-bc" style="visibility: hidden;">
+          <div class="col">
+                <input type="number" ng-disabled="(!data.barcodeMode || !data.Submit)">
+                <div class="track">
+                  <div class="handle"></div>
+                </div>
+
+          </div>
+          <div class="col">
+            <li class="barcode-toggle item item-toggle">
+              BS
+              <label class="toggle toggle-assertive">
+                <input type="checkbox" ng-model="data.Submit" ng-change="onModeChange()">
                 <div class="track">
                   <div class="handle"></div>
                 </div>

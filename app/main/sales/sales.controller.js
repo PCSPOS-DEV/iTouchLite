@@ -2070,6 +2070,7 @@ angular.module('itouch.controllers')
 
       $scope.barcodeSubmit = function (e) {
         e.preventDefault();
+        $scope.data.Submit = false;
         debugLog.log('Barcode barcodeSubmit Mode : ' + buttonClicked.barcode);
         if (!buttonClicked.barcode) {
           debugLog.log('--*-- Read Barcode : Start --*--');
@@ -2108,9 +2109,15 @@ angular.module('itouch.controllers')
           }
           debugLog.log('--*-- Read Barcode : Complete --*--');
           LogService.SaveLog();
+          // $scope.data.Submit = true;
+          $timeout(function () { $scope.data.Submit = true; $scope.onTextBlur();}, 500);
           $timeout(function () { Alert.hideLoading();}, 10);
         }
       };
+
+      setInterval(function () {
+        $scope.data.Submit = true;
+      }, 500);
 
       $scope.onBarcodeModeChange = function () {
         debugLog.log('--*-- onBarcodeModeChange --*--');
@@ -2120,15 +2127,50 @@ angular.module('itouch.controllers')
       $scope.onBarcodeTextBlur = function () {
         console.log('BarcodeMode : ' + $scope.data.barcodeMode);
         debugLog.log('BarcodeMode : ' + $scope.data.barcodeMode);
+
         if ($scope.data.barcodeMode) {
           $scope.data.barcode = '';
+          if ($scope.data.Submit == false) {
+            $scope.data.Submit = true;
+            $scope.onTextBlur();
+          }
           $timeout(function () {
             debugLog.log('BarcodeMode : Focus');
             document.getElementById('barcodeText').focus();
           }, 500);
         } else {
+          $scope.data.Submit = false;
           $timeout(function () {
             debugLog.log('BarcodeMode : Blur');
+            document.getElementById('barcodeText').blur();
+          }, 500);
+        }
+        LogService.SaveLog();
+      };
+
+      $scope.onModeChange = function () {
+        $scope.onTextBlur();
+      };
+
+      $scope.onTextBlur = function () {
+        console.log('data.Submit : ' + $scope.data.Submit);
+        debugLog.log('data.Submit : ' + $scope.data.Submit);
+        if ($scope.data.barcodeMode) {
+          if ($scope.data.Submit) {
+            $scope.data.barcode = '';
+            $timeout(function () {
+              debugLog.log('Submit : ON');
+              document.getElementById('barcodeText').focus();
+            }, 500);
+          } else {
+            $timeout(function () {
+              debugLog.log('Submit : OFF');
+              document.getElementById('barcodeText').blur();
+            }, 500);
+          }
+        } else {
+          $timeout(function () {
+            debugLog.log('Submit : OFF');
             document.getElementById('barcodeText').blur();
           }, 500);
         }
