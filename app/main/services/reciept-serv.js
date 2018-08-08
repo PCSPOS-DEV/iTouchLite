@@ -216,6 +216,7 @@ angular.module('itouch.services')
     self.print = function (DocNo) {
       BillService.getBillHeader(DocNo).then(function (result) {
         var header = result;
+        var showErrorMsg = 0;
         header.ReprintCount += 1;
         DB.update(DB_CONFIG.tableNames.bill.header, header, {columns: 'DocNo=?', data: [DocNo]});
       });
@@ -257,7 +258,8 @@ angular.module('itouch.services')
           console.log(e);
           errorLog.log('Receipt Error' + e);
         }
-      } else {
+      } else if (showErrorMsg == 0) {
+        showErrorMsg = 1;
         Alert.success('printer not connected', 'Error');
         errorLog.log('printer not connected');
       }
