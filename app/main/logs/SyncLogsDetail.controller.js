@@ -82,7 +82,7 @@ angular.module('itouch.controllers')
             $scope.newlogs = '';
           }, 200);
         }, function errorCallback (response) {
-          Alert.error(response);
+          // Alert.error(response);
         });
 
       };

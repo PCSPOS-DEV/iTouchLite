@@ -69,9 +69,9 @@ angular.module('itouch.controllers')
         to: 'pcsposdev@prima.com.sg',
           //  cc: , // email addresses for CC field
           //  bcc: , // email addresses for BCC field
-        attachments: [SettingsService.generateAttachment(pdfBase64, 'UploadLog.pdf')],
+        attachments: [SettingsService.generateAttachment(pdfBase64, 'EventLog.pdf')],
         subject: 'Event Log <itouchlite>',
-        body: '<h1>Evemt Log Attachment</h1>' + '<p>Date : ' + systemDate + '</p>',
+        body: '<h1>Event Log Attachment</h1>' + '<p>Date : ' + systemDate + '</p>',
         isHtml: true
       }).then(function successCallback () {
         Alert.success('Email Sent Successfully');
@@ -82,7 +82,7 @@ angular.module('itouch.controllers')
           $scope.newlogs = '';
         }, 200);
       }, function errorCallback (response) {
-        Alert.error(response);
+        // Alert.error(response);
       });
 
     };

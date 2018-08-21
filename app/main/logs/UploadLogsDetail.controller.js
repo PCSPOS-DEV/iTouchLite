@@ -114,7 +114,7 @@ angular.module('itouch.controllers')
             $scope.newlogs = '';
           }, 200);
         }, function errorCallback (response) {
-          Alert.error('Fail to send the email please check internet connection and try again. ');
+          // Alert.error('Fail to send the email please check internet connection and try again. ');
         });
       };
     }]);

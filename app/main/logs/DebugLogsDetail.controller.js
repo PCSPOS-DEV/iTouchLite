@@ -16,7 +16,7 @@ angular.module('itouch.controllers')
       $scope.newlogs = debugLog;
       var lines = debugLog.split('\n');
       $scope.totallines = lines.length;
-      if ($scope.totallines >= 10000) {
+      if ($scope.totallines >= 5000) {
         // LogService.sendDebugLog(); // not implementation for auto upload
         localStorage.removeItem('DebugLogs');
         $scope.newlogs = '';
@@ -67,9 +67,9 @@ angular.module('itouch.controllers')
           to: 'pcsposdev@prima.com.sg',
           //  cc: , // email addresses for CC field
           //  bcc: , // email addresses for BCC field
-          attachments: [SettingsService.generateAttachment(pdfBase64, fileName + '.pdf')],
-          subject: 'Error Log <itouchlite>',
-          body: '<h1>Error Log Attachment</h1>' + '<p>Date : ' + systemDate + '</p>',
+          attachments: [SettingsService.generateAttachment(pdfBase64, 'BarcodeLog.pdf')],
+          subject: 'Barcode Log <itouchlite>',
+          body: '<h1>Barcode Log Attachment</h1>' + '<p>Date : ' + systemDate + '</p>',
           isHtml: true
         }).then(function successCallback () {
           Alert.success('Email Sent Successfully');
@@ -80,7 +80,7 @@ angular.module('itouch.controllers')
             $scope.newlogs = '';
           }, 200);
         }, function errorCallback (response) {
-          Alert.error(response);
+          // Alert.error(response);
         });
 
       };
