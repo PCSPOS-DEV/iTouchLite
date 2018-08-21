@@ -3,6 +3,7 @@ angular.module('itouch.services')
 .service('Reciept', ['PrinterSettings', 'PrintService', 'DB', 'DB_CONFIG', '$q', 'ItemService', 'AuthService', 'ShiftService', 'ControlService', 'LocationService', 'SettingsService', 'Alert', 'Restangular', 'DiscountService', 'BillService', 'LogService',
   function (PrinterSettings, PrintService, DB, DB_CONFIG, $q, ItemService, AuthService, ShiftService, ControlService, LocationService, SettingsService, Alert, Restangular, DiscountService, BillService, LogService) {
     var self = this;
+    var showErrorMsg = 0;
     var printData = null;
     var printer = PrintService.getPrinter();
     var location = LocationService.currentLocation;
@@ -216,7 +217,6 @@ angular.module('itouch.services')
     self.print = function (DocNo) {
       BillService.getBillHeader(DocNo).then(function (result) {
         var header = result;
-        var showErrorMsg = 0;
         header.ReprintCount += 1;
         DB.update(DB_CONFIG.tableNames.bill.header, header, {columns: 'DocNo=?', data: [DocNo]});
       });

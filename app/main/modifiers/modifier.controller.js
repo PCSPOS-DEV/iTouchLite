@@ -14,6 +14,7 @@ angular.module('itouch.controllers')
       self.cart = [];
       self.selectedCart = [];
       self.removeList = [];
+      self.oldcart;
 
       $scope.$on('modal.shown', function (event, data) {
         if ($scope.shownModal == 'mod') {
@@ -95,6 +96,7 @@ angular.module('itouch.controllers')
             });
           } else {
             angular.forEach(self.cart, function (it, key) {
+              self.oldcart = self.cart;
               if (item.Plu == it.Plu) {
                 self.removeList.push(it);
                 self.cart.splice(key, 1);
@@ -126,18 +128,26 @@ angular.module('itouch.controllers')
         }
       };
 
-
+      $scope.flag = false;
       self.save = function () {
+        $scope.flag = true;
         var parentItem = $scope.cart.selectedItem;
         if (parentItem && self.cart.length > 0) {
           ModifierService.add(parentItem.DocNo, parentItem.LineNumber, angular.copy(self.cart)).then(function (res) {
+            angular.forEach(self.oldcart, function (removeMod) {
+              removeMod.Discount = removeMod.DiscAmount;
+              // console.log('gg1');
+              setTimeout(function () { $scope.DeleteFunction(removeMod); }, 0);
+            } );
             angular.forEach(self.removeList, function (removeMod) {
               removeMod.Discount = removeMod.DiscAmount;
               // console.log('gg1');
-              setTimeout(function () { $scope.DeleteFunction(removeMod); }, 10);
+              setTimeout(function () { $scope.DeleteFunction(removeMod); }, 0);
             } );
-            // setTimeout(function () {
+            self.oldcart = self.cart;
+            self.removeList = [];
             $scope.refreshCart().then(function () {
+              console.log('ggwp');
               $scope.PostApi(res, 5);
             });
             setTimeout(function () {
@@ -148,6 +158,9 @@ angular.module('itouch.controllers')
             console.log(err);
           });
         }
+        setTimeout(function () {
+          $scope.flag = false;
+        }, 200);
       };
 
       self.goBack = function () {

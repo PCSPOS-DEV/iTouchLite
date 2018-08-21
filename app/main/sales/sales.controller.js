@@ -1135,7 +1135,8 @@ angular.module('itouch.controllers')
             'parentItemLineNumber': Nitem.ParentItemLineNumber
           }
         }).then(function successCallback (response) {
-          console.log('Post');
+          console.log('Post : ' + Nitem.Desc1);
+          console.log(response);
           eventLog.log('2nd Display: Post Success');
         }, function errorCallback (response) {
           console.log(response);
@@ -1250,6 +1251,7 @@ angular.module('itouch.controllers')
           },
         }).then(function successCallback (response) {
           console.log('Delete');
+          console.log(response);
           eventLog.log('2nd Display: Delete All Success');
         }, function errorCallback (response) {
           console.log(response);
@@ -1281,7 +1283,8 @@ angular.module('itouch.controllers')
           }
         }).then(function successCallback (response) {
           eventLog.log('2nd Display: Delete Success');
-          console.log('Delete');
+          console.log('Delete : ' + Ditem.Desc1);
+          console.log(response);
         }, function errorCallback (response) {
           console.log(response);
           errorLog.log('2nd Display Delete Fail : ' + response.status + ' ' + response.statusText);
@@ -2081,7 +2084,7 @@ angular.module('itouch.controllers')
             if ($scope.data.barcode == undefined) {
               $scope.data.barcode = '';
               debugLog.log('Barcode : Undefined');
-              Alert.warning('Try Again : 2');
+              // Alert.warning('Try Again : 2');
             } else {
               ItemService.getItemByBarcode($scope.data.barcode).then(function (item) {
                 debugLog.log('Barcode : ' + $scope.data.barcode);
@@ -2105,7 +2108,7 @@ angular.module('itouch.controllers')
             buttonClicked.barcode = false;
             document.getElementById('barcodeText').focus();
             debugLog.log('Barcode : Try Again');
-            Alert.warning('Try Again');
+            // Alert.warning('Try Again');
           }
           debugLog.log('--*-- Read Barcode : Complete --*--');
           LogService.SaveLog();
