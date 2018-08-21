@@ -11,16 +11,40 @@
 
                 <div class = "row" style = "border-color: #ddd; border-width: 0px 0px 1px; border-style: solid;">
                   <div class = "col-80" >
-                    <label class="item item-input item-stacked-label" >
-                      <span class="input-label">Printer</span>
-                    </label>
+                      <button class="button button-block button-secondary" style="color: black" disabled="disabled">
+                        Printer
+                      </button>
                   </div>
                   <div class = "col-20">
-                    <label class="item item-input item-stacked-label">
                       <button class="button button-block button-positive" ng-click="ctrl.connect()">
                         Connect
                       </button>
-                    </label>
+                  </div>
+                </div>
+
+                <div class = "row" style = "border-color: #ddd; border-width: 0px 0px 1px; border-style: solid;">
+                  <div class = "col-80" >
+                    <button class="button button-block button-secondary" style="color: black" disabled="disabled">
+                      Clear 2nd Display
+                    </button>
+                  </div>
+                  <div class = "col-20">
+                      <button class="button button-block button-positive" ng-click="ctrl.clearDisplay()">
+                        Clear
+                      </button>
+                  </div>
+                </div>
+
+                <div class = "row" style = "border-color: #ddd; border-width: 0px 0px 1px; border-style: solid;">
+                  <div class = "col-80" >
+                      <button class="button button-block button-secondary" style="color: black" disabled="disabled">
+                          Send Log
+                        </button>
+                  </div>
+                  <div class = "col-20">
+                      <button class="button button-block button-positive" ng-click="ctrl.sendLog()">
+                        Send
+                      </button>
                   </div>
                 </div>
 
