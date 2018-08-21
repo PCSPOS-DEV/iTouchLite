@@ -67,4 +67,17 @@ Ver 1.7 2018-07-17
     Support modifier for all itemtypes
     Bug fixes for 2nd display (salekit, modifier) & pwp
 
-Ver 1.8
+Ver 1.8 2018-08-08
+    More detail log and log UI change
+    Reset button after features
+    Bug fixes for 2nd display (modifier)
+    Add support for ios 11.4.1
+    minor PWP fixes
+    barcode bug fixes
+    add totalreceiptPrint
+
+Ver 1.8.1 2018-08
+    Fix log error
+    modifier update for 2nd display
+    prevent tender prevent error
+    add clear 2nd display & send log options for config page
