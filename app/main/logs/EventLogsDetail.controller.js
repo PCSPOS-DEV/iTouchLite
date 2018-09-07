@@ -15,7 +15,8 @@ angular.module('itouch.controllers')
     $scope.newlogs = eventlog;
     var lines = eventlog.split('\n');
     $scope.totallines = lines.length;
-    if ($scope.totallines >= 10000) {
+    $scope.size = LogService.checkstorage();
+    if ($scope.totallines >= 5000) {
       LogService.sendEventLog();
       // localStorage.removeItem('EventLogs');
       $scope.newlogs = '';

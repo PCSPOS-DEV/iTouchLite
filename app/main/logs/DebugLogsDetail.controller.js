@@ -16,12 +16,15 @@ angular.module('itouch.controllers')
       $scope.newlogs = debugLog;
       var lines = debugLog.split('\n');
       $scope.totallines = lines.length;
+      $scope.size = LogService.checkstorage();
+      console.log('locallength : ' + localStorage.length);
       if ($scope.totallines >= 5000) {
         // LogService.sendDebugLog(); // not implementation for auto upload
         localStorage.removeItem('DebugLogs');
         $scope.newlogs = '';
         $scope.totallines = 0;
       }
+
       // console.log(lines);
       var startline = 0;
       var lastline = 49;
@@ -97,5 +100,19 @@ angular.module('itouch.controllers')
         $state.go('app.admin');
       };
 
-
+      self.StorageTester = function () {
+        for (var i = 0, data = 'm'; i < 40; i++) {
+          try {
+            localStorage.setItem('DATA', data);
+            data = data + data;
+          } catch (e) {
+            var storageSize = Math.round(JSON.stringify(localStorage).length / 1024);
+            Alert.error('LIMIT REACHED: (' + i + ') ' + storageSize + 'K');
+            console.log('LIMIT REACHED: (' + i + ') ' + storageSize + 'K');
+            console.log(e);
+            break;
+          }
+        }
+        localStorage.removeItem('DATA');
+      };
     }]);

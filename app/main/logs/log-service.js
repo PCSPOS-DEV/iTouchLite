@@ -19,6 +19,13 @@ angular.module('itouch.services')
       var requestUrl = AppConfig.getDisplayUrl() + '/Log/Write';
       console.log(requestUrl);
 
+      self.checkstorage = function () {
+        var storageSize = Math.round(JSON.stringify(localStorage).length / 1024);
+        if (storageSize >= 1800) {
+          PostLogData();
+        }
+        return storageSize;
+      };
 
       var errorlog = localStorage.getItem('ErrorLogs');
       if (errorlog == null) { errorlog = 'no Data'; }
@@ -136,7 +143,16 @@ angular.module('itouch.services')
         eventLog.clear();
         // console.log('Eventlog: N');console.log(logs);
         if (Eventlog == null) {Eventlog = '';}
-        localStorage.setItem('EventLogs', Eventlog + logs);
+        try {
+          localStorage.setItem('EventLogs', Eventlog + logs);
+        } catch (ex1) {
+          if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+            Eventlog.log('Eventlog : QuotaExceededError');
+            LogService.sendEventLog();
+          } else {
+            Eventlog.log('Important Error : ' + ex1);
+          }
+        }
         // Eventlog = localStorage.getItem('EventLogs');
         // console.log('Eventlog: M');console.log(Eventlog);
       };
@@ -149,7 +165,16 @@ angular.module('itouch.services')
         errorLog.clear();
         // console.log('Errorlog: N');console.log(logs);
         if (Errorlog == null) {Errorlog = '';}
-        localStorage.setItem('ErrorLogs', Errorlog + logs);
+        try {
+          localStorage.setItem('ErrorLogs', Errorlog + logs);
+        } catch (ex1) {
+          if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+            Errorlog.log('Errorlog : QuotaExceededError');
+            LogService.sendErrorlog();
+          } else {
+            Errorlog.log('Important Error : ' + ex1);
+          }
+        }
         // Errorlog = localStorage.getItem('ErrorLogs');
         // console.log('Errorlog: M');console.log(Errorlog);
       };
@@ -160,7 +185,17 @@ angular.module('itouch.services')
         var logs = debugLog.getLog();
         debugLog.clear();
         if (debugLogs == null) {debugLogs = '';}
-        localStorage.setItem('DebugLogs', debugLogs + logs);
+        try {
+          localStorage.setItem('DebugLogs', debugLogs + logs);
+        } catch (ex1) {
+          if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+            debugLog.log('Errorlog : QuotaExceededError');
+            localStorage.removeItem('DebugLogs');
+          } else {
+            debugLog.log('Important Error : ' + ex1);
+          }
+        }
+
       };
 
 

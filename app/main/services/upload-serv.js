@@ -306,7 +306,16 @@ angular.module('itouch.services')
               if (uploadlog == null) {
                 uploadlog = '';
               }
-              localStorage.setItem('UploadLogs', uploadlog + logs);
+              try {
+                localStorage.setItem('UploadLogs', uploadlog + logs);
+              } catch (ex1) {
+                if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                  uploadlog.log('Errorlog : QuotaExceededError');
+                  LogService.sendUploadLog();
+                } else {
+                  uploadlog.log('Important Error : ' + ex1);
+                }
+              }
             }, 100);
           }, autoupinterval);
         }

@@ -78,7 +78,16 @@ angular.module('itouch.controllers')
             uploadlog = '';
           }
           eventLog.log('Upload Complete: ');
-          localStorage.setItem('UploadLogs', uploadlog + logs);
+          try {
+            localStorage.setItem('UploadLogs', uploadlog + logs);
+          } catch (ex1) {
+            if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+              uploadlog.log('Errorlog : QuotaExceededError');
+              LogService.sendUploadLog();
+            } else {
+              uploadlog.log('Important Error : ' + ex1);
+            }
+          }
           Alert.success('Upload success');
         }, function (err) {
           errorLog.log('Upload Error : ' + err, 4);
@@ -92,7 +101,16 @@ angular.module('itouch.controllers')
           if (uploadlog == null) {
             uploadlog = '';
           }
-          localStorage.setItem('UploadLogs', uploadlog + logs);
+          try {
+            localStorage.setItem('UploadLogs', uploadlog + logs);
+          } catch (ex1) {
+            if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+              uploadlog.log('Errorlog : QuotaExceededError');
+              LogService.sendUploadLog();
+            } else {
+              uploadlog.log('Important Error : ' + ex1);
+            }
+          }
           Alert.error(err);
         }).finally(function () {
           uploadClicked = false;

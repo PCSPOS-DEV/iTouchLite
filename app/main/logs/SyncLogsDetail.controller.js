@@ -16,7 +16,8 @@ angular.module('itouch.controllers')
       $scope.newlogs = synclog;
       var lines = synclog.split('\n');
       $scope.totallines = lines.length;
-      if ($scope.totallines >= 10000) {
+      $scope.size = LogService.checkstorage();
+      if ($scope.totallines >= 5000) {
         LogService.sendSyncLog();
         // localStorage.removeItem('SyncLogs');
         $scope.newlogs = '';
