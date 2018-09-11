@@ -65,8 +65,8 @@ angular.module('itouch.controllers')
           // debugLog.log('--*-- PWP Discount End --*-- ', 7);
           // console.log(Adisc);
           item.AlteredPrice = (((Bdisc / 100) * discPercent).toFixed(3));
-          item.Price = Adisc;
-          item.SubItemPrice = Adisc;
+          item.Price = parseFloat(Adisc);
+          item.SubItemPrice = parseFloat(Adisc);
           item.OrgPrice = data ? data.OrgPrice : 0;
           item.StdCost = data ? data.StdCost : 0;
           item.PriceLevelId  = data ? data.PriceLevelId : 0;
@@ -96,20 +96,14 @@ angular.module('itouch.controllers')
 
       var tempD = 0;
       var addItem = function (item) {
-        Alert.showLoading();
         if (item) {
-          // debugLog.log('--*-- PWP Child Control Start --*-- ', 7);
-          // debugLog.log('PWP SubItemMaxQty : '+ item.SubItemMaxQty, 7);
-          // debugLog.log('Item Qty: '+ item.Qty, 7);
           if (item.SubItemMaxQty <= item.Qty) {
-            // debugLog.log('Case 1: You have selected the maximum children allowed for this item.', 7);
             Alert.warning('You have selected the maximum child item allowed for this item.');
             eventLog.log('You have selected the maximum child item allowed for this item.');
             Alert.hideLoading();
             return true;
           }
           else if ($scope.pwp.Qty && $scope.pwp.TotalChildQty <= $scope.pwp.Qty) {
-            // debugLog.log('Case 2: You have selected the maximum children allowed for this PWP.', 7);
             Alert.warning('You have selected the maximum child item allowed for this PWP.');
             eventLog.log('You have selected the maximum child item  allowed for this PWP.');
             Alert.hideLoading();
@@ -119,44 +113,36 @@ angular.module('itouch.controllers')
           }
           $timeout(function () {
             temp = temp + parseFloat(item.Price);
-            eventLog.log('temp : ' + temp );
-            // debugLog.log('Temp Price: '+ temp, 7);
-            // debugLog.log('PWP Max Price: '+ $scope.pwp.MaxPrice, 7);
-            if (temp > $scope.pwp.MaxPrice && $scope.pwp.MaxPrice != 0) {
-              eventLog.log('temp : ' + temp + ' Maxprice : ' + $scope.pwp.MaxPrice);
+            if (isNaN(temp)) {
+              console.log('do nothing');
+            }
+            else if (temp <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
+              $scope.tempSubTotal = temp;
+              if ($scope.selectedRow != null) {
+                SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
+              } else {
+                $scope.selectRow( $scope.previousitem);
+                if ($scope.selectedRow != null) {
+                  SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
+                }
+              }
+            } else {
               if (tempD == 0) {
-                // debugLog.log('Case 3: The child total price exceed the limit of maximum price.', 7);
                 Alert.warning('The child total price exceed the limit of maximum price.');
                 eventLog.log('The child total price exceed the limit of maximum price.');
-                Alert.hideLoading();
               } else {
                 tempD = 0;
               }
-              eventLog.log('PWP Selected Item: ');
-              eventLog.log($scope.selectedRow.ItemDesc1);
 
               console.log($scope.selectedRow);
               $scope.selectedRow.Qty--;
               $scope.pwp.Qty--;
-              console.log($scope.previousitem);
-              temp = temp - $scope.selectedRow.Price;
-
-              // $scope.pwp.selectedItems = $scope.previousitem;
+              temp -= $scope.selectedRow.Price;
               if ($scope.selectedRow.Qty == 0) {
                 $scope.clearSelected(true);
               }
-              $scope.selectRow( $scope.previousitem);
               // $scope.removeSelected();
               return true;
-            } else { //if (temp <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
-              if ($scope.selectedRow != null) {
-                $scope.previousitem = $scope.selectedRow;
-                $scope.tempSubTotal = temp;
-                SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
-              } else {
-                errorLog.log('$scope.selectedRow = ' + $scope.selectedRow);
-              }
-
             }
             eventLog.log('--*-- PWP Child Control END --*-- ', 7);
             LogService.SaveLog();
@@ -195,7 +181,6 @@ angular.module('itouch.controllers')
                   } else {
                     addPrice(item, dis.Percentage);
                   }
-
                 });
                 promise = $q.when(item);
                 // promise = addPrice(item);
@@ -210,35 +195,49 @@ angular.module('itouch.controllers')
             });
           }
         }
-        Alert.hideLoading();
       };
 
       $scope.removeSelected = function () {
-        if ($scope.selectedRow == null) {
+        console.log($scope.selectedRow);
+        if ($scope.selectedRow == null || $scope.selectedRow == undefined || $scope.selectedRow == '') {
           console.log('do nothing');
         } else {
           Alert.showLoading();
-          $timeout(function () {
-            if ($scope.selectedRow && $scope.selectedRow != null && $scope.selectedRow != undefined && $scope.selectedRow != '') {
-              if ($scope.selectedRow.Qty > 0) {
-                $scope.selectedRow.Qty--;
-                $scope.pwp.Qty--;
-                $scope.tempSubTotal -= $scope.selectedRow.Price;
-                temp -= $scope.selectedRow.Price;
-                eventLog.log('$scope.tempSubTotal ' + $scope.tempSubTotal);
-                eventLog.log('$scope.selectedRow.Price ' + $scope.selectedRow.Price);
-                eventLog.log('temp ' + temp);
-                eventLog.log('pwp removeSelected');
-                if ($scope.tempSubTotal == 0) {
-                  temp = 0;
+          if ($scope.selectedRow && $scope.selectedRow.Default != true) {
+            if ($scope.selectedRow.Qty == undefined) {
+              Alert.warning('No selected item to clear.');
+              return true;
+            } else if ($scope.selectedRow.Qty > 0 ) {
+              eventLog.log('pwp minus Qty');
+              $scope.selectedRow.Qty --;
+              var promise;
+              if ($scope.selectedRow.DiscountId == null) {
+                if ($scope.selectedRow.SubItemPrice >= 0) {
+                  $scope.selectedRow.Price = $scope.selectedRow.SubItemPrice;
+                  // item.OrgPrice = item.SubItemPrice;
+                  $scope.selectedRow.AlteredPrice = $scope.selectedRow.SubItemPrice;
+                  promise = $q.when($scope.selectedRow);
+                } else {
+                  promise = addPrice($scope.selectedRow);
                 }
-                if ($scope.tempSubTotal < 0 || temp < 0) {temp = 0; $scope.tempSubTotal = 0; }
-                if ($scope.selectedRow.Qty == 0) {
+              } else {
+                $scope.selectedRow.Price = $scope.selectedRow.SubItemPrice;
+                // item.OrgPrice = item.SubItemPrice;
+                $scope.selectedRow.AlteredPrice = $scope.selectedRow.SubItemPrice;
+                promise = $q.when($scope.selectedRow);
+              }
+              promise.then(function (item) {
+                $scope.pwp.Qty--;
+                temp = temp - item.SubItemPrice;
+                $scope.tempSubTotal = $scope.tempSubTotal - item.SubItemPrice;
+                $scope.pwp.selectedItems[item.SubItemId] = item;
+                if (item.Qty == 0) {
                   $scope.clearSelected(true);
                 }
-              }
+              });
             }
-          }, 20);
+            // $scope.selectRow(null);
+          }
           Alert.hideLoading();
         }
       };
