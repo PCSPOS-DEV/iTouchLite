@@ -518,6 +518,7 @@ angular.module('itouch.services')
             deferred.resolve();
           }, function (err) {
             errorLog.log('getTempBill executeQueueDB error :' + err);
+            ControlService.counterDocId(bill.header.DocNo);
             deferred.reject(err);
           });
         }, function (err) {

@@ -17,6 +17,7 @@ angular.module('itouch.controllers')
       SubItemTotalPrice = 0;
       $scope.disableP = false;
       $scope.disableA = false;
+      clearAll = 0;
 
       $scope.$on('modal.shown', function () {
         if ($scope.shownModal == 'pwp') {
@@ -38,12 +39,14 @@ angular.module('itouch.controllers')
       $scope.selectItem = function (item) {
         // $scope.disableA = true;
         Alert.showLoading();
-        addItem(item);
         $scope.selectRow(item);
         $timeout(function () {
-          $scope.disableA = false;
+          addItem(item);
         }, 100);
-        Alert.hideLoading();
+        $timeout(function () {
+          // $scope.disableA = false;
+          Alert.hideLoading();
+        }, 500);
       };
 
       var addPrice = function (item, discPercent) {
@@ -97,6 +100,8 @@ angular.module('itouch.controllers')
       var tempD = 0;
       var addItem = function (item) {
         if (item) {
+          console.log('----');
+          console.log(item);
           if (item.SubItemMaxQty <= item.Qty) {
             Alert.warning('You have selected the maximum child item allowed for this item.');
             eventLog.log('You have selected the maximum child item allowed for this item.');
@@ -112,9 +117,15 @@ angular.module('itouch.controllers')
             return true;
           }
           $timeout(function () {
+            if (clearAll == 1) {
+              temp = 0;
+              $scope.tempSubTotal = 0;
+              clearAll = 0;
+            }
             temp = temp + parseFloat(item.Price);
-            if (isNaN(temp)) {
-              console.log('do nothing');
+            if ($scope.pwp.Qty == 0 && (temp != 0 || $scope.tempSubTotal != 0)) {
+              temp = 0;
+              $scope.tempSubTotal = 0;
             }
             else if (temp <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
               $scope.tempSubTotal = temp;
@@ -133,20 +144,26 @@ angular.module('itouch.controllers')
               } else {
                 tempD = 0;
               }
-
-              console.log($scope.selectedRow);
-              $scope.selectedRow.Qty--;
-              $scope.pwp.Qty--;
-              temp -= $scope.selectedRow.Price;
-              if ($scope.selectedRow.Qty == 0) {
-                $scope.clearSelected(true);
+              try {
+                $scope.selectedRow.Qty--;
+                $scope.pwp.Qty--;
+                temp -= $scope.selectedRow.Price;
+                if ($scope.selectedRow.Qty == 0) {
+                  $scope.clearSelected(true);
+                }
+              } catch (err) {
+                $scope.selectRow(item);
+                $scope.clearAll();
+                Alert.warning('Invalid Input. Try Again.');
+                console.log('err : ' + err );
+                errorLog.log('$scope.selectedRow.Qty Error : ' + err);
               }
               // $scope.removeSelected();
               return true;
             }
             eventLog.log('--*-- PWP Child Control END --*-- ', 7);
             LogService.SaveLog();
-          }, 200);
+          }, 150);
 
           var exItem = _.findWhere($scope.pwp.selectedItems, { SubItemId: item.SubItemId});
           if (exItem) {
@@ -238,7 +255,9 @@ angular.module('itouch.controllers')
             }
             // $scope.selectRow(null);
           }
-          Alert.hideLoading();
+          $timeout(function () {
+            Alert.hideLoading();
+          }, 500);
         }
       };
 
@@ -261,7 +280,9 @@ angular.module('itouch.controllers')
             removeSelectedItem($scope.selectedRow.SubItemId);
             $scope.selectRow(null);
           }
-          Alert.hideLoading();
+          $timeout(function () {
+            Alert.hideLoading();
+          }, 500);
         }
       };
 
@@ -276,11 +297,15 @@ angular.module('itouch.controllers')
               removeSelectedItem(key);
               $scope.tempSubTotal = 0;
               temp = 0;
+              clearAll = 1;
             }
           });
           $scope.selectRow(null);
-          Alert.hideLoading();
+          $timeout(function () {
+            Alert.hideLoading();
+          }, 200);
         }
+
       };
 
       var removeSelectedItem = function (itemId) {
@@ -292,14 +317,22 @@ angular.module('itouch.controllers')
           if (item) {
             eventLog.log('pwp removeSelectedItem');
             $scope.pwp.Qty -= item.Qty;
+            if ($scope.pwp.Qty < 0) {
+              $scope.pwp.Qty = 0;
+            }
             item.Qty = 0;
+            SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
+            temp = temp - SubItemTotalPrice;
+            $scope.tempSubTotal = $scope.tempSubTotal - SubItemTotalPrice;
             delete $scope.pwp.selectedItems[itemId];
             var keys = _.keys($scope.pwp.selectedItems);
             if (keys.length > 0) {
               $scope.selectRow($scope.pwp.selectedItems[_.last(keys)]);
             }
           }
-          Alert.hideLoading();
+          $timeout(function () {
+            Alert.hideLoading();
+          }, 200);
         }
       };
 

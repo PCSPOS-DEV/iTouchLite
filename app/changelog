@@ -76,9 +76,10 @@ Ver 1.8 2018-08-08
     barcode bug fixes
     add totalreceiptPrint
 
-Ver 1.9 2018-09s
+Ver 1.9 2018-09-13
     Fix log error & measure localstorage size then auto upload log
     modifier update for 2nd display
     fix tender prevent error
     add clear 2nd display & send log options for config page
+    performance issue fixes
 

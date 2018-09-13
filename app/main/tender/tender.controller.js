@@ -39,11 +39,15 @@ angular.module('itouch.controllers')
       };
 
       $scope.$on('$ionicView.beforeEnter', function (event, data) {
+        Alert.showLoading();
         submitted = false;
         console.log(submitted);
         DiscountService.clearTempTenderDiscounts();
         initBill();
         syncItem();
+        setTimeout(function () {
+          Alert.hideLoading();
+        }, 250);
       });
 
       var syncItem = function () {
