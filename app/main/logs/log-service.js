@@ -146,12 +146,12 @@ angular.module('itouch.services')
         try {
           localStorage.setItem('EventLogs', Eventlog + logs);
         } catch (ex1) {
-          if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-            Eventlog.log('Eventlog : QuotaExceededError');
-            LogService.sendEventLog();
-          } else {
-            Eventlog.log('Important Error : ' + ex1);
-          }
+          // if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+          eventLog.log('Eventlog : QuotaExceededError');
+          LogService.sendEventLog();
+          // } else {
+          //   eventLog.log('Important Error : ' + ex1);
+          // }
         }
         // Eventlog = localStorage.getItem('EventLogs');
         // console.log('Eventlog: M');console.log(Eventlog);
@@ -168,12 +168,12 @@ angular.module('itouch.services')
         try {
           localStorage.setItem('ErrorLogs', Errorlog + logs);
         } catch (ex1) {
-          if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-            Errorlog.log('Errorlog : QuotaExceededError');
-            LogService.sendErrorlog();
-          } else {
-            Errorlog.log('Important Error : ' + ex1);
-          }
+          // if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+          errorLog.log('Errorlog : QuotaExceededError');
+          LogService.sendErrorlog();
+          // } else {
+          //   errorLog.log('Important Error : ' + ex1);
+          // }
         }
         // Errorlog = localStorage.getItem('ErrorLogs');
         // console.log('Errorlog: M');console.log(Errorlog);
@@ -188,12 +188,12 @@ angular.module('itouch.services')
         try {
           localStorage.setItem('DebugLogs', debugLogs + logs);
         } catch (ex1) {
-          if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-            debugLog.log('Errorlog : QuotaExceededError');
-            localStorage.removeItem('DebugLogs');
-          } else {
-            debugLog.log('Important Error : ' + ex1);
-          }
+          // if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+          debugLog.log('Errorlog : QuotaExceededError');
+          localStorage.removeItem('DebugLogs');
+          // } else {
+          //   debugLog.log('Important Error : ' + ex1);
+          // }
         }
 
       };

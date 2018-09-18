@@ -72,12 +72,12 @@ angular.module('itouch.services')
                     try {
                       localStorage.setItem('SyncLogs', syncLogs + logs);
                     } catch (ex1) {
-                      if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                        syncLog.log('SyncLog : QuotaExceededError');
-                        LogService.sendSyncLog();
-                      } else {
-                        syncLog.log('Important Error : ' + ex1);
-                      }
+                      // if ( ex1.name === 'QuotaExceededError' || ex1.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                      syncLog.log('SyncLog : QuotaExceededError');
+                      LogService.sendSyncLog();
+                      // } else {
+                      //   syncLog.log('Important Error : ' + ex1);
+                      // }
                     }
 
                     // var logs = syncLog.getLog();
