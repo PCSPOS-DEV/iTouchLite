@@ -208,7 +208,7 @@ angular.module('itouch.controllers')
               $scope.pwp.Qty++;
               // $scope.pwp.MaxQuantity--;
               $scope.pwp.selectedItems[item.SubItemId] = item;
-
+              Alert.hideLoading();
             });
           }
         }
@@ -223,6 +223,7 @@ angular.module('itouch.controllers')
           if ($scope.selectedRow && $scope.selectedRow.Default != true) {
             if ($scope.selectedRow.Qty == undefined) {
               Alert.warning('No selected item to clear.');
+              Alert.hideLoading();
               return true;
             } else if ($scope.selectedRow.Qty > 0 ) {
               eventLog.log('pwp minus Qty');
@@ -270,6 +271,7 @@ angular.module('itouch.controllers')
             if (flag == false) {
               if ($scope.selectedRow.Qty == undefined) {
                 Alert.warning('No selected item to clear.');
+                Alert.hideLoading();
                 return true;
               }
               eventLog.log('pwp clearSelected');
@@ -311,6 +313,7 @@ angular.module('itouch.controllers')
       var removeSelectedItem = function (itemId) {
         if ($scope.selectedRow == null) {
           console.log('do nothing');
+          Alert.hideLoading();
         } else {
           Alert.showLoading();
           var item = $scope.pwp.selectedItems[itemId];
