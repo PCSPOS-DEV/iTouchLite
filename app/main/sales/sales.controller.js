@@ -767,8 +767,8 @@ angular.module('itouch.controllers')
             }
             eventLog.log('Item Retrieve SubPLUCode : Done');
             fetchSelectedItem($scope.selectedItem);
-            $timeout(function () { Alert.hideLoading();}, 5);
-            $timeout(function () { $scope.bkey = false; }, 50); // in case of increase the waiting time
+            $timeout(function () { Alert.hideLoading();}, 30);
+            $timeout(function () { $scope.bkey = false; }, 500); // in case of increase the waiting time
 
           }
         }, 5);
@@ -1135,11 +1135,11 @@ angular.module('itouch.controllers')
             'parentItemLineNumber': Nitem.ParentItemLineNumber
           }
         }).then(function successCallback (response) {
-          console.log('Post : ' + Nitem.Desc1);
-          console.log(response);
+          // console.log('Post : ' + Nitem.Desc1);
+          // console.log(response);
           eventLog.log('2nd Display: Post Success');
         }, function errorCallback (response) {
-          console.log(response);
+          // console.log(response);
           errorLog.log('2nd Display Post Fail : ' + response.status + ' ' + response.statusText);
         });
       };
@@ -1179,11 +1179,11 @@ angular.module('itouch.controllers')
           }
         }).then(function successCallback (response) {
           eventLog.log('2nd Display: Update Success');
-          console.log('Update : ' + Nitem.Desc1);
-          console.log(response);
+          // console.log('Update : ' + Nitem.Desc1);
+          // console.log(response);
         }, function errorCallback (response) {
           errorLog.log('2nd Display Update Fail : ' + response.status + ' ' + response.statusText);
-          console.log(response);
+          // console.log(response);
         });
       };
 
@@ -1283,10 +1283,10 @@ angular.module('itouch.controllers')
           }
         }).then(function successCallback (response) {
           eventLog.log('2nd Display: Delete Success');
-          console.log('Delete : ' + Ditem.Desc1);
-          console.log(response);
+          // console.log('Delete : ' + Ditem.Desc1);
+          // console.log(response);
         }, function errorCallback (response) {
-          console.log(response);
+          // console.log(response);
           errorLog.log('2nd Display Delete Fail : ' + response.status + ' ' + response.statusText);
         });
       };

@@ -135,8 +135,11 @@ angular.module('itouch.services')
 
         return BillService.findItems(item.ItemId, DocNo, item.ItemType, item.ParentItemLineNumber).then(function (items) {
 
+          // console.log(items);
           var ndItem = getItem(items);
+          // console.log(ndItem);
           if (item.OpenKey) {
+            // console.log('A1');
             if (item.customQuantity) {
               item.Qty = item.customQuantity;
             }
@@ -146,6 +149,7 @@ angular.module('itouch.services')
             return BillService.addItem(item);
 
           } else if (ndItem && !salesKit && ndItem.TakeAway == 'false' && ndItem.ChildCount == 0) {
+            // console.log('B1');
             if (item.customQuantity) {
               ndItem.Qty += item.customQuantity;
             } else {
@@ -155,7 +159,9 @@ angular.module('itouch.services')
             var upitem =  ndItem;
             upitem.update = 1;
             return upitem;
-          } else {
+          } else if (ndItem == false) {
+            // console.log('C1');
+            // console.log(item);
             if (item.customQuantity) {
               item.Qty = item.customQuantity;
             }
@@ -166,7 +172,15 @@ angular.module('itouch.services')
             if (ndItem && salesKit) {
               item.LineNumber = ndItem.LineNumber + 10;
             }
-            return BillService.addItem(item);
+            // console.log('--*-- ' + item.Id + '--*--');
+            if (item.Id == null ) {
+              return false;
+            } else {
+              return BillService.addItem(item);
+            }
+
+          } else {
+            // console.log('D1');
           }
         });
 
@@ -205,6 +219,8 @@ angular.module('itouch.services')
       };
 
       var getItem = function (items) {
+        // console.log('getItems');
+        // console.log(items);
         var nDI = false;
         angular.forEach(items, function (item) {
           if (item.DiscAmount == 0 && !item.ReasonId) {
