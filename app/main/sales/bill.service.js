@@ -336,6 +336,8 @@ angular.module('itouch.services')
       self.addItem = function (item) {
         var def = $q.defer();
         item = prepareItem(item);
+        // console.log('bill service additem ');
+        // console.log(item);
 
         var errors = validateBill(item);
         if (errors.length == 0) {
@@ -343,10 +345,11 @@ angular.module('itouch.services')
           if (!item.LineNumber) {
             itemPromise =  self.loadLineNewNumber().then(function (ln) {
               item.LineNumber = ln;
-
+              // console.log('P1 :' + item.LineNumber);
               itemPromise = saveItemToDB(item);
             });
           } else {
+            // console.log('P2 :' + item.LineNumber);
             itemPromise = saveItemToDB(item);
           }
           return itemPromise.then(function () {
@@ -463,9 +466,9 @@ angular.module('itouch.services')
         if (!payTransactions) {
           payTransactions = [];
         }
-        if (!payTransactionsOverTender) {
-          payTransactionsOverTender = [];
-        }
+        // if (!payTransactionsOverTender) {
+        //   payTransactionsOverTender = [];
+        // }
 
         stockTransactions = _.map(stockTransactions, function (item) {
           return _.pick(item, stockTransactionColumnList);
@@ -503,9 +506,17 @@ angular.module('itouch.services')
           DB.addInsertToQueue(DB_CONFIG.tableNames.bill.stockTransactions, stockTransactions);
           DB.addInsertToQueue(DB_CONFIG.tableNames.bill.payTransactions, payTransactions);
           DB.addInsertToQueue(DB_CONFIG.tableNames.discounts.billDiscounts, bill.discounts);
-          if (payTransactionsOverTender) {
+          if (payTransactionsOverTender != false) {
             DB.addInsertToQueue(DB_CONFIG.tableNames.bill.payTransactionsOverTender, payTransactionsOverTender);
+          } else if (payTransactionsOverTender == false) {
+            console.log('enjoy');
+          } else {
+            if (!payTransactionsOverTender) {
+              payTransactionsOverTender = [];
+              DB.addInsertToQueue(DB_CONFIG.tableNames.bill.payTransactionsOverTender, payTransactionsOverTender);
+            }
           }
+          eventLog.log('payTransactionsOverTender' + payTransactionsOverTender);
           eventLog.log('getTempBill Insert Data to DB');
 
           DB.executeQueue().then(function () {
@@ -518,7 +529,7 @@ angular.module('itouch.services')
             deferred.resolve();
           }, function (err) {
             errorLog.log('getTempBill executeQueueDB error :' + err);
-            ControlService.counterDocId(bill.header.DocNo);
+            // ControlService.counterDocId(bill.header.DocNo);
             deferred.reject(err);
           });
         }, function (err) {
