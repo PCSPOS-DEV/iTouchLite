@@ -18,12 +18,12 @@ angular.module('itouch.controllers')
       $scope.totallines = lines.length;
       $scope.size = LogService.checkstorage();
       console.log('locallength : ' + localStorage.length);
-      if ($scope.totallines >= 5000) {
-        // LogService.sendDebugLog(); // not implementation for auto upload
-        localStorage.removeItem('DebugLogs');
-        $scope.newlogs = '';
-        $scope.totallines = 0;
-      }
+      // if ($scope.totallines >= 5000) {
+      //   // LogService.sendDebugLog(); // not implementation for auto upload
+      //   localStorage.removeItem('DebugLogs');
+      //   $scope.newlogs = '';
+      //   $scope.totallines = 0;
+      // }
 
       // console.log(lines);
       var startline = 0;

@@ -17,12 +17,12 @@ angular.module('itouch.controllers')
       var lines = synclog.split('\n');
       $scope.totallines = lines.length;
       $scope.size = LogService.checkstorage();
-      if ($scope.totallines >= 5000) {
-        LogService.sendSyncLog();
-        // localStorage.removeItem('SyncLogs');
-        $scope.newlogs = '';
-        $scope.totallines = 0;
-      }
+      // if ($scope.totallines >= 5000) {
+      //   LogService.sendSyncLog();
+      //   // localStorage.removeItem('SyncLogs');
+      //   $scope.newlogs = '';
+      //   $scope.totallines = 0;
+      // }
       // console.log(lines);
       var startline = 0;
       var lastline = 49;

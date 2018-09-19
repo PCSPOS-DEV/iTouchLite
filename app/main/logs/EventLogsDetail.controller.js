@@ -16,12 +16,12 @@ angular.module('itouch.controllers')
     var lines = eventlog.split('\n');
     $scope.totallines = lines.length;
     $scope.size = LogService.checkstorage();
-    if ($scope.totallines >= 5000) {
-      LogService.sendEventLog();
-      // localStorage.removeItem('EventLogs');
-      $scope.newlogs = '';
-      $scope.totallines = 0;
-    }
+    // if ($scope.totallines >= 100) {
+    //   LogService.sendEventLog();
+    //   // localStorage.removeItem('EventLogs');
+    //   $scope.newlogs = '';
+    //   $scope.totallines = 0;
+    // }
       // console.log(lines);
     var startline = 0;
     var lastline = 49;

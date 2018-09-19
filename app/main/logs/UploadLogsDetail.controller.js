@@ -55,12 +55,12 @@ angular.module('itouch.controllers')
       var lines = uploadlog.split('\n');
       $scope.totallines = lines.length;
       $scope.size = LogService.checkstorage();
-      if ($scope.totallines >= 5000) {
-        LogService.sendUploadLog();
-        // localStorage.removeItem('UploadLogs');
-        $scope.newlogs = '';
-        $scope.totallines = 0;
-      }
+      // if ($scope.totallines >= 5000) {
+      //   LogService.sendUploadLog();
+      //   // localStorage.removeItem('UploadLogs');
+      //   $scope.newlogs = '';
+      //   $scope.totallines = 0;
+      // }
       // console.log(lines.length);
       var startline = 0;
       var lastline = 49;
