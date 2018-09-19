@@ -40,11 +40,15 @@ angular.module('itouch.controllers')
 
       self.clearDisplay = function () {
         $scope.DeleteAllFunction();
-        console.log('omae wa mo shide iru');
       };
 
       self.sendLog = function () {
         LogService.PostLogData();
+        Alert.success('Log Sent Successfully');
+      };
+
+      self.sendLogViaEmail = function () {
+        LogService.EmailLogData();
       };
 
       self.Back = function () {
