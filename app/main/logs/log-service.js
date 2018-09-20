@@ -72,6 +72,21 @@ angular.module('itouch.services')
           console.log(response);
           console.log('Post');
         }, function errorCallback (response) {
+          Alert.showConfirm('Do you want to send log to dev via email', 'Upload log to server fail', function (res) {
+            if (res == 1) {
+              self.EmailLogData();
+            } else {
+              if (LogType == 0) {
+                localStorage.removeItem('ErrorLogs');
+              } else if (LogType == 1) {
+                localStorage.removeItem('EventLogs');
+              } else if (LogType == 2) {
+                localStorage.removeItem('SyncLogs');
+              } else if (LogType == 3) {
+                localStorage.removeItem('UploadLogs');
+              }
+            }
+          });
           console.log(response);
         });
       };

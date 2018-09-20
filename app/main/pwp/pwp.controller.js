@@ -18,12 +18,14 @@ angular.module('itouch.controllers')
       $scope.disableP = false;
       $scope.disableA = false;
       clearAll = 0;
+      var total = 0;
 
       $scope.$on('modal.shown', function () {
         if ($scope.shownModal == 'pwp') {
           submitted = false;
           $scope.pwp.selectedItems = {};
           $scope.tempSubTotal = 0;
+          total = 0;
           temp = 0;
           $scope.pwp.Qty = 0;
         }
@@ -116,9 +118,16 @@ angular.module('itouch.controllers')
 
             return true;
           }
+
+
           $timeout(function () {
+            angular.forEach($scope.pwp.selectedItems, function (itemds) {
+              total = total + itemds.SubItemPrice;
+            });
+
             if (clearAll == 1) {
               temp = 0;
+              total = 0;
               $scope.tempSubTotal = 0;
               clearAll = 0;
             }
@@ -127,7 +136,9 @@ angular.module('itouch.controllers')
               temp = 0;
               $scope.tempSubTotal = 0;
             }
-            else if (temp <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
+            else if (total <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
+            // else if (temp <= $scope.pwp.MaxPrice || $scope.pwp.MaxPrice == 0) {
+              console.log(total);
               $scope.tempSubTotal = temp;
               if ($scope.selectedRow != null) {
                 SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
@@ -138,6 +149,7 @@ angular.module('itouch.controllers')
                 }
               }
             } else {
+
               if (tempD == 0) {
                 Alert.warning('The child total price exceed the limit of maximum price.');
                 eventLog.log('The child total price exceed the limit of maximum price.');
@@ -147,6 +159,7 @@ angular.module('itouch.controllers')
               try {
                 $scope.selectedRow.Qty--;
                 $scope.pwp.Qty--;
+                total -= $scope.selectedRow.Price;
                 temp -= $scope.selectedRow.Price;
                 if ($scope.selectedRow.Qty == 0) {
                   $scope.clearSelected(true);
@@ -206,9 +219,10 @@ angular.module('itouch.controllers')
             promise.then(function (item) {
               // item.MaxQuantity--;
               $scope.pwp.Qty++;
+              total = 0;
               // $scope.pwp.MaxQuantity--;
               $scope.pwp.selectedItems[item.SubItemId] = item;
-              Alert.hideLoading();
+
             });
           }
         }
@@ -223,7 +237,6 @@ angular.module('itouch.controllers')
           if ($scope.selectedRow && $scope.selectedRow.Default != true) {
             if ($scope.selectedRow.Qty == undefined) {
               Alert.warning('No selected item to clear.');
-              Alert.hideLoading();
               return true;
             } else if ($scope.selectedRow.Qty > 0 ) {
               eventLog.log('pwp minus Qty');
@@ -247,14 +260,16 @@ angular.module('itouch.controllers')
               promise.then(function (item) {
                 $scope.pwp.Qty--;
                 temp = temp - item.SubItemPrice;
+                total = total - item.SubItemPrice;
                 $scope.tempSubTotal = $scope.tempSubTotal - item.SubItemPrice;
                 $scope.pwp.selectedItems[item.SubItemId] = item;
+
                 if (item.Qty == 0) {
                   $scope.clearSelected(true);
                 }
               });
             }
-            // $scope.selectRow(null);
+
           }
           $timeout(function () {
             Alert.hideLoading();
@@ -271,12 +286,12 @@ angular.module('itouch.controllers')
             if (flag == false) {
               if ($scope.selectedRow.Qty == undefined) {
                 Alert.warning('No selected item to clear.');
-                Alert.hideLoading();
                 return true;
               }
               eventLog.log('pwp clearSelected');
               SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
-              temp = temp - SubItemTotalPrice;
+              temp = temp - item.SubItemPrice;
+              total = total - item.SubItemPrice;
               $scope.tempSubTotal = $scope.tempSubTotal - SubItemTotalPrice;
             }
             removeSelectedItem($scope.selectedRow.SubItemId);
@@ -298,6 +313,7 @@ angular.module('itouch.controllers')
               eventLog.log('pwp clear all item');
               removeSelectedItem(key);
               $scope.tempSubTotal = 0;
+              total = 0;
               temp = 0;
               clearAll = 1;
             }
@@ -313,7 +329,6 @@ angular.module('itouch.controllers')
       var removeSelectedItem = function (itemId) {
         if ($scope.selectedRow == null) {
           console.log('do nothing');
-          Alert.hideLoading();
         } else {
           Alert.showLoading();
           var item = $scope.pwp.selectedItems[itemId];
@@ -325,6 +340,7 @@ angular.module('itouch.controllers')
             }
             item.Qty = 0;
             SubItemTotalPrice = $scope.selectedRow.Qty * $scope.selectedRow.SubItemPrice;
+            total = total - SubItemTotalPrice;
             temp = temp - SubItemTotalPrice;
             $scope.tempSubTotal = $scope.tempSubTotal - SubItemTotalPrice;
             delete $scope.pwp.selectedItems[itemId];
@@ -454,7 +470,7 @@ angular.module('itouch.controllers')
       $scope.close = function () {
 
         $scope.tempSubTotal = 0;
-        temp = 0;
+        temp = 0; total = 0;
         $scope.$emit('pwpModal-close');
       };
 
